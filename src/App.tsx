@@ -10,7 +10,7 @@ import {
   setupIonicReact,
 } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
-import { ellipse, square, triangle } from "ionicons/icons";
+import {  hammer, home, business,storefront } from "ionicons/icons";
 import Tab1 from "./pages/Tab1";
 import Tab2 from "./pages/Tab2";
 import Tab3 from "./pages/Tab3";
@@ -44,7 +44,9 @@ import "@ionic/react/css/palettes/dark.system.css";
 
 /* Theme variables */
 import "./theme/variables.css";
-import Signup from "./modules/auth/signup";
+import Signup from "./modules/auth/Signup";
+import Directory from "./modules/community/Directory";
+// import Signup from "./modules/auth/signup";
 
 setupIonicReact();
 
@@ -62,8 +64,11 @@ const App: React.FC = () => (
           <Route exact path="/tab2">
             <Tab2 />
           </Route>
-          <Route path="/tab3">
+          <Route exact path="/tab3">
             <Tab3 />
+          </Route>
+          <Route exact path="/tab4">
+            <Directory />
           </Route>
           <Route exact path="/">
             <Redirect to="/signup" />
@@ -71,19 +76,19 @@ const App: React.FC = () => (
         </IonRouterOutlet>
         <IonTabBar slot="bottom">
           <IonTabButton tab="tab1" href="/tab1">
-            <IonIcon aria-hidden="true" icon={triangle} />
+            <IonIcon aria-hidden="true" icon={home} />
             <IonLabel>Home</IonLabel>
           </IonTabButton>
           <IonTabButton tab="tab2" href="/tab2">
-            <IonIcon aria-hidden="true" icon={ellipse} />
+            <IonIcon aria-hidden="true" icon={storefront} />
             <IonLabel>Social</IonLabel>
           </IonTabButton>
           <IonTabButton tab="tab3" href="/tab3">
-            <IonIcon aria-hidden="true" icon={square} />
+            <IonIcon aria-hidden="true" icon={hammer} />
             <IonLabel>Services</IonLabel>
           </IonTabButton>
           <IonTabButton tab="tab4" href="/tab4">
-            <IonIcon aria-hidden="true" icon={square} />
+            <IonIcon aria-hidden="true" icon={business} />
             <IonLabel>Community</IonLabel>
           </IonTabButton>
         </IonTabBar>

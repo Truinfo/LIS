@@ -1,8 +1,8 @@
 const Directory = () => {
-    return (
-        <>
-            <h1>
-                Directory</h1></>
-    )
-}
+  return (
+    <>
+      <h1>Directory</h1>
+    </>
+  );
+};
 export default Directory;

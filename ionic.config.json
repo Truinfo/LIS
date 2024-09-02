@@ -1,0 +1,7 @@
+{
+  "name": "liveSync",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}

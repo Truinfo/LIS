@@ -10,10 +10,10 @@ import {
   setupIonicReact,
 } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
-import {  hammer, home, business,storefront } from "ionicons/icons";
+import { hammer, home, business, storefront } from "ionicons/icons";
 import Tab1 from "./pages/Tab1";
 import Tab2 from "./pages/Tab2";
-import Tab3 from "./pages/Tab3";
+import Tab3 from "./pages/Tab3"; // Import the SignUp component
 
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/react/css/core.css";
@@ -31,25 +31,29 @@ import "@ionic/react/css/text-transformation.css";
 import "@ionic/react/css/flex-utils.css";
 import "@ionic/react/css/display.css";
 
-/**
- * Ionic Dark Mode
- * -----------------------------------------------------
- * For more info, please see:
- * https://ionicframework.com/docs/theming/dark-mode
- */
-
-/* import '@ionic/react/css/palettes/dark.always.css'; */
-/* import '@ionic/react/css/palettes/dark.class.css'; */
-import "@ionic/react/css/palettes/dark.system.css";
-
 /* Theme variables */
 import "./theme/variables.css";
+import SignUp from "./modules/auth/Signup";
+import DailyHelp from "./modules/services/DailyHelp";
 
 setupIonicReact();
 
 const App: React.FC = () => (
   <IonApp>
     <IonReactRouter>
+      <IonRouterOutlet>
+        {/* Routes that should not display the bottom navbar */}
+        <Route exact path="/signup">
+          <SignUp />
+        </Route>
+
+        {/* Default route can be redirected to either a signup or another page */}
+        <Route exact path="/">
+          <Redirect to="/tab1" />
+        </Route>
+      </IonRouterOutlet>
+
+      {/* Tab-based routes that include the bottom navbar */}
       <IonTabs>
         <IonRouterOutlet>
           <Route exact path="/tab1">
@@ -61,9 +65,10 @@ const App: React.FC = () => (
           <Route exact path="/tab3">
             <Tab3 />
           </Route>
-          <Route exact path="/">
-            <Redirect to="/tab1" />
+          <Route exact path="/service">
+            <DailyHelp />
           </Route>
+
         </IonRouterOutlet>
         <IonTabBar slot="bottom">
           <IonTabButton tab="tab1" href="/tab1">

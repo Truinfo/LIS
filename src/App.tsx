@@ -33,8 +33,6 @@ import "@ionic/react/css/display.css";
 
 /* Theme variables */
 import "./theme/variables.css";
-import SignUp from "./modules/auth/Signup";
-import DailyHelp from "./modules/services/DailyHelp";
 
 setupIonicReact();
 
@@ -65,8 +63,8 @@ const App: React.FC = () => (
           <Route exact path="/tab3">
             <Tab3 />
           </Route>
-          <Route exact path="/service">
-            <DailyHelp />
+          <Route exact path="/">
+            <Redirect to="/tab1" />
           </Route>
 
         </IonRouterOutlet>
@@ -83,7 +81,7 @@ const App: React.FC = () => (
             <IonIcon aria-hidden="true" icon={hammer} />
             <IonLabel>Services</IonLabel>
           </IonTabButton>
-          <IonTabButton tab="tab4" href="/tab4">
+          <IonTabButton tab="Directory" href="/Directory">
             <IonIcon aria-hidden="true" icon={business} />
             <IonLabel>Community</IonLabel>
           </IonTabButton>

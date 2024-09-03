@@ -1,6 +1,6 @@
-import { IonAvatar, IonButton, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonPage, IonSearchbar, IonText, IonTitle, IonToolbar } from "@ionic/react";
+import { IonAvatar, IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonPage, IonSearchbar, IonText, IonTitle, IonToolbar } from "@ionic/react";
 import React, { useState } from "react";
-import {call} from "ionicons/icons";
+import { call } from "ionicons/icons";
 const Directory: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState<string>("");
 
@@ -53,13 +53,16 @@ const Directory: React.FC = () => {
         <IonPage>
             <IonHeader>
                 <IonToolbar>
+                    <IonButtons slot="start">
+                        <IonBackButton />
+                    </IonButtons>
                     <IonTitle>Directory</IonTitle>
                 </IonToolbar>
             </IonHeader>
             <IonContent fullscreen>
                 <IonSearchbar
                     animated={true}
-                    placeholder="Search by name, block, or flat number"
+                    placeholder="Search..."
                     value={searchQuery}
                     onIonInput={handleSearchChange}
                 />

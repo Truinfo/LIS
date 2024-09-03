@@ -1,0 +1,6 @@
+/* NoticeBoard.css */
+.filter-container {
+    display: flex;
+    justify-content: flex-end;
+    padding: 16px;
+}

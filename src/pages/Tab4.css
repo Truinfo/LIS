@@ -1,0 +1,39 @@
+/* Tab4.css */
+.ion-content-background {
+    background-color: #f0f0f0;
+    /* Change to your desired color */
+    height: 100%;
+    /* Ensure it covers the full height */
+}
+
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: space-between;
+    padding:12px; 
+}
+
+.card-container ion-card {
+    flex: 1;
+    flex-basis: calc(50% - 12px); 
+    max-width: calc(50% - 12px);
+    margin: 0;
+    box-sizing: border-box; 
+}
+
+.card-container .ion-community-cards {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 10px; 
+}
+
+.card-container .ion-community-cards ion-img {
+    height: 80px;
+    width: auto;
+}
+
+.card-container .ion-community-cards ion-card-subtitle {
+    font-size: 10px;
+}

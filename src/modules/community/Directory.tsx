@@ -1,4 +1,6 @@
-import { IonContent, IonHeader, IonPage, IonText, IonTitle, IonToolbar } from "@ionic/react";
+import { IonAvatar, IonButton, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonPage, IonSearchbar, IonText, IonTitle, IonToolbar } from "@ionic/react";
+import React, { useState } from "react";
+import {call} from "ionicons/icons";
 const Directory: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState<string>("");
 

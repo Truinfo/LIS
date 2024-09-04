@@ -40,8 +40,6 @@ import NoticeBoard from "./modules/community/NoticeBoard";
 import SocietyBills from "./modules/community/SocietyBills";
 import GetHelp from "./modules/community/GetHelp";
 import AddForum from "./modules/community/AddForum";
-=======
->>>>>>> b3ceec40722d815bbd36560df801ddf5f6c9d358
 
 setupIonicReact();
 
@@ -72,7 +70,7 @@ const App: React.FC = () => (
           <Route exact path="/tab3">
             <Tab3 />
           </Route>
-<<<<<<< HEAD
+
           <Route exact path="/Community">
             <Tab4 />
           </Route>
@@ -81,11 +79,10 @@ const App: React.FC = () => (
           <Route path="/societyBills" component={SocietyBills} exact />
           <Route path="/getHelp" component={GetHelp} exact />
           <Route path="/addForum" component={AddForum} exact />
-=======
+
           <Route exact path="/">
             <Redirect to="/tab1" />
           </Route>
->>>>>>> b3ceec40722d815bbd36560df801ddf5f6c9d358
 
         </IonRouterOutlet>
         <IonTabBar slot="bottom">

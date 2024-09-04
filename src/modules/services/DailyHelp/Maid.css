@@ -1,0 +1,32 @@
+.profile-card {
+  display: flex;
+  justify-content: flex-start;
+  height: 200px;
+  background-color: #f7f9fa;
+  width: 100%;
+}
+.profile {
+  height: 100px;
+  width: 100px;
+}
+.profile-details {
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  padding-top: 30px;
+}
+.profile-header {
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  font-size: 30px;
+  font-weight: 700;
+}
+.profile-text {
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+  font-size: 20px;
+  font-weight: 500;
+}
+.icon-style {
+  height: 17px;
+  width: 17px;
+  padding: 5px 10px 0px 0px;
+}

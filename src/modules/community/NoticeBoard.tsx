@@ -18,7 +18,7 @@ import {
     IonItem
 } from "@ionic/react";
 import React, { useState } from "react";
-import image1 from "../../assets/images/image1.jpg";
+import image1 from "../../assets/Images/image1.jpg";
 import "./NoticeBoard.css";
 
 // Define events with the posted date

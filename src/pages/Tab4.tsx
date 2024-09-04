@@ -13,11 +13,11 @@ import {
   useIonRouter,
 } from "@ionic/react";
 import "./Tab4.css";
-import Directory from "../assets/images/journal.png";
-import Notice from "../assets/images/notice.png";
-import Bill from "../assets/images/bill.png";
-import Help from "../assets/images/GetHelp.png";
-import Amenities from "../assets/images/smart-city.png";
+import Directory from "../assets/Images/journal.png";
+import Notice from "../assets/Images/notice.png";
+import Bill from "../assets/Images/bill.png";
+import Help from "../assets/Images/GetHelp.png";
+import Amenities from "../assets/Images/smart-city.png";
 
 const Tab4: React.FC = () => {
   const router = useIonRouter();

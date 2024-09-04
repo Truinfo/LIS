@@ -40,9 +40,8 @@ import NoticeBoard from "./modules/community/NoticeBoard";
 import SocietyBills from "./modules/community/SocietyBills";
 import GetHelp from "./modules/community/GetHelp";
 import AddForum from "./modules/community/AddForum";
-import Signup from "./modules/auth/Signup";
-import DailyHelp from "./modules/services/DailyHelp";
-import Maid from "./modules/services/DailyHelp/Maid";
+=======
+>>>>>>> b3ceec40722d815bbd36560df801ddf5f6c9d358
 
 setupIonicReact();
 
@@ -70,33 +69,36 @@ const App: React.FC = () => (
           <Route exact path="/tab2">
             <Tab2 />
           </Route>
-
+          <Route exact path="/tab3">
+            <Tab3 />
+          </Route>
+<<<<<<< HEAD
           <Route exact path="/Community">
             <Tab4 />
-          </Route>
-          <Route exact path="/service">
-            <DailyHelp />
           </Route>
           <Route path="/directory" component={Directory} exact />
           <Route path="/noticeBoard" component={NoticeBoard} exact />
           <Route path="/societyBills" component={SocietyBills} exact />
           <Route path="/getHelp" component={GetHelp} exact />
           <Route path="/addForum" component={AddForum} exact />
-          <Route path="/Maid" component={Maid} exact />
+=======
           <Route exact path="/">
             <Redirect to="/tab1" />
           </Route>
+>>>>>>> b3ceec40722d815bbd36560df801ddf5f6c9d358
+
         </IonRouterOutlet>
         <IonTabBar slot="bottom">
           <IonTabButton tab="tab1" href="/tab1">
             <IonIcon aria-hidden="true" icon={home} />
             <IonLabel>Home</IonLabel>
           </IonTabButton>
-          <IonTabButton tab="tab2" href="/tab2">
+
+          <IonTabButton tab="Social" href="/Social">
             <IonIcon aria-hidden="true" icon={storefront} />
             <IonLabel>Social</IonLabel>
           </IonTabButton>
-          <IonTabButton tab="tab3" href="/service">
+          <IonTabButton tab="tab3" href="/tab3">
             <IonIcon aria-hidden="true" icon={hammer} />
             <IonLabel>Services</IonLabel>
           </IonTabButton>
@@ -106,6 +108,7 @@ const App: React.FC = () => (
           </IonTabButton>
         </IonTabBar>
       </IonTabs>
+     
     </IonReactRouter>
   </IonApp>
 );

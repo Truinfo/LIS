@@ -13,6 +13,7 @@ import { IonReactRouter } from "@ionic/react-router";
 import { hammer, home, business, storefront } from "ionicons/icons";
 import Tab1 from "./pages/Tab1";
 import Tab2 from "./pages/Tab2";
+import Tab3 from "./pages/Tab3"; // Import the SignUp component
 
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/react/css/core.css";
@@ -39,9 +40,8 @@ import Amenities from "./modules/community/NoticeBoard";
 import NoticeBoard from "./modules/community/NoticeBoard";
 import SocietyBills from "./modules/community/SocietyBills";
 import GetHelp from "./modules/community/GetHelp";
-import AddForum from "./modules/community/AddForum";
 import Signup from "./modules/auth/Signup";
-import Tab3 from "./pages/Tab3";
+import DailyHelp from "./modules/services/DailyHelp";
 
 setupIonicReact();
 
@@ -53,9 +53,7 @@ const App: React.FC = () => (
         <Route exact path="/signup">
           <Signup />
         </Route>
- <Route exact path="/Social">
-            <Adds />
-          </Route>
+
         {/* Default route can be redirected to either a signup or another page */}
         <Route exact path="/">
           <Redirect to="/tab1" />
@@ -72,7 +70,7 @@ const App: React.FC = () => (
             <Tab2 />
           </Route>
           <Route exact path="/tab3">
-            <Tab3 />
+            <DailyHelp />
           </Route>
 
           <Route exact path="/Community">
@@ -82,12 +80,9 @@ const App: React.FC = () => (
           <Route path="/noticeBoard" component={NoticeBoard} exact />
           <Route path="/societyBills" component={SocietyBills} exact />
           <Route path="/getHelp" component={GetHelp} exact />
-          <Route path="/addForum" component={AddForum} exact />
-
           <Route exact path="/">
             <Redirect to="/tab1" />
           </Route>
-
         </IonRouterOutlet>
         <IonTabBar slot="bottom">
           <IonTabButton tab="tab1" href="/tab1">
@@ -95,7 +90,7 @@ const App: React.FC = () => (
             <IonLabel>Home</IonLabel>
           </IonTabButton>
 
-          <IonTabButton tab="Social" href="/Social">
+          <IonTabButton tab="tab2" href="/tab2">
             <IonIcon aria-hidden="true" icon={storefront} />
             <IonLabel>Social</IonLabel>
           </IonTabButton>
@@ -109,7 +104,6 @@ const App: React.FC = () => (
           </IonTabButton>
         </IonTabBar>
       </IonTabs>
-     
     </IonReactRouter>
   </IonApp>
 );

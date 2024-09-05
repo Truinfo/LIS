@@ -73,32 +73,32 @@ const CreateTicket: React.FC = () => {
                             </IonRadioGroup>
                         </IonItem>
                     </IonList>
-                    {selectedRadio === 'community' && (
-                        <IonItem>
-                            <IonLabel>Category</IonLabel>
-                            <IonSelect
-                                value={selectedCategory}
-                                placeholder="Select a category"
-                                onIonChange={e => setSelectedCategory(e.detail.value)}
-                            >
-                                <IonSelectOption value="general_inquiry">General Inquiry</IonSelectOption>
-                                <IonSelectOption value="maintenance_request">Maintenance Request</IonSelectOption>
-                                <IonSelectOption value="security_concern">Security Concern</IonSelectOption>
-                                <IonSelectOption value="billing_issue">Billing Issue</IonSelectOption>
-                                <IonSelectOption value="noise_complaint">Noise Complaint</IonSelectOption>
-                                <IonSelectOption value="parking_issue">Parking Issue</IonSelectOption>
-                                <IonSelectOption value="public_spaces">Public Spaces</IonSelectOption>
-                                <IonSelectOption value="trash_recycling">Trash and Recycling</IonSelectOption>
-                                <IonSelectOption value="facility_booking">Facility Booking</IonSelectOption>
-                                <IonSelectOption value="neighbor_dispute">Neighbor Dispute</IonSelectOption>
-                                <IonSelectOption value="event_organization">Event Organization</IonSelectOption>
-                                <IonSelectOption value="communication_issue">Communication Issue</IonSelectOption>
-                                <IonSelectOption value="utility_issues">Utility Issues</IonSelectOption>
-                                <IonSelectOption value="animal_control">Animal Control</IonSelectOption>
-                                <IonSelectOption value="health_safety">Health and Safety</IonSelectOption>
-                            </IonSelect>
-                        </IonItem>
-                    )}
+                    {/* {selectedRadio === 'community' && ( */}
+                    <IonItem>
+                        <IonLabel>Category</IonLabel>
+                        <IonSelect
+                            value={selectedCategory}
+                            placeholder="Select a category"
+                            onIonChange={e => setSelectedCategory(e.detail.value)}
+                        >
+                            <IonSelectOption value="general_inquiry">General Inquiry</IonSelectOption>
+                            <IonSelectOption value="maintenance_request">Maintenance Request</IonSelectOption>
+                            <IonSelectOption value="security_concern">Security Concern</IonSelectOption>
+                            <IonSelectOption value="billing_issue">Billing Issue</IonSelectOption>
+                            <IonSelectOption value="noise_complaint">Noise Complaint</IonSelectOption>
+                            <IonSelectOption value="parking_issue">Parking Issue</IonSelectOption>
+                            <IonSelectOption value="public_spaces">Public Spaces</IonSelectOption>
+                            <IonSelectOption value="trash_recycling">Trash and Recycling</IonSelectOption>
+                            <IonSelectOption value="facility_booking">Facility Booking</IonSelectOption>
+                            <IonSelectOption value="neighbor_dispute">Neighbor Dispute</IonSelectOption>
+                            <IonSelectOption value="event_organization">Event Organization</IonSelectOption>
+                            <IonSelectOption value="communication_issue">Communication Issue</IonSelectOption>
+                            <IonSelectOption value="utility_issues">Utility Issues</IonSelectOption>
+                            <IonSelectOption value="animal_control">Animal Control</IonSelectOption>
+                            <IonSelectOption value="health_safety">Health and Safety</IonSelectOption>
+                        </IonSelect>
+                    </IonItem>
+                    {/* )} */}
                     <IonItem>
                         <IonLabel position="floating">Flat Number</IonLabel>
                         <IonInput

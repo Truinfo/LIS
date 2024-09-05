@@ -1,0 +1,10 @@
+.header-container {
+    position: relative;
+  }
+  
+  .book-chip {
+    position: absolute;
+    top: 8px; /* Adjust based on your design */
+    right: 8px; /* Adjust based on your design */
+  }
+  

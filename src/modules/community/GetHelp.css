@@ -1,4 +1,18 @@
 .custom-fab-button {
-    --background: #047857; /* Set the background color */
-    --ripple-color: #064e3b; /* Optional: Set the ripple effect color */
+    --background: #047857;
+    --ripple-color: #064e3b;
+}
+
+.custom-item {
+    position: relative;
+}
+
+.item-content {
+    padding-right: 80px;
+}
+
+.status-chip {
+    position: absolute;
+    top: 8px;
+    right: 8px;
 }

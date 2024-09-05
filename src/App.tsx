@@ -39,6 +39,7 @@ import Tab4 from "./pages/Tab4";
 import Amenities from "./modules/community/NoticeBoard";
 import NoticeBoard from "./modules/community/NoticeBoard";
 import SocietyBills from "./modules/community/SocietyBills";
+import CreateTicket from "./modules/community/CreateTicket";
 import GetHelp from "./modules/community/GetHelp";
 import Signup from "./modules/auth/Signup";
 import DailyHelp from "./modules/services/DailyHelp";
@@ -82,6 +83,7 @@ const App: React.FC = () => (
           <Route path="/noticeBoard" component={NoticeBoard} exact />
           <Route path="/societyBills" component={SocietyBills} exact />
           <Route path="/getHelp" component={GetHelp} exact />
+          <Route path="/createTicket" component={CreateTicket} exact />
           <Route exact path="/">
             <Redirect to="/tab1" />
           </Route>

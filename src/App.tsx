@@ -42,6 +42,7 @@ import SocietyBills from "./modules/community/SocietyBills";
 import GetHelp from "./modules/community/GetHelp";
 import Signup from "./modules/auth/Signup";
 import DailyHelp from "./modules/services/DailyHelp";
+import Maid from "./modules/services/DailyHelp/Maid";
 
 setupIonicReact();
 
@@ -69,13 +70,14 @@ const App: React.FC = () => (
           <Route exact path="/tab2">
             <Tab2 />
           </Route>
-          <Route exact path="/tab3">
+          <Route exact path="/service">
             <DailyHelp />
           </Route>
 
           <Route exact path="/Community">
             <Tab4 />
           </Route>
+          <Route path="/maid" component={Maid} exact />
           <Route path="/directory" component={Directory} exact />
           <Route path="/noticeBoard" component={NoticeBoard} exact />
           <Route path="/societyBills" component={SocietyBills} exact />
@@ -94,7 +96,7 @@ const App: React.FC = () => (
             <IonIcon aria-hidden="true" icon={storefront} />
             <IonLabel>Social</IonLabel>
           </IonTabButton>
-          <IonTabButton tab="tab3" href="/tab3">
+          <IonTabButton tab="tab3" href="/service">
             <IonIcon aria-hidden="true" icon={hammer} />
             <IonLabel>Services</IonLabel>
           </IonTabButton>

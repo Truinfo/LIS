@@ -40,6 +40,8 @@ import NoticeBoard from "./modules/community/NoticeBoard";
 import SocietyBills from "./modules/community/SocietyBills";
 import GetHelp from "./modules/community/GetHelp";
 import AddForum from "./modules/community/AddForum";
+import Signup from "./modules/auth/Signup";
+import Tab3 from "./pages/Tab3";
 
 setupIonicReact();
 

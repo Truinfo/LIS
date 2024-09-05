@@ -84,7 +84,7 @@ const Tab4: React.FC = () => {
         <div className="card-container">
           <IonCard
             className="ion-community-cards"
-            onClick={() => handleCardClick("/societyBills")}
+            onClick={() => handleCardClick("/amenities")}
           >
             <IonImg alt="Society Bills" src={Amenities} />
             <IonCardHeader>

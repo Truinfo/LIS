@@ -1,6 +1,7 @@
 import { IonAvatar, IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonPage, IonSearchbar, IonText, IonTitle, IonToolbar } from "@ionic/react";
 import React, { useState } from "react";
 import { call } from "ionicons/icons";
+import './Directory.css'
 const Directory: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState<string>("");
 
@@ -65,6 +66,7 @@ const Directory: React.FC = () => {
                     placeholder="Search..."
                     value={searchQuery}
                     onIonInput={handleSearchChange}
+                     className="custom-searchbar"
                 />
                 <IonList>
                     {filteredData.map((section) => (
@@ -86,7 +88,7 @@ const Directory: React.FC = () => {
                                         slot="end"
                                         onClick={() => handleCall(phone)}
                                     >
-                                        <IonIcon icon={call} />
+                                        <IonIcon icon={call} className="icon-styles" />
                                     </IonButton>
                                 </IonItem>
                             ))}

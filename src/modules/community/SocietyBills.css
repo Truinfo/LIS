@@ -1,0 +1,65 @@
+/* SocietyBills.css */
+
+/* Style the List Header */
+.ion-list-header {
+    background-color: #f0f0f0;
+    border-bottom: 1px solid #ddd;
+}
+
+.ion-list-header .ion-label {
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+/* Style the Item */
+.ion-item {
+    --background: #fff;
+    border-bottom: 1px solid #eee;
+}
+
+.ion-item .ion-label {
+    color: #333;
+}
+
+.ion-item h2 {
+    margin: 0;
+    font-size: 1.1em;
+    color: #333;
+}
+
+.ion-item p {
+    margin: 0;
+    font-size: 0.9em;
+    color: #666;
+}
+
+/* Style the View Button */
+.ion-button {
+    --padding-start: 10px;
+    --padding-end: 10px;
+    --border-radius: 4px;
+    --background: #007bff;
+    --color: #fff;
+}
+
+.ion-button.outline {
+    --border-color: #007bff;
+    --color: #007bff;
+}
+
+.ion-button.outline:hover {
+    --background: rgba(0, 123, 255, 0.1);
+}
+
+/* Style for header and toolbar */
+.ion-header {
+    --background: #007bff;
+}
+
+.ion-title {
+    color: #fff;
+}
+
+.ion-toolbar {
+    --background: #007bff;
+}

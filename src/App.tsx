@@ -36,17 +36,14 @@ import "./theme/variables.css";
 
 import Directory from "./modules/community/Directory";
 import Tab4 from "./pages/Tab4";
-import Amenities from "./modules/community/NoticeBoard";
+import Amenities from "./modules/community/Amenities";
 import NoticeBoard from "./modules/community/NoticeBoard";
 import SocietyBills from "./modules/community/SocietyBills";
 import CreateTicket from "./modules/community/CreateTicket";
 import GetHelp from "./modules/community/GetHelp";
 import Signup from "./modules/auth/Signup";
 import DailyHelp from "./modules/services/DailyHelp";
-import Maid from "./modules/services/DailyHelp/Maid/Maid";
-import MaidsList from "./modules/services/DailyHelp/Maid/MaidList";
-import milkManList from "./modules/services/DailyHelp/milk/MilkmanList";
-import milkManProfile from "./modules/services/DailyHelp/milk/Milkman";
+import Maid from "./modules/services/DailyHelp/Maid";
 
 setupIonicReact();
 
@@ -90,6 +87,8 @@ const App: React.FC = () => (
           <Route path="/societyBills" component={SocietyBills} exact />
           <Route path="/getHelp" component={GetHelp} exact />
           <Route path="/createTicket" component={CreateTicket} exact />
+          <Route path="/amenities" component={Amenities} exact />
+          <Route path="/bookAmenity" component={BookingAmenity} exact />
           <Route exact path="/">
             <Redirect to="/tab1" />
           </Route>

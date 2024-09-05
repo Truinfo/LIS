@@ -43,7 +43,10 @@ import CreateTicket from "./modules/community/CreateTicket";
 import GetHelp from "./modules/community/GetHelp";
 import Signup from "./modules/auth/Signup";
 import DailyHelp from "./modules/services/DailyHelp";
-import Maid from "./modules/services/DailyHelp/Maid";
+import Maid from "./modules/services/DailyHelp/Maid/Maid";
+import MaidsList from "./modules/services/DailyHelp/Maid/MaidList";
+import milkManList from "./modules/services/DailyHelp/milk/MilkmanList";
+import milkManProfile from "./modules/services/DailyHelp/milk/Milkman";
 
 setupIonicReact();
 
@@ -78,7 +81,10 @@ const App: React.FC = () => (
           <Route exact path="/Community">
             <Tab4 />
           </Route>
-          <Route path="/maid" component={Maid} exact />
+          <Route path="/maid-profile" component={Maid} exact />
+          <Route path="/maid" component={MaidsList} exact />
+          <Route path="/milkman-profile" component={milkManProfile} exact />
+          <Route path="/milkman" component={milkManList} exact />
           <Route path="/directory" component={Directory} exact />
           <Route path="/noticeBoard" component={NoticeBoard} exact />
           <Route path="/societyBills" component={SocietyBills} exact />

@@ -27,7 +27,7 @@ import Moving from "../../assets/Images/Moving.png";
 import Appliance from "../../assets/Images/Appliance.png";
 import Pest from "../../assets/Images/Pest Clean.png";
 import Mechanic from "../../assets/Images/Mechanic.png";
-import Maid from "./DailyHelp/Maid";
+import Maid from "./DailyHelp/Maid/Maid";
 
 const services = [
   
@@ -59,7 +59,6 @@ const services = [
 
 const DailyHelp: React.FC = () => {
   const route=useIonRouter()
-  const history = useHistory();
   const handleNavigation = (name: string) => {
     route.push(`/${name.toLowerCase().replace(" ", "")}`);
   };

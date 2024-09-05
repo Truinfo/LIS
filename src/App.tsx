@@ -53,7 +53,9 @@ const App: React.FC = () => (
         <Route exact path="/signup">
           <Signup />
         </Route>
-
+ <Route exact path="/Social">
+            <Adds />
+          </Route>
         {/* Default route can be redirected to either a signup or another page */}
         <Route exact path="/">
           <Redirect to="/tab1" />

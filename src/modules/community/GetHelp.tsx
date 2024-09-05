@@ -7,7 +7,7 @@ const GetHelp: React.FC = () => {
     const history = useHistory();
 
     const handleFabClick = () => {
-        history.push('/addforum');
+        history.push('/createTicket');
     };
 
     return (

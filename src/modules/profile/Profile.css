@@ -1,0 +1,26 @@
+.profile-container {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin: 10px;
+    background-color: #eee;
+    border-radius: 10px;
+    gap:10px
+}
+
+.profile-avatar {
+    margin-right: 16px;
+    width: 100px;
+    height: 100px;
+}
+
+.profile-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-details h2,
+.profile-details p {
+    margin: 0;
+    margin-bottom: 5px;
+}

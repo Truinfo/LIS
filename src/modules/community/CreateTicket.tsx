@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonSelect, IonSelectOption, IonLabel, IonItem, IonInput, IonTextarea, IonButton, IonIcon, IonImg, IonRadio, IonRadioGroup, IonList } from '@ionic/react';
+import { IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonSelect, IonSelectOption, IonLabel, IonItem, IonInput, IonTextarea, IonButton, IonIcon, IonImg, IonRadio, IonRadioGroup, IonList, IonGrid, IonRow, IonCol, IonFooter } from '@ionic/react';
 import { attach } from 'ionicons/icons';
 
 const CreateTicket: React.FC = () => {
@@ -16,7 +16,6 @@ const CreateTicket: React.FC = () => {
         if (files.length > 0) {
             setSelectedImages(prev => [...prev, ...files]);
 
-            // Create preview URLs for the selected images
             const newPreviews: (string | ArrayBuffer)[] = [];
             const reader = new FileReader();
 
@@ -36,7 +35,6 @@ const CreateTicket: React.FC = () => {
 
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
-        // Handle form submission logic here
         console.log('Form submitted with:', {
             selectedCategory,
             flatNumber,
@@ -56,23 +54,26 @@ const CreateTicket: React.FC = () => {
                     <IonTitle>Create Ticket</IonTitle>
                 </IonToolbar>
             </IonHeader>
-            <IonContent fullscreen style={{ paddingBottom: '80px' }}> {/* Add padding for the submit button */}
+            <IonContent fullscreen>
                 <form onSubmit={handleSubmit}>
-                    <IonList>
-                        <IonItem>
-                            <IonLabel>Type</IonLabel>
-                            <IonRadioGroup value={selectedRadio} onIonChange={e => setSelectedRadio(e.detail.value)}>
-                                <IonItem>
-                                    <IonLabel>Personal</IonLabel>
-                                    <IonRadio slot="start" value="personal" />
-                                </IonItem>
-                                <IonItem>
-                                    <IonLabel>Community</IonLabel>
-                                    <IonRadio slot="start" value="community" />
-                                </IonItem>
+                    <IonGrid>
+                        <IonRow>
+                            <IonRadioGroup value={selectedRadio} style={{ display: "flex" }} onIonChange={e => setSelectedRadio(e.detail.value)}>
+                                <IonCol size="auto">
+                                    <IonItem lines="none">
+                                        <IonLabel>Personal</IonLabel>
+                                        <IonRadio slot="start" value="personal" />
+                                    </IonItem>
+                                </IonCol>
+                                <IonCol size="auto">
+                                    <IonItem lines="none">
+                                        <IonLabel>Community</IonLabel>
+                                        <IonRadio slot="start" value="community" />
+                                    </IonItem>
+                                </IonCol>
                             </IonRadioGroup>
-                        </IonItem>
-                    </IonList>
+                        </IonRow>
+                    </IonGrid>
                     {/* {selectedRadio === 'community' && ( */}
                     <IonItem>
                         <IonLabel>Category</IonLabel>
@@ -100,19 +101,20 @@ const CreateTicket: React.FC = () => {
                     </IonItem>
                     {/* )} */}
                     <IonItem>
-                        <IonLabel position="floating">Flat Number</IonLabel>
-                        <IonInput
-                            value={flatNumber}
-                            onIonInput={e => setFlatNumber(e.detail.value!)}
-                        />
-                    </IonItem>
-                    <IonItem>
                         <IonLabel position="floating">Block Number</IonLabel>
                         <IonInput
                             value={blockNumber}
                             onIonInput={e => setBlockNumber(e.detail.value!)}
                         />
                     </IonItem>
+                    <IonItem>
+                        <IonLabel position="floating">Flat Number</IonLabel>
+                        <IonInput
+                            value={flatNumber}
+                            onIonInput={e => setFlatNumber(e.detail.value!)}
+                        />
+                    </IonItem>
+
                     <IonItem>
                         <IonLabel position="floating">Description</IonLabel>
                         <IonTextarea
@@ -132,36 +134,31 @@ const CreateTicket: React.FC = () => {
                     />
                     <IonButton
                         shape="round"
+                        className='ion-margin'
                         onClick={() => document.getElementById('image-upload')?.click()}
                     >
-                        <IonIcon slot="icon-only" icon={attach} />
+                        <IonIcon slot="icon-only" icon={attach} /> Upload
                     </IonButton>
-                    <div style={{ marginTop: '10px' }}>
+                    <div style={{ display: "flex", margin: '10px', borderRadius: '10px' }}>
                         {imagePreviews.map((preview, index) => (
                             <IonImg
                                 key={index}
                                 src={preview as string}
                                 alt={`uploaded image ${index + 1}`}
-                                style={{ marginTop: '10px', maxWidth: '100%', height: 'auto' }}
+                                style={{ margin: '10px', borderRadius: '10px', maxWidth: '100%', height: '75px' }}
                             />
                         ))}
                     </div>
-                    <IonButton
-                        expand="full"
-                        type="submit"
-                        style={{
-                            position: 'absolute',
-                            bottom: '10%',
-                            left: '0',
-                            width: '100%',
-                            margin: '0',
-                            borderRadius: '0'
-                        }}
-                    >
-                        Submit
-                    </IonButton>
+
                 </form>
             </IonContent>
+            <IonFooter className='custom-footer'><IonButton
+                expand="full"
+                type="submit"
+                style={{ padding: "20px"}}
+            >
+                Submit
+            </IonButton></IonFooter>
         </IonPage>
     );
 }

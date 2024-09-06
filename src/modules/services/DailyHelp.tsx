@@ -9,7 +9,11 @@ import {
   IonCardContent,
   IonText,
   IonImg,
-  useIonRouter
+  useIonRouter,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonIcon
 } from "@ionic/react";
 import { useHistory } from "react-router-dom";
 import "./DailyHelp.css"; // Create this CSS file to handle custom styling
@@ -28,9 +32,10 @@ import Appliance from "../../assets/Images/Appliance.png";
 import Pest from "../../assets/Images/Pest Clean.png";
 import Mechanic from "../../assets/Images/Mechanic.png";
 import Maid from "./DailyHelp/Maid/Maid";
+import { notificationsOutline, personCircleOutline, reorderFourOutline } from "ionicons/icons";
 
 const services = [
-  
+
   {
     category: "Daily Help",
     items: [
@@ -58,13 +63,45 @@ const services = [
 ];
 
 const DailyHelp: React.FC = () => {
-  const route=useIonRouter()
+  const route = useIonRouter()
   const handleNavigation = (name: string) => {
     route.push(`/${name.toLowerCase().replace(" ", "")}`);
   };
 
   return (
     <IonPage>
+      <IonHeader>
+        <IonToolbar>
+          <IonGrid>
+            <IonRow className="ion-align-items-center">
+              <IonRow className="ion-align-items-center">
+                <IonIcon
+                  icon={reorderFourOutline}
+                  size="large"
+                />
+                <IonCol>
+                  <div>
+                    <strong>Kishore</strong>
+                    <br />
+                    <span>Block-A, 303</span>
+                  </div>
+                </IonCol>
+              </IonRow>
+              <IonCol className="ion-text-right">
+                <IonIcon
+                  icon={notificationsOutline}
+                  size="large"
+                  className="ion-margin-end"
+                />
+                <IonIcon
+                  icon={personCircleOutline}
+                  size="large"
+                />
+              </IonCol>
+            </IonRow>
+          </IonGrid>
+        </IonToolbar>
+      </IonHeader>
       <IonContent>
         {services.map((service, index) => (
           <div key={index}>

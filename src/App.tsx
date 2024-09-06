@@ -1,12 +1,15 @@
 import { Redirect, Route, BrowserRouter as Router } from "react-router-dom";
 import {
   IonApp,
+  IonHeader,
   IonIcon,
   IonLabel,
   IonRouterOutlet,
   IonTabBar,
   IonTabButton,
   IonTabs,
+  IonTitle,
+  IonToolbar,
   setupIonicReact,
 } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
@@ -43,26 +46,29 @@ import CreateTicket from "./modules/community/CreateTicket";
 import GetHelp from "./modules/community/GetHelp";
 import Signup from "./modules/auth/Signup";
 import DailyHelp from "./modules/services/DailyHelp";
-import Maid from "./modules/services/DailyHelp/Maid";
+import Maid from "./modules/services/DailyHelp/Maid/Maid";
+import MaidsList from "./modules/services/DailyHelp/Maid/MaidList";
+import MilkManProfile from "./modules/services/DailyHelp/milk/Milkman";
+import milkManList from "./modules/services/DailyHelp/milk/MilkmanList";
+import BookingAmenity from "./modules/community/BookingAmenity";
+import Profile from "./modules/profile/Profile";
+import Notifications from "./modules/home/Notifications";
 
 setupIonicReact();
 
 const App: React.FC = () => (
   <IonApp>
+
     <IonReactRouter>
       <IonRouterOutlet>
-        {/* Routes that should not display the bottom navbar */}
         <Route exact path="/signup">
           <Signup />
         </Route>
-
-        {/* Default route can be redirected to either a signup or another page */}
         <Route exact path="/">
           <Redirect to="/tab1" />
         </Route>
       </IonRouterOutlet>
 
-      {/* Tab-based routes that include the bottom navbar */}
       <IonTabs>
         <IonRouterOutlet>
           <Route exact path="/tab1">
@@ -80,7 +86,7 @@ const App: React.FC = () => (
           </Route>
           <Route path="/maid-profile" component={Maid} exact />
           <Route path="/maid" component={MaidsList} exact />
-          <Route path="/milkman-profile" component={milkManProfile} exact />
+          <Route path="/milkman-profile" component={MilkManProfile} exact />
           <Route path="/milkman" component={milkManList} exact />
           <Route path="/directory" component={Directory} exact />
           <Route path="/noticeBoard" component={NoticeBoard} exact />
@@ -89,6 +95,8 @@ const App: React.FC = () => (
           <Route path="/createTicket" component={CreateTicket} exact />
           <Route path="/amenities" component={Amenities} exact />
           <Route path="/bookAmenity" component={BookingAmenity} exact />
+          <Route path="/profile" component={Profile} exact />
+          <Route path="/notifications" component={Notifications} exact />
           <Route exact path="/">
             <Redirect to="/tab1" />
           </Route>

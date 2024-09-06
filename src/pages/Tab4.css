@@ -11,22 +11,22 @@
     flex-wrap: wrap;
     gap: 12px;
     justify-content: space-between;
-    padding:12px; 
+    padding: 12px;
 }
 
 .card-container ion-card {
     flex: 1;
-    flex-basis: calc(50% - 12px); 
+    flex-basis: calc(50% - 12px);
     max-width: calc(50% - 12px);
     margin: 0;
-    box-sizing: border-box; 
+    box-sizing: border-box;
 }
 
 .card-container .ion-community-cards {
     justify-content: center;
     align-items: center;
     text-align: center;
-    padding: 10px; 
+    padding: 10px;
 }
 
 .card-container .ion-community-cards ion-img {

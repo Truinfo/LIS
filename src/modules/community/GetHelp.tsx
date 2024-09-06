@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { IonBackButton, IonButtons, IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonPage, IonSegment, IonSegmentButton, IonTitle, IonToolbar, IonLabel, IonItem, IonChip, IonText } from "@ionic/react";
 import { add } from "ionicons/icons";
 import { useHistory } from "react-router-dom";
-import './GetHelp.css'; // Import the CSS file
+import './GetHelp.css';
 
 const GetHelp: React.FC = () => {
     const history = useHistory();
@@ -59,9 +59,9 @@ const GetHelp: React.FC = () => {
                         <IonLabel className="item-content">
                             <div>
                                 <h2>General Inquiry</h2>
-                                <p>4th Sep, 2025</p>
+                                <p>4th Sep, 2023 - Block-A, 404</p>
                                 <IonText>Society Management - Detailed description of the inquiry goes here.</IonText>
-                                <p>by Block-A,404</p>
+                     
                             </div>
                         </IonLabel>
                         <IonChip class="status-chip" color="primary">

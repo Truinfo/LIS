@@ -52,6 +52,24 @@ import milkManList from "./modules/services/DailyHelp/milk/MilkmanList";
 import BookingAmenity from "./modules/community/BookingAmenity";
 import Profile from "./modules/profile/Profile";
 import Notifications from "./modules/home/Notifications";
+import Home from "./modules/home/Home";
+import Signup from "./modules/auth/Signup";
+import CookProfile from "./modules/services/DailyHelp/cook/Cook";
+import CookList from "./modules/services/DailyHelp/cook/CookList";
+import PaperProfile from "./modules/services/DailyHelp/paper/Paper";
+import WaterProfile from "./modules/services/DailyHelp/water/Water";
+import PaperList from "./modules/services/DailyHelp/paper/PaperList";
+import WaterList from "./modules/services/DailyHelp/water/WaterList";
+import Plumber from "./modules/services/TechnicalService/PlumberList";
+import Carpenter from "./modules/services/TechnicalService/Carpenter";
+import Electrical from "./modules/services/TechnicalService/Electrical";
+import Painter from "./modules/services/TechnicalService/Painter";
+import BoxMovers from "./modules/services/TechnicalService/BoxMovers";
+import Mechanic from "./modules/services/TechnicalService/Mechanic";
+import Appliances from "./modules/services/TechnicalService/Appliances";
+import PestClean from "./modules/services/TechnicalService/PestClean";
+import EditProfile from "./modules/profile/EditProfile";
+import ResetPassword from "./modules/profile/ResetPassword";
 
 setupIonicReact();
 
@@ -60,7 +78,7 @@ const App: React.FC = () => (
     <IonReactRouter>
       <IonRouterOutlet>
         <Route exact path="/signup">
-          <SignUp />
+          <Signup />
         </Route>
         <Route exact path="/">
           <Redirect to="/home" />

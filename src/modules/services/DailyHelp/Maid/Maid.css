@@ -71,10 +71,7 @@
   padding: 5px 5px 0px 0px;
   color: rgb(255, 153, 0);
 }
-.button {
-  display: flex;
-  justify-content: center;
-}
+
 .custom-toast {
   --min-height: 100px; /* Increase height here */
   --border-radius: 5px; /* Optional: Modify the border-radius */
@@ -107,4 +104,13 @@
   width: 20px;
   margin: 5px 3px 0px 0px;
 }
+.custom-footer {
+  background-color: transparent;
+  box-shadow: none;
+  border: none;
+}
 
+.custom-button{
+  color: white;
+  margin: 20px;
+}

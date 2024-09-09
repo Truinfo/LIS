@@ -111,7 +111,7 @@ const MilkManProfile: React.FC = () => {
         {/* Shift Selection */}
         <IonGrid>
           <IonGrid className="shift-card">
-            <IonTitle className="shift-title">Morning Shift</IonTitle>
+            <IonTitle className="shift-title">Available Timings</IonTitle>
             <IonGrid className="timing-card">
               {morningShift.map((slot) => (
                 <IonButton

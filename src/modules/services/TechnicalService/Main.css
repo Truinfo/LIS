@@ -1,0 +1,44 @@
+.list-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.card-container {
+  background-color: #f0f3f4;
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 5px;
+}
+
+.profile-icon {
+  height: 70px;
+  width: 70px;
+  border-radius: 20px;
+}
+
+.button-technical{
+  display: flex;
+  justify-content: center;
+  background-color: #ffffff;
+  height: 20px;
+  width: 80%;
+  margin: 15px 10px 0px 0px;
+  color: rgb(88, 86, 86);
+  font-size: 16px;
+}
+
+.anchor-element {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none; /* Remove underline from anchor */
+  color: rgb(68, 64, 64); /* Black text */
+  font-weight: 600; /* Optional for bold text */
+}
+
+.anchor-element ion-icon {
+  margin-right: 8px; /* Add spacing between icon and text */
+  color: #63676d;
+}

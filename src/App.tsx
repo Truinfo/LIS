@@ -44,7 +44,6 @@ import NoticeBoard from "./modules/community/NoticeBoard";
 import SocietyBills from "./modules/community/SocietyBills";
 import CreateTicket from "./modules/community/CreateTicket";
 import GetHelp from "./modules/community/GetHelp";
-import Signup from "./modules/auth/Signup";
 import DailyHelp from "./modules/services/DailyHelp";
 import Maid from "./modules/services/DailyHelp/Maid/Maid";
 import MaidsList from "./modules/services/DailyHelp/Maid/MaidList";
@@ -53,28 +52,25 @@ import milkManList from "./modules/services/DailyHelp/milk/MilkmanList";
 import BookingAmenity from "./modules/community/BookingAmenity";
 import Profile from "./modules/profile/Profile";
 import Notifications from "./modules/home/Notifications";
-import EditProfile from "./modules/profile/EditProfile";
-import ResetPassword from "./modules/profile/ResetPassword";
 
 setupIonicReact();
 
 const App: React.FC = () => (
   <IonApp>
-
     <IonReactRouter>
       <IonRouterOutlet>
         <Route exact path="/signup">
-          <Signup />
+          <SignUp />
         </Route>
         <Route exact path="/">
-          <Redirect to="/tab1" />
+          <Redirect to="/home" />
         </Route>
       </IonRouterOutlet>
 
       <IonTabs>
         <IonRouterOutlet>
-          <Route exact path="/tab1">
-            <Tab1 />
+          <Route exact path="/home">
+            <Home />
           </Route>
           <Route exact path="/tab2">
             <Tab2 />
@@ -90,6 +86,20 @@ const App: React.FC = () => (
           <Route path="/maid" component={MaidsList} exact />
           <Route path="/milkman-profile" component={MilkManProfile} exact />
           <Route path="/milkman" component={milkManList} exact />
+          <Route path="/cook-profile" component={CookProfile} exact />
+          <Route path="/cook" component={CookList} exact />
+          <Route path="/paper-profile" component={PaperProfile} exact />
+          <Route path="/paper" component={PaperList} exact />
+          <Route path="/water-profile" component={WaterProfile} exact />
+          <Route path="/water" component={WaterList} exact />
+          <Route path="/plumber" component={Plumber} exact />
+          <Route path="/carpenter" component={Carpenter} exact />
+          <Route path="/electrician" component={Electrical} exact />
+          <Route path="/painter" component={Painter} exact />
+          <Route path="/moving" component={BoxMovers} exact />
+          <Route path="/mechanic" component={Mechanic} exact />
+          <Route path="/appliance" component={Appliances} exact />
+          <Route path="/pestclean" component={PestClean} exact />
           <Route path="/directory" component={Directory} exact />
           <Route path="/noticeBoard" component={NoticeBoard} exact />
           <Route path="/societyBills" component={SocietyBills} exact />
@@ -103,11 +113,10 @@ const App: React.FC = () => (
           <Route path="/resetPassword" component={ResetPassword} exact />
           <Route exact path="/">
             <Redirect to="/tab1" />
-
           </Route>
         </IonRouterOutlet>
         <IonTabBar slot="bottom">
-          <IonTabButton tab="tab1" href="/tab1">
+          <IonTabButton tab="tab1" href="/home">
             <IonIcon aria-hidden="true" icon={home} />
             <IonLabel>Home</IonLabel>
           </IonTabButton>

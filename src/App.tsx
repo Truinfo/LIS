@@ -53,6 +53,8 @@ import milkManList from "./modules/services/DailyHelp/milk/MilkmanList";
 import BookingAmenity from "./modules/community/BookingAmenity";
 import Profile from "./modules/profile/Profile";
 import Notifications from "./modules/home/Notifications";
+import EditProfile from "./modules/profile/EditProfile";
+import ResetPassword from "./modules/profile/ResetPassword";
 
 setupIonicReact();
 
@@ -97,8 +99,11 @@ const App: React.FC = () => (
           <Route path="/bookAmenity" component={BookingAmenity} exact />
           <Route path="/profile" component={Profile} exact />
           <Route path="/notifications" component={Notifications} exact />
+          <Route path="/editProfile" component={EditProfile} exact />
+          <Route path="/resetPassword" component={ResetPassword} exact />
           <Route exact path="/">
             <Redirect to="/tab1" />
+
           </Route>
         </IonRouterOutlet>
         <IonTabBar slot="bottom">

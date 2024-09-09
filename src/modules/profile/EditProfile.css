@@ -1,0 +1,22 @@
+
+
+.edit-profile-avatar {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    margin-bottom: 20px;
+    background-color: #ccc;
+}
+
+.edit-avatar-button {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

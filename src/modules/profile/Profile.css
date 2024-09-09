@@ -5,7 +5,7 @@
     margin: 10px;
     background-color: #eee;
     border-radius: 10px;
-    gap:10px
+    gap: 10px
 }
 
 .profile-avatar {
@@ -16,6 +16,7 @@
 
 .profile-details {
     display: flex;
+    padding: 0;
     flex-direction: column;
 }
 
@@ -23,4 +24,30 @@
 .profile-details p {
     margin: 0;
     margin-bottom: 5px;
+}
+
+.profile-list {
+    border: 1px solid #ccc;
+    margin: 10px;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.profile-list ion-label {
+    margin-left: 10px;
+}
+
+.custom-icon {
+    color: #0284c7;
+    width: 20px;
+    height: 20px
+}
+
+.icon-label-container {
+    display: flex;
+    align-items: center;
+}
+
+.profile-grid{
+height: 100%;
 }

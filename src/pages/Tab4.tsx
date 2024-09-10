@@ -68,7 +68,7 @@ const Tab4: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen >
-        <div className="card-container">
+        <div className="community-card-container">
           <IonCard
             className="ion-community-cards"
             onClick={() => handleCardClick("/directory")}
@@ -94,7 +94,7 @@ const Tab4: React.FC = () => {
             </IonCardHeader>
           </IonCard>
         </div>
-        <div className="card-container">
+        <div className="community-card-container">
           <IonCard
             className="ion-community-cards"
             onClick={() => handleCardClick("/societyBills")}
@@ -116,7 +116,7 @@ const Tab4: React.FC = () => {
             </IonCardHeader>
           </IonCard>
         </div>
-        <div className="card-container">
+        <div className="community-card-container">
           <IonCard
             className="ion-community-cards"
             onClick={() => handleCardClick("/amenities")}

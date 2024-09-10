@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { IonAvatar, IonBackButton, IonButtons, IonContent, IonGrid, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonPage, IonRow, IonTitle, IonToolbar, IonCol, IonButton } from "@ionic/react";
+import { IonAvatar, IonBackButton, IonButtons, IonContent, IonGrid, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonPage, IonRow, IonTitle, IonToolbar, IonCol, IonButton, IonFooter } from "@ionic/react";
 import { camera } from "ionicons/icons";
 import './EditProfile.css';
 
@@ -79,6 +79,11 @@ const EditProfile: React.FC = () => {
                     </IonItem>
                 </IonGrid>
             </IonContent>
+            <IonFooter className="custom-footer">
+                <IonButton expand="full" style={{ padding: "20px" }}>
+                    Save
+                </IonButton>
+            </IonFooter>
         </IonPage>
     );
 };

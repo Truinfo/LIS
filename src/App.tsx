@@ -130,7 +130,7 @@ const App: React.FC = () => (
           <Route path="/editProfile" component={EditProfile} exact />
           <Route path="/resetPassword" component={ResetPassword} exact />
           <Route exact path="/">
-            <Redirect to="/tab1" />
+            <Redirect to="/home" />
           </Route>
         </IonRouterOutlet>
         <IonTabBar slot="bottom">

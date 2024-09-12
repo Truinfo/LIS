@@ -22,7 +22,7 @@ import Notice from "../assets/Images/notice.png";
 import Bill from "../assets/Images/bill.png";
 import Help from "../assets/Images/GetHelp.png";
 import Amenities from "../assets/Images/smart-city.png";
-import { notificationsOutline, personCircleOutline, reorderFourOutline } from "ionicons/icons";
+import Header from "../components/Header";
 
 const Tab4: React.FC = () => {
   const router = useIonRouter();
@@ -33,40 +33,8 @@ const Tab4: React.FC = () => {
 
   return (
     <IonPage className="ion-page-background">
-      <IonHeader>
-        <IonToolbar>
-          <IonGrid>
-            <IonRow className="ion-align-items-center">
-              <IonRow className="ion-align-items-center">
-                <IonIcon
-                  icon={reorderFourOutline}
-                  size="large"
-                />
-                <IonCol>
-                  <div>
-                    <strong>Kishore</strong>
-                    <br />
-                    <span>Block-A, 303</span>
-                  </div>
-                </IonCol>
-              </IonRow>
-              <IonCol className="ion-text-right">
-                <IonIcon
-                  onClick={() => handleCardClick("/notifications")}
-                  icon={notificationsOutline}
-                  size="large"
-                  className="ion-margin-end"
-                />
-                <IonIcon
-                  onClick={() => handleCardClick("/profile")}
-                  icon={personCircleOutline}
-                  size="large"
-                />
-              </IonCol>
-            </IonRow>
-          </IonGrid>
-        </IonToolbar>
-      </IonHeader>
+ 
+      <Header/>
       <IonContent fullscreen >
         <div className="community-card-container">
           <IonCard

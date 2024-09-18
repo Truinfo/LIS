@@ -1,12 +1,9 @@
 # livinSync
 
-npm install -g @ionic/cli native-run cordova-res
-ionic start liveSync tabs --type=react --capacitor
-npm install @capacitor/camera @capacitor/preferences @capacitor/filesystem
-npm install @ionic/pwa-elements
+//Apk Buliding
 
-// Apk Building
-ionic build
-ionic capacitor add android
-ionic capacitor sync
-cd android && gradlew assembleDebug && cd ..
+npx expo-doctor //this command is to check the sdk versions and dependencies errors
+
+npx expo prebuild  ///to get the android floder to bulid
+
+eas build --platform android //to bulid the project

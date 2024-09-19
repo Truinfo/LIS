@@ -148,7 +148,34 @@ const GetHelp = () => {
       </View>
     );
   }
+  const formatDate = (dateString) => {
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return "Invalid Date";
+      }
+      return date.toISOString().slice(0, 10);
+    } catch (error) {
+      return "Invalid Date";
+    }
+  };
+  const sortComplaints = (tickets) => {
+    return tickets.sort((a, b) => {
+      // First, prioritize unresolved complaints
+      if (a.resolution === "Pending" && b.resolution === "Resolved") {
+        return -1;
+      }
+      if (a.resolution === "Resolved" && b.resolution === "Pending") {
+        return 1;
+      }
 
+      // If both are the same resolution, sort by date (most recent first)
+      const dateA = new Date(a.dateAndTime);
+      const dateB = new Date(b.dateAndTime);
+      return dateB - dateA;  // Most recent first
+    });
+  };
+  const sortedTickets = sortComplaints(filteredTickets);
   return (
     <View style={styles.container}>
       <View style={styles.rowContainer}>
@@ -238,7 +265,7 @@ const GetHelp = () => {
           )}
         </View>
       </View>
-      <FlatList
+      {/* <FlatList
         data={filteredTickets}
         keyExtractor={(item) => item._id}
         renderItem={({ item }) => (
@@ -253,10 +280,18 @@ const GetHelp = () => {
                 <Ionicons name="warning" size={24} color="#facc15" />
               ) : null}
             </View>
+
             <Text style={styles.date}>{item.complaintTitle}</Text>
             <Text style={styles.date}>{item.description}</Text>
-            <Text style={styles.date}>Complaint Date: {item.dateAndTime}</Text>
-            <Text style={styles.date}>Complaint By: {item.complaintBy}</Text>
+            <View style={styles.row}>
+              <Text style={styles.label}>Complaint Date</Text>
+              <Text style={styles.value}>: {formatDate(item.dateAndTime)}</Text>
+            </View>
+
+            <View style={styles.row}>
+              <Text style={styles.label}>Complaint By</Text>
+              <Text style={styles.value}>: {item.complaintBy}</Text>
+            </View>
 
             {item.resolution === "Pending" && (
               <TouchableOpacity
@@ -267,7 +302,58 @@ const GetHelp = () => {
               </TouchableOpacity>
             )}
             {item.resolution === "Resolved" && (
-              <Text style={styles.reqId}>Resolved Date: {item.updatedAt}</Text>
+              <View style={styles.row}>
+                <Text style={styles.label}>Resolved Date</Text>
+                <Text style={styles.value}>: {formatDate(item.updatedAt)}</Text>
+              </View>
+
+            )}
+          </View>
+        )}
+      /> */}
+      <FlatList
+        data={sortedTickets} // Use sortedTickets here
+        keyExtractor={(item) => item._id}
+        renderItem={({ item }) => (
+          <View style={styles.ticketContainer}>
+            <View style={styles.header}>
+              <Text style={styles.type}>
+                {item.complaintType} - {item.complaintCategory}
+              </Text>
+              {item.resolution === "Resolved" ? (
+                <Ionicons name="checkmark-done-sharp" size={24} color="#16a34a" />
+              ) : item.resolution === "Pending" ? (
+                <Ionicons name="warning" size={24} color="#facc15" />
+              ) : null}
+            </View>
+
+            <Text style={styles.date}>{item.complaintTitle}</Text>
+            <Text style={styles.date}>{item.description}</Text>
+
+            {/* Complaint Date and Complaint By aligned together */}
+            <View style={styles.row}>
+              <Text style={styles.label}>Complaint Date</Text>
+              <Text style={styles.value}>: {formatDate(item.dateAndTime)}</Text>
+            </View>
+
+            <View style={styles.row}>
+              <Text style={styles.label}>Complaint By</Text>
+              <Text style={styles.value}>: {item.complaintBy}</Text>
+            </View>
+
+            {item.resolution === "Pending" && (
+              <TouchableOpacity
+                style={styles.resolveButton}
+                onPress={() => markAsResolved(item.complaintId)}
+              >
+                <Text style={styles.resolveButtonText}>Resolved</Text>
+              </TouchableOpacity>
+            )}
+            {item.resolution === "Resolved" && (
+              <View style={styles.row}>
+                <Text style={styles.label}>Resolved Date</Text>
+                <Text style={styles.value}>: {formatDate(item.updatedAt)}</Text>
+              </View>
             )}
           </View>
         )}
@@ -346,6 +432,7 @@ const styles = StyleSheet.create({
   },
   type: {
     fontWeight: "bold",
+    fontSize: 16,
   },
   status: {
     padding: 5,
@@ -438,11 +525,33 @@ const styles = StyleSheet.create({
     top: 10,
     right: 10,
     padding: 5,
-  }, fab: {
+  },
+  fab: {
     position: 'absolute',
     margin: 16,
     right: 0,
     bottom: 0,
+  },
+
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    marginTop: 4,
+    // Ensures items are displayed in a row
+  },
+  label: {
+    fontWeight: '400',
+    width: 105,  // Adjust the width to align labels
+    color: '#333',
+    fontSize: 14,
+  },
+  value: {
+    fontSize: 14,
+    color: '#555',
+  },
+  reqId: {
+    marginTop: 5,
+    fontSize: 14,
   },
 });
 

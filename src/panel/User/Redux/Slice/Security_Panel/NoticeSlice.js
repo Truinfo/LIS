@@ -25,16 +25,13 @@ const noticeSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchNotices.pending, (state) => {
-        console.log("Fetching notices..."); // To confirm pending state is hit
         state.status = 'loading';
       })
       .addCase(fetchNotices.fulfilled, (state, action) => {
-        console.log("Notices fetched:", action.payload); 
         state.status = 'succeeded';
         state.notices = action.payload;
       })
       .addCase(fetchNotices.rejected, (state, action) => {
-        console.error("Failed to fetch notices:", action.error.message); // Log error for debugging
         state.status = 'failed';
         state.error = action.error.message;
       });

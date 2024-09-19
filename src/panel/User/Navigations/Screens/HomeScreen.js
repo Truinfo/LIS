@@ -9,8 +9,9 @@ import {
   SafeAreaView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Avatar, RadioButton } from "react-native-paper";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUserProfiles } from "../../Redux/Slice/ProfileSlice/ProfileSlice";
@@ -30,18 +31,98 @@ const HomeScreen = () => {
   const [buildingName, setBuildingName] = useState("");
   const notices = useSelector(selectNotices);
   const [polls, setPolls] = useState([]);
+  const [checkedOption, setCheckedOption] = useState("");
 
-  const [checked, setChecked] = useState('option1');
   const [flatNumber, setFlatNumber] = useState("");
   const [profileImage, setProfileImage] = useState("");
   const { profiles } = useSelector((state) => state.profiles);
   const [expanded, setExpanded] = useState(false);
+  const [expandedPollId, setExpandedPollId] = useState(null);
 
+  // Function to toggle expanded/collapsed state
+  const toggleExpand = (pollId) => {
+    setExpandedPollId(prevId => (prevId === pollId ? null : pollId));
+  };
   const toggleExpanded = () => {
     setExpanded(!expanded);
   };
   const events = useSelector((state) => state.events.events);
+  useFocusEffect(
+    React.useCallback(() => {
+      socketServices.initializeSocket();
 
+      socketServices.emit('get_polls_by_society_id', { societyId });
+      const handlePollsBySocietyId = (fetchedPolls) => {
+        const now = new Date();
+        const activePolls = fetchedPolls.filter(poll => {
+          if (poll && poll.poll && poll.poll.expDate) {
+            const expDate = new Date(poll.poll.expDate);
+            return expDate > now;
+          }
+          return false;
+        });
+        setPolls(activePolls);
+
+        const userVotes = {};
+        activePolls.forEach(poll => {
+          if (poll.poll && Array.isArray(poll.poll.votes)) {
+            const userVote = poll.poll.votes.find(vote => vote.userId === userId);
+            if (userVote) {
+              userVotes[poll._id] = userVote.selectedOption;
+            }
+          }
+
+        });
+
+        setCheckedOption(userVotes);
+      };
+
+      const handleVoteUpdate = (data) => {
+        alert(data.message);
+
+        const userVote = data.votes.poll.votes.find(vote => vote.userId === userId);
+
+        if (userVote) {
+          console.log("User's Vote:", userVote);
+        } else {
+          console.log("User has not voted or vote not found.");
+        }
+
+        setPolls(prevPolls => {
+          const updatedPollIndex = prevPolls.findIndex(poll => poll._id === data.votes._id);
+          if (updatedPollIndex !== -1) {
+            const updatedPolls = [...prevPolls];
+            updatedPolls[updatedPollIndex] = data.votes;
+            return updatedPolls;
+          } else {
+            return prevPolls;
+          }
+        });
+
+        setCheckedOption(prevState => ({ ...prevState, [data.votes._id]: null }));
+      };
+
+      const handleNewPollCreated = (newPoll) => {
+        setPolls(prevPolls => [newPoll, ...prevPolls]);
+      };
+
+      const handleVoteError = (error) => {
+        alert(error.message);
+      };
+
+      socketServices.on('polls_by_society_id', handlePollsBySocietyId);
+      socketServices.on('vote_update', handleVoteUpdate);
+      socketServices.on('new_poll_created', handleNewPollCreated);
+      socketServices.on('vote_error', handleVoteError);
+
+      return () => {
+        socketServices.removeListener('polls_by_society_id', handlePollsBySocietyId);
+        socketServices.removeListener('new_poll_created', handleNewPollCreated);
+        socketServices.removeListener('vote_update', handleVoteUpdate);
+        socketServices.removeListener('vote_error', handleVoteError);
+      };
+    }, [societyId, userId])
+  );
   useEffect(() => {
     const getUserName = async () => {
       try {
@@ -62,6 +143,7 @@ const HomeScreen = () => {
       dispatch(fetchUserProfiles({ userId, societyId }));
       dispatch(fetchEvents(societyId));
       dispatch(fetchNotices(societyId));
+
     }
   }, [dispatch, userId, societyId]);
   useEffect(() => {
@@ -76,62 +158,15 @@ const HomeScreen = () => {
   const navigation = useNavigation();
 
 
-
-  useEffect(() => {
-    socketServices.initializeSocket();
-    socketServices.emit('get_polls_by_society_id', { societyId });
-    const handlePollsBySocietyId = (fetchedPolls) => {
-      setPolls(fetchedPolls);
-    };
-    const handleVoteUpdate = (data) => {
-      alert(data.message)
-      setPolls(prevPolls => {
-        // Check if the updated poll exists in the previous polls data
-        const updatedPollIndex = prevPolls.findIndex(poll => poll._id === data.votes._id);
-        if (updatedPollIndex !== -1) {
-          // Replace the old poll data with the updated poll data
-          const updatedPolls = [...prevPolls];
-          updatedPolls[updatedPollIndex] = data.votes;
-          return updatedPolls;
-        } else {
-          // If the updated poll is not found (this should not happen ideally)
-          console.warn("Updated poll not found in current state");
-          return prevPolls;
-        }
-      });
-
-      setCheckedOption(null);
-    };
-
-    const handleNewPollCreated = (newPoll) => {
-      setPolls((prevPolls) => [newPoll, ...prevPolls]);
-    };
-
-    const handleVoteError = (error) => {
-      alert(error.message);
-    };
-
-    socketServices.on('polls_by_society_id', handlePollsBySocietyId);
-    socketServices.on('vote_update', handleVoteUpdate);
-    socketServices.on('new_poll_created', handleNewPollCreated);
-    socketServices.on('vote_error', handleVoteError);
-
-    return () => {
-      socketServices.removeListener('polls_by_society_id', handlePollsBySocietyId);
-      socketServices.removeListener('new_poll_created', handleNewPollCreated);
-      socketServices.removeListener('vote_update', handleVoteUpdate);
-      socketServices.removeListener('vote_error', handleVoteError);
-    };
-  }, [societyId]);
-
   const handleRadioButtonPress = (optionValue, pollId) => {
-    setCheckedOption(optionValue);
+    setCheckedOption(prevState => ({ ...prevState, [pollId]: optionValue }));
     const data = {
-      userId: "3Z6S5JTx2",
+      userId: userId,
       pollId: pollId,
       selectedOption: optionValue
     };
     socketServices.emit('vote_for__polls_by_UserID', data);
+    socketServices.emit('get_polls_by_society_id', { societyId });
   };
 
 
@@ -164,7 +199,7 @@ const HomeScreen = () => {
               <Text style={styles.logoTitle}>Payment Due</Text></View>
             <Text style={[styles.description, { color: "#777" }]}>Just Now</Text>
           </View>
-          <View style={styles.divider}/>
+          <View style={styles.divider} />
           <Text style={styles.description}>
             Your maintenance bill of <Text style={styles.logoTitle}>Rs. 700</Text> for <Text style={styles.logoTitle}>August</Text> is due. Please make the payment.
           </Text>
@@ -172,42 +207,7 @@ const HomeScreen = () => {
             <Text style={styles.payButtonText}>Make Payment</Text>
           </TouchableOpacity>
         </View>
-        {/* <View style={styles.postContainer}>
-          <View style={[styles.row, { justifyContent: "space-between" }]}>
-            <View style={styles.row}>
-              <Image source={require("../../../../assets/User/images/hashtag.png")} style={styles.logo} />
-              <Text style={styles.logoTitle}>Events</Text></View>
-            <Text style={[styles.description, { color: "#777" }]}>Just Now</Text>
-          </View>
-          <View style={styles.divider} />
-          <View>
-            <Text style={styles.logoTitle}>Celebrating the Ganesh Chaturti in Comminuty</Text>
-       
-            <Text >start Date - End Date</Text>
-            <Text>Activities:Dancinmg, Singing</Text>
-            <Text style={[styles.description, { fontSize: 12, color: "#7d0431" }]}>See More...</Text>
-            <View style={{ width: "auto", height: "auto", marginTop: 10 }}>
-              <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between" }}>
-                {images.map((image, index) => (
-                  <Image
-                    key={index}
-                    source={image}
-                    style={{
-                      width:
-                        images.length === 1 || (images.length % 2 !== 0 && index === images.length - 1)
-                          ? "100%"
-                          : "49%",
-                      height: 100,
-                      borderRadius: 4,
-                      marginBottom: 10,
-                    }}
-                    resizeMode="cover"
-                  />
-                ))}
-              </View>
-            </View>
-          </View>
-        </View> */}
+
         <View style={styles.postContainer}>
           {events && events.events && events.events.length > 0 && (
             <>
@@ -267,7 +267,6 @@ const HomeScreen = () => {
                   </>
                 )}
 
-                {/* Toggle button for See More / See Less */}
                 <TouchableOpacity onPress={toggleExpanded}>
                   <Text style={[styles.description, { fontSize: 12, color: "#7d0431" }]}>
                     {expanded ? "See Less..." : "See More..."}
@@ -297,58 +296,75 @@ const HomeScreen = () => {
             </Text>
           </>)}
         </View>
-        {polls.length > 0 && (
-          <View style={styles.postContainer}>
+        {polls.length > 0 && polls.map((pollItem, index) => (
+          <View key={index} style={styles.postContainer}>
             <View>
               <View style={[styles.row, { justifyContent: "space-between" }]}>
                 <View style={styles.row}>
-                  <Image source={require("../../../../assets/User/images/poll (1).png")} style={styles.logo} />
+                  <Image
+                    source={require("../../../../assets/User/images/poll (1).png")}
+                    style={styles.logo}
+                  />
                   <Text style={styles.logoTitle}>Polls</Text>
                 </View>
                 <Text style={[styles.description, { color: "#777" }]}>
-                  {new Date(polls[polls.length - 1].poll.date).toLocaleDateString('en-US', {
+                  {new Date(pollItem.poll.date).toLocaleDateString('en-US', {
                     day: 'numeric',
-                    month: 'short'
-                  })}
-                </Text>
-              </View>
-
-              <View style={styles.divider} />
-              <Text style={styles.logoTitle}>
-                {polls[polls.length - 1].poll.question}
-              </Text>
-              <Text style={styles.description}>
-                {polls[polls.length - 1].poll.Description}
-              </Text>
-              <RadioButton.Group
-                onValueChange={(value) => setChecked(value)}
-                value={checked}
-              >
-                {polls[polls.length - 1].poll.options.map((option, optionIndex) => (
-                  <View key={optionIndex} style={styles.radioOption}>
-                    <RadioButton value={option} theme={{ colors: { primary: "#7D0431" } }} />
-                    <Text style={styles.radioLabel}>{option}</Text>
-                  </View>
-                ))}
-              </RadioButton.Group>
-
-              <View style={styles.divider} />
-              <View style={[styles.row, { justifyContent: "space-between" }]}>
-                <Text style={styles.description}>
-                  Expires by: {new Date(polls[polls.length - 1].poll.expDate).toLocaleDateString('en-US', {
-                    day: '2-digit',
                     month: 'short',
-                  })} at {new Date(polls[polls.length - 1].poll.expDate).toLocaleTimeString('en-US', {
-                    hour: '2-digit',
-                    minute: '2-digit'
                   })}
                 </Text>
-                <Text style={styles.description}>58%</Text>
               </View>
-            </View>
+              <View style={styles.divider} />
+              <Text style={styles.logoTitle}>{pollItem.poll.question}</Text>
 
+              {/* Description and expand/collapse toggle */}
+              <Text style={styles.description}>
+                {expandedPollId === pollItem._id
+                  ? pollItem.poll.Description
+                  : `${pollItem.poll.Description.substring(0, 100)}...`}
+              </Text>
+
+
+              {expandedPollId === pollItem._id && (
+                <>
+                  {/* Options */}
+                  {pollItem.poll.options.map((option, optionIndex) => (
+                    <View key={optionIndex} style={styles.radioOption}>
+                      <RadioButton
+                        value={option}
+                        status={checkedOption[pollItem._id] === option ? "checked" : "unchecked"}
+                        theme={{ colors: { primary: "#7D0431" } }}
+                        onPress={() => handleRadioButtonPress(option, pollItem)}
+                      />
+                      <Text style={styles.radioLabel}>{option}</Text>
+                    </View>
+                  ))}
+
+                  <View style={styles.divider} />
+                  <View style={[styles.row, { justifyContent: "space-between" }]}>
+                    <Text style={styles.description}>
+                      Expires by: {new Date(pollItem.poll.expDate).toLocaleDateString('en-US', {
+                        day: '2-digit',
+                        month: 'short',
+                      })} at {new Date(pollItem.poll.expDate).toLocaleTimeString('en-US', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </Text>
+                    <Text style={styles.description} onPress={() => navigation.navigate("Polls")}><MaterialIcons name="navigate-next" size={22} color="black" /></Text>
+                  </View>
+                </>
+              )}
+
+              {/* See More / See Less Toggle */}
+              <TouchableOpacity onPress={() => toggleExpand(pollItem._id)}>
+                <Text style={[styles.description, { fontSize: 12, color: "#7d0431" }]}>
+                  {expandedPollId === pollItem._id ? 'See less' : 'See more'}...
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        )}
+        ))}
       </ScrollView>
     </SafeAreaView>
   );
@@ -356,7 +372,7 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#f6f6f6f",
   },
   header: {
     flexDirection: "row",
@@ -389,15 +405,21 @@ const styles = StyleSheet.create({
     marginLeft: width * 0.05,
   },
   mainContainer: {
-    paddingHorizontal: 10,
-    paddingTop: 5
+    // paddingHorizontal: 10,
+    paddingTop: 5, flex: 1
   },
   postContainer: {
     borderWidth: 1,
+    width: "95%",
+    marginLeft: 10,
     borderColor: "#f6f6f6",
     backgroundColor: "#f6f6f6",
     padding: 8,
-    borderRadius: 5, marginVertical: 5
+    borderRadius: 5,
+    marginVertical: 5,
+
+    // Shadow for Android
+    elevation: 5, // Elevation level to create shadow effect
   },
   row: {
     flexDirection: "row",
@@ -408,7 +430,7 @@ const styles = StyleSheet.create({
     width: 20, height: 20
   },
   logoTitle: {
-    fontSize: 14, fontWeight: "600"
+    fontSize: 16, fontWeight: "600"
   },
   description: {
     fontSize: 12, fontWeight: "400", marginTop: 5, letterSpacing: 0.2

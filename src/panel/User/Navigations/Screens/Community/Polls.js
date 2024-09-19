@@ -9,7 +9,7 @@ const Polls = () => {
     const [polls, setPolls] = useState([]);
     const [userId, setUserId] = useState("");
     const [societyId, setSocietyId] = useState("");
-    const [checkedOption, setCheckedOption] = useState({}); // Store checked option per poll
+    const [checkedOption, setCheckedOption] = useState({});
 
     useEffect(() => {
         const getUserName = async () => {
@@ -53,11 +53,36 @@ const Polls = () => {
             });
 
             setCheckedOption(userVotes);
+
         };
 
 
+        // const handleVoteUpdate = (data) => {
+        //     alert(data.message);
+        //     setPolls(prevPolls => {
+        //         const updatedPollIndex = prevPolls.findIndex(poll => poll._id === data.votes._id);
+        //         if (updatedPollIndex !== -1) {
+        //             const updatedPolls = [...prevPolls];
+        //             updatedPolls[updatedPollIndex] = data.votes;
+        //             return updatedPolls;
+        //         } else {
+        //             return prevPolls;
+        //         }
+        //     });
+        //     setCheckedOption(prevState => ({ ...prevState, [data.votes._id]: null }));
+        // };
         const handleVoteUpdate = (data) => {
             alert(data.message);
+
+            // Find the user's vote from the data
+            const userVote = data.votes.poll.votes.find(vote => vote.userId === userId);
+
+            if (userVote) {
+                console.log("User's Vote:", userVote);
+            } else {
+                console.log("User has not voted or vote not found.");
+            }
+
             setPolls(prevPolls => {
                 const updatedPollIndex = prevPolls.findIndex(poll => poll._id === data.votes._id);
                 if (updatedPollIndex !== -1) {
@@ -68,9 +93,9 @@ const Polls = () => {
                     return prevPolls;
                 }
             });
+
             setCheckedOption(prevState => ({ ...prevState, [data.votes._id]: null }));
         };
-
         const handleNewPollCreated = (newPoll) => {
             setPolls(prevPolls => [newPoll, ...prevPolls]);
         };
@@ -95,11 +120,12 @@ const Polls = () => {
     const handleRadioButtonPress = (optionValue, pollId) => {
         setCheckedOption(prevState => ({ ...prevState, [pollId]: optionValue }));
         const data = {
-            userId: userId, // Ensure this uses the logged-in user's ID
+            userId: userId,
             pollId: pollId,
             selectedOption: optionValue
         };
         socketServices.emit('vote_for__polls_by_UserID', data);
+        socketServices.emit('get_polls_by_society_id', { societyId });
     };
 
     const calculateVotePercentage = (votes, option) => {

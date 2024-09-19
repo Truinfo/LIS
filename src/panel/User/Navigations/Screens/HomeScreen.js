@@ -16,6 +16,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchUserProfiles } from "../../Redux/Slice/ProfileSlice/ProfileSlice";
 import { ImagebaseURL } from "../../../Security/helpers/axios";
 import { Dimensions } from "react-native";
+import { fetchEvents } from "../../Redux/Slice/CommunitySlice/EventSlice";
+
+import { fetchNotices, selectNotices } from "../../Redux/Slice/CommunitySlice/NoticeSlice";
+import socketServices from "../../Socket/SocketServices";
 const { width, height } = Dimensions.get('window');
 
 const HomeScreen = () => {
@@ -24,10 +28,19 @@ const HomeScreen = () => {
   const [userId, setUserId] = useState("");
   const [societyId, setSocietyId] = useState("");
   const [buildingName, setBuildingName] = useState("");
+  const notices = useSelector(selectNotices);
+  const [polls, setPolls] = useState([]);
+
   const [checked, setChecked] = useState('option1');
   const [flatNumber, setFlatNumber] = useState("");
   const [profileImage, setProfileImage] = useState("");
   const { profiles } = useSelector((state) => state.profiles);
+  const [expanded, setExpanded] = useState(false);
+
+  const toggleExpanded = () => {
+    setExpanded(!expanded);
+  };
+  const events = useSelector((state) => state.events.events);
 
   useEffect(() => {
     const getUserName = async () => {
@@ -35,7 +48,6 @@ const HomeScreen = () => {
         const userString = await AsyncStorage.getItem("user");
         if (userString !== null) {
           const user = JSON.parse(userString);
-          setUserName(user.name);
           setSocietyId(user.societyId);
           setUserId(user.userId);
         }
@@ -48,22 +60,81 @@ const HomeScreen = () => {
   useEffect(() => {
     if (userId && societyId) {
       dispatch(fetchUserProfiles({ userId, societyId }));
+      dispatch(fetchEvents(societyId));
+      dispatch(fetchNotices(societyId));
     }
   }, [dispatch, userId, societyId]);
   useEffect(() => {
     if (profiles.length > 0) {
       const profile = profiles[0];
+      setUserName(profile.name);
       setBuildingName(profile.buildingName);
       setFlatNumber(profile.flatNumber);
       setProfileImage(profile.profilePicture)
     }
   }, [profiles]);
   const navigation = useNavigation();
-  const images = [
-    require("../../../../assets/User/images/image1.jpg"),
-    require("../../../../assets/User/images/image1.jpg"),
-    require("../../../../assets/User/images/image1.jpg"),
-  ];
+
+
+
+  useEffect(() => {
+    socketServices.initializeSocket();
+    socketServices.emit('get_polls_by_society_id', { societyId });
+    const handlePollsBySocietyId = (fetchedPolls) => {
+      setPolls(fetchedPolls);
+    };
+    const handleVoteUpdate = (data) => {
+      alert(data.message)
+      setPolls(prevPolls => {
+        // Check if the updated poll exists in the previous polls data
+        const updatedPollIndex = prevPolls.findIndex(poll => poll._id === data.votes._id);
+        if (updatedPollIndex !== -1) {
+          // Replace the old poll data with the updated poll data
+          const updatedPolls = [...prevPolls];
+          updatedPolls[updatedPollIndex] = data.votes;
+          return updatedPolls;
+        } else {
+          // If the updated poll is not found (this should not happen ideally)
+          console.warn("Updated poll not found in current state");
+          return prevPolls;
+        }
+      });
+
+      setCheckedOption(null);
+    };
+
+    const handleNewPollCreated = (newPoll) => {
+      setPolls((prevPolls) => [newPoll, ...prevPolls]);
+    };
+
+    const handleVoteError = (error) => {
+      alert(error.message);
+    };
+
+    socketServices.on('polls_by_society_id', handlePollsBySocietyId);
+    socketServices.on('vote_update', handleVoteUpdate);
+    socketServices.on('new_poll_created', handleNewPollCreated);
+    socketServices.on('vote_error', handleVoteError);
+
+    return () => {
+      socketServices.removeListener('polls_by_society_id', handlePollsBySocietyId);
+      socketServices.removeListener('new_poll_created', handleNewPollCreated);
+      socketServices.removeListener('vote_update', handleVoteUpdate);
+      socketServices.removeListener('vote_error', handleVoteError);
+    };
+  }, [societyId]);
+
+  const handleRadioButtonPress = (optionValue, pollId) => {
+    setCheckedOption(optionValue);
+    const data = {
+      userId: "3Z6S5JTx2",
+      pollId: pollId,
+      selectedOption: optionValue
+    };
+    socketServices.emit('vote_for__polls_by_UserID', data);
+  };
+
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -93,6 +164,7 @@ const HomeScreen = () => {
               <Text style={styles.logoTitle}>Payment Due</Text></View>
             <Text style={[styles.description, { color: "#777" }]}>Just Now</Text>
           </View>
+          <View style={styles.divider}/>
           <Text style={styles.description}>
             Your maintenance bill of <Text style={styles.logoTitle}>Rs. 700</Text> for <Text style={styles.logoTitle}>August</Text> is due. Please make the payment.
           </Text>
@@ -100,7 +172,7 @@ const HomeScreen = () => {
             <Text style={styles.payButtonText}>Make Payment</Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.postContainer}>
+        {/* <View style={styles.postContainer}>
           <View style={[styles.row, { justifyContent: "space-between" }]}>
             <View style={styles.row}>
               <Image source={require("../../../../assets/User/images/hashtag.png")} style={styles.logo} />
@@ -110,7 +182,7 @@ const HomeScreen = () => {
           <View style={styles.divider} />
           <View>
             <Text style={styles.logoTitle}>Celebrating the Ganesh Chaturti in Comminuty</Text>
-            {/* <Text style={[styles.description]}>We are iniviting all the residents to participate cherish the moment.</Text> */}
+       
             <Text >start Date - End Date</Text>
             <Text>Activities:Dancinmg, Singing</Text>
             <Text style={[styles.description, { fontSize: 12, color: "#7d0431" }]}>See More...</Text>
@@ -135,61 +207,148 @@ const HomeScreen = () => {
               </View>
             </View>
           </View>
-        </View>
+        </View> */}
         <View style={styles.postContainer}>
-          <View style={[styles.row, { justifyContent: "space-between" }]}>
-            <View style={styles.row}>
-              <Image source={require("../../../../assets/User/images/megaphone (1).png")} style={styles.logo} />
-              <Text style={styles.logoTitle}>Notice</Text></View>
-            <Text style={[styles.description, { color: "#777" }]}>Just Now</Text>
-          </View>
-          <View style={styles.divider} />
+          {events && events.events && events.events.length > 0 && (
+            <>
+              <View style={[styles.row, { justifyContent: "space-between" }]}>
+                <View style={styles.row}>
+                  <Image source={require("../../../../assets/User/images/hashtag.png")} style={styles.logo} />
+                  <Text style={styles.logoTitle}>Events</Text>
+                </View>
+                <Text style={[styles.description, { color: "#777" }]}>
+                  {new Date(events.events[events.events.length - 1].createdAt).toLocaleDateString('en-US', {
+                    day: 'numeric',
+                    month: 'short'
+                  })}
+                </Text>
+              </View>
+              <View style={styles.divider} />
 
-          <Text style={styles.logoTitle}>
-            Meeting
-          </Text>
-          <Text style={styles.description}>
-            we are conducting the meeting to discuss about issues in our community .I hope everyone will involve in the discussions.
-            -with regards,president.
-          </Text>
+              <View>
+                <Text style={styles.logoTitle}>
+                  {events.events[events.events.length - 1].name}
+                </Text>
+                <Text>
+                  {new Date(events.events[events.events.length - 1].startDate).toLocaleDateString()} -
+                  {new Date(events.events[events.events.length - 1].endDate).toLocaleDateString()}
+                </Text>
+
+                {expanded && (
+                  <>
+                    <View>
+                      {events.events[events.events.length - 1].activities.map((activity, index) => (
+                        <Text key={index}>
+                          {activity.type}
+                        </Text>
+                      ))}
+                    </View>
+
+                    <View style={{ width: "auto", height: "auto", marginTop: 10 }}>
+                      <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between" }}>
+                        {events.events[events.events.length - 1].pictures.map((image, index) => (
+                          <Image
+                            key={index}
+                            source={{ uri: `${ImagebaseURL}${image.img}` }}
+                            style={{
+                              width: events.events[events.events.length - 1].pictures.length === 1 ||
+                                (events.events[events.events.length - 1].pictures.length % 2 !== 0 && index === events.events[events.events.length - 1].pictures.length - 1)
+                                ? "100%"
+                                : "49%",
+                              height: 100,
+                              borderRadius: 4,
+                              marginBottom: 10,
+                            }}
+                            resizeMode="cover"
+                          />
+                        ))}
+                      </View>
+                    </View>
+                  </>
+                )}
+
+                {/* Toggle button for See More / See Less */}
+                <TouchableOpacity onPress={toggleExpanded}>
+                  <Text style={[styles.description, { fontSize: 12, color: "#7d0431" }]}>
+                    {expanded ? "See Less..." : "See More..."}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </>
+          )}
         </View>
         <View style={styles.postContainer}>
-          <View style={[styles.row, { justifyContent: "space-between" }]}>
-            <View style={styles.row}>
-              <Image source={require("../../../../assets/User/images/poll (1).png")} style={styles.logo} />
-              <Text style={styles.logoTitle}>Polls</Text></View>
-            <Text style={[styles.description, { color: "#777" }]}>Just Now</Text>
-          </View>
-          <View style={styles.divider} />
-          <Text style={styles.logoTitle}>
-            Meeting
-          </Text>
-          <Text style={styles.description}>
-            we are conducting the meeting to discuss about issues in our community .I hope everyone will involve in the discussions.
-            -with regards,president.
-          </Text>
-          <View>
-            <RadioButton.Group onValueChange={value => setChecked(value)} value={checked}>
-              <View style={styles.radioOption}>
-                <RadioButton value="option1" theme={{ colors: { primary: "#7D0431" } }} />
-                <Text style={styles.radioLabel}>I will attend</Text>
-              </View>
-              <View style={styles.radioOption}>
-                <RadioButton value="option2" theme={{ colors: { primary: "#7D0431" } }} />
-                <Text style={styles.radioLabel}>I will not attend</Text>
-              </View>
-              <View style={styles.radioOption}>
-                <RadioButton value="option3" theme={{ colors: { primary: "#7D0431" } }} />
-                <Text style={styles.radioLabel}>Maybe</Text>
-              </View>
-            </RadioButton.Group>
-          </View>
-          <View style={styles.divider} />
-          <View style={[styles.row,{justifyContent:"space-between"}]}>
-            <Text style={styles.description}>Polls</Text>
-            <Text style={styles.description}>Polls</Text>
+          {notices && notices.notices && notices.notices.length > 0 && (<>
+            <View style={[styles.row, { justifyContent: "space-between" }]}>
+              <View style={styles.row}>
+                <Image source={require("../../../../assets/User/images/megaphone (1).png")} style={styles.logo} />
+                <Text style={styles.logoTitle}>Notice</Text></View>
+              <Text style={[styles.description, { color: "#777" }]}>{new Date(notices.notices[notices.notices.length - 1].createdAt).toLocaleDateString('en-US', {
+                day: 'numeric',
+                month: 'short'
+              })}</Text>
             </View>
+            <View style={styles.divider} />
+            <Text style={styles.logoTitle}>
+              {notices.notices[notices.notices.length - 1].subject}
+            </Text>
+            <Text style={styles.description}>
+              {notices.notices[notices.notices.length - 1].description}
+            </Text>
+          </>)}
         </View>
+        {polls.length > 0 && (
+          <View style={styles.postContainer}>
+            <View>
+              <View style={[styles.row, { justifyContent: "space-between" }]}>
+                <View style={styles.row}>
+                  <Image source={require("../../../../assets/User/images/poll (1).png")} style={styles.logo} />
+                  <Text style={styles.logoTitle}>Polls</Text>
+                </View>
+                <Text style={[styles.description, { color: "#777" }]}>
+                  {new Date(polls[polls.length - 1].poll.date).toLocaleDateString('en-US', {
+                    day: 'numeric',
+                    month: 'short'
+                  })}
+                </Text>
+              </View>
+
+              <View style={styles.divider} />
+              <Text style={styles.logoTitle}>
+                {polls[polls.length - 1].poll.question}
+              </Text>
+              <Text style={styles.description}>
+                {polls[polls.length - 1].poll.Description}
+              </Text>
+              <RadioButton.Group
+                onValueChange={(value) => setChecked(value)}
+                value={checked}
+              >
+                {polls[polls.length - 1].poll.options.map((option, optionIndex) => (
+                  <View key={optionIndex} style={styles.radioOption}>
+                    <RadioButton value={option} theme={{ colors: { primary: "#7D0431" } }} />
+                    <Text style={styles.radioLabel}>{option}</Text>
+                  </View>
+                ))}
+              </RadioButton.Group>
+
+              <View style={styles.divider} />
+              <View style={[styles.row, { justifyContent: "space-between" }]}>
+                <Text style={styles.description}>
+                  Expires by: {new Date(polls[polls.length - 1].poll.expDate).toLocaleDateString('en-US', {
+                    day: '2-digit',
+                    month: 'short',
+                  })} at {new Date(polls[polls.length - 1].poll.expDate).toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                </Text>
+                <Text style={styles.description}>58%</Text>
+              </View>
+            </View>
+
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -202,7 +361,6 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
-    // backgroundColor: "#7D0431",
     backgroundColor: "#7D0431",
     paddingVertical: height * 0.02,
     borderBottomLeftRadius: 20,
@@ -278,3 +436,4 @@ const styles = StyleSheet.create({
 });
 
 export default HomeScreen;
+

@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
   },
   disabledInput: {
     borderWidth: 1,
-    borderColor: "#800336",
+    borderColor: "#cacecf",
     backgroundColor: "#fff",
     borderRadius: 5,
     padding: 10,
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
   },
   inputField: {
     borderWidth: 1,
-    borderColor: "#800336",
+    borderColor: "#cacecf",
     backgroundColor: "#fff",
     borderRadius: 5,
     paddingHorizontal: 10,

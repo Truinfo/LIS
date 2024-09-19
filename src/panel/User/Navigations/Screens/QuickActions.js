@@ -140,6 +140,8 @@ const QuickActions = ({ navigation }) => {
     }
   }, [profiles]);
 
+
+
   const handleSubmitCabEntry = () => {
     const visitorData = {
       userId,
@@ -154,25 +156,31 @@ const QuickActions = ({ navigation }) => {
       role
     };
 
-    dispatch(createVisitor(visitorData))
-      .then((result) => {
-        if (createVisitor.fulfilled.match(result)) {
-          Alert.alert('Success', 'Cab entry created successfully');
-          const { visitors } = result.payload.data.savedVisitor.society
-          const qrImage = result.payload.data.qrCodeUrl
-          const newVisitor = visitors[visitors.length - 1];
-          const { visitorId } = newVisitor;
-          setVisitorId(visitorId);
-          setQrImageUrl(qrImage);
-          setShowQrModal(true);
-          resetFields();
-          setCabModalVisible(false);
-          setInviteModalVisible(true);
-        } else {
-          Alert.alert('Error', result.payload || 'Failed to create cab entry');
-        }
-      })
-
+    // Validation: Ensure all fields are filled
+    if (name === "" || phoneNumber === "" || vehicleNumber === "" || company === "" || selectedDate === "") {
+      // Show error toast if any field is empty
+      Alert.alert("Please fill out all fields before submitting.")
+    } else {
+      // Proceed with submission if all fields are filled
+      dispatch(createVisitor(visitorData))
+        .then((result) => {
+          if (createVisitor.fulfilled.match(result)) {
+            Alert.alert('Success', 'Cab entry created successfully');
+            const { visitors } = result.payload.data.savedVisitor.society;
+            const qrImage = result.payload.data.qrCodeUrl;
+            const newVisitor = visitors[visitors.length - 1];
+            const { visitorId } = newVisitor;
+            setVisitorId(visitorId);
+            setQrImageUrl(qrImage);
+            setShowQrModal(true);
+            resetFields();
+            setCabModalVisible(false);
+            setInviteModalVisible(true);
+          } else {
+            Alert.alert('Error', result.payload || 'Failed to create cab entry');
+          }
+        });
+    }
   };
   const handleSubmitDeliveryEntry = () => {
     const visitorData = {
@@ -181,37 +189,39 @@ const QuickActions = ({ navigation }) => {
       phoneNumber,
       details,
       date: selectedDate,
-
       company,
       societyId,
       block: buildingName,
       flatNo: flatNumber,
       role
     };
+    if (name === "" || phoneNumber === "" || details === "" || company === "" || selectedDate === "") {
+      // Show error toast if any field is empty
+      Alert.alert("Please fill out all fields before submitting.")
+    } else {
+      dispatch(createVisitor(visitorData))
+        .then((result) => {
+          if (createVisitor.fulfilled.match(result)) {
+            Alert.alert('Success', 'Delivery entry created successfully');
+            const { visitors } = result.payload.data.savedVisitor.society
+            const qrImage = result.payload.data.qrCodeUrl
+            const newVisitor = visitors[visitors.length - 1];
+            const { visitorId } = newVisitor;
+            setVisitorId(visitorId);
+            setQrImageUrl(qrImage);
+            setShowQrModal(true);
+            resetFields();
+            setDeliveryModalVisible(false);
+            setInviteModalVisible(true);
+          } else {
+            Alert.alert('Error', result.payload || 'Failed to create cab entry');
+          }
+        })
+        .finally(() => {
 
-    dispatch(createVisitor(visitorData))
-      .then((result) => {
-        if (createVisitor.fulfilled.match(result)) {
-
-          Alert.alert('Success', 'Delivery entry created successfully');
-          const { visitors } = result.payload.data.savedVisitor.society
-          const qrImage = result.payload.data.qrCodeUrl
-          const newVisitor = visitors[visitors.length - 1];
-          const { visitorId } = newVisitor;
-          setVisitorId(visitorId);
-          setQrImageUrl(qrImage);
-          setShowQrModal(true);
-          resetFields();
-          setDeliveryModalVisible(false);
-          setInviteModalVisible(true);
-        } else {
-          Alert.alert('Error', result.payload || 'Failed to create cab entry');
-        }
-      })
-      .finally(() => {
-
-        dispatch(resetState());
-      });
+          dispatch(resetState());
+        });
+    }
   };
 
   const handleSubmitGuestEntry = () => {
@@ -231,25 +241,41 @@ const QuickActions = ({ navigation }) => {
 
     // Append image if it exists
     if (image) {
-      // Extract the file extension from the URI
       const fileExtension = image.split('.').pop(); // e.g., 'jpeg'
+      const mimeType = `image/${fileExtension}`;    // e.g., 'image/jpeg'
+      const fileName = `photo.${fileExtension}`;    // e.g., 'photo.jpeg'
 
-      // Determine the MIME type based on file extension
-      const mimeType = `image/${fileExtension}`; // e.g., 'image/jpeg'
-
-      // Use a default file name if the image doesn't provide one
-      const fileName = `photo.${fileExtension}`; // e.g., 'photo.jpeg'
       const file = {
         uri: image,
         type: mimeType,
         name: fileName,
       };
       formData.append('pictures', file);
-    } else {
-      console.log('No image selected');
     }
 
-    // Dispatch the createVisitor action
+    // Validation for required fields
+    if (!name) {
+      Alert.alert('Error', 'Name is required');
+      return;
+    }
+    if (!phoneNumber) {
+      Alert.alert('Error', 'Phone Number is required');
+      return;
+    }
+    if (!vehicleNumber) {
+      Alert.alert('Error', 'Vehicle Number is required');
+      return;
+    }
+    if (!selectedDate) {
+      Alert.alert('Error', 'Date is required');
+      return;
+    }
+    if (!image) {
+      Alert.alert('Error', 'Image is required');
+      return;
+    }
+
+    // All fields are valid, proceed to dispatch the createVisitor action
     dispatch(createVisitor(formData))
       .then((result) => {
         if (createVisitor.fulfilled.match(result)) {
@@ -273,7 +299,6 @@ const QuickActions = ({ navigation }) => {
       });
   };
 
-
   const handleSubmitServiceEntry = () => {
     const visitorData = {
       userId,
@@ -288,6 +313,26 @@ const QuickActions = ({ navigation }) => {
       flatNo: flatNumber,
       role,
     };
+    if (!name) {
+      Alert.alert('Error', 'Name is required');
+      return;
+    }
+    if (!phoneNumber) {
+      Alert.alert('Error', 'Phone Number is required');
+      return;
+    }
+    if (!vehicleNumber) {
+      Alert.alert('Error', 'Vehicle Number is required');
+      return;
+    }
+    if (!selectedDate) {
+      Alert.alert('Error', 'Date is required');
+      return;
+    }
+    if (!company) {
+      Alert.alert('Error', 'Company is required');
+      return;
+    }
 
     dispatch(createVisitor(visitorData))
       .then((result) => {
@@ -444,16 +489,7 @@ const QuickActions = ({ navigation }) => {
           />
           <Text style={styles.iconLabel}>Security Alert</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.iconWrapper}
-          onPress={() => navigation.navigate("Message to Guard")}
-        >
-          <Image
-            source={require("../../../../assets/User/images/text1.png")}
-            style={styles.icon}
-          />
-          <Text style={styles.iconLabel}>Message to Guard</Text>
-        </TouchableOpacity>
+     
         <TouchableOpacity
           style={styles.iconWrapper}
           onPress={() => navigation.navigate("Call to Security")}
@@ -838,7 +874,7 @@ const styles = StyleSheet.create({
   heading: {
     fontWeight: "bold",
     fontSize: 17,
-    color: "#192c4c",
+    color: "#484848",
     marginBottom: height * 0.02,
     marginBottom: height * 0.02,
 
@@ -862,8 +898,13 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     marginRight: width * 0.073,
     borderWidth: 1,
-    backgroundColor: "#F3E1D5",
-    borderColor: "#C59358",
+    backgroundColor: "#f7f7f7",
+    borderColor: "#f0f3f4",
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
   },
   icon: {
     width: width * 0.11,
@@ -884,7 +925,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.7)",
     justifyContent: "center",
-   
+
     alignItems: "center",
   },
   modalContent: {

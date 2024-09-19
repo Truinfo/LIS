@@ -8,7 +8,6 @@
       "image": "./src/assets/User/images/taxi-driver.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
-      
      },
     "extra": {
       "eas": {

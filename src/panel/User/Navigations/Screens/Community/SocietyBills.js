@@ -75,7 +75,7 @@ const SocietyBills = () => {
                 />
             </View>
             <View style={styles.header}>
-                <Text style={{ fontSize: 20, fontWeight: '600' }}>{item.monthAndYear}</Text>
+                <Text style={{ fontSize: 20, fontWeight: '600',color:"#484848" }}>{item.monthAndYear}</Text>
                 <View style={styles.chip}>
                     <Text style={styles.chipText}>{item.status}</Text>
                 </View>

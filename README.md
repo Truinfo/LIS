@@ -12,5 +12,6 @@ git remove remote
 git remote -v
 git remote remove origin
 git remote add origin https://github.com/Truinfo/LIS.git
+git remote set-url origin https://github.com/Truinfo/LIS.git
 git remote -v
 git push --set-upstream origin main

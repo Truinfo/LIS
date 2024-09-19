@@ -23,27 +23,33 @@ const RentalPropertyType = ({ route }) => {
         ) : (
           <Text style={styles.errorText}>Image not available</Text>
         )}
-        <View style={styles.row}>
+        <View style={[styles.row, { marginTop: 4 }]}>
           <Text style={styles.detailText}>Flat No: {item.details.flat_No}</Text>
           <Text style={styles.detailText}>₹ {item.details.price}</Text>
         </View>
+        <View style={[styles.row, { marginTop: 4 }]}>
+          <View style={styles.row}>
+            <Image
+              source={require("../../../../../assets/User/images/bed.png")}
+              style={styles.availablePropertyImage2}
+            />
+            <Text style={styles.alternatingText}>{item.details.rooms}</Text>
+          </View>
+          <View style={styles.row}>
+            <Image
+              source={require("../../../../../assets/User/images/shower.png")}
+              style={styles.availablePropertyImage2}
+            />
+            <Text style={styles.alternatingText}>{item.details.washrooms}</Text>
+          </View>
+          <View style={styles.row}>
+            <Image
+              source={require("../../../../../assets/User/images/ruler.png")}
+              style={styles.availablePropertyImage2}
+            />
+            <Text style={styles.alternatingText}>{item.details.flat_Area} sqft</Text>
+          </View>
 
-        <View style={styles.alternatingRow}>
-          <Image
-            source={require("../../../../../assets/User/images/bed.png")}
-            style={styles.availablePropertyImage2}
-          />
-          <Text style={styles.alternatingText}>{item.details.rooms}</Text>
-          <Image
-            source={require("../../../../../assets/User/images/shower.png")}
-            style={styles.availablePropertyImage2}
-          />
-          <Text style={styles.alternatingText}>{item.details.washrooms}</Text>
-          <Image
-            source={require("../../../../../assets/User/images/ruler.png")}
-            style={styles.availablePropertyImage2}
-          />
-          <Text style={styles.alternatingText}>{item.details.flat_Area}</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -136,11 +142,11 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 10,
+    alignItems: "center",
   },
   detailText: {
     fontSize: 16,
-    color: "#192c4c",
+    color: "#484848",
     fontWeight: "700",
   },
   detailText2: {
@@ -149,19 +155,21 @@ const styles = StyleSheet.create({
     marginTop: 5,
     marginBottom: 5,
   },
-  alternatingRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 10,
-  },
+  // alternatingRow: {
+  //   flexDirection: "row",
+  //   justifyContent:"space-between",
+  //   alignItems: "center",
+  //   marginTop: 10,
+  // },
   alternatingText: {
     fontSize: 14,
     color: "#333",
     marginHorizontal: 5,
+    textAlign: "left",
   },
   availablePropertyImage2: {
-    width: 20,
-    height: 20,
+    width: 30,
+    height: 30,
   },
 });
 

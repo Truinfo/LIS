@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { createRental, resetState } from '../../../Redux/Slice/CommunitySlice/Rental/createRentalSlice';
-import { StyleSheet, View, Text, Button, ScrollView, TextInput, TouchableOpacity, Alert, Image } from 'react-native';
+import { StyleSheet, View, Text, Button, ScrollView, TextInput, TouchableOpacity, Alert, Image, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -46,11 +46,10 @@ const CreateRental = () => {
   const createRentalState = useSelector((state) => state.createRental);
 
   const { loading = false, success = false, error = null } = createRentalState || {};
-
+  let [errorMessage, seterorMessage] = useState("")
   const handleSubmit = async () => {
     try {
       const formData = new FormData();
-
       const details = JSON.stringify({
         block,
         flat_No: flatNo,
@@ -76,7 +75,34 @@ const CreateRental = () => {
           name: file.name,
         });
       });
+      if (!flatArea) {
+        Alert.alert("Please enter flatArea")
+        return
+      }
+      if (!maintenancePrice) {
+        return seterorMessage("Please enter maintenancePrice")
 
+      }
+      if (!price) {
+        Alert.alert("Please enter price")
+        return
+      }
+      if (!rooms) {
+        return seterorMessage("Please enter room")
+
+      }
+      if (!washrooms) {
+        return seterorMessage("Please enter washrooms")
+
+      }
+      if (!phoneNumber) {
+        return seterorMessage("Please enter phoneNumber")
+
+      }
+      if (!pictures) {
+        return seterorMessage("Please add pictures")
+
+      }
       const result = await dispatch(createRental(formData));
       if (result.type === 'createRental/createRental/fulfilled') {
         dispatch(getSocietiesByAdvertisements());
@@ -119,117 +145,127 @@ const CreateRental = () => {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.heading}>Create Property</Text>
+    <SafeAreaView style={styles.container}>
+      <ScrollView style={styles.ScrollViewcontainer}>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Block"
-        value={block}
-        onChangeText={setBlock}
-        placeholderTextColor="#800336"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Flat Area"
-        value={flatArea}
-        onChangeText={setFlatArea}
-        placeholderTextColor="#800336"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Flat No"
-        value={flatNo}
-        onChangeText={setFlatNo}
-        placeholderTextColor="#800336"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Maintenance Price"
-        value={maintenancePrice}
-        onChangeText={(value) => handleNumberInput(value, setMaintenancePrice)}
-        keyboardType="numeric"
-        placeholderTextColor="#800336"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Price"
-        value={price}
-        onChangeText={(value) => handleNumberInput(value, setPrice)}
-        keyboardType="numeric"
-        placeholderTextColor="#800336"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Rooms"
-        value={rooms}
-        onChangeText={setRooms}
-        placeholderTextColor="#800336"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Washrooms"
-        value={washrooms}
-        onChangeText={(value) => handleNumberInput(value, setWashrooms)}
-        keyboardType="numeric"
-        placeholderTextColor="#800336"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Phone Number"
-        value={phoneNumber}
-        onChangeText={(value) => handleNumberInput(value, setPhoneNumber)}
-        keyboardType="phone-pad"
-        placeholderTextColor="#800336"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Society ID"
-        value={societyId}
-        onChangeText={setSocietyId}
-        placeholderTextColor="#800336"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Status"
-        value={status}
-        onChangeText={setStatus}
-        placeholderTextColor="#800336"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="User ID"
-        value={userId}
-        onChangeText={setUserId}
-        placeholderTextColor="#800336"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="User Name"
-        value={userName}
-        onChangeText={setUserName}
-        placeholderTextColor="#800336"
-      />
-      <TouchableOpacity style={styles.imageUploadButton} onPress={handleImageUpload}>
-        <Text style={styles.buttonText}>Upload Image</Text>
-      </TouchableOpacity>
-      {pictures.length > 0 && (
-        <View style={styles.imagePreview}>
-          {pictures.map((picture, index) => (
-            <Image key={index} source={{ uri: picture.uri }} style={styles.image} />
-          ))}
-        </View>
-      )}
-      <Button title="Submit" onPress={handleSubmit} disabled={loading} />
-    </ScrollView>
+
+        <Text style={styles.heading}>Create Property</Text>
+
+        <TextInput
+          style={styles.input}
+          placeholder="Block"
+          value={block}
+          onChangeText={setBlock}
+          placeholderTextColor="#800336"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Flat Area"
+          value={flatArea}
+          onChangeText={setFlatArea}
+          placeholderTextColor="#800336"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Flat No"
+          value={flatNo}
+          onChangeText={setFlatNo}
+          placeholderTextColor="#800336"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Maintenance Price"
+          value={maintenancePrice}
+          onChangeText={(value) => handleNumberInput(value, setMaintenancePrice)}
+          keyboardType="numeric"
+          placeholderTextColor="#800336"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Price"
+          value={price}
+          onChangeText={(value) => handleNumberInput(value, setPrice)}
+          keyboardType="numeric"
+          placeholderTextColor="#800336"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Rooms"
+          value={rooms}
+          onChangeText={setRooms}
+          placeholderTextColor="#800336"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Washrooms"
+          value={washrooms}
+          onChangeText={(value) => handleNumberInput(value, setWashrooms)}
+          keyboardType="numeric"
+          placeholderTextColor="#800336"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Phone Number"
+          value={phoneNumber}
+          onChangeText={(value) => handleNumberInput(value, setPhoneNumber)}
+          keyboardType="phone-pad"
+          placeholderTextColor="#800336"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Society ID"
+          value={societyId}
+          onChangeText={setSocietyId}
+          placeholderTextColor="#800336"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Status"
+          value={status}
+          onChangeText={setStatus}
+          placeholderTextColor="#800336"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="User ID"
+          value={userId}
+          onChangeText={setUserId}
+          placeholderTextColor="#800336"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="User Name"
+          value={userName}
+          onChangeText={setUserName}
+          placeholderTextColor="#800336"
+        />
+        <TouchableOpacity style={styles.imageUploadButton} onPress={handleImageUpload}>
+          <Text style={styles.buttonText}>Upload Image</Text>
+        </TouchableOpacity>
+        {pictures.length > 0 && (
+          <View style={styles.imagePreview}>
+            {pictures.map((picture, index) => (
+              <Image key={index} source={{ uri: picture.uri }} style={styles.image} />
+            ))}
+          </View>
+        )}
+
+        <TouchableOpacity onPress={handleSubmit} disabled={loading} style={styles.imageUploadButton} >
+          <Text style={styles.buttonText}>Submit</Text></TouchableOpacity>
+      </ScrollView>
+    </SafeAreaView>
+
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+
     backgroundColor: '#fff',
+  },
+  ScrollViewcontainer: {
+    paddingHorizontal: 10,
   },
   heading: {
     fontSize: 24,
@@ -267,6 +303,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
     marginBottom: 8,
   },
+
 });
 
 export default CreateRental;

@@ -2,10 +2,10 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Image, Text, View } from 'react-native';
 import HomeScreen from '../../Navigations/Screens/HomeScreen';
-import GetHelp from '../../Navigations/Screens/GetHelp';
 import QuickActions from '../../Navigations/Screens/QuickActions';
 import Services from '../../Navigations/Screens/Services';
 import Community from '../../Navigations/Screens/Community';
+import RentalProperties from '../../Navigations/Screens/Community/RentalProperties';
 
 const Tab = createBottomTabNavigator();
 
@@ -78,7 +78,7 @@ function Tabs() {
                 headerTintColor: '#fff',
             }} />
 
-            <Tab.Screen name="Social" component={GetHelp} options={{
+            <Tab.Screen name="Social" component={RentalProperties} options={{
                 headerStyle: { backgroundColor: '#7D0431' },
                 headerTintColor: '#fff',
             }} />

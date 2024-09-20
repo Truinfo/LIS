@@ -51,12 +51,7 @@ export default function App() {
     setSelectedDate(currentDate.toLocaleDateString());
   };
 
-  const onChange = (event, selectedDate) => {
-    const currentDate = selectedDate || date; setShow(Platform.OS === "ios"); // close picker on iOS
-    setDate(currentDate); // Format the date to "YYYY-MM-DD" or another format that the backend expects
-    const formattedDate = currentDate.toISOString().split("T")[0]; // 'YYYY-MM-DD'
-    setSelectedDate(formattedDate);
-  };
+ 
   const showMode = (currentMode) => {
     setShow(true);
     setMode(currentMode);

@@ -1,11 +1,10 @@
-
-
 import React, { useEffect, useState } from "react";
 import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { Card } from "react-native-paper";
 import { fetchEvents } from "../../../Redux/Slice/CommunitySlice/EventSlice";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
 const Events = ({ navigation }) => {
   const dispatch = useDispatch();
   const events = useSelector((state) => state.events.events);
@@ -40,65 +39,65 @@ const Events = ({ navigation }) => {
   if (status === "loading") {
     content = <Text>Loading...</Text>;
   } else if (status === "succeeded") {
-    content = (<>
-      {
-        events.events.map((event) => (
-          <TouchableOpacity key={event._id}
+    const sortedEvents = [...events.events].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    
+    content = (
+      <>
+        {sortedEvents.map((event) => (
+          <Card
+            style={styles.card}
+            key={event._id}
             onPress={() => navigation.navigate('EventDetails', { event })}
           >
-            <Card style={styles.card}>
-              <Card.Content>
-                {event.pictures[0] ? (
-                  <Image
-                    source={{ uri: `https://livinsync.onrender.com${event.pictures[0].img}` }}
-                    style={styles.pictures}
-                  />
-                ) : (
-                  <Text style={styles.errorText}>Image not available</Text>
-                )}
+            <Card.Content>
+              {event.pictures[0] ? (
+                <Image
+                  source={{ uri: `https://livinsync.onrender.com${event.pictures[0].img}` }}
+                  style={styles.pictures}
+                />
+              ) : (
+                <Text style={styles.errorText}>Image not available</Text>
+              )}
 
-                <View style={[styles.infoContainer, { marginTop: 10 }]}>
-                  <Text style={styles.label}>Name </Text>
-                  <Text style={styles.value}>: {event.name}</Text>
-                </View>
-
-                <View style={styles.infoContainer}>
-                  <Text style={styles.label}>Start Date</Text>
-                  <Text style={styles.value}>: {event.startDate.slice(0, 10)}</Text>
-                </View>
-
-                <View style={styles.infoContainer}>
-                  <Text style={styles.label}>End Date</Text>
-                  <Text style={styles.value}>: {event.endDate.slice(0, 10)}</Text>
-                </View>
-              </Card.Content>
-
-            </Card>
-          </TouchableOpacity>
-
-        ))
-      }
-    </>
-    )
+              <View style={[styles.infoContainer, { marginTop: 10 }]}>
+                <Text style={styles.label}>Name </Text>
+                <Text style={styles.value}>: {event.name}</Text>
+              </View>
+              <View style={styles.infoContainer}>
+                <Text style={styles.label}>Start Date</Text>
+                <Text style={styles.value}>: {event.startDate.slice(0, 10)}</Text>
+              </View>
+              <View style={styles.infoContainer}>
+                <Text style={styles.label}>End Date</Text>
+                <Text style={styles.value}>: {event.endDate.slice(0, 10)}</Text>
+              </View>
+            </Card.Content>
+          </Card>
+        ))}
+      </>
+    );
   } else if (status === "failed") {
     content = <Text>{error}</Text>;
   }
 
   return (
-    <View style={{
-      flex: 1, backgroundColor: "#FFF",
-      paddingVertical: 10,
-    }}>
-      <ScrollView contentContainerStyle={styles.scrollView}>{content}</ScrollView></View>
+    <View style={{ flex: 1, backgroundColor: "#f6f6f6" }}>
+      <ScrollView contentContainerStyle={styles.scrollView}>{content}</ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-
+  scrollView: {
+    paddingHorizontal: 10
+  },
   card: {
     width: "100%",
     borderRadius: 10,
-    marginTop: 20,
+    marginVertical: 10,
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#ccc",
   },
   pictures: {
     width: "100%",
@@ -109,16 +108,20 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   infoContainer: {
-    flexDirection: 'row',  // Align items in a row (horizontally)
+    flexDirection: 'row',
     marginBottom: 5,
   },
   label: {
-    flex: 1,  // This will align the label to the left
+    flex: 1,
     fontSize: 16,
   },
   value: {
-    flex: 2.5,  // This will ensure that the value aligns to the right side
+    flex: 2.5,
     fontSize: 16,
+  },
+  errorText: {
+    color: 'red',
+    textAlign: 'center',
   },
 });
 

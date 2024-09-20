@@ -13,6 +13,7 @@ const Notice = () => {
   const notices = useSelector(selectNotices);
   const loading = useSelector(selectLoading);
   const error = useSelector(selectError);
+
   useEffect(() => {
     const getUserName = async () => {
       try {
@@ -28,6 +29,7 @@ const Notice = () => {
 
     getUserName();
   }, []);
+
   useEffect(() => {
     if (societyId) {
       dispatch(fetchNotices(societyId));
@@ -49,10 +51,14 @@ const Notice = () => {
       </View>
     );
   }
+
+  // Sort notices in descending order (most recent at the top)
+  const sortedNotices = [...notices.notices].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
   return (
     <View style={styles.container}>
       <FlatList
-        data={notices.notices}
+        data={sortedNotices}
         keyExtractor={(item) => item._id}
         renderItem={({ item }) => (
           <View style={styles.MainContainer}>
@@ -63,7 +69,15 @@ const Notice = () => {
                 resizeMode="contain"
               />
               <Text style={styles.headerText}>{item.subject}</Text>
-              <Text style={styles.time}>{item.time}</Text>
+              <Text style={styles.time}>
+                {new Date(item.createdAt).toLocaleString('en-US', {
+                  day: '2-digit',
+                  month: 'short',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  hour12: true,
+                })}
+              </Text>
             </View>
             <Text style={styles.mainText}>{item.subject}</Text>
             <Text style={styles.paragraph}>{item.description}</Text>
@@ -74,22 +88,25 @@ const Notice = () => {
   );
 };
 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    padding: 20,
+    backgroundColor: "#f6f6f6",
   },
   loadingContainer: {
     justifyContent: 'center',
     alignItems: 'center',
   },
   MainContainer: {
-    backgroundColor: "#F3E1D5",
+    backgroundColor: "#fff",
     borderWidth: 1,
-    borderColor: "#27272a",
+    borderColor: "#f6f6f6",
+    elevation: 2,
     padding: 10,
-    marginTop: 10,
+    width: "95%",
+    marginLeft: 10,
+    marginVertical: 5,
     borderRadius: 8,
   },
   header: {

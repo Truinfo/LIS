@@ -44,12 +44,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: "#800336",
+    borderColor: "#cacecf",
     borderRadius: 5,
   },
   categoryButtonText: {
     fontSize: 16,
-    color: "#000",
+    color: "#484848",
     fontWeight: "bold",
   },
 });

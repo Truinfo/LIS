@@ -2,7 +2,7 @@
 import React from "react";
 import { View, Text, Image, ScrollView, StyleSheet, Dimensions, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-const { width,  } = Dimensions.get('window');
+const { width, } = Dimensions.get('window');
 const services = [
   {
     category: "Daily Help",
@@ -120,10 +120,14 @@ const ServiceItem = ({ name, icon }) => {
   };
   return (
     <TouchableOpacity onPress={handlePress}>
-      <View style={[styles.serviceIconContainer, { borderColor: "#C59358", borderWidth: 1 }]}>
-        <Image source={icon} style={styles.serviceIcon} />
+      <View style={{ display: 'flex', justifyContent: "center", alignItems: "center" }}>
+        <View style={styles.serviceIconContainer}>
+          <Image source={icon} style={styles.serviceIcon} />
+        </View>
         <Text style={styles.serviceName}>{name}</Text>
       </View>
+
+
     </TouchableOpacity>
   );
 };
@@ -191,7 +195,7 @@ const styles = StyleSheet.create({
   categoryTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#800336"
+    color: "#484848"
   },
   categorySubtitle: {
     fontSize: 12,
@@ -204,18 +208,23 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   serviceIconContainer: {
-    backgroundColor: "#F3E1D5",
+    backgroundColor: "#f7f7f7",
     borderWidth: 1,
-    borderColor: "#C59358",
-    padding: 10,
-    borderBottomLeftRadius: 20,
-    borderTopRightRadius: 20,
+    borderColor: "#F0f3f4",
+    padding: 7,
+    borderRadius: 60,
     marginLeft: 8,
+    marginTop: 7,
     marginBottom: 10,
     justifyContent: "center",
     alignItems: "center",
-    width: width * 0.21,
-    height: 82,
+    width: width * 0.20,
+    height:75,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
   },
   serviceIcon: {
     width: 40,
@@ -236,9 +245,8 @@ const styles = StyleSheet.create({
   serviceName: {
     fontSize: 12,
     textAlign: "center",
-    marginTop: 5,
     maxWidth: 70,
-    color: "#800336"
+    color: "#222222"
   },
 });
 export default Services;

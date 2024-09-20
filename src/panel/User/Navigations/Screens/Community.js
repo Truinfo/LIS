@@ -15,13 +15,6 @@ const Community = () => {
         navigation.navigate("Society Bills");
     }
 
-    const handleDiscussionPress = () => {
-        navigation.navigate("Communication");
-
-    }
-    // const handleRentalFlatsPress = () => {
-    //     navigation.navigate("RentalProperties");
-    // }
     const handleNoticeBoardPress = () => {
         navigation.navigate("Notice Board");
     }
@@ -41,7 +34,7 @@ const Community = () => {
                     <View style={styles.cardContent}>
                         <Text style={styles.cardHeading}>Residents</Text>
                         <Text style={styles.cardSubheading}>
-                            View society residents & management Committee
+                            Society residents & management
                         </Text>
                     </View>
                 </TouchableOpacity>
@@ -54,38 +47,15 @@ const Community = () => {
                     <View style={styles.cardContent}>
                         <Text style={styles.cardHeading}>Emergency No’s</Text>
                         <Text style={styles.cardSubheading}>
-                            Emergency contacts for your society
+                            Emergency contacts of society
                         </Text>
                     </View>
                 </TouchableOpacity>
             </View>
-            {/* <TouchableOpacity style={styles.card} onPress={handleRentalFlatsPress}>
-                <Image
-                    style={styles.cardImage}
-                    source={require("../../../../assets/User/images/building.png")}
-                />
-                <View style={styles.cardContent}>
-                    <Text style={styles.cardHeading}>Rental Flats</Text>
-                    <Text style={styles.cardSubheading}>
-                        Find & post your flats for rentals
-                    </Text>
-                </View>
-            </TouchableOpacity> */}
+
             <Text style={styles.text}>Engage</Text>
 
             <View style={styles.cardContainer}>
-                {/* <TouchableOpacity style={styles.card} onPress={handleDiscussionPress}>
-                    <Image
-                        style={styles.cardImage}
-                        source={require("../../../../assets/User/images/chating.png")}
-                    />
-                    <View style={styles.cardContent}>
-                        <Text style={styles.cardHeading}>Discussion</Text>
-                        <Text style={styles.cardSubheading}>
-                            Host meetings , polls and Communication channels
-                        </Text>
-                    </View>
-                </TouchableOpacity> */}
 
                 <TouchableOpacity style={styles.card} onPress={handleAminitiesPress}>
                     <Image
@@ -107,7 +77,7 @@ const Community = () => {
                     <View style={styles.cardContent}>
                         <Text style={styles.cardHeading}>Polls</Text>
                         <Text style={styles.cardSubheading}>
-                            Give you decisions
+                            Give your decisions
                         </Text>
                     </View>
                 </TouchableOpacity>
@@ -134,7 +104,7 @@ const Community = () => {
                     />
                     <View style={styles.cardContent}>
                         <Text style={styles.cardHeading}>Notice Board</Text>
-                        <Text style={styles.cardSubheading}>View society announcement</Text>
+                        <Text style={styles.cardSubheading}>Society announcement</Text>
                     </View>
                 </TouchableOpacity>
             </View>
@@ -147,12 +117,12 @@ const Community = () => {
                 <View style={styles.cardContent}>
                     <Text style={styles.cardHeading}>Society Bills</Text>
                     <Text style={styles.cardSubheading}>
-                        Find & store society and personal documents
+                        Society and personal documents
                     </Text>
                 </View>
             </TouchableOpacity>
             <Text style={styles.text}>Get Help</Text>
-            <TouchableOpacity style={styles.card}  onPress={() => { navigation.navigate("GetHelp") }}>
+            <TouchableOpacity style={styles.card} onPress={() => { navigation.navigate("GetHelp") }}>
                 <Image
                     style={styles.cardImage}
                     source={require("../../../../assets/User/images/gethelp.png")}
@@ -160,7 +130,7 @@ const Community = () => {
                 <View style={styles.cardContent}>
                     <Text style={styles.cardHeading}>Complaints</Text>
                     <Text style={styles.cardSubheading}>
-                        Find & rise issues in flats/society
+                        View & Rise issues in flats/society
                     </Text>
                 </View>
             </TouchableOpacity>
@@ -188,9 +158,9 @@ const styles = StyleSheet.create({
     card: {
         width: "49%",
         height: 75, // Adjusted height to fit content naturally
-        backgroundColor: "#F3E1D5",
+        backgroundColor: "#f7f7f7",
         borderWidth: 1,
-        borderColor: "#C59358",
+        borderColor: "#f0f3f4",
         borderTopRightRadius: 20,
         borderBottomLeftRadius: 20,
         shadowColor: "#000",
@@ -198,7 +168,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
         shadowRadius: 4,
         elevation: 5,
-        padding: 7,
+        padding: 5,
         flexDirection: "row",
         alignItems: "center",
         marginVertical: 10,
@@ -206,17 +176,18 @@ const styles = StyleSheet.create({
     cardImage: {
         width: 40,
         height: 40,
-        marginRight: 16, // Margin to space out image and text
+        marginRight: 12, // Margin to space out image and text
     },
     cardContent: {
         flex: 1,
-        // justifyContent: "center",
+        
     },
     cardHeading: {
         fontSize: 15,
         fontWeight: "bold",
         marginBottom: 4,
         textAlign: "left", // Align text to the left
+        color:"#484848"
     },
     cardSubheading: {
         fontSize: 10,

@@ -51,13 +51,9 @@ const RentalFlatDetails = ({ route }) => {
             <Text style={styles.propertyText}>₹ {advertisement.details.price}</Text>
           </View>
           <Text style={styles.propertySubText}>
-            {apartment.societyAdress.addressLine1},
-            {apartment.societyAdress.addressLine2},
-            {apartment.societyAdress.state}-
-            {apartment.societyAdress.postalCode}
+            {apartment.societyAdress.addressLine1}, {apartment.societyAdress.addressLine2}, {apartment.societyAdress.state}- {apartment.societyAdress.postalCode}
           </Text>
-
-          <View style={styles.row}>
+          <View style={[styles.row, { marginTop: 4 }]}>
             <View style={styles.iconTextContainer}>
               <Image
                 source={require("../../../../../assets/User/images/bed.png")}
@@ -82,40 +78,27 @@ const RentalFlatDetails = ({ route }) => {
           </View>
 
         </View>
-
-
         <View style={styles.propertyContainer}>
           <Text style={styles.mainTitle}>Society Info</Text>
           <Text style={styles.societyName}>{apartment.societyName}</Text>
           <View style={styles.row}>
             <Text style={styles.propertySubText}>{apartment.blocks.length} Blocks</Text>
             <View style={styles.contactContainer}>
-              <Image
-                style={styles.contactIcon}
-              />
+
               <Text style={styles.propertySubText}>{apartment.contactNumber}</Text>
             </View>
           </View>
           <View style={styles.row}>
             <Text style={styles.propertySubText}>{totalFlats} Flats</Text>
             <View style={styles.contactContainer}>
-              <Image
-                style={styles.contactIcon}
-              />
               <Text style={styles.propertySubText}>
                 {apartment.email}
               </Text>
             </View>
           </View>
           <View style={styles.contactContainer}>
-            <Image
-              style={styles.locationIcon}
-            />
             <Text style={styles.propertySubText}>
-              {apartment.societyAdress.addressLine1},
-              {apartment.societyAdress.addressLine2},
-              {apartment.societyAdress.state}-
-              {apartment.societyAdress.postalCode}
+              {apartment.societyAdress.addressLine1}, {apartment.societyAdress.addressLine2}, {apartment.societyAdress.state}- {apartment.societyAdress.postalCode}
             </Text>
           </View>
         </View>
@@ -184,26 +167,26 @@ const styles = StyleSheet.create({
   },
   propertyText: {
     fontSize: 16,
-    color: "#192c4c",
+    color: "#484848",
     fontWeight: "bold",
   },
   propertySubText: {
     fontSize: 15,
     color: "#666",
+
   },
   iconTextContainer: {
     flexDirection: "row",
     alignItems: "center",
   },
   icon: {
-    width: 20,
-    height: 20,
-    marginRight: 5,
+    width: 30,
+    height: 30,
   },
   mainTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#192c4c",
+    color: "#484848",
     marginBottom: 10,
   },
   societyName: {

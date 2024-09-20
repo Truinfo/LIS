@@ -116,6 +116,7 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 18,
     fontWeight: 'bold',
+    color:"#484848"
   },
   phone: {
     fontSize: 16,

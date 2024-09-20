@@ -265,52 +265,7 @@ const GetHelp = () => {
           )}
         </View>
       </View>
-      {/* <FlatList
-        data={filteredTickets}
-        keyExtractor={(item) => item._id}
-        renderItem={({ item }) => (
-          <View style={styles.ticketContainer}>
-            <View style={styles.header}>
-              <Text style={styles.type}>
-                {item.complaintType} - {item.complaintCategory}
-              </Text>
-              {item.resolution === "Resolved" ? (
-                <Ionicons name="checkmark-done-sharp" size={24} color="#16a34a" />
-              ) : item.resolution === "Pending" ? (
-                <Ionicons name="warning" size={24} color="#facc15" />
-              ) : null}
-            </View>
-
-            <Text style={styles.date}>{item.complaintTitle}</Text>
-            <Text style={styles.date}>{item.description}</Text>
-            <View style={styles.row}>
-              <Text style={styles.label}>Complaint Date</Text>
-              <Text style={styles.value}>: {formatDate(item.dateAndTime)}</Text>
-            </View>
-
-            <View style={styles.row}>
-              <Text style={styles.label}>Complaint By</Text>
-              <Text style={styles.value}>: {item.complaintBy}</Text>
-            </View>
-
-            {item.resolution === "Pending" && (
-              <TouchableOpacity
-                style={styles.resolveButton}
-                onPress={() => markAsResolved(item.complaintId)}
-              >
-                <Text style={styles.resolveButtonText}>Resolved</Text>
-              </TouchableOpacity>
-            )}
-            {item.resolution === "Resolved" && (
-              <View style={styles.row}>
-                <Text style={styles.label}>Resolved Date</Text>
-                <Text style={styles.value}>: {formatDate(item.updatedAt)}</Text>
-              </View>
-
-            )}
-          </View>
-        )}
-      /> */}
+      
       <FlatList
         data={sortedTickets} // Use sortedTickets here
         keyExtractor={(item) => item._id}
@@ -433,6 +388,7 @@ const styles = StyleSheet.create({
   type: {
     fontWeight: "bold",
     fontSize: 16,
+    color:"#484848"
   },
   status: {
     padding: 5,

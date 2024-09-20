@@ -27,7 +27,6 @@ import AddService from "./src/panel/Security/Navigations/AddService";
 import AddDelivery from "./src/panel/Security/Navigations/AddDelivery";
 import AddGuest from "./src/panel/Security/Navigations/AddGuest";
 import Tabs from "./src/panel/User/Components/Bottom-tabs/Tabs";
-// import Tab2 from "./src/panel/User/Components/Bottom-tabs/Tab";
 import MaidList from "./src/panel/User/Navigations/Screens/Services/MaidList";
 import MaidProfile from "./src/panel/User/Navigations/Screens/Services/MaidProfile";
 import MilkManList from "./src/panel/User/Navigations/Screens/Services/MilkManList";
@@ -57,19 +56,16 @@ import TermsandConditions1 from "./src/panel/User/Navigations/Screens/Profile/Te
 import ResetPassword1 from "./src/panel/User/Navigations/Screens/Profile/ResetPassword";
 import Amenities from "./src/panel/User/Navigations/Screens/Community/Amenities";
 import BookingScreen from "./src/panel/User/Navigations/Screens/Community/BookingScreen";
-// import Discussion from "./src/panel/User/Navigations/Screens/Community/Discussion";
 import DiscussionChat from "./src/panel/User/Navigations/Screens/Community/DiscussionChat";
 import Documents from "./src/panel/User/Navigations/Screens/Community/Documents";
 import Emergency from "./src/panel/User/Navigations/Screens/Community/Emergency";
 import Flats from "./src/panel/User/Navigations/Screens/Community/Flats";
 import NoticeBoard from "./src/panel/User/Navigations/Screens/Community/NoticeBoard";
 import Payment from "./src/panel/User/Navigations/Screens/Community/Payment";
-import RentalFlats from "./src/panel/User/Navigations/Screens/Community/RentalFlats";
 import Resident from "./src/panel/User/Navigations/Screens/Community/Residents";
 import Notifications from './src/panel/User/Navigations/Screens/Notifications/Notifications';
 import Sample from './src/panel/Security/Component/Barcode/Sample';
 import PreApproval from './src/panel/User/Navigations/Screens/QuickActions/PreApprovals/PreApproval';
-import MessagetoGuard from './src/panel/User/Navigations/Screens/QuickActions/MessagetoGuard';
 import Household from './src/panel/User/Navigations/Screens/Profile/Household';
 import Polls from './src/panel/User/Navigations/Screens/Community/Polls';
 import CreateUser from './src/panel/User/Navigations/Authentication/CreateUser';
@@ -83,10 +79,8 @@ import InandOut1 from './src/panel/Security/Component/Header/InandOut1';
 import MyDocuments from './src/panel/User/Navigations/Screens/Profile/MyDocuments';
 import Communication from './src/panel/User/Navigations/Screens/Community/Communication';
 import MyBills from './src/panel/User/Navigations/Screens/Profile/MyBills/MyBills';
-
 import Guard from './src/panel/Security/Component/Header/Guard';
 import MyBookings from './src/panel/User/Navigations/Screens/Profile/MyBookings';
-
 import StaffVisitors from "./src/panel/Security/Navigations/StaffVisitors";
 import RentalPropertyType from './src/panel/User/Navigations/Screens/Community/RentalPropertyType';
 import RentalFlatDetails from './src/panel/User/Navigations/Screens/Community/RentalFlatDetails';
@@ -176,9 +170,6 @@ export default function App() {
             <Stack.Screen name="Tabs" component={Tabs} options={{
               headerShown: false,
             }} />
-            {/* <Stack.Screen name="Tab" component={Tab2} options={{
-              headerShown: false,
-            }} /> */}
             <Stack.Screen name="Forgot Password" component={ForgotPassword} options={{
               headerShown: false,
             }} />
@@ -253,14 +244,11 @@ export default function App() {
             <Stack.Screen name="Flats" component={Flats} />
             <Stack.Screen name="Notice Board" component={NoticeBoard} />
             <Stack.Screen name="Payment" component={Payment} />
-            <Stack.Screen name="Rental Flats" component={RentalFlats} />
             <Stack.Screen name="Residents " component={Resident} />
             <Stack.Screen name="Notification" component={Notifications} />
             <Stack.Screen name="Pre Approval Visitors" component={PreApproval} />
-            <Stack.Screen name="Message to Guard" component={MessagetoGuard} />
             <Stack.Screen name="Household" component={Household} />
             <Stack.Screen name="GetHelp" component={GetHelp} />
-
             <Stack.Screen name="IndividualChatRoom" component={IndividualChatRoom} />
             <Stack.Screen name="Create Rental" component={CreateRental} />
             <Stack.Screen name="RentalPropertyType" component={RentalPropertyType} />

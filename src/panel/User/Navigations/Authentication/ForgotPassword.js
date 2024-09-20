@@ -1,93 +1,109 @@
 import React, { useState } from "react";
-import { View, StyleSheet, Image, Text, TouchableOpacity, Alert } from "react-native";
+import { View, StyleSheet, Image, Text, TouchableOpacity, SafeAreaView } from "react-native";
 import { TextInput } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import { sendForgotPasswordEmail } from "../../Redux/Slice/AuthSlice/Forgot/SendForgotEmail";
+import Toast from "react-native-toast-message";
 
 const ForgotPassword = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const loading = useSelector((state) => state.forgotPassword.loading);
-  const error = useSelector((state) => state.forgotPassword.error);
+  const loading = useSelector((state) => state.senEmailforgotPassword.loading);
+  const error = useSelector((state) => state.senEmailforgotPassword.error);
   const [email, setemail] = useState("");
   const [emailError, setEmailError] = useState("");
-
-  const handleContinue = () => {
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const handleContinue = async () => {
     let isValid = true;
+
+    // Email validation
     if (!email) {
       setEmailError("Please enter your email.");
       isValid = false;
+    } else if (!emailRegex.test(email)) {
+      setEmailError("Please enter a valid email address.");
+      isValid = false;
     } else {
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailPattern.test(email)) {
-        setEmailError("Please enter a valid email address.");
-        isValid = false;
-      } else {
-        setEmailError("");
+      setEmailError("");
+    }
+
+    if (isValid) {
+      try {
+        // Dispatch the action to send the forgot password email
+        const resultAction = await dispatch(sendForgotPasswordEmail(email));
+
+        // Handle success scenario
+        if (resultAction.payload && resultAction.payload.success === true) {
+          console.log('Email sent successfully, navigate to verification screen');
+          navigation.navigate("Verification", { email });
+        } else {
+          // Handle error scenario if the result action failed
+          Toast.show({
+            type: 'error',
+            text1: 'Email Sending Failed',
+            text2: resultAction.payload.message || 'An error occurred during the password reset process.',
+            position: 'top',
+            topOffset: 60,
+          });
+        }
+      } catch (error) {
+        // Handle any unexpected errors
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: 'An unexpected error occurred. Please try again later.',
+          position: 'top',
+          topOffset: 60,
+        });
       }
     }
-    
-    if (isValid) {
-      dispatch(sendForgotPasswordEmail(email))
-          .then(returnResult => {
-              console.log('result', returnResult);
-              if (returnResult.payload.success === true) {
-                console.log('Email sent successfully,navigate to verification screen');
-                  navigation.navigate("Verification ", { email });
-              } else {
-                  Alert.alert( returnResult.payload.message);
-              }
-          })
-          .catch(error => {
-              console.error('Error sending forgot password email:', error);
-          });
-  }
-  
   };
-  
 
   const handleLoginPage = () => {
     navigation.navigate("Login");
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.topContainer}>
-        <Image
-          source={require("../../../../assets/User/gif/Forgot password.gif")}
-          style={styles.image}
-        />
-        <Text style={styles.headerText}>Forgot Password</Text>
-      </View>
-      <View style={styles.bottomContainer}>
-        <TextInput
-          label="Email"
-          value={email}
-          onChangeText={(text) => {
-            setemail(text);
-            setEmailError("");
-          }}
-          keyboardType="email-address"
-          style={styles.input}
-          mode="outlined"
-          outlineColor="#CCC"
-          theme={{ colors: { primary: "#27272A" } }}
-          error={!!emailError}
-        />
-        {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
-        <TouchableOpacity style={styles.button} onPress={handleContinue}>
-          <Text style={styles.buttonText}>
-            {loading ? 'Sending...' : 'Continue'}
+    <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
+        <View style={styles.topContainer}>
+          <Image
+            source={require("../../../../assets/User/gif/Forgot password.gif")}
+            style={styles.image}
+          />
+        </View>
+        <View style={styles.bottomContainer}>
+          <Text style={styles.headerText}>Forgot Password</Text>
+          <TextInput
+            label="Email"
+            value={email}
+            onChangeText={(text) => {
+              setemail(text.toLowerCase());
+              setEmailError("");
+            }}
+            keyboardType="email-address"
+            style={styles.input}
+            mode="outlined"
+            outlineColor="#CCC"
+            theme={{ colors: { primary: "#27272A" } }}
+            error={!!emailError}
+          />
+          {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
+          <TouchableOpacity style={styles.button} onPress={handleContinue}>
+            <Text style={styles.buttonText}>
+              {loading ? 'Sending...' : 'Continue'}
+            </Text>
+          </TouchableOpacity>
+          {error && <Text style={styles.errorText}>{error}</Text>}
+          <Text style={styles.backToSignIn}>
+            Back to
+            <Text style={styles.highlightText} onPress={handleLoginPage} > Login</Text>
           </Text>
-        </TouchableOpacity>
-        {error && <Text style={styles.errorText}>{error}</Text>}
-        <Text style={styles.backToSignIn} onPress={handleLoginPage}>
-          Back to
-          <Text style={styles.highlightText}> Login</Text>
-        </Text>
+        </View>
       </View>
-    </View>
+      <Toast />
+    </SafeAreaView>
   );
 };
 
@@ -97,7 +113,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
   },
   topContainer: {
-    flex: 3.6,
+    flex: 1,
     backgroundColor: "#7D0431",
     justifyContent: "center",
     alignItems: "center",
@@ -117,9 +133,10 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
   headerText: {
-    fontWeight: "500",
-    fontSize: 42,
-    color: "#F3E1D5",
+    fontWeight: "600",
+    fontSize: 30,
+    color: "#7D0431",
+    marginBottom: 10,
   },
   highlightText: {
     color: "#7D0431",
@@ -144,6 +161,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   backToSignIn: {
+    marginTop: 20,
     fontSize: 16,
     textAlign: "center",
   },

@@ -44,12 +44,12 @@ export default function App() {
     setSelectedDate(currentDate.toLocaleDateString());
   }, []);
   const communityHall = navigateData.find(eachAme => eachAme.amenityName === "Community Hall");
-  // const onChange = (selectedDate) => {
-  //   const currentDate = selectedDate || date;
-  //   setShow(Platform.OS === "ios");
-  //   setDate(currentDate);
-  //   setSelectedDate(currentDate.toLocaleDateString());
-  // };
+  const onChange = ( selectedDate) => {
+    const currentDate = selectedDate || date;
+    setShow(Platform.OS === "ios");
+    setDate(currentDate);
+    setSelectedDate(currentDate.toLocaleDateString());
+  };
 
   const onChange = (event, selectedDate) => {
     const currentDate = selectedDate || date; setShow(Platform.OS === "ios"); // close picker on iOS

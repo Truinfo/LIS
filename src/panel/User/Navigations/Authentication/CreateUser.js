@@ -1,258 +1,414 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
-import { RadioButton, Text as PaperText, Button, TextInput } from "react-native-paper";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView } from "react-native";
+import { Button, TextInput } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchCities } from '../../Redux/Slice/AuthSlice/Signup/citySlice';
-import { fetchSocieties } from "../../Redux/Slice/AuthSlice/Signup/societySlice";
-import { sendVerificationEmail } from '../../Redux/Slice/AuthSlice/Signup/SendEmailVerification';
 import { useNavigation } from "@react-navigation/native";
-
+import { fetchSocietyByLicence } from "../../Redux/Slice/AuthSlice/Signup/licenceSlice";
+import { fetchCitiesById } from "../../Redux/Slice/AuthSlice/Signup/citySlice";
+import { sendVerificationEmail } from "../../Redux/Slice/AuthSlice/Signup/SendEmailVerification";
+import Toast from "react-native-toast-message";
 
 const CreateUser = () => {
     const dispatch = useDispatch();
     const navigation = useNavigation();
-    const cities = useSelector(state => state.citiesState.cities);
-    const societies = useSelector(state => state.societiesState.societies);
-    const [name, setName] = useState("");
+    const [societyLicense, setSocietyLicense] = useState("LIS-");
+    const [isLicenseValid, setIsLicenseValid] = useState(false);
+    const [showDetails, setShowDetails] = useState(false);
     const [email, setEmail] = useState("");
     const [mobileNumber, setPhoneNumber] = useState("");
     const [password, setPassword] = useState("");
-    const [city, setCity] = useState("");
-    const [society, setSociety] = useState("");
+    const [retypePassword, setRetypePassword] = useState("");
+    const [passwordError, setPasswordError] = useState("");
+    const [name, setName] = useState("");
     const [block, setBlock] = useState("");
     const [flat, setFlat] = useState("");
-    const [showCityMenu, setShowCityMenu] = useState(false);
-    const [showSocietyMenu, setShowSocietyMenu] = useState(false);
+    const [userType, setUserType] = useState("");
+    const [emailError, setEmailError] = useState("");
+    const [nameError, setNameError] = useState("");
+    const [mobileNumberError, setMobileNumberError] = useState("");
+    const [blockError, setBlockError] = useState("");
+    const [flatError, setFlatError] = useState("");
+    const [userTypeError, setUserTypeError] = useState("");
     const [showBlockMenu, setShowBlockMenu] = useState(false);
     const [showFlatMenu, setShowFlatMenu] = useState(false);
-    const [userType, setUserType] = useState("");
-    const [blocksForSelectedSociety, setBlocksForSelectedSociety] = useState([]);
-    const [flatsForSelectedBlock, setFlatsForSelectedBlock] = useState([]);
-    const [citySelected, setCitySelected] = useState(false);
-    const [societySelected, setsocietySelected] = useState(false);
-    const [blockSelected, setblockSelected] = useState(false);
-    const [flatsSelected, setFlatsSelected] = useState(false);
-    const [societyId, setSocietyId] = useState('')
+    const [showUserTypeMenu, setShowUserTypeMenu] = useState(false);
+
+    const society = useSelector(state => state.societyLis.societyByLicence || null);
+    const city = useSelector(state => state.citiesState.currentCity || null);
+
+    const blocksForSelectedSociety = society?.blocks || [];
+    const flatsForSelectedBlock = blocksForSelectedSociety.find(b => b.blockName === block)?.flats || [];
+    const userTypes = ["Tenant", "Owner"];
 
     useEffect(() => {
-        dispatch(fetchCities());
-    }, [dispatch]);
+        if (society && society.city) {
+            dispatch(fetchCitiesById({ cityId: society.city }));
+        }
+    }, [society, dispatch]);
 
-    const selectCity = (selectedCity) => {
-        setCity(selectedCity.name);
-        setShowCityMenu(false);
-        dispatch(fetchSocieties(selectedCity._id));
-        setCitySelected(true);
+    const handleLicenseInputChange = (value) => {
+        const digits = value.replace("LIS-", "");
+        if (/^\d{0,6}$/.test(digits)) {
+            setSocietyLicense(`LIS-${digits}`);
+            setIsLicenseValid(digits.length === 6);
+        }
     };
 
-    const toggleCityMenu = () => {
-        setShowCityMenu(!showCityMenu);
+    const handleSubmit = async () => {
+        if (isLicenseValid) {
+            try {
+                const result = await dispatch(fetchSocietyByLicence({ societyLicense })).unwrap();
+
+                setShowDetails(true);
+
+                if (result.city) {
+                    await dispatch(fetchCitiesById({ cityId: result.city }));
+                } else {
+                    throw new Error('City ID not found in society data');
+                }
+            } catch (error) {
+                setSocietyLicense("LIS-")
+                Toast.show({
+                    type: 'error',
+                    text1: 'License Invalid',
+                    text2: error.message || 'An error occurred during the fetch process.',
+                    position: 'top',
+                    topOffset: 60,
+                    zIndex: 1000,
+                });
+            }
+        }
     };
 
-    const selectSociety = (selectedSociety) => {
-        setsocietySelected(true);
-        setSocietyId(selectedSociety._id)
-        setSociety(selectedSociety.societyName);
-        setShowSocietyMenu(false);
-        const fetchedBlocks = fetchBlocksForSociety(selectedSociety._id);
-        setBlocksForSelectedSociety(fetchedBlocks);
-    };
 
-    const fetchBlocksForSociety = (selectedSocietyId) => {
-        const blocks = societies.find(item => item._id === selectedSocietyId)?.blocks || [];
-        return blocks;
-    };
+    const handleCreateUser = async () => {
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        const mobileNumberRegex = /^\d{10}$/;
+        let isValid = true;
 
-    const selectBlock = (selectedBlock) => {
-        setblockSelected(true);
-        setBlock(selectedBlock.blockName);
-        setShowBlockMenu(false);
-        const fetchedFlats = fetchFlatsForBlock(selectedBlock.blockName);
-        setFlatsForSelectedBlock(fetchedFlats);
-    };
+        if (!email) {
+            setEmailError("Please enter your email.");
+            isValid = false;
+        } else if (!emailRegex.test(email)) {
+            setEmailError("Please enter a valid email address.");
+            isValid = false;
+        } else {
+            setEmailError("");
+        }
 
-    const fetchFlatsForBlock = (selectedBlockName) => {
-        const flats = blocksForSelectedSociety.find(item => item.blockName === selectedBlockName)?.flats || [];
-        return flats;
-    };
+        if (!password) {
+            setPasswordError("Password is required");
+            isValid = false;
+        } else if (password !== retypePassword) {
+            setPasswordError("Passwords do not match.");
+            isValid = false;
+        } else {
+            setPasswordError("");
+        }
 
-    const selectFlat = (selectedFlat) => {
-        setFlat(selectedFlat.flatNumber);
-        setShowFlatMenu(false);
-        setFlatsSelected(true);
-    };
+        if (!name) {
+            setNameError("Name is required");
+            isValid = false;
+        } else {
+            setNameError("");
+        }
 
-    const toggleSocietyMenu = () => {
-        setShowSocietyMenu(!showSocietyMenu);
+        if (!mobileNumber) {
+            setMobileNumberError("Phone number is required");
+            isValid = false;
+        } else if (!mobileNumberRegex.test(mobileNumber)) {
+            setMobileNumberError("Phone number must be exactly 10 digits");
+            isValid = false;
+        } else {
+            setMobileNumberError("");
+        }
+
+        if (!block) {
+            setBlockError("Block is required");
+            isValid = false;
+        } else {
+            setBlockError("");
+        }
+
+        if (!flat) {
+            setFlatError("Flat is required");
+            isValid = false;
+        } else {
+            setFlatError("");
+        }
+
+        if (!userType) {
+            setUserTypeError("User Type is required");
+            isValid = false;
+        } else {
+            setUserTypeError("");
+        }
+
+        if (!isValid) {
+            return;
+        }
+
+        const societyId = society?._id;
+        const societyName = society?.societyName;
+
+        try {
+            const resultAction = await dispatch(sendVerificationEmail(email)).unwrap();
+            console.log(resultAction)
+            navigation.navigate("Verification", {
+                name,
+                email,
+                mobileNumber,
+                password,
+                societyId,
+                society: societyName,
+                block,
+                flat,
+                userType,
+            });
+        } catch (error) {
+            Toast.show({
+                type: 'error',
+                text1: 'Verification Email Failed',
+                text2: error.message || 'An error occurred while sending the verification email.',
+                position: 'top',
+                topOffset: 60,
+            });
+        }
     };
 
     const toggleBlockMenu = () => {
         setShowBlockMenu(!showBlockMenu);
+        if (showFlatMenu) setShowFlatMenu(false);
     };
 
     const toggleFlatMenu = () => {
         setShowFlatMenu(!showFlatMenu);
+        if (showBlockMenu) setShowBlockMenu(false);
     };
 
-    const handleCreateUser = () => {
-        dispatch(sendVerificationEmail(email))
-            .unwrap()
-            .then((result) => {
-                navigation.navigate("Verification", {
-                    name,
-                    email,
-                    mobileNumber,
-                    password,
-                    societyId,
-                    society,
-                    block,
-                    flat,
-                    userType,
-                });
-            })
-            .catch((error) => {
-                console.error('Failed to send email:', error);
-            });
+    const toggleUserTypeMenu = () => {
+        setShowUserTypeMenu(!showUserTypeMenu);
     };
-
 
     return (
+
         <View style={styles.container}>
-            <ScrollView>
-                <Text style={styles.title}>Create User</Text>
-                <Text style={styles.sectionTitle}>User Information</Text>
-                <TextInput
-                    theme={{ colors: { primary: "#7D0431" } }}
-                    mode="outlined"
-                    style={styles.input}
-                    label="Name"
-                    value={name}
-                    onChangeText={setName}
-                />
-                <TextInput
-                    theme={{ colors: { primary: "#7D0431" } }}
-                    mode="outlined"
-                    style={styles.input}
-                    label="Email"
-                    value={email}
-                    onChangeText={setEmail}
-                    keyboardType="email-address"
-                />
-                <TextInput
-                    theme={{ colors: { primary: "#7D0431" } }}
-                    mode="outlined"
-                    style={styles.input}
-                    label="Phone Number"
-                    value={mobileNumber}
-                    onChangeText={setPhoneNumber}
-                    keyboardType="phone-pad"
-                />
-                <TextInput
-                    theme={{ colors: { primary: "#7D0431" } }}
-                    mode="outlined"
-                    style={styles.input}
-                    label="Password"
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry={true}
-                />
 
-                <Text style={styles.sectionTitle}>Apartment Information</Text>
-                <View style={styles.dropdownContainer}>
-                    <TouchableOpacity onPress={toggleCityMenu} style={[styles.dropdown, showCityMenu && styles.dropdownActive]}>
-                        <Text style={styles.dropdownText}>{city ? city : "Select City"}</Text>
-                    </TouchableOpacity>
-                    {showCityMenu && (
-                        <View style={styles.menu}>
-                            {cities.map((item) => (
-                                <TouchableOpacity key={item._id} onPress={() => selectCity(item)}>
-                                    <Text style={styles.menuItem}>{item.name}</Text>
-                                </TouchableOpacity>
-                            ))}
-                        </View>
-                    )}
-                </View>
-                <View style={styles.dropdownContainer}>
-                    <TouchableOpacity onPress={toggleSocietyMenu} style={[styles.dropdown, showSocietyMenu && styles.dropdownActive]} disabled={!citySelected}>
-                        <Text style={styles.dropdownText}>{society ? society : "Select Society"}</Text>
-                    </TouchableOpacity>
-                    {showSocietyMenu && (
-                        <View style={styles.menu}>
-                            {societies.map((item) => (
-                                <TouchableOpacity key={item._id} onPress={() => selectSociety(item)} disabled={!citySelected}>
-                                    <Text style={styles.menuItem}>{item.societyName}</Text>
-                                </TouchableOpacity>
-                            ))}
-                        </View>
-                    )}
-                </View>
-
-                <View style={styles.dropdownContainer}>
-                    <TouchableOpacity onPress={toggleBlockMenu} style={[styles.dropdown, showBlockMenu && styles.dropdownActive]} disabled={!societySelected}>
-                        <Text>{block ? block : "Select Block"}</Text>
-                    </TouchableOpacity>
-                    {showBlockMenu && (
-                        <View style={styles.menu}>
-                            {blocksForSelectedSociety.map((item) => (
-                                <TouchableOpacity key={item._id} onPress={() => selectBlock(item)} disabled={!societySelected}>
-                                    <Text style={styles.menuItem}>{item.blockName}</Text>
-                                </TouchableOpacity>
-                            ))}
-                        </View>
-                    )}
-                </View>
-
-                <View style={styles.dropdownContainer}>
-                    <TouchableOpacity onPress={toggleFlatMenu} style={[styles.dropdown, showSocietyMenu && styles.dropdownActive]} disabled={!blockSelected}>
+            <Text style={styles.maintitle}>Registration</Text>
+            {!showDetails ? (
+                <>
+                    <Text style={styles.title}>Enter Society License</Text>
+                    <TextInput
+                        theme={{ colors: { primary: "#7D0431" } }}
+                        mode="outlined"
+                        style={styles.input}
+                        label="Society License"
+                        value={societyLicense}
+                        onChangeText={handleLicenseInputChange}
+                        keyboardType="numeric"
+                    />
+                    <View style={styles.buttonContainer}>
+                        <Button
+                            mode="contained"
+                            theme={{ colors: { primary: '#7D0431' } }}
+                            onPress={handleSubmit}
+                            disabled={!isLicenseValid}
+                        >
+                            Submit
+                        </Button>
+                    </View>
+                </>
+            ) : (
+                <>
+                    <View style={styles.societyContainer}>
+                        <Text style={styles.title}>Society Details</Text>
+                        {society && (
+                            <>
+                                <View style={styles.detailRow}>
+                                    <Text style={styles.label}>Name:</Text>
+                                    <Text style={styles.value}>{society.societyName}</Text>
+                                </View>
+                                <View style={styles.detailRow}>
+                                    <Text style={styles.label}>Address:</Text>
+                                    <Text style={styles.value}>{society.societyAdress.addressLine1}, {society.societyAdress.addressLine2}</Text>
+                                </View>
+                            </>
+                        )}
+                        {city && (
+                            <>
+                                <View style={styles.detailRow}>
+                                    <Text style={styles.label}>City:</Text>
+                                    <Text style={styles.value}>{city.name}</Text>
+                                </View>
+                            </>
+                        )}
+                    </View>
+                    <ScrollView style={styles.detailsContainer}>
                         <View>
-                            <Text>{flat ? flat : "Select Flat"}</Text>
-                        </View>
-                    </TouchableOpacity>
-                    {showFlatMenu && (
-                        <View style={styles.menu}>
-                            {flatsForSelectedBlock.map((item) => (
-                                <TouchableOpacity key={item._id} onPress={() => selectFlat(item)} disabled={!blockSelected}>
-                                    <Text style={styles.menuItem}>{item.flatNumber}</Text>
+                            {/* Block Dropdown */}
+                            <View style={styles.dropdownContainer}>
+                                <TouchableOpacity
+                                    onPress={toggleBlockMenu}
+                                    style={[styles.dropdown, showBlockMenu && styles.dropdownActive]}
+                                    disabled={!society}
+                                >
+                                    <Text>{block ? block : "Select Block"}</Text>
                                 </TouchableOpacity>
-                            ))}
-                        </View>
-                    )}
-                </View>
-                {flatsSelected && (
-                    <View style={styles.radioContainer}>
-                        <View style={styles.radioGroup}>
-                            <View style={styles.radioButton}>
-                                <RadioButton.Android
-                                    theme={{ colors: { primary: "#7D0431" } }}
-                                    value="Owner"
-                                    status={userType === "Owner" ? "checked" : "unchecked"}
-                                    onPress={() => setUserType("Owner")}
-                                />
-                                <PaperText>Owner</PaperText>
+                                {showBlockMenu && (
+                                    <View style={styles.menu}>
+                                        {blocksForSelectedSociety.map((item) => (
+                                            <TouchableOpacity
+                                                key={item._id}
+                                                onPress={() => {
+                                                    setBlock(item.blockName);
+                                                    setShowBlockMenu(false);
+                                                    setFlat("");
+                                                }}
+                                                style={styles.menuItem}
+                                                disabled={!society}
+                                            >
+                                                <Text>{item.blockName}</Text>
+                                            </TouchableOpacity>
+                                        ))}
+                                    </View>
+                                )}
+                                {blockError ? <Text style={styles.errorText}>{blockError}</Text> : null}
                             </View>
-                            <View style={styles.radioButton}>
-                                <RadioButton.Android
+
+                            {/* Flat Dropdown */}
+                            <View style={styles.dropdownContainer}>
+                                <TouchableOpacity
+                                    onPress={toggleFlatMenu}
+                                    style={[styles.dropdown, showFlatMenu && styles.dropdownActive]}
+                                    disabled={!society}
+                                >
+                                    <Text>{flat ? flat : "Select Flat"}</Text>
+                                </TouchableOpacity>
+                                {showFlatMenu && (
+                                    <View style={styles.menu}>
+                                        {flatsForSelectedBlock.map((item) => (
+                                            <TouchableOpacity
+                                                key={item._id}
+                                                onPress={() => {
+                                                    setFlat(item.flatNumber);
+                                                    setShowFlatMenu(false);
+                                                }}
+                                                style={styles.menuItem}
+                                                disabled={!society}
+                                            >
+                                                <Text>{item.flatNumber}</Text>
+                                            </TouchableOpacity>
+                                        ))}
+                                    </View>
+                                )}
+                                {flatError ? <Text style={styles.errorText}>{flatError}</Text> : null}
+
+                            </View>
+                            <View style={styles.dropdownContainer}>
+                                <TouchableOpacity
+                                    onPress={toggleUserTypeMenu}
+                                    style={[styles.dropdown, showUserTypeMenu && styles.dropdownActive]}
+                                >
+                                    <Text>{userType ? userType : "Select User Type"}</Text>
+                                </TouchableOpacity>
+                                {showUserTypeMenu && (
+                                    <View style={styles.menu}>
+                                        {userTypes.map((type) => (
+                                            <TouchableOpacity
+                                                key={type}
+                                                onPress={() => {
+                                                    setUserType(type);
+                                                    setShowUserTypeMenu(false);
+                                                }}
+                                                style={styles.menuItem}
+                                            >
+                                                <Text>{type}</Text>
+                                            </TouchableOpacity>
+                                        ))}
+                                    </View>
+                                )}
+                                {userTypeError ? <Text style={styles.errorText}>{userTypeError}</Text> : null}
+                            </View>
+                            {/* Additional fields */}
+                            <View style={styles.subContainer}>
+                                <TextInput
                                     theme={{ colors: { primary: "#7D0431" } }}
-                                    value="Tenant"
-                                    status={userType === "Tenant" ? "checked" : "unchecked"}
-                                    onPress={() => setUserType("Tenant")}
+                                    mode="outlined"
+                                    style={styles.input}
+                                    label="Name"
+                                    value={name}
+                                    onChangeText={setName}
                                 />
-                                <PaperText>Tenant</PaperText>
+                                {nameError ? <Text style={styles.errorText}>{nameError}</Text> : null}
+                            </View>
+                            <View style={styles.subContainer}>
+                                <TextInput
+                                    theme={{ colors: { primary: "#7D0431" } }}
+                                    mode="outlined"
+                                    style={styles.input}
+                                    label="Email"
+                                    value={email}
+                                    onChangeText={(text) => {
+                                        setEmail(text.toLowerCase());
+                                        setEmailError("");
+                                    }}
+                                    error={!!emailError}
+                                />
+                                {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
+                            </View>
+                            <View style={styles.subContainer}>
+                                <TextInput
+                                    theme={{ colors: { primary: "#7D0431" } }}
+                                    mode="outlined"
+                                    style={styles.input}
+                                    label="Phone Number"
+                                    value={mobileNumber}
+                                    onChangeText={setPhoneNumber}
+                                    keyboardType="numeric"
+                                />
+                                {mobileNumberError ? <Text style={styles.errorText}>{mobileNumberError}</Text> : null}
                             </View>
                         </View>
-                    </View>)}
-            </ScrollView>
-            <View style={styles.buttonContainer}>
-                <Button
-                    mode="contained"
-                    theme={{ colors: { primary: '#7D0431' } }}
-                    onPress={handleCreateUser}
-                    disabled={!name || !email || !mobileNumber || !password || !city || !society || !block || !flat || !userType}
-                >
-                    Submit
-                </Button>
-            </View>
-        </View>
+                        <View style={styles.subContainer}>
+                            <TextInput
+                                theme={{ colors: { primary: "#7D0431" } }}
+                                mode="outlined"
+                                style={styles.input}
+                                label="Password"
+                                value={password}
+                                onChangeText={setPassword}
+                                secureTextEntry
+                            />
+                            {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
+                        </View>
+                        <View style={styles.subContainer}>
+                            <TextInput
+                                theme={{ colors: { primary: "#7D0431" } }}
+                                mode="outlined"
+                                style={styles.input}
+                                label="Re-type Password"
+                                value={retypePassword}
+                                onChangeText={(text) => {
+                                    setRetypePassword(text);
+                                    setPasswordError("");
+                                }}
+                                secureTextEntry
+                            />
+                            {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
+                        </View>
+                        <Button
+                            mode="contained"
+                            theme={{ colors: { primary: '#7D0431' } }}
+                            onPress={handleCreateUser}
+                            style={styles.buttonContainer}
+                        >
+                            Create User
+                        </Button>
+                    </ScrollView>
+                </>
+            )}
+            <Toast />
+        </View >
     );
 };
 
@@ -263,71 +419,87 @@ const styles = StyleSheet.create({
         paddingTop: 20,
         backgroundColor: "#fcf6f0",
     },
+    maintitle: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#7D0431',
+        textAlign: 'center',
+        marginBottom: 20,
+    },
     title: {
-        fontSize: 28,
-        color: "#7D0431",
-        letterSpacing: 0.7,
-        fontWeight: "bold",
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#7D0431',
         marginBottom: 10,
     },
-    sectionTitle: {
-        fontSize: 18,
-        fontWeight: "bold",
-        marginTop: 15,
-        marginBottom: 5,
-        color: "#555",
-    },
     input: {
-        marginVertical: 5,
-    },
-    dropdownContainer: {
-        marginVertical: 8,
-    },
-    dropdown: {
-        borderWidth: 1,
-        borderColor: "#ccc",
-        backgroundColor: "#fff",
-        padding: 12,
-        borderRadius: 5,
-    },
-    dropdownActive: {
-        borderColor: "#7D0431",
-    },
-    dropdownText: {
-        fontSize: 16,
-    },
-    menu: {
-        marginTop: 5,
-        backgroundColor: "#fff",
-        borderWidth: 1,
-        borderColor: "#ccc",
-        borderRadius: 5,
-        maxHeight: 150,
-        overflow: "scroll",
-    },
-    menuItem: {
-        padding: 12,
-        borderBottomWidth: 1,
-        borderBottomColor: "#ccc",
-    },
-    radioContainer: {
-        marginTop: 20,
-    },
-    radioGroup: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-    },
-    radioButton: {
-        flexDirection: "row",
-        alignItems: "center",
+        fontSize: 15,
     },
     buttonContainer: {
-        marginVertical: 20,
-        paddingHorizontal: 15,
-        position: "absolute",
-        bottom: 0,
-        left: 0,
-        right: 0,
+        marginTop: 20,
+        marginBottom: 20,
+    },
+    detailsContainer: {
+        flex: 1,
+        padding: 15,
+    },
+    societyContainer: {
+        borderWidth: 1,
+        borderColor: "gray",
+        borderStyle: "solid",
+        borderRadius: 5,
+        padding: 10
+    },
+
+    detailRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginVertical: 2,
+    },
+    label: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#333',
+        width: 70, // Set a fixed width for the label
+    },
+    value: {
+        fontSize: 16,
+        color: '#800336',
+        flex: 1,  // Let the value take the remaining space
+    },
+    dropdownContainer: {
+        marginBottom: 15,
+    },
+    subContainer: {
+        marginBottom: 15,
+    },
+    dropdown: {
+        padding: 10,
+        borderWidth: 1,
+        borderColor: '#7D0431',
+        borderRadius: 4,
+        backgroundColor: '#fff',
+    },
+    dropdownActive: {
+        backgroundColor: '#f1f1f1',
+    },
+    menu: {
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: 4,
+        marginTop: 5,
+        backgroundColor: '#fff',
+        position: 'absolute',
+        zIndex: 999,
+        width: '100%',
+        fontSize: 15,
+    },
+    menuItem: {
+        padding: 10,
+    },
+    errorText: {
+        color: 'red',
+        fontSize: 14,
     },
 });
 

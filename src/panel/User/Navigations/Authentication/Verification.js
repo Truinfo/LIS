@@ -1,5 +1,3 @@
-// Verification.js
-
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, TextInput, StyleSheet, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
@@ -7,19 +5,21 @@ import { useNavigation } from '@react-navigation/native';
 import { verifyOTP, resetVerification, selectLoadingStatus, selectError, selectVerificationStatus } from '../../Redux/Slice/AuthSlice/Signup/otpSlice';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { fetchUserProfile } from '../../Redux/Slice/AuthSlice/Signup/userProfileSlice';
+import Toast from 'react-native-toast-message';
 
 const Verification = ({ route }) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const { name, email, mobileNumber, password, city, society, societyId, block, flat, userType } = route.params;
+  const { name, email, mobileNumber, password, society, societyId, block, flat, userType } = route.params;
   const [countdown, setCountdown] = useState(180);
   const [verificationCode, setVerificationCode] = useState(Array(6).fill(''));
   const loading = useSelector(selectLoadingStatus);
   const refs = useRef([]);
-
+  const successMessage = useSelector((state) => state.user.successMessage);
+  console.log(successMessage)
   useEffect(() => {
     if (countdown > 0) {
-      const timer = setInterval(() => setCountdown(countdown - 1), 1000);
+      const timer = setInterval(() => setCountdown(prev => prev - 1), 1000);
       return () => clearInterval(timer);
     }
   }, [countdown]);
@@ -46,31 +46,53 @@ const Verification = ({ route }) => {
 
   const handleResendOTP = () => {
     setCountdown(180);
+    // Add logic to resend OTP if needed
   };
-  const handleContinue = () => {
-    dispatch(verifyOTP({ email, otp: verificationCode.join('') }))
-      .then((resultAction) => {
-        if (resultAction.payload.success === true) {
-          dispatch(resetVerification());
-          const userProfile = resultAction.payload.userProfile?._id;
-          if (userProfile) {
-            const id = userProfile;
-            const userData = { name, email, mobileNumber, password, city, society, societyId, block, flat, userType };
-            dispatch(fetchUserProfile({ id, data: userData }));
+
+  const handleContinue = async () => {
+    try {
+      // Dispatch OTP verification
+      const resultAction = await dispatch(verifyOTP({ email, otp: verificationCode.join('') })).unwrap();
+
+      if (resultAction.success) {
+        // Reset verification and fetch user profile
+        dispatch(resetVerification());
+
+        const userProfileId = resultAction.userProfile?._id;
+        if (userProfileId) {
+          const userData = { name, email, mobileNumber, password, society, societyId, block, flat, userType };
+          await dispatch(fetchUserProfile({ id: userProfileId, data: userData })).unwrap();
+          Toast.show({
+            type: 'success',
+            text1: 'Success',
+            text2: successMessage || 'Successfully Created.',
+            position: 'top',
+            topOffset: 60,
+          });
+          setTimeout(() => {
             navigation.navigate('Login');
-          } else {
-            console.log("User profile data is missing in the response.");
-          }
-        } else {
-          console.log("OTP verification failed.");
+          }, 2000);
         }
-      })
-      .catch((error) => {
-        console.error("Error verifying OTP:", error);
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: 'Verification Failed',
+          text2: resultAction.payload.message || 'An error occurred during OTP verification.',
+          position: 'top',
+          topOffset: 60,
+        });
+        navigation.goBack();
+      }
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Verification Failed',
+        text2: error.message || 'An error occurred during OTP verification.',
+        position: 'top',
+        topOffset: 60,
       });
-
+    }
   };
-
 
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
@@ -132,6 +154,7 @@ const Verification = ({ route }) => {
             <Text style={styles.continueText}>Continue</Text>
           </TouchableOpacity>
         </View>
+        <Toast />
       </View>
     </TouchableWithoutFeedback>
   );
@@ -145,7 +168,7 @@ const styles = StyleSheet.create({
   },
   prompt: {
     fontSize: 18,
-    fontWeight: "500",
+    fontWeight: '500',
     marginBottom: 10,
   },
   row: {
@@ -159,7 +182,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   phoneText: {
-    fontStyle: "italic",
+    fontStyle: 'italic',
     fontSize: 16,
   },
   editButton: {

@@ -39,7 +39,7 @@ import Settings from './Slice/Security_Panel/SettingsSlice';
 import quickContacts from './Slice/Security_Panel/QuickContactsSlice';
 import staffVisitors from './Slice/Security_Panel/StaffInandOutSlice';
 import billsReducer from './Slice//ProfileSlice/myBillsSlice';
-
+import societyLicence from './Slice/AuthSlice/Signup/licenceSlice';
 import societyBillReducer from './Slice/CommunitySlice/SocietyBillsSlice'
 import rentalReducer from './Slice/CommunitySlice/Rental/rentalSlice'
 
@@ -103,7 +103,8 @@ const store = configureStore({
     setting: Settings,
     quickContact: quickContacts,
     staffVisitor: staffVisitors,
+    societyLis: societyLicence,
+
   },
 });
-
 export default store;

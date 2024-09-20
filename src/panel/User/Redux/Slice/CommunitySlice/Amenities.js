@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axiosInstance from "../../../../Security/helpers/axios";
+import axios from "axios";
 
 export const getAmenitiesBySocietyId = createAsyncThunk(
     'amenities/fetchAmenities',
@@ -16,8 +17,9 @@ export const getAmenitiesBySocietyId = createAsyncThunk(
 export const bookAmenity = createAsyncThunk(
     'amenities/booking', // Renamed to a more accurate string
     async (BookingData, { rejectWithValue }) => {
+        console.log("Booking data",BookingData)
         try {
-            const response = await axiosInstance.post(`/bookAmenity/${BookingData.amenityId}`, BookingData.data);
+            const response = await axios.post(`http://192.168.29.226:2000/api/bookAmenity/${BookingData.amenityId}`, BookingData.data);
             return response.data; // Return the data directly
         } catch (error) {
             console.error("Error fetching amenities:", error);

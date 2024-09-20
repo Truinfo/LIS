@@ -44,13 +44,19 @@ export default function App() {
     setSelectedDate(currentDate.toLocaleDateString());
   }, []);
   const communityHall = navigateData.find(eachAme => eachAme.amenityName === "Community Hall");
-  const onChange = ( selectedDate) => {
-    const currentDate = selectedDate || date;
-    setShow(Platform.OS === "ios");
-    setDate(currentDate);
-    setSelectedDate(currentDate.toLocaleDateString());
-  };
+  // const onChange = (selectedDate) => {
+  //   const currentDate = selectedDate || date;
+  //   setShow(Platform.OS === "ios");
+  //   setDate(currentDate);
+  //   setSelectedDate(currentDate.toLocaleDateString());
+  // };
 
+  const onChange = (event, selectedDate) => {
+    const currentDate = selectedDate || date; setShow(Platform.OS === "ios"); // close picker on iOS
+    setDate(currentDate); // Format the date to "YYYY-MM-DD" or another format that the backend expects
+    const formattedDate = currentDate.toISOString().split("T")[0]; // 'YYYY-MM-DD'
+    setSelectedDate(formattedDate);
+  };
   const showMode = (currentMode) => {
     setShow(true);
     setMode(currentMode);
@@ -138,101 +144,14 @@ export default function App() {
             </View>
           </View>
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Arrival time</Text>
-            <View style={styles.inputWithIcon}>
-              <TextInput
-                style={styles.input}
-                placeholder="Arrival time"
-                value={arrivalTime}
-                onChangeText={setArrivalTime}
-              />
-              <TouchableOpacity
-                onPress={() => toggleDropdown("arrivalTime")}
-                style={styles.iconContainer}
-              >
-                <AntDesign
-                  name="caretdown"
-                  size={12}
-                  color="#777"
-                  style={styles.iconInside}
-                />
-              </TouchableOpacity>
-            </View>
-            {showOptions.arrivalTime && (
-              <View style={styles.dropdown}>
-                {["1:00 AM", "3:00 AM", "5:00 AM", "7:00 AM", "9:00 AM", "11:00 AM", ,
-                  "1:00 PM", "3:00 PM", "5:00 PM", "7:00 PM", "9:00 PM",
-                ].map((time) => (
-                  <TouchableOpacity
-                    key={time}
-                    onPress={() => handleSelect("arrivalTime", time)}
-                    style={styles.dropdownItem}
-                  >
-                    <Text>{time}</Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
-          </View>
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Departure time</Text>
-            <View style={styles.inputWithIcon}>
-              <TextInput
-                style={styles.input}
-                placeholder="Departure time"
-                value={departureTime}
-                onChangeText={setDepartureTime}
-              />
-              <TouchableOpacity
-                onPress={() => toggleDropdown("departureTime")}
-                style={styles.iconContainer}
-              >
-                <AntDesign
-                  name="caretdown"
-                  size={12}
-                  color="#777"
-                  style={styles.iconInside}
-                />
-              </TouchableOpacity>
-            </View>
-            {showOptions.departureTime && (
-              <View style={styles.dropdown}>
-                {["1:00 AM", "3:00 AM", "5:00 AM", "7:00 AM", "9:00 AM", "11:00 AM", "1:00 PM", "3:00 PM", "5:00 PM", "7:00 PM", "9:00 PM", "11:00 PM",].map(
-                  (time) => (
-                    <TouchableOpacity
-                      key={time}
-                      onPress={() => handleSelect("departureTime", time)}
-                      style={styles.dropdownItem}
-                    >
-                      <Text>{time}</Text>
-                    </TouchableOpacity>
-                  )
-                )}
-              </View>
-            )}
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Number of guests</Text>
-            <View style={styles.inputWithIcon}>
-              <TextInput
-                style={styles.input}
-                placeholder="Number of guests"
-                value={numGuests}
-                onChangeText={setNumGuests}
-                keyboardType="numeric"
-              />
-            </View>
-          </View>
-          <View style={styles.inputContainer}>
             <Text style={styles.label}>Category</Text>
             <View style={styles.inputWithIcon}>
-              <TextInput
-                style={styles.input}
-                placeholder="Category"
-                value={category}
-                onChangeText={setCategory}
-              />
+              <TouchableOpacity
+                onPress={() => toggleDropdown("category")}
+                style={{ flex: 1 }}
+              >
+                <Text style={styles.input}>{category || "Category"}</Text>
+              </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => toggleDropdown("category")}
                 style={styles.iconContainer}
@@ -259,7 +178,6 @@ export default function App() {
               </View>
             )}
           </View>
-
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Date</Text>
             <View style={styles.inputWithIcon}>
@@ -292,6 +210,99 @@ export default function App() {
               />
             )}
           </View>
+          <View style={styles.rowContainer}>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Arrival time</Text>
+              <View style={styles.inputWithIcon}>
+                {/* <TextInput
+                  style={styles.input}
+                  placeholder="Arrival time"
+                  value={arrivalTime}
+                  onChangeText={setArrivalTime}
+                /> */}
+                <TouchableOpacity
+                  onPress={() => toggleDropdown("arrivalTime")}
+                  style={{ flex: 1 }}
+                >
+                  <Text style={styles.input}>{arrivalTime || "Arrival time"}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => toggleDropdown("arrivalTime")}
+                  style={styles.iconContainer}
+                >
+                  <AntDesign
+                    name="caretdown"
+                    size={12}
+                    color="#777"
+                    style={styles.iconInside}
+                  />
+                </TouchableOpacity>
+              </View>
+              {showOptions.arrivalTime && (
+                <View style={styles.dropdown}>
+                  {["1:00 AM", "3:00 AM", "5:00 AM", "7:00 AM", "9:00 AM", "11:00 AM", "1:00 PM", "3:00 PM", "5:00 PM", "7:00 PM", "9:00 PM"].map((time) => (
+                    <TouchableOpacity
+                      key={time}
+                      onPress={() => handleSelect("arrivalTime", time)}
+                      style={styles.dropdownItem}
+                    >
+                      <Text>{time}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
+            </View>
+
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Departure time</Text>
+              <View style={styles.inputWithIcon}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Departure time"
+                  value={departureTime}
+                  onChangeText={setDepartureTime}
+                />
+                <TouchableOpacity
+                  onPress={() => toggleDropdown("departureTime")}
+                  style={styles.iconContainer}
+                >
+                  <AntDesign
+                    name="caretdown"
+                    size={12}
+                    color="#777"
+                    style={styles.iconInside}
+                  />
+                </TouchableOpacity>
+              </View>
+              {showOptions.departureTime && (
+                <View style={styles.dropdown}>
+                  {["1:00 AM", "3:00 AM", "5:00 AM", "7:00 AM", "9:00 AM", "11:00 AM", "1:00 PM", "3:00 PM", "5:00 PM", "7:00 PM", "9:00 PM", "11:00 PM"].map((time) => (
+                    <TouchableOpacity
+                      key={time}
+                      onPress={() => handleSelect("departureTime", time)}
+                      style={styles.dropdownItem}
+                    >
+                      <Text>{time}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
+            </View>
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Number of guests</Text>
+            <View style={styles.inputWithIcon}>
+              <TextInput
+                style={styles.input}
+                placeholder="Number of guests"
+                value={numGuests}
+                onChangeText={setNumGuests}
+                keyboardType="numeric"
+              />
+            </View>
+          </View>
+
 
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Payment Method</Text>
@@ -365,7 +376,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10, marginTop: 10,
   },
 
+  rowContainer: {
+    flexDirection: 'row', // Align children in a row
+    justifyContent: 'space-between', // Space between the two input containers
+    alignItems: 'flex-start', // Align items at the start
+  },
   inputContainer: {
+    flex: 1, // Allow each input container to take equal width
+    marginRight: 10, // Optional: Add margin between the two inputs
     marginBottom: 12,
   },
   label: {
@@ -377,6 +395,8 @@ const styles = StyleSheet.create({
     height: 40,
     borderColor: "#ccc",
     borderWidth: 1,
+    justifyContent: "center",
+    paddingVertical: 10,
     borderRadius: 4,
     paddingHorizontal: 8,
     backgroundColor: "#fff",
@@ -394,7 +414,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: "#fff",
     position: "absolute",
-    top: 45,
+    top: 72,
     width: "100%",
     zIndex: 1,
   },

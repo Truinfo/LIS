@@ -265,7 +265,7 @@ const GetHelp = () => {
           )}
         </View>
       </View>
-      
+
       <FlatList
         data={sortedTickets} // Use sortedTickets here
         keyExtractor={(item) => item._id}
@@ -323,7 +323,6 @@ const GetHelp = () => {
     </View>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {
@@ -388,7 +387,7 @@ const styles = StyleSheet.create({
   type: {
     fontWeight: "bold",
     fontSize: 16,
-    color:"#484848"
+    color: "#484848"
   },
   status: {
     padding: 5,

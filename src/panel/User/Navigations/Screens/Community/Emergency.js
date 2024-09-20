@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert, Image } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert, Image, ActivityIndicator } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchEmergencyContacts } from '../../../Redux/Slice/CommunitySlice/EmergencyContactSlice';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -52,9 +52,16 @@ const EmergencyContacts = () => {
       </View>
     </View>
   );
+  const spinner = () => {
+    return (
+      <View style={[styles.containerSpin, styles.horizontalSpin]}>
+        <ActivityIndicator size="large" color="#7d0431" />
+      </View>
+    );
+  };
 
   if (status === 'loading') {
-    return <Text>Loading...</Text>;
+    return spinner();
   }
 
   if (status === 'failed') {
@@ -74,6 +81,18 @@ const EmergencyContacts = () => {
 };
 
 const styles = StyleSheet.create({
+
+  containerSpin: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  horizontalSpin: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    padding: 10,
+  },
+
+
   container: {
     flex: 1,
     backgroundColor: '#f6f6f6',
@@ -89,7 +108,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderWidth: 1,
     backgroundColor: '#fff',
-    elevation:2,
+    elevation: 2,
     borderColor: '#ccc',
     borderRadius: 12,
     marginBottom: 10,
@@ -117,7 +136,7 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 18,
     fontWeight: 'bold',
-    color:"#484848"
+    color: "#484848"
   },
   phone: {
     fontSize: 16,

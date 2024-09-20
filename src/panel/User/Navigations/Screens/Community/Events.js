@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import { View, Text, Image, StyleSheet, ScrollView, ActivityIndicator } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { Card } from "react-native-paper";
 import { fetchEvents } from "../../../Redux/Slice/CommunitySlice/EventSlice";
@@ -35,12 +35,19 @@ const Events = ({ navigation }) => {
   }, [dispatch, societyId]);
 
   let content;
+  const spinner = () => {
+    return (
+      <View style={[styles.containerSpin, styles.horizontalSpin]}>
+        <ActivityIndicator size="large" color="#7d0431" />
+      </View>
+    );
+  };
 
   if (status === "loading") {
-    content = <Text>Loading...</Text>;
+    content = spinner();
   } else if (status === "succeeded") {
     const sortedEvents = [...events.events].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    
+
     content = (
       <>
         {sortedEvents.map((event) => (
@@ -88,6 +95,16 @@ const Events = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  containerSpin: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingVertical: "80%"
+  },
+  horizontalSpin: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    padding: 10,
+  },
   scrollView: {
     paddingHorizontal: 10
   },

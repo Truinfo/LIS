@@ -142,12 +142,12 @@ const Polls = () => {
     };
 
     return (
-        <View style={{ flex: 1, paddingHorizontal: 10, paddingVertical: 10, backgroundColor: "#fff" }}>
+        <View style={{ flex: 1, paddingHorizontal: 10, backgroundColor: "#f6f6f6" }}>
             <ScrollView >
                 {polls.map((item) => {
                     const isExpired = isPollExpired(item.poll.expDate);
                     return (
-                        <View key={item._id} style={{ paddingHorizontal: 10, paddingVertical: 5, marginVertical: 5, borderWidth: 1, borderColor: "#ccc", backgroundColor: "#f6f6f6", borderRadius: 8 }}>
+                        <View key={item._id} style={{ paddingHorizontal: 10, paddingVertical: 5, marginVertical: 5, borderWidth: 1, borderColor: "#ccc", backgroundColor: "#fff", borderRadius: 8, elevation: 2 }}>
                             <View>
                                 <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                                     <Text style={{ fontWeight: 700, fontSize: 18 }}>

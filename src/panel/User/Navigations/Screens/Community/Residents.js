@@ -48,7 +48,7 @@ const Residents = () => {
       dispatch(fetchresidents(societyId));
     }
   }, [dispatch, societyId]);
-console.log(userProfiles)
+  console.log(userProfiles)
   useEffect(() => {
     if (societyId) {
       dispatch(fetchSocietyById(societyId));
@@ -110,10 +110,10 @@ console.log(userProfiles)
         <View style={styles.optionsContainer}>
           {society.blocks.map((block) => (
             <TouchableOpacity
-              key={block.blockName} 
+              key={block.blockName}
               style={styles.option}
               onPress={() => selectBlock(block.blockName)}
-              
+
             >
               <Text style={styles.optionText}>{block.blockName}</Text>
             </TouchableOpacity>
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
   },
   selectBlock: {
     flexDirection: "row",
-    justifyContent:"space-between",
+    justifyContent: "space-between",
     alignItems: "center",
     flex: 1,
     borderWidth: 1,
@@ -205,9 +205,10 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     paddingHorizontal: 10,
     borderWidth: 1,
-    borderColor: "#800336",
+    borderColor: "#ccc",
+    backgroundColor: '#fff',
+    elevation: 2,
     borderRadius: 5,
-    backgroundColor: "#fff",
   },
   avatar: {
     width: 50,
@@ -239,7 +240,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 5,
-    marginRight:5
+    marginRight: 5
   },
   buttonText: {
     color: "#393939",

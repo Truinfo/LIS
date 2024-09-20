@@ -162,7 +162,7 @@ const EventDetails = ({ route }) => {
                 </Text>
               </View>
               {isRegistrationClosed(activity.endDate) ? (
-                <Text style={styles.closedText}></Text>
+                <Text></Text>
               ) : (
                 <TouchableOpacity
                   style={styles.button}
@@ -268,17 +268,17 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#91A8BA",
+    borderColor: "#ccc",
     width: "92%",
   },
   row: {
     flexDirection: "row",
-    marginBottom: 7,
+    marginBottom: 5,
     alignItems: 'center',
   },
   propertyText: {
     fontSize: 16,
-    color: "#192c4c",
+    color: "#202020",
     fontWeight: "700",
     width: 120, // Increase width to accommodate longer labels
     flexShrink: 1,

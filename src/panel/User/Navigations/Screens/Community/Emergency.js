@@ -47,7 +47,7 @@ const EmergencyContacts = () => {
           <Text style={styles.phone}>{item.phoneNumber}</Text>
         </View>
         <TouchableOpacity style={styles.callButton} onPress={() => handleCall(item.phoneNumber)}>
-          <Icon name="call-outline" size={24} color="#c59358" />
+          <Icon name="call-outline" size={24} color="#7d0431" />
         </TouchableOpacity>
       </View>
     </View>
@@ -76,7 +76,7 @@ const EmergencyContacts = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fbf5f1',
+    backgroundColor: '#f6f6f6',
   },
   listContainer: {
     padding: 16,
@@ -89,7 +89,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderWidth: 1,
     backgroundColor: '#fff',
-    borderColor: '#F3E1D5',
+    elevation:2,
+    borderColor: '#ccc',
     borderRadius: 12,
     marginBottom: 10,
   },

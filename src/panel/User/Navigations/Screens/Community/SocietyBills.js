@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchSocietyBills } from '../../../Redux/Slice/CommunitySlice/SocietyBillsSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { FlatList, Image,  StyleSheet, Text, TouchableOpacity, View, Alert } from 'react-native';
-import * as FileSystem from 'expo-file-system'; // Import FileSystem from expo
+import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View, Alert } from 'react-native';
+import * as FileSystem from 'expo-file-system';
+import { Ionicons } from '@expo/vector-icons'; 
 import * as Sharing from 'expo-sharing';
 import * as MediaLibrary from 'expo-media-library';
 const SocietyBills = () => {
     const dispatch = useDispatch();
+    const [fileUri, setFileUri] = useState(null);
     const [societyId, setSocietyId] = useState('');
     const { society } = useSelector((state) => state.societyBills.societyBills);
 
@@ -34,11 +36,14 @@ const SocietyBills = () => {
     }, [dispatch, societyId]);
     const downloadFile = async (relativeUrl) => {
         try {
-            const baseUrl = "https://livinsync.onrender.com";
+            const baseUrl = "http://192.168.29.226:2000";
             const fullUrl = `${baseUrl}${relativeUrl}`;
             const fileName = relativeUrl.split('/').pop();
             const fileUri = FileSystem.documentDirectory + fileName;
+
+            console.log('Attempting to download file from:', fullUrl);
             const { uri } = await FileSystem.downloadAsync(fullUrl, fileUri);
+            console.log('File downloaded to:', uri);
 
             // Request media library permissions
             const { status } = await MediaLibrary.requestPermissionsAsync();
@@ -53,6 +58,16 @@ const SocietyBills = () => {
                 Alert.alert('Error', 'File not found.');
                 return;
             }
+
+            // Save the file to the media library
+            // const asset = await MediaLibrary.createAssetAsync(uri);
+            // if (asset) {
+            //     Alert.alert('Success', 'File downloaded and saved to your media library.');
+            // } else {
+            //     Alert.alert('Error', 'Failed to create asset.');
+            // }
+
+            // Optionally, share the file if needed
             if (await Sharing.isAvailableAsync()) {
                 await Sharing.shareAsync(uri);
             } else {
@@ -64,34 +79,60 @@ const SocietyBills = () => {
         }
     };
 
-  
+    // const downloadFile = async (relativeUrl) => {
+    //     try {
+    //         const baseUrl = "http://192.168.29.226:2000";
+    //         const fullUrl = `${baseUrl}${relativeUrl}`;
+    //         const fileUri = FileSystem.documentDirectory + relativeUrl.split('/').pop();
+
+    //         console.log('Attempting to download file from:', fullUrl);
+
+    //         const { uri } = await FileSystem.downloadAsync(fullUrl, fileUri);
+    //         console.log('File downloaded to:', uri);
+    //         setFileUri(fullUrl);
+    //         // Share the file
+    //         // if (await Sharing.isAvailableAsync()) {
+    //         //     await Sharing.shareAsync(uri);
+    //         // } else {
+    //         //     console.log('Sharing is not available on this platform.');
+    //         // }
+
+    //     } catch (error) {
+    //         console.error('File download error:', error.message);
+    //     }
+    // };
+
     const renderItem = ({ item }) => (
         <View style={styles.billContainer}>
-            <View style={{ width: "100%" }}>
+            <View style={{ width: "100%", position: 'relative' }}>
                 <Image
                     source={{ uri: `https://livinsync.onrender.com${item.pictures}` }}
-                    style={{ height: 200, width: "100%" ,backgroundColor:"#ddd",borderRadius:10}}
+                    style={styles.billImage}
                     resizeMode="contain"
                 />
-            </View>
-            <View style={styles.header}>
-                <Text style={{ fontSize: 20, fontWeight: '600',color:"#484848" }}>{item.monthAndYear}</Text>
                 <View style={styles.chip}>
                     <Text style={styles.chipText}>{item.status}</Text>
                 </View>
-            </View>
-            <Text style={{ fontSize: 16, fontWeight: '500', color: "#777" }}>{item.name}</Text>
-            <Text style={{ fontSize: 14, fontWeight: '500', color: "#777" }}>{new Date(item.date).toLocaleDateString()}</Text>
-            <View style={styles.amountContainer}>
-                <Text style={{ fontSize: 18, fontWeight: '600' }}>₹{item.amount}</Text>
-                <TouchableOpacity
-                    style={styles.downloadButton}
+    
+                <TouchableOpacity 
+                    style={styles.shareButton} 
                     onPress={() => downloadFile(item.pictures)}
                 >
-                    <Text style={{ color: "#ffffff", fontWeight: 500 }}>Share File</Text>
+                    <Ionicons name="share-social-outline" size={18} color="#fff" />
                 </TouchableOpacity>
             </View>
-
+    
+            <View style={styles.header}>
+                <Text style={{ fontSize: 20, fontWeight: '600', color: "#202020" }}>{item.monthAndYear}</Text>
+            </View>
+    
+            <View style={styles.amountContainer}>
+                <View>
+                    <Text style={{ fontSize: 16, fontWeight: '400', color: "#777" }}>{item.name}</Text>
+                    <Text style={{ fontSize: 14, fontWeight: '400', color: "#777" }}>{new Date(item.date).toLocaleDateString()}</Text>
+                </View>
+                <Text style={{ fontSize: 18, fontWeight: '600' }}>₹{item.amount}</Text>
+            </View>
         </View>
     );
 
@@ -109,8 +150,8 @@ const SocietyBills = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#fff",
-        padding: 16,
+        backgroundColor: "#f6f6f6",
+        marginHorizontal: 10,
     },
     billContainer: {
         padding: 12,
@@ -118,8 +159,38 @@ const styles = StyleSheet.create({
         borderColor: '#ccc',
         borderRadius: 8,
         marginBottom: 10,
-        backgroundColor: '#f9f9f9',
-        position: 'relative',
+        backgroundColor: '#fff',
+        elevation: 2,
+        marginTop: 10,
+    },
+    billImage: {
+        height: 150,
+        width: "100%",
+        backgroundColor: "#ddd",
+        borderRadius: 10,
+    },
+    chip: {
+        position: 'absolute',
+        top: 10,
+        left: 10,
+        backgroundColor: '#4caf50', // Green color for paid bills
+        borderRadius: 12,
+        paddingVertical: 4,
+        paddingHorizontal: 8,
+        zIndex: 1, // Ensure it appears on top of the image
+    },
+    shareButton: {
+        position: 'absolute',
+        bottom: 10, // Adjust the vertical positioning
+        right: 10,  // Adjust the horizontal positioning
+        backgroundColor: 'rgba(0, 0, 0, 0.08)', // Semi-transparent background
+        padding: 8,  // Add some padding around the icon
+        borderRadius: 20,  // Make it circular or rounded
+    },
+    chipText: {
+        color: '#fff',
+        fontSize: 12,
+        fontWeight: 'bold',
     },
     header: {
         flexDirection: 'row',
@@ -127,28 +198,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 8,
     },
-    chip: {
-        backgroundColor: '#4caf50', // Green color for paid bills
-        borderRadius: 12,
-        paddingVertical: 4,
-        paddingHorizontal: 8,
-    },
-    chipText: {
-        color: '#fff',
-        fontSize: 12,
-        fontWeight: 'bold',
-    },
     amountContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: "center",
-        marginTop: 5,
     },
-    downloadButton: {
-        padding: 10,
-        borderRadius: 10,
-        backgroundColor: "#7d0431",
-    }
 });
-
 export default SocietyBills;

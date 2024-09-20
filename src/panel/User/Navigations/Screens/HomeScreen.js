@@ -39,7 +39,6 @@ const HomeScreen = () => {
   const [expanded, setExpanded] = useState(false);
   const [expandedPollId, setExpandedPollId] = useState(null);
 
-  // Function to toggle expanded/collapsed state
   const toggleExpand = (pollId) => {
     setExpandedPollId(prevId => (prevId === pollId ? null : pollId));
   };

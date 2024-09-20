@@ -73,6 +73,7 @@ const Polls = () => {
         // };
         const handleVoteUpdate = (data) => {
             alert(data.message);
+            socketServices.on('polls_by_society_id', handlePollsBySocietyId);
 
             // Find the user's vote from the data
             const userVote = data.votes.poll.votes.find(vote => vote.userId === userId);

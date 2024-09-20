@@ -8,12 +8,14 @@ import {
   TouchableOpacity,
   TextInput,
   Alert,
+  Image,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { Linking } from "react-native";
 import { fetchresidents } from "../../../Redux/Slice/CommunitySlice/residentsSlice";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchSocietyById } from "../../../Redux/Slice/Security_Panel/SocietyByIdSlice";
+import { ImagebaseURL } from "../../../../Security/helpers/axios";
 
 const Residents = () => {
   const dispatch = useDispatch();
@@ -46,6 +48,7 @@ const Residents = () => {
       dispatch(fetchresidents(societyId));
     }
   }, [dispatch, societyId]);
+console.log(userProfiles)
   useEffect(() => {
     if (societyId) {
       dispatch(fetchSocietyById(societyId));
@@ -79,8 +82,10 @@ const Residents = () => {
 
   const renderItem = ({ item }) => (
     <View style={styles.contactItem}>
+      {/* <Image source={{ uri: `${ImagebaseURL}${item.profilePicture}` }} style={styles.avatar} /> */}
       <View style={styles.contactInfo}>
         <Text style={styles.name}>{item.name}</Text>
+        {/* <Text style={styles.mobileNumber}>{item.mobileNumber}</Text> */}
         <View style={styles.blockFlat}>
           <View style={styles.button}>
             <Text style={styles.buttonText}>{item.buildingName}</Text>
@@ -90,6 +95,12 @@ const Residents = () => {
           </View>
         </View>
       </View>
+      <TouchableOpacity
+        style={styles.callButton}
+        onPress={() => handleCall(item.mobileNumber)}
+      >
+        <Icon name="call-outline" size={24} color="#7D0431" />
+      </TouchableOpacity>
     </View>
   );
 

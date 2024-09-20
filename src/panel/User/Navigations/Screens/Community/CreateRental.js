@@ -147,10 +147,7 @@ const CreateRental = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.ScrollViewcontainer}>
-
-
         <Text style={styles.heading}>Create Property</Text>
-
         <TextInput
           style={styles.input}
           placeholder="Block"

@@ -6,8 +6,9 @@ import { useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getSocietiesByAdvertisements } from '../../../Redux/Slice/CommunitySlice/Rental/rentalSlice';
-
+import { Modal, ActivityIndicator } from 'react-native';
 const CreateRental = () => {
+  const [loadingsubmittion, setLoadingsubmission] = useState(false);
   const navigation = useNavigation();
   const [block, setBlock] = useState('');
   const [flatArea, setFlatArea] = useState('');
@@ -22,6 +23,7 @@ const CreateRental = () => {
   const [status, setStatus] = useState('Unoccupied');
   const [userId, setUserId] = useState('');
   const [userName, setUserName] = useState('');
+
   useEffect(() => {
     const getUserName = async () => {
       try {
@@ -41,13 +43,12 @@ const CreateRental = () => {
 
     getUserName();
   }, []);
-
   const dispatch = useDispatch();
   const createRentalState = useSelector((state) => state.createRental);
 
   const { loading = false, success = false, error = null } = createRentalState || {};
-  let [errorMessage, seterorMessage] = useState("")
   const handleSubmit = async () => {
+
     try {
       const formData = new FormData();
       const details = JSON.stringify({
@@ -76,36 +77,38 @@ const CreateRental = () => {
         });
       });
       if (!flatArea) {
-        Alert.alert("Please enter flatArea")
-        return
+        Alert.alert('Error', "Please enter flatArea")
+        return;
       }
       if (!maintenancePrice) {
-        return seterorMessage("Please enter maintenancePrice")
-
+        Alert.alert('Error', 'Please enter maintenancePrice');
+        return;
       }
       if (!price) {
-        Alert.alert("Please enter price")
-        return
+        Alert.alert('Error', "Please enter price")
+        return;
       }
       if (!rooms) {
-        return seterorMessage("Please enter room")
-
+        Alert.alert('Error', 'Please enter room');
+        return;
       }
       if (!washrooms) {
-        return seterorMessage("Please enter washrooms")
-
+        Alert.alert('Error', 'Please enter washrooms');
+        return;
       }
       if (!phoneNumber) {
-        return seterorMessage("Please enter phoneNumber")
-
+        Alert.alert('Error', 'Date is required');
+        return;
       }
       if (!pictures) {
-        return seterorMessage("Please add pictures")
-
+        Alert.alert('Error', 'Please add pictures');
+        return;
       }
+      setLoadingsubmission(true)
       const result = await dispatch(createRental(formData));
       if (result.type === 'createRental/createRental/fulfilled') {
         dispatch(getSocietiesByAdvertisements());
+        setLoadingsubmission(true)
         navigation.navigate('RentalProperties')
       }
     }
@@ -120,7 +123,6 @@ const CreateRental = () => {
         Alert.alert('Permission Required', 'Permission to access media library is required to upload images.');
       }
     };
-
     requestPermissions();
   }, []);
   const handleImageUpload = async () => {
@@ -143,7 +145,6 @@ const CreateRental = () => {
     const numericValue = value.replace(/[^0-9]/g, '');
     setter(numericValue);
   };
-
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.ScrollViewcontainer}>
@@ -246,9 +247,16 @@ const CreateRental = () => {
             ))}
           </View>
         )}
-
-        <TouchableOpacity onPress={handleSubmit} disabled={loading} style={styles.imageUploadButton} >
-          <Text style={styles.buttonText}>Submit</Text></TouchableOpacity>
+        <TouchableOpacity onPress={handleSubmit} disabled={loadingsubmittion} style={styles.imageUploadButton}>
+          <Text style={styles.buttonText}>{loadingsubmittion ? 'Submitting...' : 'Submit'}</Text>
+        </TouchableOpacity>
+        <Modal transparent={true} animationType="none" visible={loadingsubmittion}>
+          <View style={styles.modalBackground}>
+            <View style={styles.activityIndicatorWrapper}>
+              <ActivityIndicator size="large" color="#800336" />
+            </View>
+          </View>
+        </Modal>
       </ScrollView>
     </SafeAreaView>
 

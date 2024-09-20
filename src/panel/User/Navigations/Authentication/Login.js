@@ -1,61 +1,75 @@
 import React, { useState } from "react";
-import { View, StyleSheet, Image, Text, TouchableOpacity } from "react-native";
+import { View, StyleSheet, Image, Text, TouchableOpacity, SafeAreaView } from "react-native";
 import { TextInput } from "react-native-paper";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { useDispatch, useSelector } from "react-redux"; // Import useDispatch and useSelector
+import { useDispatch } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
-import { userLogin } from "../../Redux/Slice/AuthSlice/Login/LoginSlice"; // Import your Redux action
+import { userLogin } from "../../Redux/Slice/AuthSlice/Login/LoginSlice";
+import Toast from "react-native-toast-message";
 
 const Login = () => {
   const navigation = useNavigation();
-  const dispatch = useDispatch(); // Initialize useDispatch hook
-
+  const dispatch = useDispatch();
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
+  // Email Validation Regex
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
   const handleLogin = async () => {
     let isValid = true;
+
+    // Validate Email Format
     if (!email) {
       setEmailError("Please enter your email.");
+      isValid = false;
+    } else if (!emailRegex.test(email)) {
+      setEmailError("Please enter a valid email address.");
       isValid = false;
     } else {
       setEmailError("");
     }
+
     if (!password) {
       setPasswordError("Please enter your password.");
       isValid = false;
     } else {
       setPasswordError("");
     }
+
     if (isValid) {
       try {
         const resultAction = await dispatch(userLogin({ email, password }));
-    
         if (userLogin.fulfilled.match(resultAction)) {
           await AsyncStorage.setItem('userToken', resultAction.payload.token);
-          
-          // Assuming the role is available in resultAction.payload.role
           const userRole = resultAction.payload.profile.role;
-          // Navigate to different screens based on the user's role
           if (userRole === 'User') {
-            navigation.navigate("Tabs"); 
+            navigation.navigate("Tabs");
           } else if (userRole === 'Sequrity') {
             navigation.navigate("Header");
-          } else {
-            console.log('Unhandled user role:', userRole);
           }
         } else {
-          console.log('Login failed:', resultAction.payload);
+          Toast.show({
+            type: 'error',
+            text1: 'Login Failed',
+            text2: resultAction.payload.message || 'An error occurred during login.',
+            position: 'top',
+            topOffset: 60,
+          });
         }
       } catch (error) {
-        console.error('Login error:', error);
+        Toast.show({
+          type: 'error',
+          text1: 'Login Error',
+          text2: 'An error occurred. Please try again later.',
+          position: 'top',
+        });
       }
     }
-    
   };
 
   const handleSignuppress = () => {
@@ -71,28 +85,25 @@ const Login = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.halfContainer1}>
         <Image
           source={require("../../../../assets/User/gif/Login.gif")}
           style={styles.video}
           resizeMode="cover"
         />
-        <Text style={{ fontWeight: "600", fontSize: 48, color: "#F3E1D5" }}>
-          Login
-        </Text>
-        <Text style={{ fontSize: 16, paddingHorizontal: 5, paddingVertical: 5, color: "#F3E1D5" }}>
+        <Text style={styles.loginSubtitle}>
           Experience Seamless Access
         </Text>
       </View>
       <View style={styles.halfContainer2}>
-
+        <Text style={styles.loginTitle}>Login</Text>
         <TextInput
           style={styles.input}
           label="Email"
           value={email}
           onChangeText={(text) => {
-            setEmail(text);
+            setEmail(text.toLowerCase());
             setEmailError("");
           }}
           keyboardType="email-address"
@@ -103,73 +114,47 @@ const Login = () => {
         {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
         <View style={styles.passwordInput}>
           <TextInput
-            style={styles.input}
+            style={styles.inputTextpass}
             label="Password"
             value={password}
-            onChangeText={(text) => {
-              setPassword(text);
-            }}
-            secureTextEntry={!showPassword} 
+            onChangeText={(text) => setPassword(text)}
+            secureTextEntry={!showPassword}
             mode="outlined"
             outlineColor="#CCC"
             theme={{ colors: { primary: "#27272A" } }}
           />
           <TouchableOpacity onPress={toggleShowPassword} style={styles.eyeIcon}>
-            <Icon name={showPassword ? 'eye-slash' : 'eye'} size={20} color="#888" />
+            <Icon name={showPassword ? 'eye-slash' : 'eye'} size={15} color="#888" />
           </TouchableOpacity>
         </View>
         {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
-        <Text
-          onPress={handleForgotpress}
-          style={{
-            textAlign: "right", 
-            color: "#7D0431",
-            marginTop: 5,
-            fontSize: 15,
-            fontWeight: "400",
-            width: "90%",
-          }}
-        >
+        <Text onPress={handleForgotpress} style={styles.forgotPassword}>
           Forgot Password
         </Text>
         <TouchableOpacity style={styles.Button} onPress={handleLogin}>
-          <Text style={{ color: "white", fontSize: 24, fontWeight: "700" }}>
-            Sign In
-          </Text>
+          <Text style={styles.signInText}>Sign In</Text>
         </TouchableOpacity>
-        <Text style={{ marginTop: 10, fontSize: 16, textAlign: "center" }}>
+        <Text style={styles.signUpPrompt}>
           Don't have an account!
-          <Text style={styles.signUpText} onPress={handleSignuppress}>
-            <Text
-              style={{
-                color: "#7D0431",
-                marginTop: 10,
-                fontSize: 15,
-                fontWeight: "400",
-              }}
-            > Sign Up
-            </Text>
-          </Text>
+          <Text style={styles.signUpText} onPress={handleSignuppress}> Sign Up</Text>
         </Text>
-
       </View>
-    </View>
+      <Toast />
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: "column",
   },
   halfContainer1: {
-    flex: 2,
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#7D0431",
     borderBottomLeftRadius: 40,
     borderBottomRightRadius: 40,
-
   },
   halfContainer2: {
     flex: 1,
@@ -177,19 +162,33 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#fbf5f1"
   },
-  signUpText: {
-    color: "#F8E9DC",
-  },
   video: {
     width: "80%",
     height: "70%",
     marginTop: 10,
   },
+  loginSubtitle: {
+    fontSize: 16,
+    paddingHorizontal: 5,
+    paddingVertical: 5,
+    color: "#F3E1D5",
+  },
+  loginTitle: {
+    fontWeight: "600",
+    fontSize: 30,
+    color: "#7D0431",
+    marginBottom: 10,
+  },
   input: {
     width: "90%",
     marginBottom: 5,
   },
+  inputTextpass: {
+    width: "80%",
+    marginBottom: 5,
+  },
   passwordInput: {
+    justifyContent: 'flex-start',
     width: "90%",
     marginBottom: 5,
     flexDirection: "row",
@@ -197,7 +196,21 @@ const styles = StyleSheet.create({
   },
   eyeIcon: {
     position: "absolute",
+    justifyContent: 'flex-end',
     right: 10,
+    borderWidth: 1,
+    borderColor: "gray",
+    borderStyle: "solid",
+    borderRadius: 5,
+    padding: 10,
+  },
+  forgotPassword: {
+    textAlign: "right",
+    color: "#7D0431",
+    marginTop: 5,
+    fontSize: 15,
+    fontWeight: "400",
+    width: "90%",
   },
   Button: {
     width: "90%",
@@ -205,12 +218,30 @@ const styles = StyleSheet.create({
     padding: 10,
     alignItems: "center",
     borderRadius: 12,
+    marginTop: 15,
+    marginBottom: 10,
+  },
+  signInText: {
+    color: "white",
+    fontSize: 24,
+    fontWeight: "700",
+  },
+  signUpPrompt: {
     marginTop: 10,
+    fontSize: 16,
+    textAlign: "center",
+  },
+  signUpText: {
+    color: "#7D0431",
+    marginTop: 10,
+    fontSize: 15,
+    fontWeight: "400",
   },
   errorText: {
     color: "red",
-    alignSelf: 'left',
+    alignSelf: "flex-start",
     fontSize: 12,
+    marginLeft: "5%",
   },
 });
 

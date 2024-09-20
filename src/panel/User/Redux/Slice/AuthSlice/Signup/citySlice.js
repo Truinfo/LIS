@@ -1,7 +1,10 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import axiosInstance from '../../../../../Security/helpers/axios';
+import axios from 'axios';
+
 
 export const fetchCities = createAsyncThunk('cities/fetchCities', async () => {
-    const response = await fetch('https://livinsync.onrender.com/api/getAllCities');
+    const response = await axiosInstance.fetch('getAllCities');
     if (!response.ok) {
         throw new Error('Failed to fetch cities');
     }
@@ -9,11 +12,25 @@ export const fetchCities = createAsyncThunk('cities/fetchCities', async () => {
     return cities;
 });
 
+// router.get('/getCity/:cityId', getCityById);
+
+export const fetchCitiesById = createAsyncThunk(
+    'fetchCities/fetchCitiesById',
+    async ({cityId}) => {
+        try {
+            const response = await axios.get(`http://192.168.29.24:2000/api/getCity/${cityId}`);
+            return response.data;
+        } catch (error) {
+            throw Error('Failed to fetch visitors: ' + error.message);
+        }
+    }
+);
 
 const citySlice = createSlice({
     name: 'cities',
     initialState: {
         cities: [],
+        currentCity: null,
         status: 'idle', 
         error: null,
     },
@@ -31,9 +48,25 @@ const citySlice = createSlice({
             .addCase(fetchCities.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.error.message;
+            })
+
+            .addCase(fetchCitiesById.pending, (state) => {
+                state.status = 'loading';
+                state.error = null;
+            })
+            .addCase(fetchCitiesById.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                state.currentCity = action.payload;
+            })
+            .addCase(fetchCitiesById.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.error.message;
             });
     },
 });
 
-export default citySlice.reducer;
 
+
+
+
+export default citySlice.reducer;

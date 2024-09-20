@@ -1,13 +1,17 @@
+// userProfileSlice.js
 
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../../../../Security/helpers/axios';
+import axios from 'axios';
+
 
 export const fetchUserProfile = createAsyncThunk(
   'userProfile/fetchUserProfile',
   async ({ id, data }, { rejectWithValue }) => {
+    console.log("data", data)
     try {
-      const response = await axiosInstance.put(`/user/createUserProfile/${id}`, data)
-      return response.data.userProfile;
+      const response = await axios.put(`http://192.168.29.24:2000/api/user/createUserProfile/${id}`, data)
+      return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data.message || error.message);
     }
@@ -18,6 +22,7 @@ const initialState = {
   userProfile: null,
   loading: false,
   error: null,
+  successMessage: null,
 };
 
 const userProfileSlice = createSlice({
@@ -39,7 +44,8 @@ const userProfileSlice = createSlice({
       })
       .addCase(fetchUserProfile.fulfilled, (state, action) => {
         state.loading = false;
-        state.userProfile = action.payload;
+        state.userProfile = action.payload.userProfile;
+        state.successMessage = action.payload.message;
         state.error = null;
       })
       .addCase(fetchUserProfile.rejected, (state, action) => {

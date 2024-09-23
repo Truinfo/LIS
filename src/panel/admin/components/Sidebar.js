@@ -2,18 +2,20 @@ import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import Icon from 'react-native-vector-icons/FontAwesome'; // Import FontAwesome icons
-import Dashboard from '../pages/Dashboard';
-import Advertisements from '../pages/Advertisements';
-import ResidentialUnit from '../pages/ResidentialUnit';
-import UserManagement from '../pages/UserManagement';
-import Events from '../pages/Events';
-import Polls from '../pages/Polls';
-import VisitorManagement from '../pages/VisistorManagement';
-import Amenities from '../pages/Amenities';
-import Inventory from '../pages/Inventory';
-import Complaints from '../pages/Complaints';
-import Documents from '../pages/Documents';
-import SocietyBills from '../pages/SocietyBills';
+import Dashboard from '../pages/Dashboard/Dashboard';
+import Advertisements from '../pages/Advertisements/Advertisements';
+import ResidentialUnit from '../pages/ResidentialUnit/ResidentialUnit';
+import Events from '../pages/Events/Events';
+import Polls from '../pages/Polls/Polls';
+import VisitorManagement from '../pages/VisistorManagement/VisistorManagement';
+import Amenities from '../pages/Amenities/Amenities';
+import Inventory from '../pages/Inventory/Inventory';
+import Complaints from '../pages/Complaints/Complaints';
+import Documents from '../pages/Documents/Documents';
+import SocietyBills from '../pages/SocietyBills/SocietyBills';
+import Security from '../pages/Security/Security';
+import Services from '../pages/Services/Services';
+import Maintenance from '../pages/Maintenance/Maintenance';
 
 const Drawer = createDrawerNavigator();
 

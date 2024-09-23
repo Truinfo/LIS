@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import Icon from 'react-native-vector-icons/FontAwesome'; 
+import Icon from 'react-native-vector-icons/FontAwesome'; // Import FontAwesome icons
 import Dashboard from '../pages/Dashboard';
 import Advertisements from '../pages/Advertisements';
+import ResidentialUnit from '../pages/ResidentialUnit';
 import UserManagement from '../pages/UserManagement';
 import Events from '../pages/Events';
 import Polls from '../pages/Polls';
@@ -13,7 +14,6 @@ import Inventory from '../pages/Inventory';
 import Complaints from '../pages/Complaints';
 import Documents from '../pages/Documents';
 import SocietyBills from '../pages/SocietyBills';
-import ResidentialUnit from "../pages/ResidentialUnit"
 
 const Drawer = createDrawerNavigator();
 
@@ -26,29 +26,30 @@ export default function Sidebar() {
           <View style={{ flexDirection: 'row', alignItems: "center", gap: 15, marginRight: 10 }}>
 
             <View>
-              <Icon name="bell-o" size={25} color="#000" />
+              <Icon name="bell-o" size={25} color="#202020" />
               <View style={styles.badge}>
                 <Text style={styles.badgeText}>3</Text>
               </View>
             </View>
-            <Icon name="user-circle-o" size={25} color="#000" />
-
+            <Icon name="user-circle-o" size={25} color="#202020" />
           </View>
         ),
       }}
     >
       <Drawer.Screen name="Dashboard" component={Dashboard} />
       <Drawer.Screen name="Advertisements" component={Advertisements} />
-      <Drawer.Screen name="Residential Unit" component={ResidentialUnit} />
-      <Drawer.Screen name="UserManagement" component={UserManagement} />
+      <Drawer.Screen name="Residential Management" component={ResidentialUnit} />
+      <Drawer.Screen name="Security" component={Security} />
+      <Drawer.Screen name="Services" component={Services} />
       <Drawer.Screen name="Complaints" component={Complaints} />
       <Drawer.Screen name="Documents" component={Documents} />
       <Drawer.Screen name="Events" component={Events} />
       <Drawer.Screen name="Polls" component={Polls} />
-      <Drawer.Screen name="VisitorManagement" component={VisitorManagement} />
+      <Drawer.Screen name="Visitor Management" component={VisitorManagement} />
       <Drawer.Screen name="Amenities" component={Amenities} />
       <Drawer.Screen name="Inventory" component={Inventory} />
       <Drawer.Screen name="Society Bills" component={SocietyBills} />
+      <Drawer.Screen name="Maintenance Bills" component={Maintenance} />
     </Drawer.Navigator>
   );
 }

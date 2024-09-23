@@ -1,8 +1,8 @@
 import React from "react";
 import { View } from "react-native";
-const UserManagement = () => {
+const Maintenance = () => {
     return (
         <View></View>
     );
 }
-export default UserManagement;
+export default Maintenance;

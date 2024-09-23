@@ -177,7 +177,7 @@ export default function App() {
             <Text style={styles.label}>Date</Text>
             <View style={styles.inputWithIcon}>
               <TextInput
-                style={[styles.input, styles.inputWithIconInput]}
+                style={[styles.input]}
                 placeholder="Date"
                 value={selectedDate}
                 onFocus={() => setShow(true)}
@@ -251,12 +251,18 @@ export default function App() {
             <View style={styles.inputContainer}>
               <Text style={styles.label}>Departure time</Text>
               <View style={styles.inputWithIcon}>
-                <TextInput
+                {/* <TextInput
                   style={styles.input}
                   placeholder="Departure time"
                   value={departureTime}
                   onChangeText={setDepartureTime}
-                />
+                /> */}  
+                <TouchableOpacity
+                  onPress={() => toggleDropdown("departureTime")}
+                  style={{ flex: 1 }}
+                >
+                  <Text style={styles.input}>{departureTime || "Departure time"}</Text>
+                </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => toggleDropdown("departureTime")}
                   style={styles.iconContainer}

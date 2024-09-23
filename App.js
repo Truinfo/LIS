@@ -88,6 +88,7 @@ import RentalProperties from './src/panel/User/Navigations/Screens/Community/Ren
 import SocietyBills from './src/panel/User/Navigations/Screens/Community/SocietyBills';
 import EventDetails from './src/panel/User/Navigations/Screens/Community/EventDetails';
 import GetHelp from './src/panel/User/Navigations/Screens/GetHelp';
+import Sidebar from './src/panel/admin/components/Sidebar';
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -122,7 +123,7 @@ export default function App() {
           if (userRole === 'Sequrity') {
             setInitialRoute('Header');
           } else {
-            setInitialRoute('Tabs');
+            setInitialRoute('Sidebar');
           }
         }
       } catch (error) {
@@ -257,6 +258,12 @@ export default function App() {
             <Stack.Screen name="Society Bills" component={SocietyBills} />
             <Stack.Screen name="EventDetails" component={EventDetails} />
             <Stack.Screen name="My Bookings" component={MyBookings} />
+
+
+
+            <Stack.Screen name="Sidebar" component={Sidebar} options={{
+              headerShown: false,
+            }} />
           </Stack.Navigator>
         </SafeAreaView>
       </NavigationContainer>

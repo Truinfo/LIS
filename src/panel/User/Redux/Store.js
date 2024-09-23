@@ -47,6 +47,9 @@ import complaintsReducer from './Slice/GetHelpSlice/ComplaintsSlice';
 import AmenitiesReducer from './Slice/CommunitySlice/Amenities';
 import GetDocumentSlice from './Slice/ProfileSlice/GetDocumentSlice';
 import DocumentSlice from './Slice/ProfileSlice/DocumentSlice';
+import { GateKeeperReducer } from '../../admin/pages/Security/GateKeeperSlice';
+
+
 
 const store = configureStore({
   reducer: {
@@ -105,6 +108,7 @@ const store = configureStore({
     staffVisitor: staffVisitors,
     societyLis: societyLicence,
 
+    gateKeepers: GateKeeperReducer,
   },
 });
 export default store;

@@ -89,11 +89,16 @@ import SocietyBills from './src/panel/User/Navigations/Screens/Community/Society
 import EventDetails from './src/panel/User/Navigations/Screens/Community/EventDetails';
 import GetHelp from './src/panel/User/Navigations/Screens/GetHelp';
 import Sidebar from './src/panel/admin/components/Sidebar';
+import AddSecurity from './src/panel/admin/pages/Security/Add';
+import EditSecurity from './src/panel/admin/pages/Security/Edit';
+import ViewSequrity from './src/panel/admin/pages/Security/View';
+import AttendanceForm from './src/panel/admin/pages/Security/Attendance';
+
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
-  const [initialRoute, setInitialRoute] = useState('Onboard');
+  const [initialRoute, setInitialRoute] = useState('Sidebar');
   useEffect(() => {
     const checkTokenExpiry = async () => {
       try {
@@ -258,12 +263,17 @@ export default function App() {
             <Stack.Screen name="Society Bills" component={SocietyBills} />
             <Stack.Screen name="EventDetails" component={EventDetails} />
             <Stack.Screen name="My Bookings" component={MyBookings} />
+            
 
 
 
             <Stack.Screen name="Sidebar" component={Sidebar} options={{
               headerShown: false,
             }} />
+            <Stack.Screen name="Add Security" component={AddSecurity} />
+            <Stack.Screen name="Edit Security" component={EditSecurity} />
+            <Stack.Screen name="View Security" component={ViewSequrity} />
+            <Stack.Screen name="Attendance" component={AttendanceForm} />
           </Stack.Navigator>
         </SafeAreaView>
       </NavigationContainer>

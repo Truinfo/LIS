@@ -1,10 +1,9 @@
 import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import Icon from 'react-native-vector-icons/FontAwesome'; // Import FontAwesome icons
+import Icon from 'react-native-vector-icons/FontAwesome'; 
 import Dashboard from '../pages/Dashboard';
 import Advertisements from '../pages/Advertisements';
-import ResidentialUnit from '../pages/ResidentialUnit';
 import UserManagement from '../pages/UserManagement';
 import Events from '../pages/Events';
 import Polls from '../pages/Polls';
@@ -14,6 +13,7 @@ import Inventory from '../pages/Inventory';
 import Complaints from '../pages/Complaints';
 import Documents from '../pages/Documents';
 import SocietyBills from '../pages/SocietyBills';
+import ResidentialUnit from "../pages/ResidentialUnit"
 
 const Drawer = createDrawerNavigator();
 

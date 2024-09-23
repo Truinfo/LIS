@@ -5,7 +5,6 @@ import Icon from 'react-native-vector-icons/FontAwesome'; // Import FontAwesome 
 import Dashboard from '../pages/Dashboard/Dashboard';
 import Advertisements from '../pages/Advertisements/Advertisements';
 import ResidentialUnit from '../pages/ResidentialUnit/ResidentialUnit';
-import UserManagement from '../pages/UserManagement/UserManagement';
 import Events from '../pages/Events/Events';
 import Polls from '../pages/Polls/Polls';
 import VisitorManagement from '../pages/VisistorManagement/VisistorManagement';
@@ -41,8 +40,7 @@ export default function Sidebar() {
     >
       <Drawer.Screen name="Dashboard" component={Dashboard} />
       <Drawer.Screen name="Advertisements" component={Advertisements} />
-      <Drawer.Screen name="Residential Unit" component={ResidentialUnit} />
-      <Drawer.Screen name="User Management" component={UserManagement} />
+      <Drawer.Screen name="Residential Management" component={ResidentialUnit} />
       <Drawer.Screen name="Security" component={Security} />
       <Drawer.Screen name="Services" component={Services} />
       <Drawer.Screen name="Complaints" component={Complaints} />

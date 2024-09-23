@@ -47,6 +47,11 @@ import complaintsReducer from './Slice/GetHelpSlice/ComplaintsSlice';
 import AmenitiesReducer from './Slice/CommunitySlice/Amenities';
 import GetDocumentSlice from './Slice/ProfileSlice/GetDocumentSlice';
 import DocumentSlice from './Slice/ProfileSlice/DocumentSlice';
+import { AdvertisementReducer } from '../../admin/pages/Advertisements/AdvertisementSlice';
+
+
+
+//admin
 
 const store = configureStore({
   reducer: {
@@ -104,6 +109,12 @@ const store = configureStore({
     quickContact: quickContacts,
     staffVisitor: staffVisitors,
     societyLis: societyLicence,
+
+
+    //admin
+
+
+    advertisements:AdvertisementReducer,
 
   },
 });

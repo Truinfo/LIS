@@ -89,6 +89,8 @@ import SocietyBills from './src/panel/User/Navigations/Screens/Community/Society
 import EventDetails from './src/panel/User/Navigations/Screens/Community/EventDetails';
 import GetHelp from './src/panel/User/Navigations/Screens/GetHelp';
 import Sidebar from './src/panel/admin/components/Sidebar';
+import ReviewAdd from './src/panel/admin/pages/Advertisements/ReviewAdd';
+import AddAdvertisements from './src/panel/admin/pages/Advertisements/AddPost';
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -258,12 +260,16 @@ export default function App() {
             <Stack.Screen name="Society Bills" component={SocietyBills} />
             <Stack.Screen name="EventDetails" component={EventDetails} />
             <Stack.Screen name="My Bookings" component={MyBookings} />
-
-
-
             <Stack.Screen name="Sidebar" component={Sidebar} options={{
               headerShown: false,
             }} />
+
+
+
+
+            {/* Admin */}
+            <Stack.Screen name='View Details' component={ReviewAdd}/>
+            {/* <Stack.Screen name='Add Post' component={AddAdvertisements}/> */}
           </Stack.Navigator>
         </SafeAreaView>
       </NavigationContainer>

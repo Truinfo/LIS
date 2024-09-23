@@ -16,7 +16,7 @@ export const fetchCities = createAsyncThunk('cities/fetchCities', async () => {
 
 export const fetchCitiesById = createAsyncThunk(
     'fetchCities/fetchCitiesById',
-    async ({cityId}) => {
+    async ({ cityId }) => {
         try {
             const response = await axios.get(`http://192.168.29.24:2000/api/getCity/${cityId}`);
             return response.data;
@@ -31,7 +31,7 @@ const citySlice = createSlice({
     initialState: {
         cities: [],
         currentCity: null,
-        status: 'idle', 
+        status: 'idle',
         error: null,
     },
     reducers: {},

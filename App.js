@@ -89,26 +89,16 @@ import SocietyBills from './src/panel/User/Navigations/Screens/Community/Society
 import EventDetails from './src/panel/User/Navigations/Screens/Community/EventDetails';
 import GetHelp from './src/panel/User/Navigations/Screens/GetHelp';
 import Sidebar from './src/panel/admin/components/Sidebar';
-<<<<<<< HEAD
-
-=======
 import AddResidents from './src/panel/admin/pages/ResidentialUnit/AddResidents';
 import ResidentsDetails from './src/panel/admin/pages/ResidentialUnit/ResidentsDetails';
->>>>>>> 9c8e5e1284aa668c790d0569eeef899252b23e91
 import AddSecurity from './src/panel/admin/pages/Security/Add';
 import EditSecurity from './src/panel/admin/pages/Security/Edit';
 import ViewSequrity from './src/panel/admin/pages/Security/View';
 import AttendanceForm from './src/panel/admin/pages/Security/Attendance';
-<<<<<<< HEAD
-
-
 import ReviewAdd from './src/panel/admin/pages/Advertisements/ReviewAdd';
 import AddAdvertisements from './src/panel/admin/pages/Advertisements/AddPost';
-
-=======
 import ReviewAdd from './src/panel/admin/pages/Advertisements/ReviewAdd';
 import AddAdvertisements from './src/panel/admin/pages/Advertisements/AddPost';
->>>>>>> 9c8e5e1284aa668c790d0569eeef899252b23e91
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -279,9 +269,6 @@ export default function App() {
             <Stack.Screen name="EventDetails" component={EventDetails} />
             <Stack.Screen name="My Bookings" component={MyBookings} />
 
-
-
-<<<<<<< HEAD
             <Stack.Screen name="Sidebar" component={Sidebar} options={{
               headerShown: false,
             }} />
@@ -289,12 +276,6 @@ export default function App() {
             <Stack.Screen name="Edit Security" component={EditSecurity} />
             <Stack.Screen name="View Security" component={ViewSequrity} />
             <Stack.Screen name="Attendance" component={AttendanceForm} />
-=======
-
-
-
->>>>>>> 9c8e5e1284aa668c790d0569eeef899252b23e91
-
 
             {/* Admin */}
             <Stack.Screen name="Sidebar" component={Sidebar} options={{

@@ -11,8 +11,9 @@ const initialState = {
 export const fetchSocietyById = createAsyncThunk(
     'society/fetchSocietyById',
     async (societyId) => {
+        console.log("datadas",societyId)
         const response = await axiosInstance.get(`/societyDetails/${societyId}`);
-        console.log(response.data,"society details")
+
         return response.data.society;
 
     }

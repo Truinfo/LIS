@@ -48,6 +48,9 @@ import AmenitiesReducer from './Slice/CommunitySlice/Amenities';
 import GetDocumentSlice from './Slice/ProfileSlice/GetDocumentSlice';
 import DocumentSlice from './Slice/ProfileSlice/DocumentSlice';
 
+//Admin
+import { residentsReducer } from '../../admin/pages/ResidentialUnit/ResidentsSlice';
+
 const store = configureStore({
   reducer: {
     //Services
@@ -105,6 +108,13 @@ const store = configureStore({
     staffVisitor: staffVisitors,
     societyLis: societyLicence,
 
+
+
+
+
+    //Admin
+    //Residents
+    AdminResidents: residentsReducer
   },
 });
 export default store;

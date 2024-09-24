@@ -48,7 +48,14 @@ import AmenitiesReducer from './Slice/CommunitySlice/Amenities';
 import GetDocumentSlice from './Slice/ProfileSlice/GetDocumentSlice';
 import DocumentSlice from './Slice/ProfileSlice/DocumentSlice';
 import { GateKeeperReducer } from '../../admin/pages/Security/GateKeeperSlice';
-//Admin
+
+import { AdvertisementReducer } from '../../admin/pages/Advertisements/AdvertisementSlice';
+
+
+
+//admin
+
+
 import { residentsReducer } from '../../admin/pages/ResidentialUnit/ResidentsSlice';
 import { AdvertisementReducer } from '../../admin/pages/Advertisements/AdvertisementSlice';
 
@@ -108,6 +115,11 @@ const store = configureStore({
     quickContact: quickContacts,
     staffVisitor: staffVisitors,
     societyLis: societyLicence,
+
+    gateKeepers: GateKeeperReducer,
+
+
+    advertisements:AdvertisementReducer,
 
     //Admin
     //Residents

@@ -1,8 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../../Security/helpers/axios';
-// const societyAdmin = JSON.parse(localStorage.getItem('societyAdmin')) || {};
-// const societyId = societyAdmin._id || "6683b57b073739a31e8350d0";
-const societyId ="6683b57b073739a31e8350d0";
+const societyId = "6683b57b073739a31e8350d0";
 
 export const fetchGatekeepers = createAsyncThunk(
   'sequrity/fetchGatekeepers',
@@ -13,7 +11,6 @@ export const fetchGatekeepers = createAsyncThunk(
   }
 );
 
-// router.get('/sequrity/getSequrityPerson/:societyId/:sequrityId'
 export const getSequrityPerson = createAsyncThunk(
   'sequrity/getSequrityPerson',
   async (sequrityId, { rejectWithValue }) => {
@@ -141,6 +138,11 @@ const GateKeeperSlice = createSlice({
     error: null,
     successMessage: null,
 
+  },
+  reducers: {
+    setGateKeepers: (state, action) => {
+      state.data = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder

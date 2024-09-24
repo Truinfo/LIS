@@ -73,6 +73,8 @@ const AdvertisementSlice = createSlice({
     error: null,
     successMessage: null,
   },
+  reducers: {
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchAdvertisements.pending, (state) => {

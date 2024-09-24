@@ -17,7 +17,6 @@ const ResidentialUnit = () => {
     const [selectedResident, setSelectedResident] = useState(null);
     const [snackbarVisible, setSnackbarVisible] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
-
     useEffect(() => {
         dispatch(fetchUsers());
     }, [dispatch]);

@@ -1,7 +1,7 @@
 import * as ImagePicker from "expo-image-picker";
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, ScrollView, Alert, Modal } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, ScrollView, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { createSequrity } from './GateKeeperSlice';
 import Toast from 'react-native-toast-message';
@@ -84,16 +84,9 @@ const AddSecurity = () => {
   };
 
   const deletePhoto = () => {
-    Alert.alert(
-      "Remove Profile Photo",
-      "Are you sure you want to remove the profile photo?",
-      [
-        { text: "Cancel", style: "cancel" },
-        { text: "Remove", onPress: () => setImageFile(null), style: "destructive" },
-      ],
-      { cancelable: true }
-    );
+    setImageFile(null);
   };
+  
 
   const handleAdd = () => {
     const newErrors = {};
@@ -307,7 +300,7 @@ const AddSecurity = () => {
                 <Text style={styles.modalButtonText}>Take a Photo</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.modalButton}>
-                <Text style={styles.modalButtonText}>Cancel</Text>
+                <Text style={styles.modalButtonCancel} >Cancel</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -359,7 +352,7 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   uploadButton: {
-    backgroundColor: '#007BFF',
+    backgroundColor: '#28a745',
     padding: 10,
     borderRadius: 5,
     alignItems: 'center',
@@ -368,7 +361,7 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   submitButton: {
-    backgroundColor: '#28a745',
+    backgroundColor: '#7D0431',
     padding: 15,
     borderRadius: 5,
     alignItems: 'center',
@@ -377,6 +370,7 @@ const styles = StyleSheet.create({
   submitButtonText: {
     color: 'white',
   },
+  
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -384,7 +378,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    width: '80%',
     backgroundColor: 'white',
     borderRadius: 10,
     padding: 20,
@@ -392,12 +385,18 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     marginBottom: 20,
+    justifyContent: "center",
+    color: '#7D0431'
   },
   modalButton: {
     padding: 10,
   },
   modalButtonText: {
     textAlign: 'center',
+  },
+  modalButtonCancel: {
+    textAlign: 'center',
+    color: "#7D0431",
   },
 });
 

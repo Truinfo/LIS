@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, TouchableOpacity, StyleSheet, Alert, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { checkAttendanceStatus, sequrityCheckIn, sequrityCheckOut } from './GateKeeperSlice';
 import Toast from 'react-native-toast-message';
@@ -36,19 +36,18 @@ const AttendanceForm = () => {
     }));
   };
 
-
   const handleCheckin = async () => {
     try {
       if (selectedDate !== today) {
         Alert.alert('Error', 'You can only check in today.');
         return;
       }
-  
+
       let formData = {
         date: attendance.date,
         status: attendance.status,
       };
-  
+
       if (attendance.status === 'present') {
         formData.checkInDateTime = new Date().toISOString();
       }
@@ -58,7 +57,7 @@ const AttendanceForm = () => {
       if (response.meta.requestStatus === 'fulfilled') {
         Toast.show({
           text1: 'Check-in Successful',
-          text2: "Successfully Added",
+          text2: 'Successfully Added',
           type: 'success',
         });
 
@@ -71,7 +70,7 @@ const AttendanceForm = () => {
         });
       }
     } catch (error) {
-      console.error("Error during check-in:", error);
+      console.error('Error during check-in:', error);
       Toast.show({
         text1: 'Check-in Failed',
         text2: 'An error occurred during check-in.',
@@ -79,8 +78,6 @@ const AttendanceForm = () => {
       });
     }
   };
-  
-  
 
   const handleCheckout = async () => {
     const formData = {
@@ -122,8 +119,12 @@ const AttendanceForm = () => {
           <Text style={styles.recordTitle}>Last Attendance Record:</Text>
           <Text>Date: {new Date(sequrityAttendance.date).toLocaleDateString()}</Text>
           <Text>Status: {sequrityAttendance.status}</Text>
-          <Text>Check-in Time: {sequrityAttendance.checkInDateTime ? new Date(sequrityAttendance.checkInDateTime).toLocaleString() : '-'}</Text>
-          <Text>Check-out Time: {sequrityAttendance.checkOutDateTime ? new Date(sequrityAttendance.checkOutDateTime).toLocaleString() : '-'}</Text>
+          <Text>
+            Check-in Time: {sequrityAttendance.checkInDateTime ? new Date(sequrityAttendance.checkInDateTime).toLocaleString() : '-'}
+          </Text>
+          <Text>
+            Check-out Time: {sequrityAttendance.checkOutDateTime ? new Date(sequrityAttendance.checkOutDateTime).toLocaleString() : '-'}
+          </Text>
         </View>
       )}
 
@@ -151,7 +152,6 @@ const AttendanceForm = () => {
 
       {selectedDate === today && sequrity === 'No CheckIn' && (
         <View style={styles.buttonContainer}>
-
           <TouchableOpacity style={styles.buttonCheck} onPress={handleCheckin}>
             <Text style={styles.addButtonText}>Check-in</Text>
           </TouchableOpacity>
@@ -185,7 +185,7 @@ const AttendanceForm = () => {
         </View>
       )}
 
-      <Toast ref={(ref) => Toast.setRef(ref)} />
+      <Toast />
     </View>
   );
 };
@@ -230,7 +230,6 @@ const styles = StyleSheet.create({
   dropdownText: {
     color: '#333',
     marginBottom: 5,
-
   },
   dropdownOptions: {
     borderColor: 'lightgrey',
@@ -254,15 +253,15 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: 'center',
   },
-  addButtonText: {
-    color: '#FFF',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
   buttonText: {
     fontSize: 16,
-    marginBottom: 10,
-  }
+    color: '#333',
+  },
+  addButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#fff',
+  },
 });
 
 export default AttendanceForm;

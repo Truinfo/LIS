@@ -97,8 +97,6 @@ import ViewSequrity from './src/panel/admin/pages/Security/View';
 import AttendanceForm from './src/panel/admin/pages/Security/Attendance';
 import ReviewAdd from './src/panel/admin/pages/Advertisements/ReviewAdd';
 import AddAdvertisements from './src/panel/admin/pages/Advertisements/AddPost';
-import ReviewAdd from './src/panel/admin/pages/Advertisements/ReviewAdd';
-import AddAdvertisements from './src/panel/admin/pages/Advertisements/AddPost';
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -278,17 +276,8 @@ export default function App() {
             <Stack.Screen name="Attendance" component={AttendanceForm} />
 
             {/* Admin */}
-            <Stack.Screen name="Sidebar" component={Sidebar} options={{
-              headerShown: false,
-            }} />
-
             <Stack.Screen name="Add Residents" component={AddResidents} />
             <Stack.Screen name="Residents Details" component={ResidentsDetails} />
-
-            <Stack.Screen name="Add Security" component={AddSecurity} />
-            <Stack.Screen name="Edit Security" component={EditSecurity} />
-            <Stack.Screen name="View Security" component={ViewSequrity} />
-            <Stack.Screen name="Attendance" component={AttendanceForm} />
             <Stack.Screen name='View Details' component={ReviewAdd} />
             {/* <Stack.Screen name='Add Post' component={AddAdvertisements}/> */}
 

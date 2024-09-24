@@ -12,11 +12,8 @@ const EditSecurity = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { sequrityId } = route.params;
-
   const profile = useSelector((state) => state.gateKeepers.sequrity);
-  const aadharNumber = profile.aadharNumber
   const successMessage = useSelector((state) => state.gateKeepers.successMessage);
-  console.log("aadharNumber", aadharNumber)
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -98,7 +95,12 @@ const EditSecurity = () => {
         picture: { uri, name: uri.split('/').pop(), type: 'image/jpeg' },
       }));
       setPreviewImage(uri);
+      setModalVisible(false);
     }
+  };
+
+  const deletePhoto = () => {
+    setPreviewImage(null);
   };
 
   const handleSubmit = async () => {
@@ -159,7 +161,7 @@ const EditSecurity = () => {
         />
         <TextInput
           placeholder='Aadhar Number'
-          value={formData.aadharNumber}
+          value={(formData.aadharNumber)?.toString() || '' }
           onChangeText={(value) => handleChange('aadharNumber', value)}
           style={styles.input}
           keyboardType="numeric"
@@ -194,8 +196,13 @@ const EditSecurity = () => {
         {previewImage ? (
           <View style={styles.imageContainer}>
             <Image source={{ uri: previewImage }} style={styles.image} />
+            <TouchableOpacity onPress={deletePhoto} style={styles.removeImageButton}>
+                <Text style={styles.removeImageText}>Remove Image</Text>
+              </TouchableOpacity>
           </View>
         ) : null}
+
+
 
         {/* Image Picker Modal */}
         <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.imageButton}>
@@ -218,7 +225,7 @@ const EditSecurity = () => {
               <Text style={styles.modalButtonText}>Take a Photo</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.modalButton}>
-              <Text style={styles.modalButtonText}>Cancel</Text>
+              <Text style={styles.modalButtonCancel}>Cancel</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -244,10 +251,11 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   imageButton: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#28a745',
     padding: 10,
     borderRadius: 5,
     alignItems: 'center',
+    marginBottom: 10,
   },
   imageButtonText: {
     color: 'white',
@@ -262,10 +270,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   submitButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#7D0431',
     padding: 15,
     borderRadius: 5,
     alignItems: 'center',
+    marginBottom: 15,
   },
   submitButtonText: {
     color: 'white',
@@ -277,7 +286,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    width: '80%',
     backgroundColor: 'white',
     borderRadius: 10,
     padding: 20,
@@ -285,12 +293,28 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     marginBottom: 20,
+    justifyContent: "center",
+    color: '#7D0431'
   },
   modalButton: {
     padding: 10,
   },
   modalButtonText: {
     textAlign: 'center',
+  },
+  modalButtonCancel: {
+    textAlign: 'center',
+    color: "#7D0431",
+  },
+  removeImageButton: {
+    marginTop: 8,
+    marginBottom: 10,
+    padding: 5,
+    backgroundColor: 'red',
+    borderRadius: 5,
+  },
+  removeImageText: {
+    color: 'white',
   },
 });
 

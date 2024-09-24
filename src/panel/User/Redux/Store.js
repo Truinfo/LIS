@@ -49,6 +49,10 @@ import GetDocumentSlice from './Slice/ProfileSlice/GetDocumentSlice';
 import DocumentSlice from './Slice/ProfileSlice/DocumentSlice';
 
 import { GateKeeperReducer } from '../../admin/pages/Security/GateKeeperSlice';
+<<<<<<< HEAD
+=======
+
+>>>>>>> 2fb4c10a638456bc97623ae65f9cd0cc9b639965
 import { residentsReducer } from '../../admin/pages/ResidentialUnit/ResidentsSlice';
 
 import { AdvertisementReducer } from '../../admin/pages/Advertisements/AdvertisementSlice';
@@ -115,11 +119,20 @@ const store = configureStore({
 
 
 
+<<<<<<< HEAD
+=======
+    advertisements: AdvertisementReducer,
+>>>>>>> 2fb4c10a638456bc97623ae65f9cd0cc9b639965
     AdminResidents: residentsReducer,
 
     //Admin
     //Residents
     gateKeepers: GateKeeperReducer,
+<<<<<<< HEAD
+=======
+
+    //admin
+>>>>>>> 2fb4c10a638456bc97623ae65f9cd0cc9b639965
     advertisements: AdvertisementReducer,
     gateKeepers: GateKeeperReducer,
     adminProfile: AdminProfileReducer

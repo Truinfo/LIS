@@ -89,7 +89,6 @@ import SocietyBills from './src/panel/User/Navigations/Screens/Community/Society
 import EventDetails from './src/panel/User/Navigations/Screens/Community/EventDetails';
 import GetHelp from './src/panel/User/Navigations/Screens/GetHelp';
 import Sidebar from './src/panel/admin/components/Sidebar';
-
 import AddSecurity from './src/panel/admin/pages/Security/Add';
 import EditSecurity from './src/panel/admin/pages/Security/Edit';
 import ViewSequrity from './src/panel/admin/pages/Security/View';
@@ -99,6 +98,11 @@ import AddAdvertisements from './src/panel/admin/pages/Advertisements/AddPost';
 import EditResidents from './src/panel/admin/pages/ResidentialUnit/EditResidents';
 import AddResidents from './src/panel/admin/pages/ResidentialUnit/AddResidents';
 import ResidentDetails from './src/panel/admin/pages/ResidentialUnit/ResidentsDetails';
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 2fb4c10a638456bc97623ae65f9cd0cc9b639965
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -272,6 +276,10 @@ export default function App() {
 
 
             {/* Admin */}
+<<<<<<< HEAD
+=======
+
+>>>>>>> 2fb4c10a638456bc97623ae65f9cd0cc9b639965
             <Stack.Screen name="Sidebar" component={Sidebar} options={{
               headerShown: false,
             }} />
@@ -284,6 +292,10 @@ export default function App() {
             <Stack.Screen name="Edit Security" component={EditSecurity} />
             <Stack.Screen name="View Security" component={ViewSequrity} />
             <Stack.Screen name="Attendance" component={AttendanceForm} />
+<<<<<<< HEAD
+=======
+
+>>>>>>> 2fb4c10a638456bc97623ae65f9cd0cc9b639965
             <Stack.Screen name='View Details' component={ReviewAdd} />
             <Stack.Screen name='Add Post' component={AddAdvertisements} />
 

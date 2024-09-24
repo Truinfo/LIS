@@ -25,8 +25,6 @@ export const fetchUserProfiles = createAsyncThunk(
     'user/fetchUserProfiles',
     async ({ userId }) => {
         const response = await axiosInstance.get(`/user/getUserProfiles/${userId}/${societyId}`);
-
-        console.log(response.data)
         return response.data.userProfiles;
     }
 );
@@ -85,7 +83,6 @@ const ResidentsSlice = createSlice({
             })
             .addCase(fetchUserProfiles.fulfilled, (state, action) => {
                 state.status = 'succeeded';
-                console.log(action.payload)
                 state.profiles = action.payload;
             })
             .addCase(fetchUserProfiles.rejected, (state, action) => {

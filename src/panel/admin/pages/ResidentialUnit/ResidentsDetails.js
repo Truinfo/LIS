@@ -6,14 +6,15 @@ import { ImagebaseURL } from '../../../Security/helpers/axios';
 import Collapsible from 'react-native-collapsible';
 import { fetchServicePerson } from '../../../User/Redux/Slice/ProfileSlice/manageServiceSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import { fetchFrequentVisitors } from '../../../User/Redux/Slice/ProfileSlice/Household/frequentVisitorsSlice';
 
 const ResidentDetails = ({ route }) => {
     const { resident } = route.params;
     const { societyId, buildingName, flatNumber } = resident;
-    console.log("resident", societyId, buildingName, flatNumber)
     const dispatch = useDispatch();
-    const {  servicePerson } = useSelector((state) => state.manageServices);
+    const { servicePerson, error, loading } = useSelector((state) => state.manageServices);
     const { services } = servicePerson || {};
+    const { visitors, fetchStatus } = useSelector(state => state.frequentVisitor);
     const serviceType = [
         { id: 'maid', type: 'Maid' },
         { id: 'milkMan', type: 'Milkman' },
@@ -35,38 +36,36 @@ const ResidentDetails = ({ route }) => {
     const [collapsedPets, setCollapsedPets] = useState(true);
     const [collapsedVehicles, setCollapsedVehicles] = useState(true);
     const [collapsedDailyHelp, setCollapsedDailyHelp] = useState(true);
+    const [collapsedVisitors, setCollapsedVisitors] = useState(true);
     // Toggle functions
     const toggleFamily = () => setCollapsedFamily(!collapsedFamily);
     const togglePets = () => setCollapsedPets(!collapsedPets);
     const toggleVehicles = () => setCollapsedVehicles(!collapsedVehicles);
     const toggleDailyHelp = () => setCollapsedDailyHelp(!collapsedDailyHelp);
+    const toggleVisitors = () => setCollapsedVisitors(!collapsedVisitors);
     useEffect(() => {
         if (societyId && buildingName && flatNumber) {
             dispatch(fetchServicePerson({ societyId, block: buildingName, flatNumber }));
+            dispatch(fetchFrequentVisitors({ societyId, block: buildingName, flatNo: flatNumber }));
+
+
         }
     }, [dispatch, societyId, buildingName, flatNumber]);
-    console.log(services)
+
 
     const renderServiceList = (serviceCategory, serviceName) => {
         if (!services || !services[serviceCategory] || services[serviceCategory].length === 0) {
-            console.log(`No services found for category: ${serviceCategory}`);
-            return null;  
+            return null;
         }
         return (
             <View>
                 {services[serviceCategory].map((item) => (
                     <View key={item._id} style={styles.listItem}>
-                        {console.log(item,"item list")}
                         <Text style={styles.listTitle}>{item.name} ({serviceName})</Text>
                         <Text style={styles.subText}>Phone: {item.phoneNumber}</Text>
                         <Text style={styles.subText}>Address: {item.address}</Text>
                         <Text style={styles.subText}>Timings: {item.timings}</Text>
-                        {item.qrImages && (
-                            <Image
-                                source={{ uri: `${ImagebaseURL}${item.qrImages}` }}
-                                style={styles.qrImage}
-                            />
-                        )}
+
                     </View>
                 ))}
             </View>
@@ -103,11 +102,9 @@ const ResidentDetails = ({ route }) => {
                         <Icon name="person" size={18} color="#777" />
                         <Text style={styles.details}>{resident.userType}</Text>
                     </View>
-                    {/* <Text style={styles.role}>{resident.userType}</Text> */}
                 </View>
             </View>
 
-            {/* <Divider style={styles.divider} /> */}
 
             {/* Family Members Section */}
             <TouchableOpacity onPress={toggleFamily} style={styles.sectionHeader}>
@@ -129,7 +126,6 @@ const ResidentDetails = ({ route }) => {
                 )}
             </Collapsible>
 
-            {/* <Divider style={styles.divider} /> */}
 
             {/* Pets Section */}
             <TouchableOpacity onPress={togglePets} style={styles.sectionHeader}>
@@ -151,7 +147,6 @@ const ResidentDetails = ({ route }) => {
                 )}
             </Collapsible>
 
-            {/* <Divider style={styles.divider} /> */}
 
             {/* Vehicles Section */}
             <TouchableOpacity onPress={toggleVehicles} style={styles.sectionHeader}>
@@ -181,30 +176,34 @@ const ResidentDetails = ({ route }) => {
                 <Icon name={collapsedDailyHelp ? "keyboard-arrow-down" : "keyboard-arrow-up"} size={24} color="#424242" />
             </TouchableOpacity>
             <Collapsible collapsed={collapsedDailyHelp}>
-                {serviceType.map(({ id, type }) => (
-                    renderServiceList(id, type)
-                ))}
+                {loading ? (
+                    <View style={styles.loadingContainer}>
+                        <Text>Loading services...</Text>
+                    </View>
+                ) : error ? (
+                    <Text style={styles.noData}>No Services found.</Text>
+                ) : (
+                    serviceType.map(({ id, type }) => renderServiceList(id, type))
+                )}
             </Collapsible>
 
-            <TouchableOpacity style={styles.sectionHeader}>
+          {/* Frequent Visitors Section */}
+          <TouchableOpacity onPress={toggleVisitors} style={styles.sectionHeader}>
                 <Text style={styles.sectionTitle}>Frequent Visitors</Text>
-                {/* <Icon name={collapsedVehicles ? "keyboard-arrow-down" : "keyboard-arrow-up"} size={24} color="#424242" /> */}
+                <Icon name={collapsedVisitors ? "keyboard-arrow-down" : "keyboard-arrow-up"} size={24} color="#424242" />
             </TouchableOpacity>
-            {/* <Collapsible collapsed={collapsedVehicles}>
-                {resident.Vehicle.length > 0 ? (
-                    resident.Vehicle.map((item) => (
-                        <View key={item._id} style={styles.listItem}>
-                            <Text style={styles.listTitle}>{item.brand} ({item.type})</Text>
-                            <Text style={styles.subText}>Model: {item.modelName}</Text>
-                            <Text style={styles.subText}>Vehicle Number: {item.vehicleNumber}</Text>
-                            <Text style={styles.subText}>Driver: {item.driverName}</Text>
-                            <Text style={styles.subText}>Driver's Mobile: {item.mobileNumber}</Text>
+            <Collapsible collapsed={collapsedVisitors}>
+                {visitors.length > 0 ? (
+                    visitors.map((visitor) => (
+                        <View key={visitor._id} style={styles.listItem}>
+                            <Text style={styles.listTitle}>{visitor.name}</Text>
+                            <Text style={styles.subText}>Phone: {visitor.phoneNumber}</Text>
                         </View>
                     ))
                 ) : (
-                    <Text style={styles.noData}>No vehicles found.</Text>
+                    <Text style={styles.noData}>No frequent visitors found.</Text>
                 )}
-            </Collapsible> */}
+            </Collapsible>
         </ScrollView>
     );
 };

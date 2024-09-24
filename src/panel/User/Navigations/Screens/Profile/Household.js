@@ -45,7 +45,7 @@ const Household = ({ route }) => {
   const [phoneNumber, setPhoneNumber] = useState("");
 
 
-  const { visitors, fetchStatus,  error } = useSelector(state => state.frequentVisitors);
+  const { visitors, fetchStatus,  error } = useSelector(state => state.frequentVisitor);
   const { userId, societyId,  buildingName, flatNumber } = route.params;
 
   //pet data

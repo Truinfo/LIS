@@ -13,9 +13,10 @@ export const fetchServicePerson = createAsyncThunk(
   'service/fetchServicePerson',
   async ({ societyId, block, flatNumber }, { rejectWithValue }) => {
     try {
-
       const response = await axiosInstance.get(`/getAllServicesforFlat/${societyId}/${block}/${flatNumber}`);
+      
       return response.data;
+
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Something went wrong');
     }
@@ -74,6 +75,7 @@ const serviceSlice = createSlice({
       })
       .addCase(fetchServicePerson.rejected, (state, action) => {
         state.loading = false;
+
         state.error = action.payload || 'Failed to fetch services';
       })
       .addCase(deleteUserService.pending, (state) => {

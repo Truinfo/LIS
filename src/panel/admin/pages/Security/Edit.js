@@ -14,9 +14,9 @@ const EditSecurity = () => {
   const { sequrityId } = route.params;
 
   const profile = useSelector((state) => state.gateKeepers.sequrity);
-  const aadharNumber =profile.aadharNumber
+  const aadharNumber = profile.aadharNumber
   const successMessage = useSelector((state) => state.gateKeepers.successMessage);
-console.log("aadharNumber", aadharNumber)
+  console.log("aadharNumber", aadharNumber)
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -164,8 +164,7 @@ console.log("aadharNumber", aadharNumber)
           style={styles.input}
           keyboardType="numeric"
         />
-        
-        {/* Address Fields */}
+
         <TextInput
           placeholder='Address Line 1'
           value={formData.address.addressLine1}
@@ -209,21 +208,21 @@ console.log("aadharNumber", aadharNumber)
       </View>
 
       <Modal visible={modalVisible} transparent={true} animationType="slide">
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Select Image Source</Text>
-              <TouchableOpacity onPress={() => handleImagePicker('gallery')} style={styles.modalButton}>
-                <Text style={styles.modalButtonText}>Pick from Gallery</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleImagePicker('camera')} style={styles.modalButton}>
-                <Text style={styles.modalButtonText}>Take a Photo</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.modalButton}>
-                <Text style={styles.modalButtonText}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Select Image Source</Text>
+            <TouchableOpacity onPress={() => handleImagePicker('gallery')} style={styles.modalButton}>
+              <Text style={styles.modalButtonText}>Pick from Gallery</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleImagePicker('camera')} style={styles.modalButton}>
+              <Text style={styles.modalButtonText}>Take a Photo</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.modalButton}>
+              <Text style={styles.modalButtonText}>Cancel</Text>
+            </TouchableOpacity>
           </View>
-        </Modal>
+        </View>
+      </Modal>
       <Toast />
     </ScrollView>
   );

@@ -6,7 +6,9 @@ export const fetchFrequentVisitors = createAsyncThunk(
   'frequentVisitors/fetchFrequentVisitors',
   async ({ societyId, block, flatNo }) => {
     try {
+
       const response = await axiosInstance.get(`/getFrequentVisitors/${societyId}/${block}/${flatNo}`);
+     
       return response.data.frequentVisitors;
     } catch (error) {
       throw new Error('Failed to fetch frequent visitors');
@@ -47,10 +49,12 @@ const frequentVisitorsSlice = createSlice({
       .addCase(fetchFrequentVisitors.fulfilled, (state, action) => {
         state.fetchStatus = 'succeeded';
         state.error = null;
+        
         state.visitors = action.payload;
       })
       .addCase(fetchFrequentVisitors.rejected, (state, action) => {
         state.fetchStatus = 'failed';
+        
         state.error = action.error.message;
       })
       .addCase(deleteFrequentVisitor.pending, (state) => {

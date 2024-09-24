@@ -87,10 +87,16 @@ export const checkAttendanceStatus = createAsyncThunk(
 export const sequrityCheckIn = createAsyncThunk(
   'sequrity/sequrityCheckIn',
   async ({ sequrityId, formData }, { rejectWithValue }) => {
+
+    console.log("clicked slice")
+    console.log(sequrityId, formData)
     try {
       const response = await axiosInstance.put(`/sequrity/addCheckIn/${sequrityId}`, formData);
+      console.log("checkin", response.data)
       return response.data;
     } catch (error) {
+      console.log("error", error)
+      console.log("error", error.response ? error.response.data : error.message)
       return rejectWithValue(error.response ? error.response.data : error.message)
     }
   }

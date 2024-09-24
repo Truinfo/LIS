@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, TouchableWithoutFeedback, Keyboard } from 'react-native'; // Import TouchableWithoutFeedback
+import { TouchableWithoutFeedback, Keyboard } from 'react-native'; // Import TouchableWithoutFeedback
+
+import { Alert, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import {
     View,
     Text,
@@ -15,11 +17,13 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ImagebaseURL } from '../../../Security/helpers/axios';
 import { useCallback } from 'react';
 import Toast from 'react-native-toast-message';
+import Modal from 'react-native-modal'; // Import Modal
 
 const Security = () => {
     const [searchText, setSearchText] = useState('');
     const [selectedUser, setSelectedUser] = useState(null);
     const [actionMenuVisible, setActionMenuVisible] = useState(null);
+    const [isModalVisible, setModalVisible] = useState(false); // State for modal visibility
 
     const navigation = useNavigation();
     const dispatch = useDispatch();
@@ -47,42 +51,30 @@ const Security = () => {
     };
 
     const handleDelete = (user) => {
-        Alert.alert(
-            'Delete Confirmation',
-            `Are you sure you want to delete ${user.name}?`,
-            [
-                {
-                    text: 'Cancel',
-                    onPress: () => setActionMenuVisible(null),
-                    style: 'cancel',
-                },
-                {
-                    text: 'Yes',
-                    onPress: () => {
-                        setSelectedUser(user);
-                        dispatch(deleteGatekeepers({ id: user._id }))
-                            .then(() => {
-                                Toast.show({
-                                    text1: 'Deleted',
-                                    text2: 'Security guard deleted successfully!',
-                                    type: 'success',
-                                });
-                                dispatch(fetchGatekeepers());
-                            })
-                            .catch((error) => {
-                                console.error('Error:', error);
-                                Toast.show({
-                                    text1: 'Error',
-                                    text2: 'Failed to delete security guard.',
-                                    type: 'error',
-                                });
-                            });
-                        setActionMenuVisible(null);
-                    },
-                },
-            ],
-            { cancelable: false }
-        );
+        setSelectedUser(user);
+        setModalVisible(true); // Show the modal
+        setActionMenuVisible(null);
+    };
+
+    const confirmDelete = () => {
+        dispatch(deleteGatekeepers({ id: selectedUser._id }))
+            .then(() => {
+                Toast.show({
+                    text1: 'Deleted',
+                    text2: 'Security guard deleted successfully!',
+                    type: 'success',
+                });
+                dispatch(fetchGatekeepers());
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                Toast.show({
+                    text1: 'Error',
+                    text2: 'Failed to delete security guard.',
+                    type: 'error',
+                });
+            });
+        setModalVisible(false); // Hide the modal
     };
 
     const renderItem = ({ item }) => (
@@ -140,19 +132,18 @@ const Security = () => {
         </View>
     );
 
-
-
     return (
         <View style={styles.container}>
             <View style={styles.mainrow}>
-                <Text style={styles.modalText}>Manage Security Guards</Text>
-                <Button
-                    title="Add"
+                <TouchableOpacity
+                    style={styles.addButton}
                     onPress={() => {
                         setActionMenuVisible(null);
                         navigation.navigate('Add Security');
                     }}
-                />
+                >
+                    <Text style={styles.addButtonText}>Add</Text>
+                </TouchableOpacity>
             </View>
 
             <FlatList
@@ -164,13 +155,26 @@ const Security = () => {
                 renderItem={renderItem}
                 keyboardShouldPersistTaps="handled"
             />
-
+            {/* Modal for delete confirmation */}
+            <Modal isVisible={isModalVisible}>
+                <View style={styles.modalContent}>
+                    <Text style={styles.modalMainText}>Delete Confirmation</Text>
+                    <Text style={styles.modalText}>Are you sure you want to delete {selectedUser?.name}?</Text>
+                    <View style={styles.modalButtons}>
+                        <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.modalButton}>
+                            <Text style={styles.modalButtonText}>Cancel</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={confirmDelete} style={styles.modalButton}>
+                            <Text style={styles.modalButtonText}>Yes</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
 
             {/* Toast Message */}
-            <Toast ref={(ref) => Toast.setRef(ref)} />
+            <Toast />
         </View>
     );
-
 };
 
 const styles = StyleSheet.create({
@@ -179,8 +183,8 @@ const styles = StyleSheet.create({
         padding: 10,
     },
     mainrow: {
-        flexDirection: "row",
-        justifyContent: 'space-between',
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
         marginBottom: 15,
         padding: 10,
         backgroundColor: '#f9f9f9',
@@ -211,7 +215,7 @@ const styles = StyleSheet.create({
     dotsText: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#333',
+        color: '#7D0431',
     },
     actionMenu: {
         position: 'absolute',
@@ -227,8 +231,56 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
     },
     buttonText: {
-        color: '#000',
         fontSize: 14,
+    },
+    addButton: {
+        width: 50,
+        backgroundColor: '#7D0431',
+        paddingVertical: 10,
+        borderRadius: 5,
+        alignItems: 'center', 
+    },
+    addButtonText: {
+        color: '#FFF',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    modalContent: {
+        backgroundColor: '#fff',
+        padding: 20,
+        borderRadius: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    modalMainText: {
+        fontSize: 20,
+        marginBottom: 20,
+        textAlign: 'center',
+        fontWeight:'bold',
+        color: '#7D0431',
+    },
+    modalButtonText: {
+        fontSize: 15,
+        textAlign: 'center',
+        fontWeight:'bold',
+        color: 'white',
+    },
+    modalText: {
+        fontSize: 16,
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+    modalButtons: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+    },
+    modalButton: {
+        backgroundColor: '#7D0431',
+        padding: 10,
+        borderRadius: 5,
+        width: '45%',
+        alignItems: 'center',
     },
 });
 

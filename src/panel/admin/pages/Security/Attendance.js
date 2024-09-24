@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, Button, TouchableOpacity, StyleSheet, Alert, Platform } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { checkAttendanceStatus, sequrityCheckIn, sequrityCheckOut } from './GateKeeperSlice';
-import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 import { useRoute } from '@react-navigation/native';
 
@@ -13,12 +12,14 @@ const AttendanceForm = () => {
   const data = useSelector((state) => state.gateKeepers.sequrity);
   const sequrity = data?.status || '';
   const sequrityAttendance = data?.attendanceRecords || {};
+
   const [attendance, setAttendance] = useState({
     date: new Date().toISOString().slice(0, 10),
     status: '',
     checkInDateTime: '',
     checkOutDateTime: '',
   });
+
   const [showDropdown, setShowDropdown] = useState(false);
   const [today] = useState(new Date().toISOString().slice(0, 10));
   const selectedDate = new Date(attendance.date).toISOString().slice(0, 10);
@@ -29,34 +30,46 @@ const AttendanceForm = () => {
   }, [dispatch, sequrityId, attendance.date]);
 
   const handleAttendanceChange = (name, value) => {
-    setAttendance(prevState => ({
+    setAttendance((prevState) => ({
       ...prevState,
       [name]: value,
     }));
   };
 
+
   const handleCheckin = async () => {
-    if (selectedDate !== today) {
-      Alert.alert("Error", "You can only check in today.");
-      return;
-    }
-
-    let formData = {
-      date: attendance.date,
-      status: attendance.status,
-    };
-    if (attendance.status === 'present') {
-      formData.checkInDateTime = new Date().toISOString();
-    }
-
     try {
-      await dispatch(sequrityCheckIn({ sequrityId, formData }));
-      Toast.show({
-        text1: 'Check-in Successful',
-        text2: 'You have checked in successfully.',
-        type: 'success',
-      });
-      dispatch(checkAttendanceStatus({ sequrityId, date: new Date(attendance.date).toISOString() }));
+      if (selectedDate !== today) {
+        Alert.alert('Error', 'You can only check in today.');
+        return;
+      }
+  
+      let formData = {
+        date: attendance.date,
+        status: attendance.status,
+      };
+  
+      if (attendance.status === 'present') {
+        formData.checkInDateTime = new Date().toISOString();
+      }
+
+      const response = await dispatch(sequrityCheckIn({ sequrityId, formData }));
+
+      if (response.meta.requestStatus === 'fulfilled') {
+        Toast.show({
+          text1: 'Check-in Successful',
+          text2: "Successfully Added",
+          type: 'success',
+        });
+
+        await dispatch(checkAttendanceStatus({ sequrityId, date: new Date(attendance.date).toISOString() }));
+      } else {
+        Toast.show({
+          text1: 'Check-in Failed',
+          text2: 'An error occurred during check-in.',
+          type: 'error',
+        });
+      }
     } catch (error) {
       console.error("Error during check-in:", error);
       Toast.show({
@@ -66,6 +79,8 @@ const AttendanceForm = () => {
       });
     }
   };
+  
+  
 
   const handleCheckout = async () => {
     const formData = {
@@ -96,6 +111,10 @@ const AttendanceForm = () => {
     setShowDropdown(false);
   };
 
+  const capitalizeFirstLetter = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+  };
+
   return (
     <View style={styles.container}>
       {sequrityAttendance && (
@@ -108,37 +127,62 @@ const AttendanceForm = () => {
         </View>
       )}
 
-      <TextInput
-        style={styles.dateInput}
-        placeholder="Date"
-        value={attendance.date}
-        onChangeText={(value) => handleAttendanceChange('date', value)}
-
-      />
+      <TouchableOpacity style={styles.datePickerButton}>
+        <Text style={styles.datePickerText}>{attendance.date}</Text>
+      </TouchableOpacity>
 
       {selectedDate === today && sequrity !== 'Already checkin But no checkOut' && (
-        <TouchableOpacity onPress={() => setShowDropdown(!showDropdown)} style={styles.dropdown}>
-          <Text style={styles.dropdownText}>{attendance.status || 'Select Status'}</Text>
-        </TouchableOpacity>
-      )}
-
-      {showDropdown && (
-        <View style={styles.dropdownOptions}>
-          <TouchableOpacity onPress={() => handleSelectStatus('present')} style={styles.option}>
-            <Text style={styles.optionText}>Present</Text>
+        <View style={styles.dropdown}>
+          <TouchableOpacity onPress={() => setShowDropdown(!showDropdown)}>
+            <Text style={styles.dropdownText}>{capitalizeFirstLetter(attendance.status) || 'Select Status'}</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleSelectStatus('leave')} style={styles.option}>
-            <Text style={styles.optionText}>Leave</Text>
-          </TouchableOpacity>
+          {showDropdown && (
+            <View style={styles.dropdownOptions}>
+              <TouchableOpacity onPress={() => handleSelectStatus('present')} style={styles.option}>
+                <Text style={styles.optionText}>Present</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => handleSelectStatus('leave')} style={styles.option}>
+                <Text style={styles.optionText}>Leave</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       )}
 
       {selectedDate === today && sequrity === 'No CheckIn' && (
-        <Button title="Check-in" onPress={handleCheckin} />
+        <View style={styles.buttonContainer}>
+
+          <TouchableOpacity style={styles.buttonCheck} onPress={handleCheckin}>
+            <Text style={styles.addButtonText}>Check-in</Text>
+          </TouchableOpacity>
+        </View>
       )}
 
       {selectedDate === today && sequrity === 'Already checkin But no checkOut' && (
-        <Button title="Check-out" onPress={handleCheckout} />
+        <View style={styles.buttonContainer}>
+          <Text style={styles.buttonText}>Already Check-In</Text>
+          <TouchableOpacity style={styles.buttonCheck} onPress={handleCheckout}>
+            <Text style={styles.addButtonText}>Check Out</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {selectedDate === today && sequrity === 'In Leave' && (
+        <View style={styles.buttonContainer}>
+          <Text style={styles.buttonText}>You are on leave for this date.</Text>
+          <TouchableOpacity style={styles.buttonCheck} onPress={handleCheckin}>
+            <Text style={styles.addButtonText}>Check-in Anyway</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {selectedDate === today && sequrityAttendance.checkOutDateTime && (
+        <View style={styles.buttonContainer}>
+          <Text style={styles.buttonText}>Re-Entry</Text>
+          <TouchableOpacity style={styles.buttonCheck} onPress={handleCheckin}>
+            <Text style={styles.addButtonText}>Check-in Again</Text>
+          </TouchableOpacity>
+        </View>
       )}
 
       <Toast ref={(ref) => Toast.setRef(ref)} />
@@ -152,18 +196,6 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#fff',
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#630000',
-    padding: 10,
-  },
-  headerTitle: {
-    fontSize: 23,
-    fontWeight: '700',
-    color: '#fff',
-  },
   record: {
     marginVertical: 20,
     padding: 10,
@@ -176,12 +208,16 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#630000',
   },
-  dateInput: {
+  datePickerButton: {
+    padding: 10,
     borderColor: 'lightgrey',
     borderWidth: 1,
     borderRadius: 5,
-    padding: 10,
     marginVertical: 10,
+  },
+  datePickerText: {
+    fontSize: 16,
+    color: '#333',
   },
   dropdown: {
     borderColor: 'lightgrey',
@@ -193,17 +229,15 @@ const styles = StyleSheet.create({
   },
   dropdownText: {
     color: '#333',
+    marginBottom: 5,
+
   },
   dropdownOptions: {
     borderColor: 'lightgrey',
     borderWidth: 1,
     borderRadius: 5,
     backgroundColor: '#fff',
-    position: 'absolute',
-    zIndex: 1,
-    width: '100%',
-    maxHeight: 150,
-    overflow: 'hidden',
+    marginBottom: 10,
   },
   option: {
     padding: 10,
@@ -211,6 +245,24 @@ const styles = StyleSheet.create({
   optionText: {
     color: '#333',
   },
+  buttonContainer: {
+    marginVertical: 10,
+  },
+  buttonCheck: {
+    backgroundColor: '#7D0431',
+    paddingVertical: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  addButtonText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  buttonText: {
+    fontSize: 16,
+    marginBottom: 10,
+  }
 });
 
 export default AttendanceForm;

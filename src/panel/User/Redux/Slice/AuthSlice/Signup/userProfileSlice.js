@@ -8,9 +8,9 @@ import axios from 'axios';
 export const fetchUserProfile = createAsyncThunk(
   'userProfile/fetchUserProfile',
   async ({ id, data }, { rejectWithValue }) => {
-    console.log("data", data)
+    console.log("data", data,id)
     try {
-      const response = await axios.put(`http://192.168.29.24:2000/api/user/createUserProfile/${id}`, data)
+      const response = await axiosInstance.put(`/user/createUserProfile/${id}`, data)
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data.message || error.message);
@@ -44,12 +44,15 @@ const userProfileSlice = createSlice({
       })
       .addCase(fetchUserProfile.fulfilled, (state, action) => {
         state.loading = false;
+        console.log(action.payload)
+
         state.userProfile = action.payload.userProfile;
         state.successMessage = action.payload.message;
         state.error = null;
       })
       .addCase(fetchUserProfile.rejected, (state, action) => {
         state.loading = false;
+        console.log(action.payload)
         state.error = action.payload;
       });
   },

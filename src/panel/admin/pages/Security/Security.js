@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from 'react';
+<<<<<<< HEAD
 import { TouchableWithoutFeedback, Keyboard } from 'react-native'; // Import TouchableWithoutFeedback
+=======
+import { Alert, TouchableWithoutFeedback, Keyboard } from 'react-native';
+>>>>>>> 9c8e5e1284aa668c790d0569eeef899252b23e91
 import {
     View,
     Text,
@@ -154,6 +158,7 @@ const Security = () => {
                 keyboardShouldPersistTaps="handled"
             />
 
+<<<<<<< HEAD
             {/* Modal for delete confirmation */}
             <Modal isVisible={isModalVisible}>
                 <View style={styles.modalContent}>
@@ -170,8 +175,10 @@ const Security = () => {
                 </View>
             </Modal>
 
+=======
+>>>>>>> 9c8e5e1284aa668c790d0569eeef899252b23e91
             {/* Toast Message */}
-            <Toast ref={(ref) => Toast.setRef(ref)} />
+            <Toast />
         </View>
     );
 };

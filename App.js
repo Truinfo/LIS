@@ -98,6 +98,7 @@ import AddAdvertisements from './src/panel/admin/pages/Advertisements/AddPost';
 import EditResidents from './src/panel/admin/pages/ResidentialUnit/EditResidents';
 import AddResidents from './src/panel/admin/pages/ResidentialUnit/AddResidents';
 import ResidentDetails from './src/panel/admin/pages/ResidentialUnit/ResidentsDetails';
+import EditAdd from './src/panel/admin/pages/Advertisements/EditAdd';
 
 
 const Stack = createNativeStackNavigator();
@@ -289,6 +290,8 @@ export default function App() {
 
             <Stack.Screen name='View Details' component={ReviewAdd} />
             <Stack.Screen name='Add Post' component={AddAdvertisements} />
+            <Stack.Screen name='Edit Post' component={EditAdd} />
+
 
           </Stack.Navigator>
         </SafeAreaView>

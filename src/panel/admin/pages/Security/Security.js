@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, TouchableWithoutFeedback, Keyboard } from 'react-native'; // Import TouchableWithoutFeedback
+import { Alert, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import {
     View,
     Text,
@@ -140,8 +140,6 @@ const Security = () => {
         </View>
     );
 
-
-
     return (
         <View style={styles.container}>
             <View style={styles.mainrow}>
@@ -165,9 +163,8 @@ const Security = () => {
                 keyboardShouldPersistTaps="handled"
             />
 
-
             {/* Toast Message */}
-            <Toast ref={(ref) => Toast.setRef(ref)} />
+            <Toast />
         </View>
     );
 

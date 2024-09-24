@@ -62,7 +62,7 @@ const ResidentialUnit = () => {
         const chipStyle = item.ownerType === 'Owner' ? styles.ownerChip : styles.tenantChip;
 
         return (
-            <TouchableOpacity style={styles.residentCard} onPress={()=>navigation.navigate("Residents Details")}>
+            <TouchableOpacity style={styles.residentCard} onPress={() => navigation.navigate("Residents Details", { resident: item })}>
                 <Avatar.Image source={{ uri: `${ImagebaseURL}${item.profilePicture}` }} size={50} style={{ backgroundColor: "#ccc" }} />
                 <View style={styles.residentDetails}>
                     <Text style={styles.name}>{item.name}</Text>
@@ -84,7 +84,6 @@ const ResidentialUnit = () => {
                         <TouchableOpacity onPress={handleDelete} style={styles.menuItem}>
                             <Text>Delete</Text>
                         </TouchableOpacity>
-
                     </ScrollView>
                 )}
             </TouchableOpacity>

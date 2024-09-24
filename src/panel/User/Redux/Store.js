@@ -47,6 +47,17 @@ import complaintsReducer from './Slice/GetHelpSlice/ComplaintsSlice';
 import AmenitiesReducer from './Slice/CommunitySlice/Amenities';
 import GetDocumentSlice from './Slice/ProfileSlice/GetDocumentSlice';
 import DocumentSlice from './Slice/ProfileSlice/DocumentSlice';
+<<<<<<< HEAD
+import { GateKeeperReducer } from '../../admin/pages/Security/GateKeeperSlice';
+
+
+=======
+import { AdvertisementReducer } from '../../admin/pages/Advertisements/AdvertisementSlice';
+
+
+
+//admin
+>>>>>>> 83cfd3372e333883a36091a8d2ba6e79e399c66d
 
 //Admin
 import { residentsReducer } from '../../admin/pages/ResidentialUnit/ResidentsSlice';
@@ -108,6 +119,7 @@ const store = configureStore({
     staffVisitor: staffVisitors,
     societyLis: societyLicence,
 
+<<<<<<< HEAD
 
 
 
@@ -115,6 +127,18 @@ const store = configureStore({
     //Admin
     //Residents
     AdminResidents: residentsReducer
+=======
+<<<<<<< HEAD
+    gateKeepers: GateKeeperReducer,
+=======
+
+    //admin
+
+
+    advertisements:AdvertisementReducer,
+
+>>>>>>> 83cfd3372e333883a36091a8d2ba6e79e399c66d
+>>>>>>> 8d219ef7510c8753ce6414bdb1bdbda1cc563785
   },
 });
 export default store;

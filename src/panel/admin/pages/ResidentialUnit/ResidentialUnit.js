@@ -76,7 +76,7 @@ const ResidentialUnit = () => {
                 </TouchableOpacity>
                 {anchor === item._id && (
                     <ScrollView style={[styles.menuList, { top: 0 }]}>
-                        <TouchableOpacity onPress={() => console.log('Edit', selectedResident)} style={styles.menuItem}>
+                        <TouchableOpacity onPress={() => navigation.navigate('Edit Resident', { resident: selectedResident })} style={styles.menuItem}>
                             <Text>Edit</Text>
                         </TouchableOpacity>
                         <View style={styles.divider} />

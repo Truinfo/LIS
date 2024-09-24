@@ -270,14 +270,6 @@ export default function App() {
             <Stack.Screen name="My Bookings" component={MyBookings} />
 
 
-            <Stack.Screen name="Sidebar" component={Sidebar} options={{
-              headerShown: false,
-            }} />
-            <Stack.Screen name="Add Security" component={AddSecurity} />
-            <Stack.Screen name="Edit Security" component={EditSecurity} />
-            <Stack.Screen name="View Security" component={ViewSequrity} />
-            <Stack.Screen name="Attendance" component={AttendanceForm} />
-
 
 
             {/* Admin */}

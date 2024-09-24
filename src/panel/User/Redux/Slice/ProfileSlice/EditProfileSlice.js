@@ -9,7 +9,7 @@ const initialState = {
 
 export const EditUserProfile = createAsyncThunk(
   'profiles/EditUserProfile',
-  async ({formData,id}, thunkAPI) => {
+  async ({ formData, id }, thunkAPI) => {
     try {
 
       const response = await axiosInstance.put(
@@ -40,7 +40,6 @@ const profileEditSlice = createSlice({
       })
       .addCase(EditUserProfile.fulfilled, (state, action) => {
         state.status = 'succeeded';
-
         state.profiles = action.payload;
       })
       .addCase(EditUserProfile.rejected, (state, action) => {

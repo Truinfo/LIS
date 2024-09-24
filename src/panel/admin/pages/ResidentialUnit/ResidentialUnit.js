@@ -30,6 +30,11 @@ const ResidentialUnit = () => {
         setSelectedResident(resident);
         setAnchor(anchor ? null : resident._id);
     };
+    const handleEdit = (resident) => {
+        navigation.navigate('Edit Resident', { resident: selectedResident })
+        setSelectedResident(resident);
+        setAnchor(anchor ? null : resident._id);
+    };
 
     const handleDelete = () => {
         if (selectedResident) {
@@ -77,7 +82,7 @@ const ResidentialUnit = () => {
                 </TouchableOpacity>
                 {anchor === item._id && (
                     <ScrollView style={[styles.menuList, { top: 0 }]}>
-                        <TouchableOpacity onPress={() => navigation.navigate('Edit Resident', { resident: selectedResident })} style={styles.menuItem}>
+                        <TouchableOpacity onPress={handleEdit} style={styles.menuItem}>
                             <Text>Edit</Text>
                         </TouchableOpacity>
                         <View style={styles.divider} />

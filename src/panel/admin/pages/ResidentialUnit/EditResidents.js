@@ -1,19 +1,75 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Image, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, TouchableOpacity, Text, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import { TextInput, Avatar, Snackbar } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
+import { useDispatch, useSelector } from 'react-redux';
+import { EditUserProfile } from '../../../User/Redux/Slice/ProfileSlice/EditProfileSlice';
+import { Ionicons } from '@expo/vector-icons';
+import { ImagebaseURL } from '../../../Security/helpers/axios';
+import { useNavigation } from '@react-navigation/native';
+import { fetchUsers } from './ResidentsSlice';
 
-const EditResidents = () => {
-    const {resident}=route.params;
-    const [name, setName] = useState(resident.name);
-    const [phone, setPhone] = useState(resident.phone);
-    const [email, setEmail] = useState(resident.email);
-    const [photo, setPhoto] = useState(resident.photo);
-    const [block, setBlock] = useState(resident.block);
-    const [flat, setFlat] = useState(resident.flat);
-    const [apartment, setApartment] = useState(resident.apartment);
+const EditResidents = ({ route }) => {
+    const { resident } = route.params;
+    const dispatch = useDispatch();
+    const navigation = useNavigation();
+    const { users } = useSelector((state) => state.AdminResidents);
+
+    // Initialize state for resident details
+    const [name, setName] = useState('');
+    const [photo, setPhoto] = useState('');
+    const [phone, setPhone] = useState('');
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [email, setEmail] = useState('');
+    const [block, setBlock] = useState('');
+    const [flat, setFlat] = useState('');
+    const [apartment, setApartment] = useState('');
+    const [imageUri, setImageUri] = useState(null); // State to hold image URI
+    const [snackbarVisible, setSnackbarVisible] = useState(false); // State for Snackbar visibility
+
+    // Fetch users on component mount
+    useEffect(() => {
+        dispatch(fetchUsers());
+    }, [dispatch]);
+
+    // Find resident details based on ID
+    useEffect(() => {
+        const foundResident = users.find(user => user._id === resident._id);
+        if (foundResident) {
+            setName(foundResident.name);
+            setPhoto(foundResident.profilePicture);
+            setPhone(foundResident.mobileNumber);
+            setEmail(foundResident.email);
+            setBlock(foundResident.buildingName);
+            setFlat(foundResident.flatNumber);
+            setApartment(foundResident.societyName);
+            setImageUri(foundResident.profilePicture ? `${ImagebaseURL}${foundResident.profilePicture}` : null); // Set image URI for Avatar
+        }
+    }, [users, resident._id]);
 
     const handleImagePick = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
+        Alert.alert(
+            'Select Image Source',
+            'Choose an option to upload an image:',
+            [
+                {
+                    text: 'Camera',
+                    onPress: () => pickImage(ImagePicker.launchCameraAsync),
+                },
+                {
+                    text: 'Gallery',
+                    onPress: () => pickImage(ImagePicker.launchImageLibraryAsync),
+                },
+                {
+                    text: 'Cancel',
+                    style: 'cancel',
+                },
+            ]
+        );
+    };
+
+    const pickImage = async (launchFunction) => {
+        let result = await launchFunction({
             mediaTypes: ImagePicker.MediaTypeOptions.All,
             allowsEditing: true,
             aspect: [4, 3],
@@ -21,79 +77,173 @@ const EditResidents = () => {
         });
 
         if (!result.canceled) {
-            setPhoto(result.assets[0].uri);
+            setImageUri(result.assets[0].uri); // Store the URI for use in the image upload
+            setPhoto(result.assets[0]); // Store the asset for form submission
         }
     };
 
-    const handleSubmit = () => {
-        const updatedResident = { name, phone, email, photo, block, flat, apartment };
-        onSave(updatedResident);
+    const handleSubmit = async () => {
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('mobileNumber', phone);
+        formData.append('email', email);
+        formData.append('block', block);
+        formData.append('flat', flat);
+        formData.append('apartment', apartment);
+
+        // Only append the image if it was changed
+        if (imageUri) {
+            formData.append('profilePicture', {
+                uri: imageUri,
+                name: `profile-${Date.now()}.jpeg`, // Change the name to match your server's expectation
+                type: 'image/jpeg', // Set appropriate MIME type
+            });
+        }
+
+        const updatedResident = { formData, id: resident._id };
+
+        try {
+            const result = await dispatch(EditUserProfile(updatedResident)).unwrap();
+            console.log(result);
+            setSnackbarMessage(`${result.message}`);
+            setSnackbarVisible(true);
+            dispatch(fetchUsers());
+            setTimeout(() => {
+                navigation.navigate('Residential Management');
+            }, 2000);
+        } catch (error) {
+            setSnackbarMessage(`${error.message}`);
+            setSnackbarVisible(true);
+        }
     };
 
     return (
-        <View style={styles.container}>
-            <Text>Edit Resident Details</Text>
+        <KeyboardAvoidingView
+            style={styles.container}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={100}
+        >
+            <View style={styles.avatarContainer}>
+                <Avatar.Image
+                    size={120}
+                    source={imageUri ? { uri: imageUri } : { uri: `${ImagebaseURL}${resident.profilePicture}` }}
+                    style={styles.avatar}
+                />
+                <TouchableOpacity style={styles.cameraButton} onPress={handleImagePick}>
+                    <Ionicons name="camera" size={20} color="white" />
+                </TouchableOpacity>
+            </View>
 
-            <Button title="Pick an image" onPress={handleImagePick} />
-            {photo && <Image source={{ uri: photo }} style={styles.image} />}
+            <View style={styles.inputContainer}>
+                <TextInput
+                    label="Name"
+                    value={name}
+                    onChangeText={setName}
+                    style={styles.input}
+                    mode="outlined"
+                />
+                <TextInput
+                    label="Phone"
+                    value={phone}
+                    onChangeText={setPhone}
+                    style={styles.input}
+                    mode="outlined"
+                    keyboardType="phone-pad"
+                />
+                <TextInput
+                    label="Email"
+                    value={email}
+                    onChangeText={setEmail}
+                    style={styles.input}
+                    mode="outlined"
+                    keyboardType="email-address"
+                    disabled={true}
+                />
+                <TextInput
+                    label="Block"
+                    value={block}
+                    onChangeText={setBlock}
+                    style={styles.input}
+                    mode="outlined"
+                    disabled={true}
+                />
+                <TextInput
+                    label="Flat"
+                    value={flat}
+                    onChangeText={setFlat}
+                    style={styles.input}
+                    mode="outlined"
+                    disabled={true}
+                />
+                <TextInput
+                    label="Apartment"
+                    value={apartment}
+                    onChangeText={setApartment}
+                    style={styles.input}
+                    mode="outlined"
+                    disabled={true}
+                />
+            </View>
 
-            <TextInput
-                placeholder="Name"
-                value={name}
-                onChangeText={setName}
-                style={styles.input}
-            />
-            <TextInput
-                placeholder="Phone"
-                value={phone}
-                onChangeText={setPhone}
-                style={styles.input}
-            />
-            <TextInput
-                placeholder="Email"
-                value={email}
-                onChangeText={setEmail}
-                style={styles.input}
-            />
-            <TextInput
-                placeholder="Block"
-                value={block}
-                onChangeText={setBlock}
-                style={styles.input}
-            />
-            <TextInput
-                placeholder="Flat"
-                value={flat}
-                onChangeText={setFlat}
-                style={styles.input}
-            />
-            <TextInput
-                placeholder="Apartment"
-                value={apartment}
-                onChangeText={setApartment}
-                style={styles.input}
-            />
+            <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+                <Text style={styles.buttonText}>Save Changes</Text>
+            </TouchableOpacity>
 
-            <Button title="Save Changes" onPress={handleSubmit} />
-        </View>
+            <Snackbar
+                visible={snackbarVisible}
+                onDismiss={() => setSnackbarVisible(false)}
+                duration={3000}
+                action={{
+                    label: 'OK',
+                    onPress: () => {
+                        setSnackbarVisible(false);
+                    },
+                }}
+            >
+                {snackbarMessage}
+            </Snackbar>
+        </KeyboardAvoidingView>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
         padding: 20,
+        justifyContent: 'space-between', // Ensure space between items
+    },
+    avatarContainer: {
+        alignSelf: 'center',
+        marginBottom: 20,
+        position: 'relative', // Needed for positioning camera button
+    },
+    avatar: {
+        alignSelf: 'center',
+    },
+    cameraButton: {
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        backgroundColor: "rgba(0, 0, 0, 0.5)", // Your primary color
+        borderRadius: 50,
+        padding: 5,
+    },
+    inputContainer: {
+        flex: 1, // Take remaining space for inputs
     },
     input: {
-        height: 40,
-        borderColor: 'gray',
-        borderWidth: 1,
         marginBottom: 10,
-        padding: 10,
     },
-    image: {
-        width: 100,
-        height: 100,
-        marginBottom: 10,
+    button: {
+        backgroundColor: '#7d0431', // Your primary color
+        padding: 10,
+        borderRadius: 5,
+        alignItems: 'center',
+    },
+    buttonText: {
+        color: '#fff', // Text color
+        fontSize: 16,
+        fontWeight: '500',
     },
 });
 

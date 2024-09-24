@@ -89,16 +89,16 @@ import SocietyBills from './src/panel/User/Navigations/Screens/Community/Society
 import EventDetails from './src/panel/User/Navigations/Screens/Community/EventDetails';
 import GetHelp from './src/panel/User/Navigations/Screens/GetHelp';
 import Sidebar from './src/panel/admin/components/Sidebar';
-<<<<<<< HEAD
+
 import AddSecurity from './src/panel/admin/pages/Security/Add';
 import EditSecurity from './src/panel/admin/pages/Security/Edit';
 import ViewSequrity from './src/panel/admin/pages/Security/View';
 import AttendanceForm from './src/panel/admin/pages/Security/Attendance';
 
-=======
+
 import ReviewAdd from './src/panel/admin/pages/Advertisements/ReviewAdd';
 import AddAdvertisements from './src/panel/admin/pages/Advertisements/AddPost';
->>>>>>> 83cfd3372e333883a36091a8d2ba6e79e399c66d
+
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -268,8 +268,6 @@ export default function App() {
             <Stack.Screen name="Society Bills" component={SocietyBills} />
             <Stack.Screen name="EventDetails" component={EventDetails} />
             <Stack.Screen name="My Bookings" component={MyBookings} />
-<<<<<<< HEAD
-            
 
 
 
@@ -280,18 +278,12 @@ export default function App() {
             <Stack.Screen name="Edit Security" component={EditSecurity} />
             <Stack.Screen name="View Security" component={ViewSequrity} />
             <Stack.Screen name="Attendance" component={AttendanceForm} />
-=======
-            <Stack.Screen name="Sidebar" component={Sidebar} options={{
-              headerShown: false,
-            }} />
-
-
 
 
             {/* Admin */}
             <Stack.Screen name='View Details' component={ReviewAdd}/>
             {/* <Stack.Screen name='Add Post' component={AddAdvertisements}/> */}
->>>>>>> 83cfd3372e333883a36091a8d2ba6e79e399c66d
+
           </Stack.Navigator>
         </SafeAreaView>
       </NavigationContainer>

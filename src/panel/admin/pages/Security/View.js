@@ -58,8 +58,8 @@ const ViewSequrity = () => {
                 <View style={styles.tableHeader}>
                   <Text style={styles.tableHeaderText}>Date</Text>
                   <Text style={styles.tableHeaderText}>Status</Text>
-                  <Text style={styles.tableHeaderText}>Check-In</Text>
-                  <Text style={styles.tableHeaderText}>Check-Out</Text>
+                  <Text style={styles.tableHeaderText}>Check In</Text>
+                  <Text style={styles.tableHeaderText}>Check Out</Text>
                 </View>
                 {profile.attendance.map((attendanceRecord) => (
                   <View key={attendanceRecord._id} style={styles.tableRow}>

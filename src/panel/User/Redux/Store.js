@@ -47,17 +47,13 @@ import complaintsReducer from './Slice/GetHelpSlice/ComplaintsSlice';
 import AmenitiesReducer from './Slice/CommunitySlice/Amenities';
 import GetDocumentSlice from './Slice/ProfileSlice/GetDocumentSlice';
 import DocumentSlice from './Slice/ProfileSlice/DocumentSlice';
-<<<<<<< HEAD
 import { GateKeeperReducer } from '../../admin/pages/Security/GateKeeperSlice';
-
-
-=======
 import { AdvertisementReducer } from '../../admin/pages/Advertisements/AdvertisementSlice';
 
 
 
 //admin
->>>>>>> 83cfd3372e333883a36091a8d2ba6e79e399c66d
+
 
 const store = configureStore({
   reducer: {
@@ -116,16 +112,12 @@ const store = configureStore({
     staffVisitor: staffVisitors,
     societyLis: societyLicence,
 
-<<<<<<< HEAD
-    gateKeepers: GateKeeperReducer,
-=======
 
-    //admin
+    gateKeepers: GateKeeperReducer,
 
 
     advertisements:AdvertisementReducer,
 
->>>>>>> 83cfd3372e333883a36091a8d2ba6e79e399c66d
   },
 });
 export default store;

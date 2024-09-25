@@ -287,7 +287,7 @@ export default function App() {
 
             <Stack.Screen name='View Details' component={ReviewAdd} />
             <Stack.Screen name='Add Post' component={AddAdvertisements} />
-            <Stack.Screen name='Edit Post' component={EditAdd} />
+            {/* <Stack.Screen name='Edit Post' component={EditAdd} /> */}
 
 
           </Stack.Navigator>

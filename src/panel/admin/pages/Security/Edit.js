@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { getSequrityPerson, updateSequrity } from './GateKeeperSlice';
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, ScrollView, Alert, Modal } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, Modal } from 'react-native';
+import { TextInput } from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 import * as ImagePicker from 'expo-image-picker';
 import { ImagebaseURL } from '../../../Security/helpers/axios';
@@ -55,6 +56,7 @@ const EditSecurity = () => {
       setPreviewImage(`${ImagebaseURL}${profile.pictures}`);
     }
   }, [profile]);
+
   const handleChange = (name, value) => {
     if (name.startsWith('address.')) {
       const addressKey = name.split('.')[1];
@@ -140,55 +142,72 @@ const EditSecurity = () => {
     <ScrollView style={styles.container}>
       <View style={styles.form}>
         <TextInput
-          placeholder='Name'
+          mode="outlined"
+          label='Name'
           value={formData.name}
           onChangeText={(value) => handleChange('name', value)}
-          style={styles.input}
+          theme={{ colors: { primary: "#7d0431" } }}
+          style={styles.textInput}
         />
+
         <TextInput
-          placeholder='Email'
+          mode="outlined"
+          label='Email'
           value={formData.email}
           onChangeText={(value) => handleChange('email', value)}
-          style={styles.input}
+          theme={{ colors: { primary: "#7d0431" } }}
+          style={styles.textInput}
         />
         <TextInput
-          placeholder='Mobile Number'
+          mode="outlined"
+          label='Mobile Number'
           value={formData.phoneNumber}
           onChangeText={(value) => handleChange('phoneNumber', value)}
-          style={styles.input}
+          theme={{ colors: { primary: "#7d0431" } }}
+          style={styles.textInput}
           keyboardType="numeric"
         />
         <TextInput
-          placeholder='Aadhar Number'
+          mode="outlined"
+          label='Aadhar Number'
           value={formData.aadharNumber?.toString() || ''}
           onChangeText={(value) => handleChange('aadharNumber', value)}
-          style={styles.input}
+          theme={{ colors: { primary: "#7d0431" } }}
+          style={styles.textInput}
           keyboardType="numeric"
         />
 
         <TextInput
-          placeholder='Address Line 1'
+          mode="outlined"
+          label='Address Line 1'
           value={formData.address.addressLine1}
           onChangeText={(value) => handleChange('address.addressLine1', value)}
-          style={styles.input}
+          theme={{ colors: { primary: "#7d0431" } }}
+          style={styles.textInput}
         />
         <TextInput
-          placeholder='Address Line 2'
+          mode="outlined"
+          label='Address Line 2'
           value={formData.address.addressLine2}
           onChangeText={(value) => handleChange('address.addressLine2', value)}
-          style={styles.input}
+          theme={{ colors: { primary: "#7d0431" } }}
+          style={styles.textInput}
         />
         <TextInput
-          placeholder='State'
+          mode="outlined"
+          label='State'
           value={formData.address.state}
           onChangeText={(value) => handleChange('address.state', value)}
-          style={styles.input}
+          theme={{ colors: { primary: "#7d0431" } }}
+          style={styles.textInput}
         />
         <TextInput
-          placeholder='Postal Code'
+          mode="outlined"
+          label='Postal Code'
           value={formData.address.postalCode}
           onChangeText={(value) => handleChange('address.postalCode', value)}
-          style={styles.input}
+          theme={{ colors: { primary: "#7d0431" } }}
+          style={styles.textInput}
         />
 
         {/* Preview Image */}
@@ -196,8 +215,8 @@ const EditSecurity = () => {
           <View style={styles.imageContainer}>
             <Image source={{ uri: previewImage }} style={styles.image} />
             <TouchableOpacity onPress={deletePhoto} style={styles.removeImageButton}>
-                <Text style={styles.removeImageText}>Remove Image</Text>
-              </TouchableOpacity>
+              <Text style={styles.removeImageText}>Remove Image</Text>
+            </TouchableOpacity>
           </View>
         ) : null}
 
@@ -315,6 +334,12 @@ const styles = StyleSheet.create({
   removeImageText: {
     color: 'white',
   },
+  textInputFields: {
+    marginBottom: 20,
+  },
+  textInput: {
+    marginBottom: 8,
+  }
 });
 
 export default EditSecurity;

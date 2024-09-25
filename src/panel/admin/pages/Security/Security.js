@@ -8,6 +8,7 @@ import {
     TouchableOpacity,
     StyleSheet,
     Button,
+    ActivityIndicator,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchGatekeepers, deleteGatekeepers } from './GateKeeperSlice';
@@ -27,6 +28,9 @@ const Security = () => {
     const navigation = useNavigation();
     const dispatch = useDispatch();
     const sequrity = useSelector(state => state.gateKeepers.sequrity || []);
+
+    const status = useSelector((state) => state.gateKeepers.status);
+    const error = useSelector((state) => state.gateKeepers.error);
 
     useFocusEffect(
         useCallback(() => {
@@ -51,7 +55,7 @@ const Security = () => {
 
     const handleDelete = (user) => {
         setSelectedUser(user);
-        setModalVisible(true); // Show the modal
+        setModalVisible(true);
         setActionMenuVisible(null);
     };
 
@@ -73,36 +77,45 @@ const Security = () => {
                     type: 'error',
                 });
             });
-        setModalVisible(false); // Hide the modal
+        setModalVisible(false);
     };
+
+    if (status === 'loading') {
+        return <ActivityIndicator size="large" color="#630000" style={styles.loader} />;
+    }
+
+    if (status === 'failed') {
+        return <Text style={styles.errorText}>Error: {error}</Text>;
+    }
+
 
     const renderItem = ({ item }) => (
         <View style={styles.row}>
-            
+
             <Image
                 source={{ uri: `${ImagebaseURL}${item.pictures}` }}
                 style={styles.image}
             />
-            <Text style={styles.text}>
-                <Text style={{ fontWeight: 'bold' }}>Security ID: </Text>
-                {item.sequrityId}
-            </Text>
-            <Text style={styles.text}>
-                <Text style={{ fontWeight: 'bold' }}>Name: </Text>
-                {item.name}
-            </Text>
-            <Text style={styles.text}>
-                <Text style={{ fontWeight: 'bold' }}>Email: </Text>
-                {item.email}
-            </Text>
-            <Text style={styles.text}>
-                <Text style={{ fontWeight: 'bold' }}>Mobile: </Text>
-                {item.phoneNumber}
-            </Text>
-            <Text style={styles.text}>
-                <Text style={{ fontWeight: 'bold' }}>Aadhar: </Text>
-                {item.aadharNumber}
-            </Text>
+            <View style={styles.details}>
+                <Text style={styles.detailLabel}>Security ID:</Text>
+                <Text style={styles.detailValue}>{item.sequrityId}</Text>
+            </View>
+            <View style={styles.details}>
+                <Text style={styles.detailLabel}>Name:</Text>
+                <Text style={styles.detailValue}>{item.name}</Text>
+            </View>
+            <View style={styles.details}>
+                <Text style={styles.detailLabel}>Email:</Text>
+                <Text style={styles.detailValue}>{item.email}</Text>
+            </View>
+            <View style={styles.details}>
+                <Text style={styles.detailLabel}>Mobile:</Text>
+                <Text style={styles.detailValue}>{item.phoneNumber}</Text>
+            </View>
+            <View style={styles.details}>
+                <Text style={styles.detailLabel}>Aadhar:</Text>
+                <Text style={styles.detailValue}>{item.aadharNumber}</Text>
+            </View>
 
             {/* Three dots button */}
             <TouchableOpacity
@@ -171,8 +184,6 @@ const Security = () => {
                     </View>
                 </View>
             </Modal>
-
-            {/* Toast Message */}
             <Toast />
         </View>
     );
@@ -183,6 +194,10 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 10,
     },
+    loader: {
+        flex: 1,
+        justifyContent: 'center',
+      },
     mainrow: {
         flexDirection: 'row',
         justifyContent: 'flex-end',
@@ -196,6 +211,22 @@ const styles = StyleSheet.create({
         padding: 10,
         backgroundColor: '#f9f9f9',
         borderRadius: 8,
+        flexDirection: 'column',
+    },
+    details: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 5,
+    },
+    detailLabel: {
+        fontWeight: 'bold',
+        flex: 1,
+        fontSize: 16,
+    },
+    detailValue: {
+        flex: 2,
+        fontSize: 16,
+        color: '#333',
     },
     text: {
         fontSize: 16,

@@ -97,23 +97,23 @@ const Security = () => {
                 style={styles.image}
             />
             <View style={styles.details}>
-                <Text style={styles.detailLabel}>Security ID:</Text>
+                <Text style={styles.detailLabel}>Security ID</Text>
                 <Text style={styles.detailValue}>{item.sequrityId}</Text>
             </View>
             <View style={styles.details}>
-                <Text style={styles.detailLabel}>Name:</Text>
+                <Text style={styles.detailLabel}>Name</Text>
                 <Text style={styles.detailValue}>{item.name}</Text>
             </View>
             <View style={styles.details}>
-                <Text style={styles.detailLabel}>Email:</Text>
+                <Text style={styles.detailLabel}>Email</Text>
                 <Text style={styles.detailValue}>{item.email}</Text>
             </View>
             <View style={styles.details}>
-                <Text style={styles.detailLabel}>Mobile:</Text>
+                <Text style={styles.detailLabel}>Mobile</Text>
                 <Text style={styles.detailValue}>{item.phoneNumber}</Text>
             </View>
             <View style={styles.details}>
-                <Text style={styles.detailLabel}>Aadhar:</Text>
+                <Text style={styles.detailLabel}>Aadhar</Text>
                 <Text style={styles.detailValue}>{item.aadharNumber}</Text>
             </View>
 
@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
         marginBottom: 5,
     },
     detailLabel: {
-        fontWeight: 'bold',
+        fontWeight: "500",
         flex: 1,
         fontSize: 16,
     },

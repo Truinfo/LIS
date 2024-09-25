@@ -29,12 +29,6 @@ const ViewSequrity = () => {
 
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="#fff" />
-        </TouchableOpacity>
-        <Text style={styles.title}>View Sequrity</Text>
-      </View>
       {profile ? (
         <View style={styles.profileContainer}>
           <Image
@@ -42,35 +36,35 @@ const ViewSequrity = () => {
             style={styles.profileImage}
           />
           <View style={styles.detailContainer}>
-            <Text style={styles.bold}>Name:</Text>
+            <Text style={styles.bold}>Name</Text>
             <Text style={styles.profileDetail}>{profile.name}</Text>
           </View>
           <View style={styles.detailContainer}>
-            <Text style={styles.bold}>Email:</Text>
+            <Text style={styles.bold}>Email</Text>
             <Text style={styles.profileDetail}>{profile.email}</Text>
           </View>
           <View style={styles.detailContainer}>
-            <Text style={styles.bold}>Mobile Number:</Text>
+            <Text style={styles.bold}>Mobile Number</Text>
             <Text style={styles.profileDetail}>{profile.phoneNumber}</Text>
           </View>
           <View style={styles.detailContainer}>
-            <Text style={styles.bold}>Role:</Text>
+            <Text style={styles.bold}>Role</Text>
             <Text style={styles.profileDetail}>{profile.role}</Text>
           </View>
           <View style={styles.detailContainer}>
-            <Text style={styles.bold}>Aadhar Number:</Text>
+            <Text style={styles.bold}>Aadhar Number</Text>
             <Text style={styles.profileDetail}>{profile.aadharNumber}</Text>
           </View>
           {profile.address && (
             <View style={styles.detailContainer}>
-              <Text style={styles.bold}>Address:</Text>
+              <Text style={styles.bold}>Address</Text>
               <Text style={styles.profileDetail}>{`${profile.address.addressLine1 || ''}, ${profile.address.addressLine2 || ''}, ${profile.address.state || ''}, ${profile.address.postalCode || ''}`}</Text>
             </View>
           )}
 
           {profile.attendance && profile.attendance.length > 0 && (
             <View style={styles.attendanceContainer}>
-              <Text style={styles.attendanceTitle}>Attendance:</Text>
+              <Text style={styles.attendanceTitle}>Attendance</Text>
               <View style={styles.table}>
                 <View style={styles.tableHeader}>
                   <Text style={styles.tableHeaderText}>Date</Text>
@@ -184,7 +178,7 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   bold: {
-    fontWeight: 'bold',
+    fontWeight: "500",
     fontSize: 17,
     flex: 1,
   },

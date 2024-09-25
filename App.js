@@ -100,13 +100,8 @@ import EditResidents from './src/panel/admin/pages/ResidentialUnit/EditResidents
 import AddResidents from './src/panel/admin/pages/ResidentialUnit/AddResidents';
 import AdminAddService from './src/panel/admin/pages/Services/AddService';
 import ResidentDetails from './src/panel/admin/pages/ResidentialUnit/ResidentsDetails';
-<<<<<<< HEAD
 import ServicesList from './src/panel/admin/pages/Services/ServicesList';
 import EditService from './src/panel/admin/pages/Services/EditService';
-=======
-
-
->>>>>>> 0fd2b143a34ade4ffb00281bc785b47eec442247
 const Stack = createNativeStackNavigator();
 
 export default function App() {

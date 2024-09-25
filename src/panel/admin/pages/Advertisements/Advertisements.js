@@ -7,7 +7,6 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { ImagebaseURL } from '../../../Security/helpers/axios';
 
 const Advertisements = () => {
-  const [modalVisible, setModalVisible] = useState(false);
   const [menuVisible, setMenuVisible] = useState(null); // Track which item's menu is open
   const dispatch = useDispatch();
   const navigate = useNavigation();
@@ -27,7 +26,7 @@ const Advertisements = () => {
   };
 
   const handleEdit = (item) => {
-    navigate.navigate('EditAdd', { id: item._id });
+    navigate.navigate('Edit Post', { id: item._id });
   };
 
   const handleDelete = (item) => {
@@ -57,44 +56,44 @@ const Advertisements = () => {
   };
 
   const handleOutsidePress = () => {
-    setMenuVisible(null); // Close the menu
+    setMenuVisible(null); // Close the menu when clicking outside
   };
 
   const renderAddItem = ({ item }) => (
-    <View style={styles.card}>
-      <Image
-        source={item.pictures[0]?.img ? { uri: `${ImagebaseURL}${item.pictures[0].img}` } : require('../../../../assets/Admin/Imgaes/ad.jpg')}
-        style={styles.image}
-      />
-      <View style={styles.detailsContainer}>
-        <Text style={styles.text}>{item.userName}</Text>
-        <Text style={styles.text}>{item.phoneNumber}</Text>
-        <Text style={styles.text}>{item.details.block}</Text>
-        <Text style={styles.text}>Flat No: {item.details.flat_No}</Text>
-      </View>
-
-      <TouchableOpacity style={styles.menuIcon} onPress={() => toggleMenu(item._id)}>
-        <Icon name="more-vert" size={20} color="#630000" />
-      </TouchableOpacity>
-      {menuVisible === item._id && (
-        <View style={styles.actionMenu}>
-          <TouchableOpacity onPress={() => handleView(item)}>
-            <Text style={styles.menuItem}>View</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleEdit(item)}>
-            <Text style={styles.menuItem}>Edit</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleDelete(item)}>
-            <Text style={styles.menuItem}>Delete</Text>
-          </TouchableOpacity>
+    <TouchableOpacity onPress={() => handleView(item)}>
+      <View style={styles.card}>
+        <Image
+          source={item.pictures[0]?.img ? { uri: `${ImagebaseURL}${item.pictures[0].img}` } : require('../../../../assets/Admin/Imgaes/ad.jpg')}
+          style={styles.image}
+        />
+        <View style={styles.detailsContainer}>
+          <Text style={styles.text}>{item.userName}</Text>
+          <Text style={styles.text}>{item.phoneNumber}</Text>
+          <Text style={styles.text}>{item.details.block}</Text>
+          <Text style={styles.text}>Flat No: {item.details.flat_No}</Text>
         </View>
-      )}
-    </View>
+        <TouchableOpacity style={styles.menuIcon} onPress={() => toggleMenu(item._id)}>
+          <Icon name="more-vert" size={25} color="#aaadab" />
+        </TouchableOpacity>
+        {menuVisible === item._id && (
+          <TouchableWithoutFeedback>
+            <View style={styles.actionMenu}>
+              <TouchableOpacity onPress={() => handleEdit(item)}>
+                <Text style={styles.menuItem}>Edit</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => handleDelete(item)}>
+                <Text style={styles.menuItem}>Delete</Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableWithoutFeedback>
+        )}
+      </View>
+    </TouchableOpacity>
   );
 
   return (
-    <View style={styles.container}>
-      <TouchableWithoutFeedback onPress={handleOutsidePress}>
+    <TouchableWithoutFeedback onPress={handleOutsidePress}>
+      <View style={styles.container}>
         {status === "loading" ? (
           <ActivityIndicator size="large" color="#630000" style={styles.spinner} />
         ) : (
@@ -105,27 +104,16 @@ const Advertisements = () => {
             ListEmptyComponent={<Text>No data found</Text>}
           />
         )}
-      </TouchableWithoutFeedback>
 
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(!modalVisible);
-        }}
-      >
-        {/* Modal Content */}
-      </Modal>
-
-      {/* Floating Action Button */}
-      <TouchableOpacity
-        style={styles.fab}
-        onPress={() => navigate.navigate('Add Post')}
-      >
-        <Icon name="add" size={24} color="#fff" />
-      </TouchableOpacity>
-    </View>
+        {/* Floating Action Button */}
+        <TouchableOpacity
+          style={styles.fab}
+          onPress={() => navigate.navigate('Add Post')}
+        >
+          <Icon name="add" size={24} color="#fff" />
+        </TouchableOpacity>
+      </View>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -134,12 +122,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 10,
     backgroundColor: '#fff',
-  },
-  title: {
-    fontSize: 23,
-    fontWeight: '700',
-    color: '#630000',
-    marginBottom: 20,
   },
   image: {
     width: 150,
@@ -173,8 +155,8 @@ const styles = StyleSheet.create({
   },
   menuIcon: {
     position: 'absolute',
-    top: 15,
-    right: 15,
+    top: 10,
+    right: 10,
   },
   spinner: {
     marginTop: 20,

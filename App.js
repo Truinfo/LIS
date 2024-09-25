@@ -272,7 +272,6 @@ export default function App() {
 
             {/* Admin */}
 
-
             <Stack.Screen name="Sidebar" component={Sidebar} options={{
               headerShown: false,
             }} />
@@ -286,9 +285,10 @@ export default function App() {
             <Stack.Screen name="View Security" component={ViewSequrity} />
             <Stack.Screen name="Attendance" component={AttendanceForm} />
 
-
             <Stack.Screen name='View Details' component={ReviewAdd} />
             <Stack.Screen name='Add Post' component={AddAdvertisements} />
+            <Stack.Screen name='Edit Post' component={EditAdd} />
+
 
           </Stack.Navigator>
         </SafeAreaView>

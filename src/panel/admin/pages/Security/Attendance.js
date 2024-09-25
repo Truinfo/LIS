@@ -12,8 +12,6 @@ const AttendanceForm = () => {
   const data = useSelector((state) => state.gateKeepers.sequrity);
   const sequrity = data?.status || '';
   const sequrityAttendance = data?.attendanceRecords || '';
-  console.log("sequrity", sequrity)
-  console.log("sequrityAttendance", sequrityAttendance)
   const [attendance, setAttendance] = useState({
     date: new Date().toISOString().slice(0, 10),
     status: '',

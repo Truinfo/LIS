@@ -6,7 +6,6 @@ export const fetchGatekeepers = createAsyncThunk(
   'sequrity/fetchGatekeepers',
   async () => {
     const response = await axiosInstance.get(`/sequrity/getSequrityBySocietyId/${societyId}`);
-    console.log(response.data)
     return response.data.sequrity;
   }
 );
@@ -39,18 +38,15 @@ export const getAttendanceOfId = createAsyncThunk(
 export const createSequrity = createAsyncThunk(
   'sequrity/createSequrity',
   async (formData, { rejectWithValue }) => {
-    console.log("clicked", formData)
     try {
       const response = await axiosInstance.post('/sequrity/createSequrity', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
-      console.log("sdbfaerhgqerhtpq", response.data)
       return response.data;
 
     } catch (error) {
-      console.log("sdbfaerhgqerhtpq", error)
       return rejectWithValue(error.response ? error.response.data : error.message)
     }
   }
@@ -87,16 +83,10 @@ export const checkAttendanceStatus = createAsyncThunk(
 export const sequrityCheckIn = createAsyncThunk(
   'sequrity/sequrityCheckIn',
   async ({ sequrityId, formData }, { rejectWithValue }) => {
-
-    console.log("clicked slice")
-    console.log(sequrityId, formData)
     try {
       const response = await axiosInstance.put(`/sequrity/addCheckIn/${sequrityId}`, formData);
-      console.log("checkin", response.data)
       return response.data;
     } catch (error) {
-      console.log("error", error)
-      console.log("error", error.response ? error.response.data : error.message)
       return rejectWithValue(error.response ? error.response.data : error.message)
     }
   }

@@ -2,7 +2,7 @@ import * as ImagePicker from "expo-image-picker";
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, Modal } from 'react-native'
-import { TextInput } from 'react-native-paper';
+import { ActivityIndicator, TextInput } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { createSequrity } from './GateKeeperSlice';
 import Toast from 'react-native-toast-message';
@@ -11,7 +11,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 const AddSecurity = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
-
+  const status = useSelector((state) => state.gateKeepers.status);
   const [formData, setFormData] = useState({
     societyId: '6683b57b073739a31e8350d0',
     name: '',
@@ -40,6 +40,7 @@ const AddSecurity = () => {
       setFormData((prevFormData) => ({
         ...prevFormData,
         address: {
+
           ...prevFormData.address,
           [addressKey]: value,
         },
@@ -90,105 +91,124 @@ const AddSecurity = () => {
   };
 
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     const newErrors = {};
-
+  
     // Required field validation
     Object.keys(formData).forEach((key) => {
       if (!formData[key] && key !== 'details') {
         newErrors[key] = 'This field is required';
       }
     });
-
+  
     // Address field validation
     Object.keys(formData.address).forEach((key) => {
       if (!formData.address[key]) {
         newErrors[`address.${key}`] = 'This field is required';
       }
     });
-
+  
     // Email format validation
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (formData.email && !emailRegex.test(formData.email)) {
       newErrors.email = 'Invalid email format';
     }
-
+  
     // Mobile number format validation
     const mobileNumberRegex = /^\d{10}$/;
     if (formData.phoneNumber && !mobileNumberRegex.test(formData.phoneNumber)) {
       newErrors.phoneNumber = 'Mobile number must be 10 digits';
     }
-
+  
     // Aadhar number format validation
     const aadharNumberRegex = /^\d{12}$/;
     if (formData.aadharNumber && !aadharNumberRegex.test(formData.aadharNumber)) {
       newErrors.aadharNumber = 'Aadhar Number must be 12 digits';
     }
-
+  
     // Check for errors
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-
+  
     // Prepare submission data
     const submissionData = new FormData();
-    Object.keys(formData).forEach(key => {
+    Object.keys(formData).forEach((key) => {
       if (key !== 'address') {
         submissionData.append(key, formData[key]);
       }
     });
-    Object.keys(formData.address).forEach(key => {
+    Object.keys(formData.address).forEach((key) => {
       submissionData.append(`address[${key}]`, formData.address[key]);
     });
-
+  
     if (imageFile) {
-      submissionData.append("picture", {
+      submissionData.append('picture', {
         uri: imageFile.uri,
         name: imageFile.name,
         type: imageFile.type,
       });
     }
-
-    dispatch(createSequrity(submissionData))
-      .then((response) => {
-        if (response.meta.requestStatus === 'fulfilled') {
-          Toast.show({
-            text1: 'Success',
-            text2: 'Security added successfully!',
-            type: 'success',
-            autoHide: true,
-            visibilityTime: 1000,
-          });
-
-          setTimeout(() => {
-            navigation.goBack();
-          }, 2000);
-
-          setFormData({
-            societyId: '6683b57b073739a31e8350d0',
-            name: '',
-            email: '',
-            phoneNumber: '',
-            role: 'Security',
-            details: '',
-            aadharNumber: '',
-            address: {
-              addressLine1: '',
-              addressLine2: '',
-              state: '',
-              postalCode: '',
-            },
-            password: '',
-          });
-          setErrors({});
-          setImageFile(null);
-        }
-      })
-      .catch((error) => {
-        console.error('Error:', error);
+  
+    try {
+      const response = await dispatch(createSequrity(submissionData));
+  
+      if (response.meta.requestStatus === 'fulfilled') {
+        Toast.show({
+          text1: 'Success',
+          text2: 'Security added successfully!',
+          type: 'success',
+        });
+  
+        setTimeout(() => {
+          navigation.goBack();
+        }, 2000);
+  
+        // Reset form data and errors
+        setFormData({
+          societyId: '6683b57b073739a31e8350d0',
+          name: '',
+          email: '',
+          phoneNumber: '',
+          role: 'Security',
+          details: '',
+          aadharNumber: '',
+          address: {
+            addressLine1: '',
+            addressLine2: '',
+            state: '',
+            postalCode: '',
+          },
+          password: '',
+        });
+        setErrors({});
+        setImageFile(null);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      Toast.show({
+        text1: 'Error',
+        text2: 'Failed to add security. Please try again.',
+        type: 'error',
       });
+    }
   };
+  
+
+  if (status === 'loading') {
+    return (
+      <Modal transparent={true} animationType="none" visible={status === 'loading'}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#630000" />
+        </View>
+      </Modal>
+    );
+  }
+
+if (status === 'failed') {
+    return <Text style={styles.errorText}>Error: {error}</Text>;
+}
 
   return (
     <ScrollView>
@@ -317,11 +337,11 @@ const AddSecurity = () => {
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>Select Image Source</Text>
               <TouchableOpacity onPress={pickImage} style={styles.modalButtonIcon}>
-                <Text style={styles.modalButtonText}>Pick from Gallery  </Text>
+                <Text>Pick from Gallery  </Text>
                 <Icon name="photo-library" size={24} color="#7D0431" />
               </TouchableOpacity>
               <TouchableOpacity onPress={takePhoto} style={styles.modalButtonIcon}>
-                <Text style={styles.modalButtonText}>Take a Photo  </Text>
+                <Text>Take a Photo  </Text>
                 <Icon name="photo-camera" size={24} color="#7D0431" />
               </TouchableOpacity>
               <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.modalButton}>
@@ -330,9 +350,8 @@ const AddSecurity = () => {
             </View>
           </View>
         </Modal>
-
         <Toast />
-      </View>
+      </View> 
     </ScrollView>
   );
 };
@@ -369,25 +388,28 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   uploadButton: {
-    backgroundColor: '#28a745',
+    backgroundColor: '#4CAF50',
     padding: 10,
     borderRadius: 5,
     alignItems: 'center',
+    marginTop: 15,
   },
   uploadButtonText: {
-    color: 'white',
+    color: '#fff',
+    fontWeight: 'bold',
   },
   submitButton: {
     backgroundColor: '#7D0431',
-    padding: 15,
+    padding: 10,
     borderRadius: 5,
     alignItems: 'center',
     marginTop: 20,
   },
   submitButtonText: {
-    color: 'white',
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
-
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -395,39 +417,57 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
+    width: 300,
+    padding: 20,
     backgroundColor: 'white',
     borderRadius: 10,
-    padding: 20,
+    alignItems: 'center',
   },
   modalTitle: {
-    fontSize: 20,
-    marginBottom: 20,
-    justifyContent: "center",
-    color: '#7D0431'
-  },
-  modalButtonIcon: {
-    flexDirection: "row",
-    justifyContent: "center",
+    fontSize: 18,
+    fontWeight: '600',
     marginBottom: 15,
+    color: "#7D0431"
   },
   modalButton: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: '#7d0431',
+    borderRadius: 5,
+    width: '100%',
     alignItems: 'center',
-    marginBottom: 15,
-  },
-  modalButtonText: {
-    fontSize: 16,
   },
   modalButtonCancel: {
-    marginTop: 15,
-    color: 'red',
-    fontSize: 16,
+    color: 'white',
+    fontWeight: 'bold',
   },
+  modalButtonIcon: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    padding: 10,
+    backgroundColor: '#f2f2f2',
+    borderRadius: 5,
+    width: '100%',
+    marginBottom: 10,
+    color: '#7d0431',
+  },
+ 
   textInputFields: {
     marginBottom: 20,
   },
   textInput: {
     marginBottom: 8,
-  }
+  },
+  loader: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
 });
 
 export default AddSecurity;

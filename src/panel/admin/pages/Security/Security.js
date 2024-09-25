@@ -67,7 +67,9 @@ const Security = () => {
                     text2: 'Security guard deleted successfully!',
                     type: 'success',
                 });
-                dispatch(fetchGatekeepers());
+                setTimeout(() => {
+                    dispatch(fetchGatekeepers());
+                }, 2000);
             })
             .catch((error) => {
                 console.error('Error:', error);
@@ -197,7 +199,7 @@ const styles = StyleSheet.create({
     loader: {
         flex: 1,
         justifyContent: 'center',
-      },
+    },
     mainrow: {
         flexDirection: 'row',
         justifyContent: 'flex-end',

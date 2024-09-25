@@ -3,11 +3,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { getSequrityPerson, updateSequrity } from './GateKeeperSlice';
 import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, Modal } from 'react-native';
-import { TextInput } from 'react-native-paper';
+import { ActivityIndicator, TextInput } from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 import * as ImagePicker from 'expo-image-picker';
 import { ImagebaseURL } from '../../../Security/helpers/axios';
-
+import Icon from 'react-native-vector-icons/MaterialIcons';
 const EditSecurity = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -15,6 +15,7 @@ const EditSecurity = () => {
   const { sequrityId } = route.params;
   const profile = useSelector((state) => state.gateKeepers.sequrity);
   const successMessage = useSelector((state) => state.gateKeepers.successMessage);
+  const status = useSelector((state) => state.gateKeepers.status);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -124,20 +125,26 @@ const EditSecurity = () => {
         text1: 'Success',
         text2: successMessage || 'Security updated successfully!',
         type: 'success',
-        position: 'top',
       });
-      navigation.goBack();
+      setTimeout(() => {
+        navigation.goBack();
+      }, 2000);
     } catch (error) {
       console.error("Error:", error);
       Toast.show({
         text1: 'Error',
         text2: 'Failed to update security. Please try again.',
         type: 'error',
-        position: 'top',
       });
     }
   };
+  if (status === 'loading') {
+    return <ActivityIndicator size="large" color="#630000" style={styles.loader} />;
+}
 
+if (status === 'failed') {
+    return <Text style={styles.errorText}>Error: {error}</Text>;
+}
   return (
     <ScrollView style={styles.container}>
       <View style={styles.form}>
@@ -236,11 +243,13 @@ const EditSecurity = () => {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Select Image Source</Text>
-            <TouchableOpacity onPress={() => handleImagePicker('gallery')} style={styles.modalButton}>
-              <Text style={styles.modalButtonText}>Pick from Gallery</Text>
+            <TouchableOpacity onPress={() => handleImagePicker('gallery')} style={styles.modalButtonIcon}>
+            <Text>Pick from Gallery  </Text>
+            <Icon name="photo-library" size={24} color="#7D0431" />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleImagePicker('camera')} style={styles.modalButton}>
-              <Text style={styles.modalButtonText}>Take a Photo</Text>
+            <TouchableOpacity onPress={() => handleImagePicker('camera')} style={styles.modalButtonIcon}>
+              <Text>Take a Photo  </Text>
+              <Icon name="photo-camera" size={24} color="#7D0431" />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.modalButton}>
               <Text style={styles.modalButtonCancel}>Cancel</Text>
@@ -314,6 +323,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     color: '#7D0431'
   },
+  modalButtonIcon: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    padding: 10,
+    backgroundColor: '#f2f2f2',
+    borderRadius: 5,
+    marginBottom: 10,
+  },
   modalButton: {
     padding: 10,
   },
@@ -339,7 +356,11 @@ const styles = StyleSheet.create({
   },
   textInput: {
     marginBottom: 8,
-  }
+  },
+  loader: {
+    flex: 1,
+    justifyContent: 'center',
+  },
 });
 
 export default EditSecurity;

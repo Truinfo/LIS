@@ -1,9 +1,8 @@
-
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, Image, TouchableOpacity, Modal, StyleSheet, Alert, ActivityIndicator, TouchableWithoutFeedback } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, FlatList, Image, TouchableOpacity, Modal, StyleSheet, Alert, ActivityIndicator, TouchableWithoutFeedback, ScrollView } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAdvertisements, deleteAdvertisement } from './AdvertisementSlice';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { ImagebaseURL } from '../../../Security/helpers/axios';
 
@@ -17,9 +16,11 @@ const Advertisements = () => {
   const successMessage = useSelector(state => state.advertisements.successMessage);
   const status = useSelector(state => state.advertisements.status);
 
-  useEffect(() => {
-    dispatch(fetchAdvertisements());
-  }, [dispatch]);
+  useFocusEffect(
+    React.useCallback(() => {
+      dispatch(fetchAdvertisements());
+    }, [dispatch])
+  );
 
   const handleView = (item) => {
     navigate.navigate('View Details', { id: item._id });
@@ -92,10 +93,8 @@ const Advertisements = () => {
   );
 
   return (
-    <TouchableWithoutFeedback onPress={handleOutsidePress}>
-      <View style={styles.container}>
-        <Text style={styles.title}>Advertisements</Text>
-
+    <View style={styles.container}>
+      <TouchableWithoutFeedback onPress={handleOutsidePress}>
         {status === "loading" ? (
           <ActivityIndicator size="large" color="#630000" style={styles.spinner} />
         ) : (
@@ -106,27 +105,27 @@ const Advertisements = () => {
             ListEmptyComponent={<Text>No data found</Text>}
           />
         )}
+      </TouchableWithoutFeedback>
 
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => {
-            setModalVisible(!modalVisible);
-          }}
-        >
-          {/* Modal Content */}
-        </Modal>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+      >
+        {/* Modal Content */}
+      </Modal>
 
-        {/* Floating Action Button */}
-        <TouchableOpacity
-          style={styles.fab}
-          onPress={() => navigate.navigate('Add Post')}
-        >
-          <Icon name="add" size={24} color="#fff" />
-        </TouchableOpacity>
-      </View>
-    </TouchableWithoutFeedback>
+      {/* Floating Action Button */}
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={() => navigate.navigate('Add Post')}
+      >
+        <Icon name="add" size={24} color="#fff" />
+      </TouchableOpacity>
+    </View>
   );
 };
 

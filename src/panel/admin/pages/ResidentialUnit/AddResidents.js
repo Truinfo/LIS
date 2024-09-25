@@ -15,7 +15,6 @@ const AddResidents = () => {
     const navigation = useNavigation();
     const { society } = useSelector((state) => state.societyById);
 
-    // Form field states
     const [name, setName] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
     const [email, setEmail] = useState('');
@@ -30,7 +29,7 @@ const AddResidents = () => {
     const [showFlatMenu, setShowFlatMenu] = useState(false);
     const [isEmailValid, setIsEmailValid] = useState(false);
     const [isVerified, setIsVerified] = useState(false);
-    // Error states
+ 
     const [nameError, setNameError] = useState('');
     const [phoneError, setPhoneError] = useState('');
     const [emailError, setEmailError] = useState('');
@@ -57,7 +56,6 @@ const AddResidents = () => {
         setEmail(input);
     };
 
-    // Phone number validation
     const validatePhoneNumber = (input) => {
         const phonePattern = /^\d{10}$/;
         if (phonePattern.test(input)) {
@@ -176,8 +174,6 @@ const AddResidents = () => {
 
                 try {
                     const result = await dispatch(fetchUserProfile({ id: userProfileId, data: userData })).unwrap();
-                    console.log(result)
-
                     setSnackbarMessage(`${result.message}`);
                     setSnackbarVisible(true);
                     setName('');
@@ -225,9 +221,7 @@ const AddResidents = () => {
     const handleVerifyPress = async () => {
         try {
             setIsEmailValid(false);
-
             const resultAction = await dispatch(sendVerificationEmail(email)).unwrap();
-            console.log("resultAction", resultAction);
             setIsOtpVisible(true);
             setSnackbarMessage(`${resultAction.message}`);
             setSnackbarVisible(true);
@@ -428,7 +422,7 @@ const styles = StyleSheet.create({
     form: {
         gap: 10,
     }, buttonDisabled: {
-        backgroundColor: '#ccc', // Change the color to indicate it's disabled
+        backgroundColor: '#ccc', 
     },
     otpContainer: {
         flexDirection: 'row',

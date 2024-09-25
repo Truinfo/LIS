@@ -55,7 +55,6 @@ const EditSecurity = () => {
       setPreviewImage(`${ImagebaseURL}${profile.pictures}`);
     }
   }, [profile]);
-
   const handleChange = (name, value) => {
     if (name.startsWith('address.')) {
       const addressKey = name.split('.')[1];
@@ -161,7 +160,7 @@ const EditSecurity = () => {
         />
         <TextInput
           placeholder='Aadhar Number'
-          value={(formData.aadharNumber)?.toString() || '' }
+          value={formData.aadharNumber?.toString() || ''}
           onChangeText={(value) => handleChange('aadharNumber', value)}
           style={styles.input}
           keyboardType="numeric"

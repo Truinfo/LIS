@@ -1,6 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-
 const ImagebaseURL = 'https://livinsync.onrender.com';
 const baseURL = 'https://livinsync.onrender.com/api';
 

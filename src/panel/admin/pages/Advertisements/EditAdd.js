@@ -120,41 +120,9 @@ const EditAdd = () => {
         }));
     };
 
-    // const handleSubmit = () => {
-    //     const data = new FormData();
-    //     Object.keys(formData).forEach((key) => {
-    //         if (key === 'details') {
-    //             Object.keys(formData[key]).forEach((nestedKey) => {
-    //                 data.append(`details[${nestedKey}]`, formData[key][nestedKey]);
-    //             });
-    //         } else if (key !== 'pictures') {
-    //             data.append(key, formData[key]);
-    //         }
-    //     });
-
-    //     if (newFilesSelected) {
-    //         formData.pictures.forEach(file => {
-    //             data.append('pictures', {
-    //                 uri: file.uri,
-    //                 type: file.type,
-    //                 name: file.fileName,
-    //             });
-    //         });
-    //     }
-    //     console.log(data)
-    //     dispatch(editAdvertisement({ id, formData: data }))
-    //         .then(() => {
-    //             Alert.alert("Success", "Advertisement updated successfully.");
-    //             navigation.goBack();
-    //         })
-    //         .catch((error) => {
-    //             Alert.alert("Error", "Something went wrong.");
-    //             console.error("Error:", error);
-    //         });
-    // };
     const handleSubmit = () => {
         const data = new FormData();
-        
+
         // Append form fields to FormData
         Object.keys(formData).forEach((key) => {
             if (key === 'details') {
@@ -165,7 +133,7 @@ const EditAdd = () => {
                 data.append(key, formData[key]);
             }
         });
-    
+
         // Append existing images to FormData
         formData.pictures.forEach((file, index) => {
             // If the image has a URI and is not a new file, append it to FormData
@@ -177,7 +145,7 @@ const EditAdd = () => {
                 });
             }
         });
-    
+
         // Append new images to FormData
         if (newFilesSelected) {
             formData.pictures.forEach(file => {
@@ -189,9 +157,14 @@ const EditAdd = () => {
             });
         }
         dispatch(editAdvertisement({ id, formData: data }))
-            .then(() => {
-                Alert.alert("Success", "Advertisement updated successfully.");
-                navigation.goBack();
+            .then((response) => {
+                if (response.meta.requestStatus === 'fulfilled') {
+                    Alert.alert("Success", "Advertisement updated successfully.");
+                    navigation.goBack();
+                }
+                else {
+                    Alert.alert("failed", `${error}`);
+                }
             })
             .catch((error) => {
                 Alert.alert("Error", "Something went wrong.");

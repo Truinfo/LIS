@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { TouchableWithoutFeedback, Keyboard } from 'react-native'; 
-
+import { TouchableWithoutFeedback, Keyboard } from 'react-native';
 import {
     View,
     Text,
@@ -9,6 +8,7 @@ import {
     TouchableOpacity,
     StyleSheet,
     Button,
+    ActivityIndicator,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchGatekeepers, deleteGatekeepers } from './GateKeeperSlice';
@@ -16,17 +16,21 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ImagebaseURL } from '../../../Security/helpers/axios';
 import { useCallback } from 'react';
 import Toast from 'react-native-toast-message';
-import Modal from 'react-native-modal'; // Import Modal
+import Modal from 'react-native-modal';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const Security = () => {
     const [searchText, setSearchText] = useState('');
     const [selectedUser, setSelectedUser] = useState(null);
     const [actionMenuVisible, setActionMenuVisible] = useState(null);
-    const [isModalVisible, setModalVisible] = useState(false); // State for modal visibility
+    const [isModalVisible, setModalVisible] = useState(false);
 
     const navigation = useNavigation();
     const dispatch = useDispatch();
     const sequrity = useSelector(state => state.gateKeepers.sequrity || []);
+
+    const status = useSelector((state) => state.gateKeepers.status);
+    const error = useSelector((state) => state.gateKeepers.error);
 
     useFocusEffect(
         useCallback(() => {
@@ -51,7 +55,7 @@ const Security = () => {
 
     const handleDelete = (user) => {
         setSelectedUser(user);
-        setModalVisible(true); // Show the modal
+        setModalVisible(true);
         setActionMenuVisible(null);
     };
 
@@ -63,7 +67,9 @@ const Security = () => {
                     text2: 'Security guard deleted successfully!',
                     type: 'success',
                 });
-                dispatch(fetchGatekeepers());
+                setTimeout(() => {
+                    dispatch(fetchGatekeepers());
+                }, 2000);
             })
             .catch((error) => {
                 console.error('Error:', error);
@@ -73,42 +79,52 @@ const Security = () => {
                     type: 'error',
                 });
             });
-        setModalVisible(false); // Hide the modal
+        setModalVisible(false);
     };
+
+    if (status === 'loading') {
+        return <ActivityIndicator size="large" color="#630000" style={styles.loader} />;
+    }
+
+    if (status === 'failed') {
+        return <Text style={styles.errorText}>Error: {error}</Text>;
+    }
+
 
     const renderItem = ({ item }) => (
         <View style={styles.row}>
-            <Text style={styles.text}>
-                <Text style={{ fontWeight: 'bold' }}>Security ID: </Text>
-                {item.sequrityId}
-            </Text>
+
             <Image
                 source={{ uri: `${ImagebaseURL}${item.pictures}` }}
                 style={styles.image}
             />
-            <Text style={styles.text}>
-                <Text style={{ fontWeight: 'bold' }}>Name: </Text>
-                {item.name}
-            </Text>
-            <Text style={styles.text}>
-                <Text style={{ fontWeight: 'bold' }}>Email: </Text>
-                {item.email}
-            </Text>
-            <Text style={styles.text}>
-                <Text style={{ fontWeight: 'bold' }}>Mobile: </Text>
-                {item.phoneNumber}
-            </Text>
-            <Text style={styles.text}>
-                <Text style={{ fontWeight: 'bold' }}>Aadhar: </Text>
-                {item.aadharNumber}
-            </Text>
+            <View style={styles.details}>
+                <Text style={styles.detailLabel}>Security ID</Text>
+                <Text style={styles.detailValue}>{item.sequrityId}</Text>
+            </View>
+            <View style={styles.details}>
+                <Text style={styles.detailLabel}>Name</Text>
+                <Text style={styles.detailValue}>{item.name}</Text>
+            </View>
+            <View style={styles.details}>
+                <Text style={styles.detailLabel}>Email</Text>
+                <Text style={styles.detailValue}>{item.email}</Text>
+            </View>
+            <View style={styles.details}>
+                <Text style={styles.detailLabel}>Mobile</Text>
+                <Text style={styles.detailValue}>{item.phoneNumber}</Text>
+            </View>
+            <View style={styles.details}>
+                <Text style={styles.detailLabel}>Aadhar</Text>
+                <Text style={styles.detailValue}>{item.aadharNumber}</Text>
+            </View>
 
             {/* Three dots button */}
             <TouchableOpacity
                 onPress={() => setActionMenuVisible(actionMenuVisible === item._id ? null : item._id)}
                 style={styles.dotsButton}
             >
-                <Text style={styles.dotsText}>•••</Text>
+                <Icon name="more-vert" size={24} color="#7D0431" />
             </TouchableOpacity>
 
             {/* Action Menu */}
@@ -133,18 +149,6 @@ const Security = () => {
 
     return (
         <View style={styles.container}>
-            <View style={styles.mainrow}>
-                <TouchableOpacity
-                    style={styles.addButton}
-                    onPress={() => {
-                        setActionMenuVisible(null);
-                        navigation.navigate('Add Security');
-                    }}
-                >
-                    <Text style={styles.addButtonText}>Add</Text>
-                </TouchableOpacity>
-            </View>
-
             <FlatList
                 data={Array.isArray(sequrity) ? sequrity.filter(user =>
                     user.name.toLowerCase().includes(searchText.toLowerCase()) ||
@@ -154,23 +158,34 @@ const Security = () => {
                 renderItem={renderItem}
                 keyboardShouldPersistTaps="handled"
             />
-            {/* Modal for delete confirmation */}
+
+            {/* Floating Action Button */}
+            <TouchableOpacity
+                style={styles.floatingButton}
+                onPress={() => {
+                    setActionMenuVisible(null);
+                    navigation.navigate('Add Security');
+                }}
+            >
+
+                <Icon name="add" size={24} color="#fff" />
+            </TouchableOpacity>
+
+            {/* Modal for delete confirmation remains unchanged */}
             <Modal isVisible={isModalVisible}>
                 <View style={styles.modalContent}>
                     <Text style={styles.modalMainText}>Delete Confirmation</Text>
                     <Text style={styles.modalText}>Are you sure you want to delete {selectedUser?.name}?</Text>
                     <View style={styles.modalButtons}>
                         <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.modalButton}>
-                            <Text style={styles.modalButtonText}>Cancel</Text>
+                            <Text style={styles.modelbuttonText}>Cancel</Text>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={confirmDelete} style={styles.modalButton}>
-                            <Text style={styles.modalButtonText}>Yes</Text>
+                            <Text style={styles.modelbuttonText}>Yes</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
             </Modal>
-
-            {/* Toast Message */}
             <Toast />
         </View>
     );
@@ -180,6 +195,10 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 10,
+    },
+    loader: {
+        flex: 1,
+        justifyContent: 'center',
     },
     mainrow: {
         flexDirection: 'row',
@@ -194,6 +213,22 @@ const styles = StyleSheet.create({
         padding: 10,
         backgroundColor: '#f9f9f9',
         borderRadius: 8,
+        flexDirection: 'column',
+    },
+    details: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 5,
+    },
+    detailLabel: {
+        fontWeight: "500",
+        flex: 1,
+        fontSize: 16,
+    },
+    detailValue: {
+        flex: 2,
+        fontSize: 16,
+        color: '#333',
     },
     text: {
         fontSize: 16,
@@ -232,17 +267,20 @@ const styles = StyleSheet.create({
     buttonText: {
         fontSize: 14,
     },
+    modelbuttonText: {
+        fontSize: 16,
+        color: "white"
+    },
     addButton: {
         width: 50,
         backgroundColor: '#7D0431',
         paddingVertical: 10,
         borderRadius: 5,
-        alignItems: 'center', 
+        alignItems: 'center',
     },
     addButtonText: {
         color: '#FFF',
-        fontSize: 16,
-        fontWeight: 'bold',
+        fontSize: 20,
     },
     modalContent: {
         backgroundColor: '#fff',
@@ -255,14 +293,7 @@ const styles = StyleSheet.create({
         fontSize: 20,
         marginBottom: 20,
         textAlign: 'center',
-        fontWeight:'bold',
-        color: '#7D0431',
-    },
-    modalButtonText: {
-        fontSize: 15,
-        textAlign: 'center',
-        fontWeight:'bold',
-        color: 'white',
+        color: '#7D0431'
     },
     modalText: {
         fontSize: 16,
@@ -280,6 +311,29 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         width: '45%',
         alignItems: 'center',
+        color: 'White',
+    },
+    floatingButton: {
+        position: 'absolute',
+        bottom: 20,
+        right: 20,
+        backgroundColor: '#7D0431',
+        width: 56,
+        height: 56,
+        borderRadius: 28,
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 6, // Add shadow on Android
+        shadowColor: '#000', // Add shadow on iOS
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+    },
+    addButtonText: {
+        color: '#FFF',
+        fontSize: 24,
+        fontWeight: 'bold',
+        lineHeight: 24,
     },
 });
 

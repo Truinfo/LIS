@@ -1,15 +1,17 @@
 import * as ImagePicker from "expo-image-picker";
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, ScrollView, Alert, Modal } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, Modal } from 'react-native'
+import { ActivityIndicator, TextInput } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { createSequrity } from './GateKeeperSlice';
 import Toast from 'react-native-toast-message';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const AddSecurity = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
-  
+  const status = useSelector((state) => state.gateKeepers.status);
   const [formData, setFormData] = useState({
     societyId: '6683b57b073739a31e8350d0',
     name: '',
@@ -38,6 +40,7 @@ const AddSecurity = () => {
       setFormData((prevFormData) => ({
         ...prevFormData,
         address: {
+
           ...prevFormData.address,
           [addressKey]: value,
         },
@@ -84,18 +87,11 @@ const AddSecurity = () => {
   };
 
   const deletePhoto = () => {
-    Alert.alert(
-      "Remove Profile Photo",
-      "Are you sure you want to remove the profile photo?",
-      [
-        { text: "Cancel", style: "cancel" },
-        { text: "Remove", onPress: () => setImageFile(null), style: "destructive" },
-      ],
-      { cancelable: true }
-    );
+    setImageFile(null);
   };
 
-  const handleAdd = () => {
+
+  const handleAdd = async () => {
     const newErrors = {};
   
     // Required field validation
@@ -138,144 +134,184 @@ const AddSecurity = () => {
   
     // Prepare submission data
     const submissionData = new FormData();
-    Object.keys(formData).forEach(key => {
+    Object.keys(formData).forEach((key) => {
       if (key !== 'address') {
         submissionData.append(key, formData[key]);
       }
     });
-    Object.keys(formData.address).forEach(key => {
+    Object.keys(formData.address).forEach((key) => {
       submissionData.append(`address[${key}]`, formData.address[key]);
     });
   
     if (imageFile) {
-      submissionData.append("picture", {
+      submissionData.append('picture', {
         uri: imageFile.uri,
         name: imageFile.name,
         type: imageFile.type,
       });
     }
   
-    dispatch(createSequrity(submissionData))
-      .then((response) => {
-        if (response.meta.requestStatus === 'fulfilled') {
-          Toast.show({
-            text1: 'Success',
-            text2: 'Security added successfully!',
-            type: 'success',
-          });
+    try {
+      const response = await dispatch(createSequrity(submissionData));
   
-          setTimeout(() => {
-            navigation.goBack();
-          }, 2000); 
+      if (response.meta.requestStatus === 'fulfilled') {
+        Toast.show({
+          text1: 'Success',
+          text2: 'Security added successfully!',
+          type: 'success',
+        });
   
-          setFormData({
-            societyId: '6683b57b073739a31e8350d0',
-            name: '',
-            email: '',
-            phoneNumber: '',
-            role: 'Security',
-            details: '',
-            aadharNumber: '',
-            address: {
-              addressLine1: '',
-              addressLine2: '',
-              state: '',
-              postalCode: '',
-            },
-            password: '',
-          });
-          setErrors({});
-          setImageFile(null);
-        }
-      })
-      .catch((error) => {
-        console.error('Error:', error);
+        setTimeout(() => {
+          navigation.goBack();
+        }, 2000);
+  
+        // Reset form data and errors
+        setFormData({
+          societyId: '6683b57b073739a31e8350d0',
+          name: '',
+          email: '',
+          phoneNumber: '',
+          role: 'Security',
+          details: '',
+          aadharNumber: '',
+          address: {
+            addressLine1: '',
+            addressLine2: '',
+            state: '',
+            postalCode: '',
+          },
+          password: '',
+        });
+        setErrors({});
+        setImageFile(null);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      Toast.show({
+        text1: 'Error',
+        text2: 'Failed to add security. Please try again.',
+        type: 'error',
       });
+    }
   };
   
-  
-  
-  
+
+  if (status === 'loading') {
+    return (
+      <Modal transparent={true} animationType="none" visible={status === 'loading'}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#630000" />
+        </View>
+      </Modal>
+    );
+  }
+
+if (status === 'failed') {
+    return <Text style={styles.errorText}>Error: {error}</Text>;
+}
+
   return (
     <ScrollView>
       <View style={styles.container}>
         <View style={styles.form}>
-          <TextInput
-            style={styles.input}
-            placeholder="Name"
-            value={formData.name}
-            onChangeText={(value) => handleChange('name', value)}
-          />
-          {errors.name && <Text style={styles.error}>{errors.name}</Text>}
 
-          <TextInput
-            style={styles.input}
-            placeholder="Email"
-            value={formData.email}
-            onChangeText={(value) => handleChange('email', value.toLowerCase())}
-          />
-          {errors.email && <Text style={styles.error}>{errors.email}</Text>}
+          <View style={styles.textInputFields}>
 
-          <TextInput
-            style={styles.input}
-            placeholder="Mobile Number"
-            value={formData.phoneNumber}
-            onChangeText={(value) => handleChange('phoneNumber', value)}
-            keyboardType="numeric"
-          />
-          {errors.phoneNumber && <Text style={styles.error}>{errors.phoneNumber}</Text>}
+            <TextInput
+              mode="outlined"
+              label="Name"
+              value={formData.name}
+              onChangeText={(value) => handleChange('name', value)}
+              theme={{ colors: { primary: "#7d0431" } }}
+              style={styles.textInput}
+            />
+            {errors.name && <Text style={styles.error}>{errors.name}</Text>}
 
-          <TextInput
-            style={styles.input}
-            placeholder="Aadhar Number"
-            value={formData.aadharNumber}
-            onChangeText={(value) => handleChange('aadharNumber', value)}
-            keyboardType="numeric"
-          />
-          {errors.aadharNumber && <Text style={styles.error}>{errors.aadharNumber}</Text>}
+            <TextInput
+              mode="outlined"
+              label="Email"
+              value={formData.email}
+              onChangeText={(value) => handleChange('email', value.toLowerCase())}
+              theme={{ colors: { primary: "#7d0431" } }}
+              style={styles.textInput}
+            />
+            {errors.email && <Text style={styles.error}>{errors.email}</Text>}
 
-          {/* Address Fields */}
-          <TextInput
-            style={styles.input}
-            placeholder="Address Line 1"
-            value={formData.address.addressLine1}
-            onChangeText={(value) => handleChange('address.addressLine1', value)}
-          />
-          {errors['address.addressLine1'] && <Text style={styles.error}>{errors['address.addressLine1']}</Text>}
+            <TextInput
+              mode="outlined"
+              label="Phone Number"
+              value={formData.phoneNumber}
+              onChangeText={(value) => handleChange('phoneNumber', value)}
+              theme={{ colors: { primary: "#7d0431" } }}
+              style={styles.textInput}
+              keyboardType="numeric"
+            />
+            {errors.phoneNumber && <Text style={styles.error}>{errors.phoneNumber}</Text>}
 
-          <TextInput
-            style={styles.input}
-            placeholder="Address Line 2"
-            value={formData.address.addressLine2}
-            onChangeText={(value) => handleChange('address.addressLine2', value)}
-          />
-          {errors['address.addressLine2'] && <Text style={styles.error}>{errors['address.addressLine2']}</Text>}
+            <TextInput
+              mode="outlined"
+              label="Aadhar Number"
+              value={formData.aadharNumber}
+              onChangeText={(value) => handleChange('aadharNumber', value)}
+              theme={{ colors: { primary: "#7d0431" } }}
+              keyboardType="numeric"
+              style={styles.textInput}
+            />
+            {errors.aadharNumber && <Text style={styles.error}>{errors.aadharNumber}</Text>}
 
-          <TextInput
-            style={styles.input}
-            placeholder="State"
-            value={formData.address.state}
-            onChangeText={(value) => handleChange('address.state', value)}
-          />
-          {errors['address.state'] && <Text style={styles.error}>{errors['address.state']}</Text>}
+            {/* Address Fields */}
+            <TextInput
+              mode="outlined"
+              label="Address Line 1"
+              value={formData.address.addressLine1}
+              onChangeText={(value) => handleChange('address.addressLine1', value)}
+              theme={{ colors: { primary: "#7d0431" } }}
+              style={styles.textInput}
+            />
+            {errors['address.addressLine1'] && <Text style={styles.error}>{errors['address.addressLine1']}</Text>}
 
-          <TextInput
-            style={styles.input}
-            placeholder="Postal Code"
-            value={formData.address.postalCode}
-            onChangeText={(value) => handleChange('address.postalCode', value)}
-          />
-          {errors['address.postalCode'] && <Text style={styles.error}>{errors['address.postalCode']}</Text>}
+            <TextInput
+              mode="outlined"
+              label="Address Line 2"
+              value={formData.address.addressLine2}
+              onChangeText={(value) => handleChange('address.addressLine2', value)}
+              theme={{ colors: { primary: "#7d0431" } }}
+              style={styles.textInput}
+            />
+            {errors['address.addressLine2'] && <Text style={styles.error}>{errors['address.addressLine2']}</Text>}
 
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            value={formData.password}
-            onChangeText={(value) => handleChange('password', value)}
-            secureTextEntry={true}
-          />
-          {errors.password && <Text style={styles.error}>{errors.password}</Text>}
+            <TextInput
+              mode="outlined"
+              label="State"
+              value={formData.address.state}
+              onChangeText={(value) => handleChange('address.state', value)}
+              theme={{ colors: { primary: "#7d0431" } }}
+              style={styles.textInput}
+            />
+            {errors['address.state'] && <Text style={styles.error}>{errors['address.state']}</Text>}
 
+            <TextInput
+              mode="outlined"
+              label="Postal Code"
+              value={formData.address.postalCode}
+              onChangeText={(value) => handleChange('address.postalCode', value)}
+              theme={{ colors: { primary: "#7d0431" } }}
+              keyboardType="numeric"
+              style={styles.textInput}
+            />
+            {errors['address.postalCode'] && <Text style={styles.error}>{errors['address.postalCode']}</Text>}
+
+            <TextInput
+              mode="outlined"
+              label="Password"
+              value={formData.password}
+              onChangeText={(value) => handleChange('password', value)}
+              secureTextEntry={true}
+              theme={{ colors: { primary: "#7d0431" } }}
+              style={styles.textInput}
+            />
+            {errors.password && <Text style={styles.error}>{errors.password}</Text>}
+          </View>
           {/* Image Preview */}
           {imageFile && (
             <View style={styles.imagePreview}>
@@ -300,21 +336,22 @@ const AddSecurity = () => {
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>Select Image Source</Text>
-              <TouchableOpacity onPress={pickImage} style={styles.modalButton}>
-                <Text style={styles.modalButtonText}>Pick from Gallery</Text>
+              <TouchableOpacity onPress={pickImage} style={styles.modalButtonIcon}>
+                <Text>Pick from Gallery  </Text>
+                <Icon name="photo-library" size={24} color="#7D0431" />
               </TouchableOpacity>
-              <TouchableOpacity onPress={takePhoto} style={styles.modalButton}>
-                <Text style={styles.modalButtonText}>Take a Photo</Text>
+              <TouchableOpacity onPress={takePhoto} style={styles.modalButtonIcon}>
+                <Text>Take a Photo  </Text>
+                <Icon name="photo-camera" size={24} color="#7D0431" />
               </TouchableOpacity>
               <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.modalButton}>
-                <Text style={styles.modalButtonText}>Cancel</Text>
+                <Text style={styles.modalButtonCancel} >Cancel</Text>
               </TouchableOpacity>
             </View>
           </View>
         </Modal>
-
-        <Toast ref={(ref) => Toast.setRef(ref)} />
-      </View>
+        <Toast />
+      </View> 
     </ScrollView>
   );
 };
@@ -327,14 +364,6 @@ const styles = StyleSheet.create({
   },
   form: {
     marginBottom: 20,
-  },
-  input: {
-    height: 50,
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 10,
   },
   error: {
     color: 'red',
@@ -359,23 +388,27 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   uploadButton: {
-    backgroundColor: '#007BFF',
+    backgroundColor: '#4CAF50',
     padding: 10,
     borderRadius: 5,
     alignItems: 'center',
+    marginTop: 15,
   },
   uploadButtonText: {
-    color: 'white',
+    color: '#fff',
+    fontWeight: 'bold',
   },
   submitButton: {
-    backgroundColor: '#28a745',
-    padding: 15,
+    backgroundColor: '#7D0431',
+    padding: 10,
     borderRadius: 5,
     alignItems: 'center',
     marginTop: 20,
   },
   submitButtonText: {
-    color: 'white',
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
   modalContainer: {
     flex: 1,
@@ -384,21 +417,58 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    width: '80%',
+    width: 300,
+    padding: 20,
     backgroundColor: 'white',
     borderRadius: 10,
-    padding: 20,
+    alignItems: 'center',
   },
   modalTitle: {
-    fontSize: 20,
-    marginBottom: 20,
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 15,
+    color: "#7D0431"
   },
   modalButton: {
+    marginTop: 10,
     padding: 10,
+    backgroundColor: '#7d0431',
+    borderRadius: 5,
+    width: '100%',
+    alignItems: 'center',
   },
-  modalButtonText: {
-    textAlign: 'center',
+  modalButtonCancel: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  modalButtonIcon: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    padding: 10,
+    backgroundColor: '#f2f2f2',
+    borderRadius: 5,
+    width: '100%',
+    marginBottom: 10,
+    color: '#7d0431',
+  },
+ 
+  textInputFields: {
+    marginBottom: 20,
+  },
+  textInput: {
+    marginBottom: 8,
+  },
+  loader: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
 });
 
 export default AddSecurity;
+

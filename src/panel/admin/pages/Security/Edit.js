@@ -2,21 +2,20 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { getSequrityPerson, updateSequrity } from './GateKeeperSlice';
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, ScrollView, Alert, Modal } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, Modal } from 'react-native';
+import { ActivityIndicator, TextInput } from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 import * as ImagePicker from 'expo-image-picker';
 import { ImagebaseURL } from '../../../Security/helpers/axios';
-
+import Icon from 'react-native-vector-icons/MaterialIcons';
 const EditSecurity = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const route = useRoute();
   const { sequrityId } = route.params;
-
   const profile = useSelector((state) => state.gateKeepers.sequrity);
-  const aadharNumber = profile.aadharNumber
   const successMessage = useSelector((state) => state.gateKeepers.successMessage);
-  console.log("aadharNumber", aadharNumber)
+  const status = useSelector((state) => state.gateKeepers.status);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -58,6 +57,7 @@ const EditSecurity = () => {
       setPreviewImage(`${ImagebaseURL}${profile.pictures}`);
     }
   }, [profile]);
+
   const handleChange = (name, value) => {
     if (name.startsWith('address.')) {
       const addressKey = name.split('.')[1];
@@ -97,7 +97,12 @@ const EditSecurity = () => {
         picture: { uri, name: uri.split('/').pop(), type: 'image/jpeg' },
       }));
       setPreviewImage(uri);
+      setModalVisible(false);
     }
+  };
+
+  const deletePhoto = () => {
+    setPreviewImage(null);
   };
 
   const handleSubmit = async () => {
@@ -120,81 +125,109 @@ const EditSecurity = () => {
         text1: 'Success',
         text2: successMessage || 'Security updated successfully!',
         type: 'success',
-        position: 'top',
       });
-      navigation.goBack();
+      setTimeout(() => {
+        navigation.goBack();
+      }, 2000);
     } catch (error) {
       console.error("Error:", error);
       Toast.show({
         text1: 'Error',
         text2: 'Failed to update security. Please try again.',
         type: 'error',
-        position: 'top',
       });
     }
   };
+  if (status === 'loading') {
+    return <ActivityIndicator size="large" color="#630000" style={styles.loader} />;
+}
 
+if (status === 'failed') {
+    return <Text style={styles.errorText}>Error: {error}</Text>;
+}
   return (
     <ScrollView style={styles.container}>
       <View style={styles.form}>
         <TextInput
-          placeholder='Name'
+          mode="outlined"
+          label='Name'
           value={formData.name}
           onChangeText={(value) => handleChange('name', value)}
-          style={styles.input}
+          theme={{ colors: { primary: "#7d0431" } }}
+          style={styles.textInput}
         />
+
         <TextInput
-          placeholder='Email'
+          mode="outlined"
+          label='Email'
           value={formData.email}
           onChangeText={(value) => handleChange('email', value)}
-          style={styles.input}
+          theme={{ colors: { primary: "#7d0431" } }}
+          style={styles.textInput}
         />
         <TextInput
-          placeholder='Mobile Number'
+          mode="outlined"
+          label='Mobile Number'
           value={formData.phoneNumber}
           onChangeText={(value) => handleChange('phoneNumber', value)}
-          style={styles.input}
+          theme={{ colors: { primary: "#7d0431" } }}
+          style={styles.textInput}
           keyboardType="numeric"
         />
         <TextInput
-          placeholder='Aadhar Number'
+          mode="outlined"
+          label='Aadhar Number'
           value={formData.aadharNumber?.toString() || ''}
           onChangeText={(value) => handleChange('aadharNumber', value)}
-          style={styles.input}
+          theme={{ colors: { primary: "#7d0431" } }}
+          style={styles.textInput}
           keyboardType="numeric"
         />
 
         <TextInput
-          placeholder='Address Line 1'
+          mode="outlined"
+          label='Address Line 1'
           value={formData.address.addressLine1}
           onChangeText={(value) => handleChange('address.addressLine1', value)}
-          style={styles.input}
+          theme={{ colors: { primary: "#7d0431" } }}
+          style={styles.textInput}
         />
         <TextInput
-          placeholder='Address Line 2'
+          mode="outlined"
+          label='Address Line 2'
           value={formData.address.addressLine2}
           onChangeText={(value) => handleChange('address.addressLine2', value)}
-          style={styles.input}
+          theme={{ colors: { primary: "#7d0431" } }}
+          style={styles.textInput}
         />
         <TextInput
-          placeholder='State'
+          mode="outlined"
+          label='State'
           value={formData.address.state}
           onChangeText={(value) => handleChange('address.state', value)}
-          style={styles.input}
+          theme={{ colors: { primary: "#7d0431" } }}
+          style={styles.textInput}
         />
         <TextInput
-          placeholder='Postal Code'
+          mode="outlined"
+          label='Postal Code'
           value={formData.address.postalCode}
           onChangeText={(value) => handleChange('address.postalCode', value)}
-          style={styles.input}
+          theme={{ colors: { primary: "#7d0431" } }}
+          style={styles.textInput}
         />
 
         {/* Preview Image */}
         {previewImage ? (
           <View style={styles.imageContainer}>
             <Image source={{ uri: previewImage }} style={styles.image} />
+            <TouchableOpacity onPress={deletePhoto} style={styles.removeImageButton}>
+              <Text style={styles.removeImageText}>Remove Image</Text>
+            </TouchableOpacity>
           </View>
         ) : null}
+
+
 
         {/* Image Picker Modal */}
         <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.imageButton}>
@@ -210,14 +243,16 @@ const EditSecurity = () => {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Select Image Source</Text>
-            <TouchableOpacity onPress={() => handleImagePicker('gallery')} style={styles.modalButton}>
-              <Text style={styles.modalButtonText}>Pick from Gallery</Text>
+            <TouchableOpacity onPress={() => handleImagePicker('gallery')} style={styles.modalButtonIcon}>
+            <Text>Pick from Gallery  </Text>
+            <Icon name="photo-library" size={24} color="#7D0431" />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleImagePicker('camera')} style={styles.modalButton}>
-              <Text style={styles.modalButtonText}>Take a Photo</Text>
+            <TouchableOpacity onPress={() => handleImagePicker('camera')} style={styles.modalButtonIcon}>
+              <Text>Take a Photo  </Text>
+              <Icon name="photo-camera" size={24} color="#7D0431" />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.modalButton}>
-              <Text style={styles.modalButtonText}>Cancel</Text>
+              <Text style={styles.modalButtonCancel}>Cancel</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -243,10 +278,11 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   imageButton: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#28a745',
     padding: 10,
     borderRadius: 5,
     alignItems: 'center',
+    marginBottom: 10,
   },
   imageButtonText: {
     color: 'white',
@@ -261,10 +297,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   submitButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#7D0431',
     padding: 15,
     borderRadius: 5,
     alignItems: 'center',
+    marginBottom: 15,
   },
   submitButtonText: {
     color: 'white',
@@ -276,7 +313,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    width: '80%',
     backgroundColor: 'white',
     borderRadius: 10,
     padding: 20,
@@ -284,12 +320,46 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     marginBottom: 20,
+    justifyContent: "center",
+    color: '#7D0431'
+  },
+  modalButtonIcon: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    padding: 10,
+    backgroundColor: '#f2f2f2',
+    borderRadius: 5,
+    marginBottom: 10,
   },
   modalButton: {
     padding: 10,
   },
   modalButtonText: {
     textAlign: 'center',
+  },
+  modalButtonCancel: {
+    textAlign: 'center',
+    color: "#7D0431",
+  },
+  removeImageButton: {
+    marginTop: 8,
+    marginBottom: 10,
+    padding: 5,
+    backgroundColor: 'red',
+    borderRadius: 5,
+  },
+  removeImageText: {
+    color: 'white',
+  },
+  textInputFields: {
+    marginBottom: 20,
+  },
+  textInput: {
+    marginBottom: 8,
+  },
+  loader: {
+    flex: 1,
+    justifyContent: 'center',
   },
 });
 

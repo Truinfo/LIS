@@ -22,38 +22,49 @@ const ViewSequrity = () => {
   if (status === 'loading') {
     return <ActivityIndicator size="large" color="#630000" style={styles.loader} />;
   }
-  
+
   if (status === 'failed') {
     return <Text style={styles.errorText}>Error: {error}</Text>;
   }
 
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="#fff" />
-        </TouchableOpacity>
-        <Text style={styles.title}>View Sequrity</Text>
-      </View>
       {profile ? (
         <View style={styles.profileContainer}>
           <Image
             source={{ uri: `${ImagebaseURL}${profile.pictures}` }}
             style={styles.profileImage}
           />
-          <Text style={styles.profileName}>{profile.name}</Text>
-          <Text style={styles.profileDetail}><Text style={styles.bold}>Email:</Text> {profile.email}</Text>
-          <Text style={styles.profileDetail}><Text style={styles.bold}>Mobile Number:</Text> {profile.phoneNumber}</Text>
-          <Text style={styles.profileDetail}><Text style={styles.bold}>Role:</Text> {profile.role}</Text>
-          <Text style={styles.profileDetail}><Text style={styles.bold}>Aadhar Number:</Text> {profile.aadharNumber}</Text>
+          <View style={styles.detailContainer}>
+            <Text style={styles.bold}>Name</Text>
+            <Text style={styles.profileDetail}>{profile.name}</Text>
+          </View>
+          <View style={styles.detailContainer}>
+            <Text style={styles.bold}>Email</Text>
+            <Text style={styles.profileDetail}>{profile.email}</Text>
+          </View>
+          <View style={styles.detailContainer}>
+            <Text style={styles.bold}>Mobile Number</Text>
+            <Text style={styles.profileDetail}>{profile.phoneNumber}</Text>
+          </View>
+          <View style={styles.detailContainer}>
+            <Text style={styles.bold}>Role</Text>
+            <Text style={styles.profileDetail}>{profile.role}</Text>
+          </View>
+          <View style={styles.detailContainer}>
+            <Text style={styles.bold}>Aadhar Number</Text>
+            <Text style={styles.profileDetail}>{profile.aadharNumber}</Text>
+          </View>
           {profile.address && (
-            <Text style={styles.profileDetail}>
-              <Text style={styles.bold}>Address:</Text> {`${profile.address.addressLine1 || ''}, ${profile.address.addressLine2 || ''}, ${profile.address.state || ''}, ${profile.address.postalCode || ''}`}
-            </Text>
+            <View style={styles.detailContainer}>
+              <Text style={styles.bold}>Address</Text>
+              <Text style={styles.profileDetail}>{`${profile.address.addressLine1 || ''}, ${profile.address.addressLine2 || ''}, ${profile.address.state || ''}, ${profile.address.postalCode || ''}`}</Text>
+            </View>
           )}
+
           {profile.attendance && profile.attendance.length > 0 && (
             <View style={styles.attendanceContainer}>
-              <Text style={styles.attendanceTitle}>Attendance:</Text>
+              <Text style={styles.attendanceTitle}>Attendance</Text>
               <View style={styles.table}>
                 <View style={styles.tableHeader}>
                   <Text style={styles.tableHeaderText}>Date</Text>
@@ -125,13 +136,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     textAlign: 'center',
   },
-  profileDetail: {
-    fontSize: 17,
-    marginVertical: 5,
-  },
-  bold: {
-    fontWeight: 'bold',
-  },
   attendanceContainer: {
     marginTop: 20,
   },
@@ -167,6 +171,21 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 10,
     textAlign: 'center',
+  },
+  profileDetail: {
+    fontSize: 17,
+    flex: 1,
+    marginVertical: 5,
+  },
+  bold: {
+    fontWeight: "500",
+    fontSize: 17,
+    flex: 1,
+  },
+  detailContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
 });
 

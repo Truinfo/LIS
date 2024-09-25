@@ -270,13 +270,7 @@ export default function App() {
             <Stack.Screen name="EventDetails" component={EventDetails} />
             <Stack.Screen name="My Bookings" component={MyBookings} />
 
-
-
-
             {/* Admin */}
-
-            <Stack.Screen name="Add Residents" component={AddResidents} />
-            <Stack.Screen name="Residents Details" component={ResidentsDetails} />
 
 
             <Stack.Screen name="Sidebar" component={Sidebar} options={{

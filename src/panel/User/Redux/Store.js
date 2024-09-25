@@ -53,6 +53,7 @@ import { residentsReducer } from '../../admin/pages/ResidentialUnit/ResidentsSli
 
 import { AdvertisementReducer } from '../../admin/pages/Advertisements/AdvertisementSlice';
 import { AdminProfileReducer } from '../../admin/pages/Advertisements/profileSlice';
+import { staffReducer } from '../../admin/pages/Services/ServicesSlice';
 
 
 
@@ -122,8 +123,8 @@ const store = configureStore({
     gateKeepers: GateKeeperReducer,
     advertisements: AdvertisementReducer,
     gateKeepers: GateKeeperReducer,
-    adminProfile: AdminProfileReducer
-
+    adminProfile: AdminProfileReducer,
+    staff: staffReducer
 
   },
 });

@@ -16,13 +16,14 @@ import SocietyBills from '../pages/SocietyBills/SocietyBills';
 import Security from '../pages/Security/Security';
 import Services from '../pages/Services/Services';
 import Maintenance from '../pages/Maintenance/Maintenance';
+import NoticeBoard from '../pages/NoticeBoard/NoticeBoard';
 
 const Drawer = createDrawerNavigator();
 
 export default function Sidebar() {
   return (
     <Drawer.Navigator
-      initialRouteName="Residential Management"
+      initialRouteName="Services"
       screenOptions={{
         headerRight: () => (
           <View style={{ flexDirection: 'row', alignItems: "center", gap: 15, marginRight: 10 }}>
@@ -45,6 +46,7 @@ export default function Sidebar() {
       <Drawer.Screen name="Services" component={Services} />
       <Drawer.Screen name="Complaints" component={Complaints} />
       <Drawer.Screen name="Documents" component={Documents} />
+      <Drawer.Screen name="Notice Board" component={NoticeBoard} />
       <Drawer.Screen name="Events" component={Events} />
       <Drawer.Screen name="Polls" component={Polls} />
       <Drawer.Screen name="Visitor Management" component={VisitorManagement} />

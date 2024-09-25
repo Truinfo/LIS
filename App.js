@@ -98,9 +98,8 @@ import AddAdvertisements from './src/panel/admin/pages/Advertisements/AddPost';
 
 import EditResidents from './src/panel/admin/pages/ResidentialUnit/EditResidents';
 import AddResidents from './src/panel/admin/pages/ResidentialUnit/AddResidents';
+import AdminAddService from './src/panel/admin/pages/Services/AddService';
 import ResidentDetails from './src/panel/admin/pages/ResidentialUnit/ResidentsDetails';
-import EditAdd from './src/panel/admin/pages/Advertisements/EditAdd';
-import AdminRiseComplaints from './src/panel/admin/pages/Complaints/AdminRiseComplaints';
 
 
 const Stack = createNativeStackNavigator();
@@ -281,6 +280,10 @@ export default function App() {
             <Stack.Screen name="Add Residents" component={AddResidents} />
             <Stack.Screen name="Residents Details" component={ResidentDetails} />
             <Stack.Screen name="Edit Resident" component={EditResidents} />
+            <Stack.Screen name="Add Staff" component={AdminAddService} />
+            <Stack.Screen name="Staff List" component={ServicesList} />
+            <Stack.Screen name="Edit Service" component={EditService} />
+
 
             <Stack.Screen name="Add Security" component={AddSecurity} />
             <Stack.Screen name="Edit Security" component={EditSecurity} />

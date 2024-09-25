@@ -232,7 +232,7 @@ const Complaints = () => {
             <Snackbar
                 visible={snackbarVisible}
                 onDismiss={() => setSnackbarVisible(false)}
-                duration={3000} // Duration for how long the snackbar will be visible
+                duration={3000} 
                 style={styles.snackbar}
             >
                 {snackbarMessage}
@@ -392,3 +392,6 @@ const styles = StyleSheet.create({
 });
 
 export default Complaints;
+
+
+

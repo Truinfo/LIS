@@ -123,7 +123,7 @@ const ComplaintSlice = createSlice({
       })
       .addCase(updateComplaintStatusResolution.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message; // Update to use action.error.message
+        state.error = action.error.message; 
         console.log(action.error, "fail")
         state.status = "Failed";
       });

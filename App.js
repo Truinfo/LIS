@@ -289,13 +289,11 @@ export default function App() {
 
             <Stack.Screen name='View Details' component={ReviewAdd} />
             <Stack.Screen name='Add Post' component={AddAdvertisements} />
-<<<<<<< HEAD
+
             <Stack.Screen name='Edit Post' component={EditAdd} />
             <Stack.Screen name='Add Complaints' component={AdminRiseComplaints} />
-=======
-            {/* <Stack.Screen name='Edit Post' component={EditAdd} /> */}
->>>>>>> 0fd2b143a34ade4ffb00281bc785b47eec442247
 
+            {/* <Stack.Screen name='Edit Post' component={EditAdd} /> */}
 
           </Stack.Navigator>
         </SafeAreaView>

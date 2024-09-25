@@ -93,7 +93,6 @@ const AdminRiseComplaints = () => {
 
     return (
         <View style={styles.container}>
-            {/* Category Dropdown with Border */}
             <View style={styles.pickerContainer}>
                 <Picker
                     selectedValue={category}
@@ -151,7 +150,6 @@ const AdminRiseComplaints = () => {
                 <Text style={styles.submitButtonText}>Submit Complaint</Text>
             </TouchableOpacity>
 
-            {/* Snackbar for success/error messages */}
             <Snackbar
                 visible={snackbarVisible}
                 onDismiss={() => setSnackbarVisible(false)}

@@ -100,6 +100,10 @@ import EditResidents from './src/panel/admin/pages/ResidentialUnit/EditResidents
 import AddResidents from './src/panel/admin/pages/ResidentialUnit/AddResidents';
 import AdminAddService from './src/panel/admin/pages/Services/AddService';
 import ResidentDetails from './src/panel/admin/pages/ResidentialUnit/ResidentsDetails';
+import ServicesList from './src/panel/admin/pages/Services/ServicesList';
+import EditService from './src/panel/admin/pages/Services/EditService';
+import AdminRiseComplaints from './src/panel/admin/pages/Complaints/AdminRiseComplaints';
+import EditAdd from './src/panel/admin/pages/Advertisements/EditAdd';
 
 
 const Stack = createNativeStackNavigator();
@@ -295,8 +299,6 @@ export default function App() {
 
             <Stack.Screen name='Edit Post' component={EditAdd} />
             <Stack.Screen name='Add Complaints' component={AdminRiseComplaints} />
-
-            {/* <Stack.Screen name='Edit Post' component={EditAdd} /> */}
 
           </Stack.Navigator>
         </SafeAreaView>

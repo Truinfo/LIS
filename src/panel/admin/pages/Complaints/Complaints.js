@@ -178,8 +178,8 @@ const Complaints = () => {
         }
     };
 
-    const personalComplaints = complaints.filter((complaint) => complaint.complaintType === "Personal");
-    const societyComplaints = complaints.filter((complaint) => complaint.complaintType === "Society");
+    const personalComplaints = complaints?.filter((complaint) => complaint.complaintType === "Personal");
+    const societyComplaints = complaints?.filter((complaint) => complaint.complaintType === "Society");
     const [index, setIndex] = useState(0);
     const [routes] = useState([
         { key: "personal", title: "Personal" },

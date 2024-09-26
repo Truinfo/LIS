@@ -95,7 +95,9 @@ const Advertisements = () => {
     <TouchableWithoutFeedback onPress={handleOutsidePress}>
       <View style={styles.container}>
         {status === "loading" ? (
-          <ActivityIndicator size="large" color="#630000" style={styles.spinner} />
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#7d0431" />
+          </View>
         ) : (
           <FlatList
             data={adds}
@@ -149,7 +151,7 @@ const styles = StyleSheet.create({
     shadowRadius: 1.5,
     maxWidth: '99%',
     alignSelf: 'center',
-    
+
   },
   detailsContainer: {
     flex: 1,
@@ -164,8 +166,8 @@ const styles = StyleSheet.create({
   },
   actionMenu: {
     position: 'absolute',
-    top:10, // Adjust to position below the menu icon
-    right:30,
+    top: 10, // Adjust to position below the menu icon
+    right: 30,
     backgroundColor: '#fff',
     borderRadius: 5,
     elevation: 5,
@@ -191,6 +193,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     elevation: 5,
   },
+  loadingContainer: {
+    flex: 1, // Use full height and width of the parent
+    justifyContent: 'center', // Center vertically
+    alignItems: 'center', // Center horizontally
+},
 });
 
 export default Advertisements;

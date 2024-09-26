@@ -53,6 +53,7 @@ import { residentsReducer } from '../../admin/pages/ResidentialUnit/ResidentsSli
 import { AdvertisementReducer } from '../../admin/pages/Advertisements/AdvertisementSlice';
 import { AdminProfileReducer } from '../../admin/pages/Advertisements/profileSlice';
 import { AdminComplaintReducer } from '../../admin/pages/Complaints/ComplaintSlice';
+import { AdminNoticeReducer } from '../../admin/pages/NoticeBoard/NoticeSlice';
 
 
 
@@ -120,7 +121,8 @@ const store = configureStore({
     advertisements: AdvertisementReducer,
     gateKeepers: GateKeeperReducer,
     adminProfile: AdminProfileReducer,
-    adminComplaints: AdminComplaintReducer
+    adminComplaints: AdminComplaintReducer,
+    adminNotices:AdminNoticeReducer
 
   },
 });

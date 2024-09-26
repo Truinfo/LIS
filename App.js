@@ -104,6 +104,8 @@ import ServicesList from './src/panel/admin/pages/Services/ServicesList';
 import EditService from './src/panel/admin/pages/Services/EditService';
 import AdminRiseComplaints from './src/panel/admin/pages/Complaints/AdminRiseComplaints';
 import EditAdd from './src/panel/admin/pages/Advertisements/EditAdd';
+import AddNotice from './src/panel/admin/pages/NoticeBoard/AddNotice';
+import EditNotice from './src/panel/admin/pages/NoticeBoard/EditNotice';
 
 
 const Stack = createNativeStackNavigator();
@@ -288,7 +290,6 @@ export default function App() {
             <Stack.Screen name="Staff List" component={ServicesList} />
             <Stack.Screen name="Edit Service" component={EditService} />
 
-
             <Stack.Screen name="Add Security" component={AddSecurity} />
             <Stack.Screen name="Edit Security" component={EditSecurity} />
             <Stack.Screen name="View Security" component={ViewSequrity} />
@@ -299,7 +300,8 @@ export default function App() {
 
             <Stack.Screen name='Edit Post' component={EditAdd} />
             <Stack.Screen name='Add Complaints' component={AdminRiseComplaints} />
-
+            <Stack.Screen name='Add Notice' component={AddNotice} />
+            <Stack.Screen name='Edit Notice' component={EditNotice} />
           </Stack.Navigator>
         </SafeAreaView>
       </NavigationContainer>

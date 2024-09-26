@@ -54,6 +54,7 @@ import { AdvertisementReducer } from '../../admin/pages/Advertisements/Advertise
 import { AdminProfileReducer } from '../../admin/pages/Advertisements/profileSlice';
 import { AdminComplaintReducer } from '../../admin/pages/Complaints/ComplaintSlice';
 import { AdminNoticeReducer } from '../../admin/pages/NoticeBoard/NoticeSlice';
+import { AdminuserProfilesSlice } from '../../admin/pages/Polls/userProfilesSlice';
 
 
 
@@ -122,7 +123,8 @@ const store = configureStore({
     gateKeepers: GateKeeperReducer,
     adminProfile: AdminProfileReducer,
     adminComplaints: AdminComplaintReducer,
-    adminNotices:AdminNoticeReducer
+    adminNotices:AdminNoticeReducer,
+    adiminUserProfile:AdminuserProfilesSlice,
 
   },
 });

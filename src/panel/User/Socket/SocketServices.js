@@ -1,5 +1,5 @@
 import io from 'socket.io-client';
-const BaseUrl = 'http://192.168.29.226:4000'
+const BaseUrl = 'https://livinsync.onrender.com'
 class WSService {
     constructor() {
         this.socket = null;
@@ -7,7 +7,10 @@ class WSService {
     initializeSocket = async () => {
         try {
             this.socket = io(BaseUrl, {
-                transports: ['websocket']
+                transports: ['websocket'],
+                cors: {
+                    origin: '*', // Set to '*' to allow any origin or specify the allowed client URL
+                  },
             });
             this.socket.on('connect', () => {
                 console.log('=== socket connected ===');

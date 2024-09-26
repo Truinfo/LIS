@@ -106,6 +106,7 @@ import AdminRiseComplaints from './src/panel/admin/pages/Complaints/AdminRiseCom
 import EditAdd from './src/panel/admin/pages/Advertisements/EditAdd';
 import AddNotice from './src/panel/admin/pages/NoticeBoard/AddNotice';
 import EditNotice from './src/panel/admin/pages/NoticeBoard/EditNotice';
+import CreatePoll from './src/panel/admin/pages/Polls/CreatePoll';
 
 
 const Stack = createNativeStackNavigator();
@@ -302,6 +303,7 @@ export default function App() {
             <Stack.Screen name='Add Complaints' component={AdminRiseComplaints} />
             <Stack.Screen name='Add Notice' component={AddNotice} />
             <Stack.Screen name='Edit Notice' component={EditNotice} />
+            <Stack.Screen name='Create Poll' component={CreatePoll} />
           </Stack.Navigator>
         </SafeAreaView>
       </NavigationContainer>

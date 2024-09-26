@@ -1,10 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../../Security/helpers/axios';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-
-
-
 export const fetchnotices = createAsyncThunk(
     'notice/fetchnotice',
     async () => {

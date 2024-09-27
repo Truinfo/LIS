@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
     View,
     Text,
@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteServicePerson, fetchAllServiceTypes } from './ServicesSlice';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import { ImagebaseURL } from '../../../Security/helpers/axios';
 import { Button, Modal, Portal, Snackbar } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -33,15 +33,19 @@ const ServicesList = () => {
     const [snackbarVisible, setSnackbarVisible] = useState(false); // Snackbar visibility state
     const [snackbarMessage, setSnackbarMessage] = useState(''); // Snackbar message state
 
-    useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true);
-            await dispatch(fetchAllServiceTypes(serviceType));
-            setLoading(false);
-        };
+    useFocusEffect(
+        useCallback(() => {
+            const fetchData = async () => {
+                setLoading(true);
+                await dispatch(fetchAllServiceTypes(serviceType));
+                setLoading(false);
+            };
 
-        fetchData();
-    }, [dispatch, serviceType]);
+            fetchData();
+            return () => {
+            };
+        }, [dispatch, serviceType])
+    );
 
     const filteredStaff = Array.isArray(staff) ? staff.filter((member) => {
         const name = member.name ? member.name : '';
@@ -63,25 +67,32 @@ const ServicesList = () => {
                         style: "cancel"
                     },
                     {
-                        text: "Yes", onPress: () => {
-                            dispatch(deleteServicePerson({ userid: selectedservicePerson.userid, serviceType, societyId })).then((response) => {
-                                setAnchor(false)
-                                if (response.type === "user/deleteServicePerson/fulfilled") {
-
-                                    setSnackbarMessage(`${response.payload.message}`);
-                                    setSnackbarVisible(true);
-                                    dispatch(fetchAllServiceTypes(serviceType));
-                                } else {
-                                    setSnackbarMessage("Error deleting service person.");
-                                    setSnackbarVisible(true);
-                                }
-                            });
+                        text: "Yes",
+                        onPress: () => {
+                            setLoading(true); // Set loading to true before deleting
+                            dispatch(deleteServicePerson({ userid: selectedservicePerson.userid, serviceType, societyId }))
+                                .then((response) => {
+                                    setAnchor(false);
+                                    if (response.type === "user/deleteServicePerson/fulfilled") {
+                                        setSnackbarMessage(`${response.payload.message}`);
+                                        setSnackbarVisible(true);
+                                        // Fetch service types again after successful deletion
+                                        dispatch(fetchAllServiceTypes(serviceType)).finally(() => {
+                                            setLoading(false); // Set loading to false after fetch is complete
+                                        });
+                                    } else {
+                                        setSnackbarMessage("Error deleting service person.");
+                                        setSnackbarVisible(true);
+                                        setLoading(false); // Set loading to false if deletion fails
+                                    }
+                                });
                         }
                     }
                 ]
             );
         }
     };
+    
     const handleEdit = (userId) => {
         setSelectedservicePerson(userId);
         console.log(selectedservicePerson)

@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../../Security/helpers/axios';
 
-// const societyAdmin = JSON.parse(Asy.getItem('societyAdmin')) || {};
 const societyId = "6683b57b073739a31e8350d0";
 
 export const fetchUsers = createAsyncThunk(
@@ -12,7 +11,6 @@ export const fetchUsers = createAsyncThunk(
     }
 );
 
-// router.get('/user/getAllOwners/:societyId', getAllOwners);
 export const getAllOwners = createAsyncThunk(
     'user/getAllOwners',
     async () => {
@@ -104,6 +102,4 @@ const ResidentsSlice = createSlice({
     }
 });
 
-
-// Export reducers as named exports
 export const residentsReducer = ResidentsSlice.reducer;

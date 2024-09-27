@@ -1,10 +1,17 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../../Security/helpers/axios';
-const societyId = "6683b57b073739a31e8350d0";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const getSocietyId = async () => {
+  const societyAdmin = await AsyncStorage.getItem('societyAdmin');
+  return JSON.parse(societyAdmin)?._id || "6683b57b073739a31e8350d0";
+};
+
 
 export const fetchGatekeepers = createAsyncThunk(
   'sequrity/fetchGatekeepers',
   async () => {
+    const societyId = await getSocietyId();
     const response = await axiosInstance.get(`/sequrity/getSequrityBySocietyId/${societyId}`);
     return response.data.sequrity;
   }
@@ -14,6 +21,7 @@ export const getSequrityPerson = createAsyncThunk(
   'sequrity/getSequrityPerson',
   async (sequrityId, { rejectWithValue }) => {
     try {
+      const societyId = await getSocietyId();
       const response = await axiosInstance.get(`/sequrity/getSequrityPerson/${societyId}/${sequrityId}`);
       return response.data.sequrity;
     } catch (error) {
@@ -27,6 +35,7 @@ export const getAttendanceOfId = createAsyncThunk(
   'sequrity/getAttendanceOfId',
   async (sequrityId, { rejectWithValue }) => {
     try {
+      const societyId = await getSocietyId();
       const response = await axiosInstance.get(`/sequrity/getAttendanceOfId/${societyId}/${sequrityId}`);
       return response.data.sequrity;
     } catch (error) {

@@ -5,7 +5,9 @@ import { View, Alert, ScrollView, TouchableOpacity, Modal, TouchableWithoutFeedb
 import { Text, TextInput, Button, IconButton, Avatar } from 'react-native-paper';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { ImagebaseURL } from '../../../Security/helpers/axios';
-import Icon from 'react-native-vector-icons/MaterialIcons'; // Import vector icon for close button
+import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const timingOptions = [
     "10:00 to 11:00", "11:00 to 12:00", "12:00 to 13:00", "13:00 to 14:00",
@@ -70,11 +72,15 @@ const EditService = () => {
             prev.includes(timing) ? prev.filter(t => t !== timing) : [...prev, timing]
         );
     };
-
-
     const handleUpdate = () => {
         if (serviceType && userid) {
-            const { name, phoneNumber, address, timings } = updatedData;
+            // Update timings in updatedData before submitting
+            const updatedFormData = {
+                ...updatedData,
+                timings: selectedTimings, // Ensure timings are set from selectedTimings
+            };
+
+            const { name, phoneNumber, address, timings } = updatedFormData;
             const formData = new FormData();
             formData.append('societyId', societyId);
             formData.append('serviceType', serviceType);
@@ -88,12 +94,15 @@ const EditService = () => {
             });
 
             if (newPicturesFile) {
-                formData.append('pictures', newPicturesFile);
-            }
-
+                const fileToUpload = {
+                  uri: newPicturesFile.uri,
+                  name: 'picture.jpg',
+                  type: 'image/jpeg',
+                };
+                formData.append('pictures', fileToUpload);
+              }
             dispatch(updateServicePerson(formData))
                 .then((response) => {
-                    // Check if the response type matches
                     if (response.type === 'staff/updateServicePerson/fulfilled') {
                         Alert.alert("Success", response.type);
                         // Fetch updated service person information
@@ -105,9 +114,78 @@ const EditService = () => {
                 });
         }
     };
+
+
+    // const handleUpdate = () => {
+    //     if (serviceType && userid) {
+    //         const { name, phoneNumber, address, timings } = updatedData;
+    //         const formData = new FormData();
+    //         formData.append('societyId', societyId);
+    //         formData.append('serviceType', serviceType);
+    //         formData.append('userid', userid);
+    //         formData.append('name', name);
+    //         formData.append('phoneNumber', phoneNumber);
+    //         formData.append('address', address);
+
+    //         timings.forEach((timing) => {
+    //             formData.append('timings', timing);
+    //         });
+
+    //         if (newPicturesFile) {
+    //             formData.append('pictures', newPicturesFile);
+    //         }
+
+    //         dispatch(updateServicePerson(formData))
+    //             .then((response) => {
+    //                 // Check if the response type matches
+    //                 if (response.type === 'staff/updateServicePerson/fulfilled') {
+    //                     Alert.alert("Success", response.type);
+    //                     // Fetch updated service person information
+    //                     dispatch(fetchServicePersonById({ serviceType, userid }));
+    //                 }
+    //             })
+    //             .catch((error) => {
+    //                 console.error("Error:", error);
+    //             });
+    //     }
+    // };
     const handleUpdateTimings = () => {
         setUpdatedData({ ...updatedData, timings: selectedTimings });
         setModalVisible(false);
+    };
+    const handleImagePick = async () => {
+        Alert.alert(
+            'Select Image Source',
+            'Choose an option to upload an image:',
+            [
+                {
+                    text: 'Camera',
+                    onPress: () => pickImage(ImagePicker.launchCameraAsync),
+                },
+                {
+                    text: 'Gallery',
+                    onPress: () => pickImage(ImagePicker.launchImageLibraryAsync),
+                },
+                {
+                    text: 'Cancel',
+                    style: 'cancel',
+                },
+            ]
+        );
+    };
+
+    const pickImage = async (launchFunction) => {
+        let result = await launchFunction({
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+        });
+
+        if (!result.canceled) {
+            setNewPicturesFile(result.assets[0].uri); // Store the URI for use in the image upload
+            setNewPicturesFile(result.assets[0]); // Store the asset for form submission
+        }
     };
 
     const handleDeleteListItem = (itemIndex) => {
@@ -130,11 +208,21 @@ const EditService = () => {
                 {profile && (
                     <View>
                         {console.log(profile, "profile")}
-                        <Avatar.Image
+                        <View style={styles.avatarContainer}>
+                            <Avatar.Image
+                                size={120}
+                                source={{ uri: newPicturesFile ? newPicturesFile : `${ImagebaseURL}${updatedData.pictures}` }}
+                                style={styles.avatar}
+                            />
+                            <TouchableOpacity style={styles.cameraButton} onPress={handleImagePick}>
+                                <Ionicons name="camera" size={20} color="white" />
+                            </TouchableOpacity>
+                        </View>
+                        {/* <Avatar.Image
                             source={{ uri: newPicturesFile ? URL.createObjectURL(newPicturesFile) : `${ImagebaseURL}${updatedData.pictures}` }}
                             size={100}
                             style={{ borderRadius: 50, marginBottom: 20, alignSelf: "center" }}
-                        />
+                        /> */}
                         <TextInput
                             label="Service Type"
                             mode="outlined"
@@ -297,5 +385,21 @@ const styles = StyleSheet.create({
         color: '#7d0431',
         fontWeight: 'bold',
         fontSize: 16,
+    },
+    avatarContainer: {
+        alignSelf: 'center',
+        marginBottom: 20,
+        position: 'relative', // Needed for positioning camera button
+    },
+    avatar: {
+        alignSelf: 'center',
+    },
+    cameraButton: {
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        backgroundColor: "rgba(0, 0, 0, 0.5)", // Your primary color
+        borderRadius: 50,
+        padding: 5,
     },
 })

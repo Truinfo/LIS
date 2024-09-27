@@ -6,9 +6,9 @@ const baseURL = 'https://livinsync.onrender.com/api';
 const axiosInstance = axios.create({
     baseURL,
     headers: {
-        'Content-Type': 'application/json',
+      'Content-Type': 'multipart/form-data',
     },
-});
+  });
 
 const Api = axios.create({
     baseURL,

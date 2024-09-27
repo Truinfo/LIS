@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
         elevation: 3,
         padding: 5,
         zIndex: 10,
-        overflow: 'hidden',
+        overflow:"visible"
     },
     divider: {
         borderBottomWidth: 1,

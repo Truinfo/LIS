@@ -109,7 +109,6 @@ import AddNotice from './src/panel/admin/pages/NoticeBoard/AddNotice';
 import EditNotice from './src/panel/admin/pages/NoticeBoard/EditNotice';
 import CreatePoll from './src/panel/admin/pages/Polls/CreatePoll';
 
-
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -291,7 +290,7 @@ export default function App() {
             <Stack.Screen name="Add Staff" component={AdminAddService} />
             <Stack.Screen name="Staff List" component={ServicesList} />
             <Stack.Screen name="Edit Service" component={EditService} />
-
+     
             <Stack.Screen name="Add Security" component={AddSecurity} />
             <Stack.Screen name="Edit Security" component={EditSecurity} />
             <Stack.Screen name="View Security" component={ViewSequrity} />

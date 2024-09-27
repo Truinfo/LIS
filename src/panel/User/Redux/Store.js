@@ -56,6 +56,8 @@ import { AdminComplaintReducer } from '../../admin/pages/Complaints/ComplaintSli
 import { SocietyEventReducer } from '../../admin/pages/Events/EventSlice';
 import { AdminNoticeReducer } from '../../admin/pages/NoticeBoard/NoticeSlice';
 import { AdminuserProfilesSlice } from '../../admin/pages/Polls/userProfilesSlice';
+import { inventoryReducer } from '../../admin/pages/Inventory/InventorySlice';
+import { staffReducer } from '../../admin/pages/Services/ServicesSlice';
 
 
 
@@ -125,9 +127,10 @@ const store = configureStore({
     gateKeepers: GateKeeperReducer,
     adminProfile: AdminProfileReducer,
     adminComplaints: AdminComplaintReducer,
+    staff:staffReducer,
 
     societyEvents:SocietyEventReducer,
-
+    inventory:inventoryReducer,
     adminNotices:AdminNoticeReducer,
     adiminUserProfile:AdminuserProfilesSlice,
 

@@ -35,7 +35,8 @@ const noticeSlice = createSlice({
         console.error("Failed to fetch notices:", action.error.message); // Log error for debugging
         state.status = 'failed';
         state.error = action.error.message;
-      });
+      })
+      
   },
 });
 

@@ -56,21 +56,6 @@ const Polls = () => {
 
         };
 
-
-        // const handleVoteUpdate = (data) => {
-        //     alert(data.message);
-        //     setPolls(prevPolls => {
-        //         const updatedPollIndex = prevPolls.findIndex(poll => poll._id === data.votes._id);
-        //         if (updatedPollIndex !== -1) {
-        //             const updatedPolls = [...prevPolls];
-        //             updatedPolls[updatedPollIndex] = data.votes;
-        //             return updatedPolls;
-        //         } else {
-        //             return prevPolls;
-        //         }
-        //     });
-        //     setCheckedOption(prevState => ({ ...prevState, [data.votes._id]: null }));
-        // };
         const handleVoteUpdate = (data) => {
             alert(data.message);
             socketServices.on('polls_by_society_id', handlePollsBySocietyId);

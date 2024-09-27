@@ -49,10 +49,14 @@ import GetDocumentSlice from './Slice/ProfileSlice/GetDocumentSlice';
 import DocumentSlice from './Slice/ProfileSlice/DocumentSlice';
 import { GateKeeperReducer } from '../../admin/pages/Security/GateKeeperSlice';
 import { residentsReducer } from '../../admin/pages/ResidentialUnit/ResidentsSlice';
-
+import { Reducer } from '../../admin/pages/ResidentialUnit/ResidentsSlice';
 import { AdvertisementReducer } from '../../admin/pages/Advertisements/AdvertisementSlice';
 import { AdminProfileReducer } from '../../admin/pages/Advertisements/profileSlice';
-import { staffReducer } from '../../admin/pages/Services/ServicesSlice';
+import { AdminComplaintReducer } from '../../admin/pages/Complaints/ComplaintSlice';
+import { SocietyEventReducer } from '../../admin/pages/Events/EventSlice';
+import { AdminNoticeReducer } from '../../admin/pages/NoticeBoard/NoticeSlice';
+import { AdminuserProfilesSlice } from '../../admin/pages/Polls/userProfilesSlice';
+
 
 
 
@@ -112,9 +116,6 @@ const store = configureStore({
     quickContact: quickContacts,
     staffVisitor: staffVisitors,
     societyLis: societyLicence,
-
-
-
     AdminResidents: residentsReducer,
 
     //Admin
@@ -123,7 +124,13 @@ const store = configureStore({
     advertisements: AdvertisementReducer,
     gateKeepers: GateKeeperReducer,
     adminProfile: AdminProfileReducer,
-    staff: staffReducer
+    adminComplaints: AdminComplaintReducer,
+
+    societyEvents:SocietyEventReducer,
+
+    adminNotices:AdminNoticeReducer,
+    adiminUserProfile:AdminuserProfilesSlice,
+
 
   },
 });

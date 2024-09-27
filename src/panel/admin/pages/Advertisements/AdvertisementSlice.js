@@ -53,6 +53,7 @@ export const editAdvertisement = createAsyncThunk(
         'Content-Type': 'multipart/form-data',
       },
     });
+    console.log(response.data, "response")
     return response.data;
   }
 );

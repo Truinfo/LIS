@@ -129,7 +129,8 @@ const AddAdvertisements = ({ navigation }) => {
       });
     });
     // Dispatch or make an API call
-    dispatch(createAdvertisements(submissionData)).then((response) => {
+    dispatch(createAdvertisements(submissionData))
+    .then((response) => {
       if (response.meta.requestStatus === 'fulfilled') {
         // Handle success (reset form, show message, etc.)
         setDialogMessage('Advertisement added successfully!');

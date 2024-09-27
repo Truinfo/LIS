@@ -93,6 +93,7 @@ import AddSecurity from './src/panel/admin/pages/Security/Add';
 import EditSecurity from './src/panel/admin/pages/Security/Edit';
 import ViewSequrity from './src/panel/admin/pages/Security/View';
 import AttendanceForm from './src/panel/admin/pages/Security/Attendance';
+import ViewEvents from './src/panel/admin/pages/Events/View';
 import ReviewAdd from './src/panel/admin/pages/Advertisements/ReviewAdd';
 import AddAdvertisements from './src/panel/admin/pages/Advertisements/AddPost';
 
@@ -102,6 +103,13 @@ import AdminAddService from './src/panel/admin/pages/Services/AddService';
 import ResidentDetails from './src/panel/admin/pages/ResidentialUnit/ResidentsDetails';
 import ServicesList from './src/panel/admin/pages/Services/ServicesList';
 import EditService from './src/panel/admin/pages/Services/EditService';
+import AdminRiseComplaints from './src/panel/admin/pages/Complaints/AdminRiseComplaints';
+import EditAdd from './src/panel/admin/pages/Advertisements/EditAdd';
+import AddNotice from './src/panel/admin/pages/NoticeBoard/AddNotice';
+import EditNotice from './src/panel/admin/pages/NoticeBoard/EditNotice';
+import CreatePoll from './src/panel/admin/pages/Polls/CreatePoll';
+
+
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -284,17 +292,22 @@ export default function App() {
             <Stack.Screen name="Staff List" component={ServicesList} />
             <Stack.Screen name="Edit Service" component={EditService} />
 
-
             <Stack.Screen name="Add Security" component={AddSecurity} />
             <Stack.Screen name="Edit Security" component={EditSecurity} />
             <Stack.Screen name="View Security" component={ViewSequrity} />
             <Stack.Screen name="Attendance" component={AttendanceForm} />
+            
+            <Stack.Screen name="View Events" component={ViewEvents} />
+
 
             <Stack.Screen name='View Details' component={ReviewAdd} />
             <Stack.Screen name='Add Post' component={AddAdvertisements} />
-            {/* <Stack.Screen name='Edit Post' component={EditAdd} /> */}
 
-
+            <Stack.Screen name='Edit Post' component={EditAdd} />
+            <Stack.Screen name='Add Complaints' component={AdminRiseComplaints} />
+            <Stack.Screen name='Add Notice' component={AddNotice} />
+            <Stack.Screen name='Edit Notice' component={EditNotice} />
+            <Stack.Screen name='Create Poll' component={CreatePoll} />
           </Stack.Navigator>
         </SafeAreaView>
       </NavigationContainer>

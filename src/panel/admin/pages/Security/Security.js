@@ -98,6 +98,7 @@ const Security = () => {
                 source={{ uri: `${ImagebaseURL}${item.pictures}` }}
                 style={styles.image}
             />
+
             <View style={styles.details}>
                 <Text style={styles.detailLabel}>Security ID</Text>
                 <Text style={styles.detailValue}>{item.sequrityId}</Text>
@@ -278,10 +279,6 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         alignItems: 'center',
     },
-    addButtonText: {
-        color: '#FFF',
-        fontSize: 20,
-    },
     modalContent: {
         backgroundColor: '#fff',
         padding: 20,
@@ -328,12 +325,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.3,
         shadowRadius: 4,
-    },
-    addButtonText: {
-        color: '#FFF',
-        fontSize: 24,
-        fontWeight: 'bold',
-        lineHeight: 24,
     },
 });
 

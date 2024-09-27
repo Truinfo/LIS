@@ -18,6 +18,7 @@ export const fetchComplaints = createAsyncThunk(
 export const createComplaint = createAsyncThunk(
     'complaints/createComplaint',
     async (complaintData, thunkAPI) => {
+       
         try {
             const response = await axiosInstance.post('/createComplaint', complaintData);
             return response.data;
@@ -37,6 +38,7 @@ export const updateComplaintResolution = createAsyncThunk(
         }
     }
 );
+
 const complaintsSlice = createSlice({
     name: 'complaints',
     initialState: {
@@ -65,7 +67,7 @@ const complaintsSlice = createSlice({
             })
             .addCase(createComplaint.fulfilled, (state, action) => {
                 state.status = 'succeeded';
-                state.complaints=action.payload; // Assuming action.payload is the created complaint
+                state.complaints = action.payload; // Assuming action.payload is the created complaint
             })
             .addCase(createComplaint.rejected, (state, action) => {
                 state.status = 'failed';

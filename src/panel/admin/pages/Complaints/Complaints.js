@@ -192,7 +192,9 @@ const Complaints = () => {
     });
 
     if (status === "loading") {
-        return <ActivityIndicator size="large" color="#630000" style={styles.spinner} />;
+        return <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#7d0431" />
+        </View>
     }
     if (status === "error") {
         return <Text>Error fetching data...</Text>;
@@ -232,7 +234,7 @@ const Complaints = () => {
             <Snackbar
                 visible={snackbarVisible}
                 onDismiss={() => setSnackbarVisible(false)}
-                duration={3000} 
+                duration={3000}
                 style={styles.snackbar}
             >
                 {snackbarMessage}
@@ -387,6 +389,11 @@ const styles = StyleSheet.create({
     },
     spinner: {
         marginTop: 10,
+    },
+    loadingContainer: {
+        flex: 1, // Use full height and width of the parent
+        justifyContent: 'center', // Center vertically
+        alignItems: 'center', // Center horizontally
     },
 
 });

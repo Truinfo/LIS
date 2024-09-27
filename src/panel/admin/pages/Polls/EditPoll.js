@@ -3,30 +3,36 @@ import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Platfo
 import DateTimePicker from '@react-native-community/datetimepicker';
 import socketServices from '../../../User/Socket/SocketServices';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
-const CreatePoll = ({ navigation }) => {
+const EditPoll = () => {
+    const navigation = useNavigation()
+    const route = useRoute()
+    const { pollData } = route.params; // Assuming pollData is passed as a param
+    // Initialize form data with existing pollData
+    console.log(pollData)
     const [formData, setFormData] = useState({
-        question: '',
-        description: '',
-        option: [''],
-        endDate: '',
-        time: '',
+        question: pollData.poll.question,
+        description: pollData.poll.Description,
+        option: pollData.poll.options,
+        expDate: pollData.poll.expDate,
+        time: pollData.poll.time,
     });
 
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showTimePicker, setShowTimePicker] = useState(false);
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [selectedTime, setSelectedTime] = useState(new Date());
-    const [societyId, setSocietyId] = useState("")
+    const [societyId, setSocietyId] = useState("");
+
     useEffect(() => {
         socketServices.initializeSocket();
-        const getAdminiD = async () => {
+        const getAdminId = async () => {
             const societyAdmin = await AsyncStorage.getItem('societyAdmin');
             const parsedAdmin = societyAdmin ? JSON.parse(societyAdmin) : {};
             setSocietyId(parsedAdmin._id || "6683b57b073739a31e8350d0");
-        }
-        getAdminiD()
-
+        };
+        getAdminId();
     }, []);
 
     const handleFormChange = (name, value, index) => {
@@ -53,17 +59,20 @@ const CreatePoll = ({ navigation }) => {
 
     // Handle form submission
     const handleFormSubmit = async () => {
-
-        const poll = {
+        const pollId = pollData._id
+        const updatedPollData = {
+            _id: pollData._id, // Include the poll ID for editing
             question: formData.question,
             Description: formData.description,
             options: formData.option,
-            endDate: formData.endDate,
+            expDate: formData.expDate,
             date: Date.now(),
             time: formData.time,
             pollType: "Individual",
         };
-        socketServices.emit('create_poll', { poll, societyId });
+
+        // Emit the update poll event
+        socketServices.emit('editPoll', { pollId, updatedPollData });
         socketServices.emit('get_polls_by_society_id', { societyId });
         setTimeout(() => {
             navigation.goBack();
@@ -90,7 +99,7 @@ const CreatePoll = ({ navigation }) => {
 
     return (
         <ScrollView style={styles.container}>
-            <Text style={styles.title}>Create New Poll</Text>
+            <Text style={styles.title}>Edit Poll</Text>
             <TextInput
                 placeholder="Poll Question"
                 value={formData.question}
@@ -119,10 +128,13 @@ const CreatePoll = ({ navigation }) => {
             <TouchableOpacity style={styles.addButton} onPress={handleAddOption}>
                 <Text style={styles.addButtonText}>Add Option</Text>
             </TouchableOpacity>
-
             {/* End Date Field */}
             <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.input}>
-                <Text>{formData.endDate || "Select End Date"}</Text>
+                <Text>
+                    {formData.expDate
+                        ? new Date(formData.expDate).toLocaleDateString()
+                        : "Select End Date"}
+                </Text>
             </TouchableOpacity>
             {showDatePicker && (
                 <DateTimePicker
@@ -132,7 +144,6 @@ const CreatePoll = ({ navigation }) => {
                     onChange={onChangeDate}
                 />
             )}
-
             {/* Time Field */}
             <TouchableOpacity onPress={() => setShowTimePicker(true)} style={styles.input}>
                 <Text>{formData.time || "Select Time"}</Text>
@@ -145,10 +156,9 @@ const CreatePoll = ({ navigation }) => {
                     onChange={onChangeTime}
                 />
             )}
-
             <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.submitButton} onPress={handleFormSubmit}>
-                    <Text style={styles.submitButtonText}>Create Poll</Text>
+                    <Text style={styles.submitButtonText}>Update Poll</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.cancelButton} onPress={() => navigation.goBack()}>
                     <Text style={styles.cancelButtonText}>Cancel</Text>
@@ -158,11 +168,10 @@ const CreatePoll = ({ navigation }) => {
     );
 };
 
+// Styles remain the same
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
         padding: 20,
-        backgroundColor: '#fff',
     },
     title: {
         fontSize: 24,
@@ -172,44 +181,39 @@ const styles = StyleSheet.create({
     input: {
         borderWidth: 1,
         borderColor: '#ccc',
-        marginBottom: 10,
-        padding: 10,
         borderRadius: 5,
+        padding: 10,
+        marginBottom: 10,
     },
     optionContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        marginBottom: 10,
-        height: 50,
     },
     removeButton: {
-        backgroundColor: '#ff6347',
+        marginLeft: 10,
+        backgroundColor: 'red',
         padding: 10,
         borderRadius: 5,
     },
     removeButtonText: {
         color: '#fff',
-        fontWeight: 'bold',
     },
     addButton: {
-        backgroundColor: '#4CAF50',
+        backgroundColor: 'blue',
         padding: 10,
         borderRadius: 5,
-        alignItems: 'center',
         marginVertical: 10,
     },
     addButtonText: {
         color: '#fff',
-        fontWeight: 'bold',
+        textAlign: 'center',
     },
     buttonContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginTop: 20,
     },
     submitButton: {
-        backgroundColor: '#007BFF',
+        backgroundColor: 'green',
         padding: 10,
         borderRadius: 5,
         flex: 1,
@@ -218,10 +222,9 @@ const styles = StyleSheet.create({
     submitButtonText: {
         color: '#fff',
         textAlign: 'center',
-        fontWeight: 'bold',
     },
     cancelButton: {
-        backgroundColor: 'red',
+        backgroundColor: 'gray',
         padding: 10,
         borderRadius: 5,
         flex: 1,
@@ -229,8 +232,7 @@ const styles = StyleSheet.create({
     cancelButtonText: {
         color: '#fff',
         textAlign: 'center',
-        fontWeight: 'bold',
     },
 });
 
-export default CreatePoll;
+export default EditPoll;

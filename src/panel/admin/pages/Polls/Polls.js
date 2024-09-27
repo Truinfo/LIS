@@ -1,19 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, ScrollView, StyleSheet, Image } from 'react-native';
-import { FAB, ProgressBar, RadioButton } from 'react-native-paper';
+import { ActivityIndicator, Button, FAB, IconButton, Menu, Modal, Portal, ProgressBar, RadioButton } from 'react-native-paper';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import socketServices from '../../../User/Socket/SocketServices';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Dimensions } from 'react-native';
-import { useNavigation } from "@react-navigation/native";
-
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { Provider as PaperProvider } from 'react-native-paper';
 const Polls = () => {
     const [polls, setPolls] = useState([]);
     const [userId, setUserId] = useState("");
     const [societyId, setSocietyId] = useState("");
-    const [checkedOption, setCheckedOption] = useState({});
     const [index, setIndex] = useState(0);
+    const [deletePollId, setDeltePollId] = useState('')
     const navigation = useNavigation();
+    const [loading, setLoading] = useState(true); // Add loading state
     const [routes] = useState([
         { key: 'active', title: 'Active Polls' },
         { key: 'closed', title: 'Closed Polls' },
@@ -23,6 +24,9 @@ const Polls = () => {
         const getUserName = async () => {
             try {
                 const userString = await AsyncStorage.getItem("user");
+                const societyAdmin = await AsyncStorage.getItem('societyAdmin');
+                const parsedAdmin = societyAdmin ? JSON.parse(societyAdmin) : {};
+                setSocietyId(parsedAdmin._id || "6683b57b073739a31e8350d0");
                 if (userString !== null) {
                     const user = JSON.parse(userString);
                     setSocietyId(user.societyId);
@@ -35,69 +39,114 @@ const Polls = () => {
         getUserName();
     }, []);
 
-    useEffect(() => {
-        socketServices.initializeSocket();
-        socketServices.emit('get_polls_by_society_id', { societyId });
+    // useEffect(() => {
+    //     socketServices.initializeSocket();
+    //     if (societyId) {
+    //         socketServices.emit('get_polls_by_society_id', { societyId });
+    //     }
 
-        const handlePollsBySocietyId = (fetchedPolls) => {
-            setPolls(fetchedPolls);
-            const userVotes = {};
-            fetchedPolls.forEach(poll => {
-                if (poll.poll && Array.isArray(poll.poll.votes)) {
-                    const userVote = poll.poll.votes.find(vote => vote.userId === userId);
-                    if (userVote) {
-                        userVotes[poll._id] = userVote.selectedOption;
+    //     const handlePollsBySocietyId = (fetchedPolls) => {
+    //         setPolls(fetchedPolls);
+    //         setLoading(false)
+    //     };
+
+    //     const handleVoteUpdate = (data) => {
+    //         alert(data.message);
+    //         setPolls(prevPolls => {
+    //             const updatedPollIndex = prevPolls.findIndex(poll => poll._id === data.votes._id);
+    //             if (updatedPollIndex !== -1) {
+    //                 const updatedPolls = [...prevPolls];
+    //                 updatedPolls[updatedPollIndex] = data.votes;
+    //                 return updatedPolls;
+    //             } else {
+    //                 return prevPolls;
+    //             }
+    //         });
+    //     };
+    //     const handlePollDeleted = (pollId) => {
+    //         setPolls(prevPolls => prevPolls.filter(poll => poll._id !== pollId));
+    //         setLoading(false)
+    //     };
+    //     const handleNewPollCreated = (newPoll) => {
+    //         setPolls(prevPolls => [newPoll, ...prevPolls]);
+    //     };
+
+    //     socketServices.on('polls_by_society_id', handlePollsBySocietyId);
+    //     socketServices.on('vote_update', handleVoteUpdate);
+    //     socketServices.on('new_poll_created', handleNewPollCreated);
+    //     socketServices.on('poll_deleted', handlePollDeleted);
+
+    //     return () => {
+    //         socketServices.removeListener('polls_by_society_id', handlePollsBySocietyId);
+    //         socketServices.removeListener('new_poll_created', handleNewPollCreated);
+    //         socketServices.removeListener('vote_update', handleVoteUpdate);
+    //         socketServices.removeListener('poll_deleted', handlePollDeleted);
+    //     };
+    // }, [societyId, userId]);
+
+
+    useFocusEffect(
+        React.useCallback(() => {
+            socketServices.initializeSocket();
+
+            // Emit the event to get polls for the current society
+            if (societyId) {
+                socketServices.emit('get_polls_by_society_id', { societyId });
+            }
+
+            const handlePollsBySocietyId = (fetchedPolls) => {
+                setPolls(fetchedPolls);
+                setLoading(false);
+            };
+
+            const handleVoteUpdate = (data) => {
+                alert(data.message);
+                setPolls(prevPolls => {
+                    const updatedPollIndex = prevPolls.findIndex(poll => poll._id === data.votes._id);
+                    if (updatedPollIndex !== -1) {
+                        const updatedPolls = [...prevPolls];
+                        updatedPolls[updatedPollIndex] = data.votes;
+                        return updatedPolls;
+                    } else {
+                        return prevPolls;
                     }
-                }
-            });
-            setCheckedOption(userVotes);
-        };
+                });
+            };
 
-        const handleVoteUpdate = (data) => {
-            alert(data.message);
-            setPolls(prevPolls => {
-                const updatedPollIndex = prevPolls.findIndex(poll => poll._id === data.votes._id);
-                if (updatedPollIndex !== -1) {
-                    const updatedPolls = [...prevPolls];
-                    updatedPolls[updatedPollIndex] = data.votes;
-                    return updatedPolls;
-                } else {
-                    return prevPolls;
-                }
-            });
-            setCheckedOption(prevState => ({ ...prevState, [data.votes._id]: null }));
-        };
+            const handlePollDeleted = (pollId) => {
+                setPolls(prevPolls => prevPolls.filter(poll => poll._id !== pollId));
+                setLoading(false);
+            };
+            const handlePollEdited = (fetchedPolls) => {
+                setPolls(prevPolls => [newPoll, ...prevPolls]);
+                setLoading(false);
+            };
 
-        const handleNewPollCreated = (newPoll) => {
-            setPolls(prevPolls => [newPoll, ...prevPolls]);
-        };
+            const handleNewPollCreated = (newPoll) => {
+                setPolls(prevPolls => [newPoll, ...prevPolls]);
+            };
 
-        socketServices.on('polls_by_society_id', handlePollsBySocietyId);
-        socketServices.on('vote_update', handleVoteUpdate);
-        socketServices.on('new_poll_created', handleNewPollCreated);
+            socketServices.on('polls_by_society_id', handlePollsBySocietyId);
+            socketServices.on('vote_update', handleVoteUpdate);
+            socketServices.on('new_poll_created', handleNewPollCreated);
+            socketServices.on('poll_deleted', handlePollDeleted);
+            socketServices.on('pollsUpdated', handlePollEdited);
 
-        return () => {
-            socketServices.removeListener('polls_by_society_id', handlePollsBySocietyId);
-            socketServices.removeListener('new_poll_created', handleNewPollCreated);
-            socketServices.removeListener('vote_update', handleVoteUpdate);
-        };
-    }, [societyId, userId]);
-
-    const handleRadioButtonPress = (optionValue, pollId) => {
-        setCheckedOption(prevState => ({ ...prevState, [pollId]: optionValue }));
-        const data = {
-            userId: userId,
-            pollId: pollId,
-            selectedOption: optionValue
-        };
-        socketServices.emit('vote_for__polls_by_UserID', data);
-    };
-
+            return () => {
+                socketServices.removeListener('polls_by_society_id', handlePollsBySocietyId);
+                socketServices.removeListener('new_poll_created', handleNewPollCreated);
+                socketServices.removeListener('vote_update', handleVoteUpdate);
+                socketServices.removeListener('poll_deleted', handlePollDeleted);
+                socketServices.removeListener('pollsUpdated', handlePollEdited);
+            };
+        }, [societyId, userId]) // Dependencies to re-run the effect
+    );
     const calculateVotePercentage = (votes, option) => {
         const totalVotes = votes.length;
         const optionVotes = votes.filter(vote => vote.selectedOption === option).length;
         return totalVotes === 0 ? 0 : (optionVotes / totalVotes);
     };
+
     const handleCreatePoll = () => {
         navigation.navigate('Create Poll'); // Adjust this to your Create Poll screen name
     };
@@ -106,22 +155,28 @@ const Polls = () => {
         const currentDate = new Date();
         return currentDate > new Date(expDate);
     };
+
     const ActivePolls = () => {
         const activePolls = polls.filter(item => !isPollExpired(item.poll.expDate));
+        if (loading) { // Show spinner while loading
+            return (
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#7d0431" />
+                </View>
+            );
+        }
         return (
             <ScrollView>
                 {activePolls.length === 0 ? (
-                    // If there are no active polls, show the "No Data Found" image
                     <View style={styles.noDataContainer}>
                         <Image
-                            source={require('../../../../assets/Admin/Imgaes/nodatadound.png')} // Replace with your image path
+                            source={require('../../../../assets/Admin/Imgaes/nodatadound.png')}
                             style={styles.noDataImage}
                             resizeMode="contain"
                         />
-                        <Text style={styles.noDataText}>No More Active Polls </Text>
+                        <Text style={styles.noDataText}>No More Active Polls</Text>
                     </View>
                 ) : (
-                    // If there are active polls, render them
                     activePolls.map((item) => (
                         <PollItem key={item._id} item={item} isExpired={false} />
                     ))
@@ -129,18 +184,26 @@ const Polls = () => {
             </ScrollView>
         );
     };
+
     const ClosedPolls = () => {
         const closedPolls = polls.filter(item => isPollExpired(item.poll.expDate));
+        if (loading) { // Show spinner while loading
+            return (
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#7d0431" />
+                </View>
+            );
+        }
         return (
             <ScrollView>
-                {closedPolls.length === 0 ? ( // Check if closedPolls is empty
+                {closedPolls.length === 0 ? (
                     <View style={styles.noDataContainer}>
                         <Image
-                            source={require('../../../../assets/Admin/Imgaes/nodatadound.png')} // Replace with your image path
+                            source={require('../../../../assets/Admin/Imgaes/nodatadound.png')}
                             style={styles.noDataImage}
                             resizeMode="contain"
                         />
-                        <Text style={styles.noDataText}>No More Closed Polls </Text>
+                        <Text style={styles.noDataText}>No More Closed Polls</Text>
                     </View>
                 ) : (
                     closedPolls.map((item) => (
@@ -151,51 +214,51 @@ const Polls = () => {
         );
     };
 
-
-
     const PollItem = ({ item, isExpired }) => {
+        const [menuVisible, setMenuVisible] = useState(false);
+        const openMenu = () => setMenuVisible(true);
+        const closeMenu = () => setMenuVisible(false);
+        const openDeleteModal = (id) => {
+            const pollId = id
+            socketServices.emit('deletePoll', { pollId });
+            socketServices.emit('get_polls_by_society_id', { societyId });
+        };
+        const handleEdit = () => {
+            closeMenu();
+            navigation.navigate('Edit Poll', { pollData: item });
+        };
         return (
             <View style={styles.pollContainer}>
-                <View>
-                    <View style={styles.pollHeader}>
-                        <Text style={styles.pollQuestion}>
-                            {item.poll.question} <Text style={styles.voteCount}>({item.poll.votes.length} Votes)</Text>
-                        </Text>
-                        <View style={[styles.statusBadge, { backgroundColor: isExpired ? "#fee2e2" : "#dcfce7" }]}>
-                            <Text style={{ color: isExpired ? "#dc2626" : "#22c55e" }}>
-                                {isExpired ? "Closed" : "Active"}
-                            </Text>
+                <View style={styles.pollHeader}>
+                    <Text style={styles.pollQuestion}>
+                        {item.poll.question} <Text style={styles.voteCount}>({item.poll.votes.length} Votes)</Text>
+                    </Text>
+                    <Menu
+                        visible={menuVisible}
+                        onDismiss={closeMenu}
+                        anchor={<IconButton icon="dots-vertical" size={20} onPress={openMenu} />}
+                    >
+                        <Menu.Item onPress={() => handleEdit(item)} title="Edit" />
+                        {/* Fixed the invocation issue here */}
+                        <Menu.Item onPress={() => openDeleteModal(item._id)} title="Delete" />
+                    </Menu>
+                </View>
+
+                {/* Poll Options and Details */}
+                <Text style={styles.pollDescription}>{item.poll.Description}</Text>
+                {item.poll.options.map((option, index) => (
+                    <View key={index} style={styles.optionContainer}>
+                        <View style={styles.optionDetails}>
+                            <ProgressBar
+                                progress={calculateVotePercentage(item.poll.votes, option)}
+                                theme={{ colors: { primary: "#7D0431" } }}
+                                style={styles.progressBar}
+                            />
+                            <Text style={styles.optionText}>{option}</Text>
                         </View>
                     </View>
-                    <Text style={styles.pollDescription}>
-                        {item.poll.Description}
-                    </Text>
-                    {!isExpired ? (
-                        item.poll.options.map((option, index) => (
-                            <View key={index} style={styles.optionContainer}>
-                                <RadioButton
-                                    value={option}
-                                    status={checkedOption[item._id] === option ? 'checked' : 'unchecked'}
-                                    onPress={() => handleRadioButtonPress(option, item._id)}
-                                    theme={{ colors: { primary: "#7D0431" } }}
-                                />
-                                <View style={styles.optionDetails}>
-                                    <Text style={styles.optionText}>{option}</Text>
-                                    <ProgressBar progress={calculateVotePercentage(item.poll.votes, option)} theme={{ colors: { primary: "#7D0431" } }} style={styles.progressBar} />
-                                </View>
-                            </View>
-                        ))
-                    ) : (
-                        item.poll.options.map((option, index) => (
-                            <View key={index} style={styles.optionContainer}>
-                                <View style={styles.optionDetails}>
-                                    <ProgressBar progress={calculateVotePercentage(item.poll.votes, option)} theme={{ colors: { primary: "#7D0431" } }} style={styles.progressBar} />
-                                    <Text style={styles.optionText}>{option}</Text>
-                                </View>
-                            </View>
-                        ))
-                    )}
-                </View>
+                ))}
+
                 <View style={styles.separator} />
                 <Text style={styles.dateText}>
                     Posted On: {new Date(item.poll.date).toLocaleDateString('en-US', { day: 'numeric', month: 'short' })}, {new Date(item.poll.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -203,35 +266,37 @@ const Polls = () => {
             </View>
         );
     };
-
     return (
-        <View style={styles.container}>
-            <TabView
-                navigationState={{ index, routes }}
-                renderScene={SceneMap({
-                    active: ActivePolls,
-                    closed: ClosedPolls,
-                })}
-                onIndexChange={setIndex}
-                initialLayout={{ width: Dimensions.get('window').width }}
-                renderTabBar={(props) => (
-                    <TabBar
-                        {...props}
-                        style={{ backgroundColor: "transparent" }}
-                        indicatorStyle={{ backgroundColor: "#7d0431" }}
-                        labelStyle={{ color: "#222222", fontWeight: "500" }}
-                    />
-                )}
-            />
-            <FAB
-                style={styles.fab}
-                icon="plus"
-                color='#fff'
-                onPress={handleCreatePoll}
-            />
-        </View>
+        <PaperProvider>
+            <View style={styles.container}>
+                <TabView
+                    navigationState={{ index, routes }}
+                    renderScene={SceneMap({
+                        active: ActivePolls,
+                        closed: ClosedPolls,
+                    })}
+                    onIndexChange={setIndex}
+                    initialLayout={{ width: Dimensions.get('window').width }}
+                    renderTabBar={(props) => (
+                        <TabBar
+                            {...props}
+                            style={{ backgroundColor: "transparent" }}
+                            indicatorStyle={{ backgroundColor: "#7d0431" }}
+                            labelStyle={{ color: "#222222", fontWeight: "500" }}
+                        />
+                    )}
+                />
+                <FAB
+                    style={styles.fab}
+                    icon="plus"
+                    color='#fff'
+                    onPress={handleCreatePoll}
+                />
+            </View>
+        </PaperProvider>
     );
 };
+
 
 const styles = StyleSheet.create({
     container: {
@@ -268,7 +333,6 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         marginTop: 10,
         borderWidth: 1,
-        borderColor: "#22c55e",
     },
     pollDescription: {
         fontWeight: '400',
@@ -329,8 +393,23 @@ const styles = StyleSheet.create({
         borderRadius: 30,
         justifyContent: 'center',
         alignItems: 'center',
-        elevation: 5,
-    }
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: "#f6f6f6",
+    },
+    modalContainer: {
+        backgroundColor: 'white',
+        padding: 20,
+        margin: 20,
+        borderRadius: 8,
+    },
+    confirmDeleteButton: {
+        marginTop: 10,
+    },
 });
+
 
 export default Polls;

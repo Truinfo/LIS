@@ -107,6 +107,7 @@ import EditAdd from './src/panel/admin/pages/Advertisements/EditAdd';
 import AddNotice from './src/panel/admin/pages/NoticeBoard/AddNotice';
 import EditNotice from './src/panel/admin/pages/NoticeBoard/EditNotice';
 import CreatePoll from './src/panel/admin/pages/Polls/CreatePoll';
+import EditPoll from './src/panel/admin/pages/Polls/EditPoll';
 
 
 const Stack = createNativeStackNavigator();
@@ -304,6 +305,7 @@ export default function App() {
             <Stack.Screen name='Add Notice' component={AddNotice} />
             <Stack.Screen name='Edit Notice' component={EditNotice} />
             <Stack.Screen name='Create Poll' component={CreatePoll} />
+            <Stack.Screen name='Edit Poll' component={EditPoll} />
           </Stack.Navigator>
         </SafeAreaView>
       </NavigationContainer>

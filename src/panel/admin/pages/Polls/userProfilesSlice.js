@@ -1,7 +1,6 @@
 // src/Redux/Slice/userProfilesSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../../Security/helpers/axios';
-
 export const fetchUserProfilesBySocietyId = createAsyncThunk(
   'userProfiles/fetchBySocietyId',
   async (societyId) => {
@@ -9,7 +8,6 @@ export const fetchUserProfilesBySocietyId = createAsyncThunk(
     return response.data.userProfiles;
   }
 );
-
 const userProfilesSlice = createSlice({
   name: 'userProfiles',
   initialState: {

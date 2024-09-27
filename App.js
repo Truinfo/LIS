@@ -114,7 +114,7 @@ const Stack = createNativeStackNavigator();
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
-  const [initialRoute, setInitialRoute] = useState('Sidebar');
+  const [initialRoute, setInitialRoute] = useState('Onboard');
   useEffect(() => {
     const checkTokenExpiry = async () => {
       try {
@@ -142,9 +142,14 @@ export default function App() {
         if (user !== null && userToken !== null) {
           if (userRole === 'Sequrity') {
             setInitialRoute('Header');
-          } else {
+          } else if (userRole === 'SocietyAdmin') {
             setInitialRoute('Sidebar');
-          }
+          } else
+            if (userRole === 'User') {
+              setInitialRoute('Tabs');
+            } else {
+              setInitialRoute('Login');
+            }
         }
       } catch (error) {
       } finally {
@@ -291,12 +296,12 @@ export default function App() {
             <Stack.Screen name="Add Staff" component={AdminAddService} />
             <Stack.Screen name="Staff List" component={ServicesList} />
             <Stack.Screen name="Edit Service" component={EditService} />
-     
+
             <Stack.Screen name="Add Security" component={AddSecurity} />
             <Stack.Screen name="Edit Security" component={EditSecurity} />
             <Stack.Screen name="View Security" component={ViewSequrity} />
             <Stack.Screen name="Attendance" component={AttendanceForm} />
-            
+
             <Stack.Screen name="View Events" component={ViewEvents} />
 
 

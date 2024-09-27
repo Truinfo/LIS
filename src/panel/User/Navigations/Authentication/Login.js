@@ -44,13 +44,16 @@ const Login = () => {
     if (isValid) {
       try {
         const resultAction = await dispatch(userLogin({ email, password }));
-        if (userLogin.fulfilled.match(resultAction)) {
+        if (resultAction.type === "auth/userLogin/fulfilled") {
           await AsyncStorage.setItem('userToken', resultAction.payload.token);
           const userRole = resultAction.payload.profile.role;
           if (userRole === 'User') {
             navigation.navigate("Tabs");
           } else if (userRole === 'Sequrity') {
             navigation.navigate("Header");
+          }
+           else if (userRole === 'SocietyAdmin') {
+            navigation.navigate("Sidebar");
           }
         } else {
           Toast.show({

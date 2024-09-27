@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { View, Text, FlatList, StyleSheet, Alert, TouchableOpacity, ScrollView, Modal, TextInput, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Alert, TouchableOpacity, ScrollView, Modal, TextInput } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { fetchInventory, deleteInventoryAsync, fetchaddInventory, fetchEditInventoryAsync } from './InventorySlice';
-import { FAB } from 'react-native-paper';
+import { ActivityIndicator, FAB, Snackbar } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const Inventory = () => {
@@ -25,6 +25,8 @@ const Inventory = () => {
         name: "",
         quantity: "",
     });
+    const [snackbarVisible, setSnackbarVisible] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState("");
 
     useEffect(() => {
         dispatch(fetchInventory());
@@ -34,33 +36,39 @@ const Inventory = () => {
         setAnchor(anchor === item._id ? null : item._id);
     };
 
-    const handleDeleteSelected = (id) => {
-        Alert.alert(
-            'Confirm Delete',
-            'Are you sure you want to delete this Inventory?',
-            [
-                { text: 'Cancel', style: 'cancel' },
-                {
-                    text: 'Delete',
-                    onPress: () => confirmDelete(id),
-                    style: 'destructive',
-                },
-            ]
-        );
-    };
+    
 
     const confirmDelete = (id) => {
-        dispatch(deleteInventoryAsync({ id }))
-            .then(() => {
-                Alert.alert('Success', 'Inventory deleted successfully');
-                dispatch(fetchInventory());
-            })
-            .catch((error) => {
-                Alert.alert('Error', 'There was an error deleting the inventory');
-                console.error("Error:", error);
-            });
+        Alert.alert(
+            'Confirm Delete',
+            'Are you sure you want to delete this inventory?',
+            [
+                {
+                    text: 'Cancel',
+                    style: 'cancel',
+                },
+                {
+                    text: 'Yes, Delete',
+                    onPress: () => {
+                        dispatch(deleteInventoryAsync({ id }))
+                            .then(() => {
+                                setSnackbarMessage("Inventory deleted successfully");
+                                setSnackbarVisible(true);
+                                dispatch(fetchInventory()); // Refresh the inventory list
+                            })
+                            .catch((error) => {
+                                setSnackbarMessage("There was an error deleting the inventory");
+                                setSnackbarVisible(true);
+                                console.error("Error:", error);
+                            });
+                    },
+                    style: 'destructive', // Optional: Makes the delete option visually distinct
+                },
+            ],
+            { cancelable: true }
+        );
     };
-
+    
     const handleEditClick = (item) => {
         setEditInventoryData({
             id: item._id,
@@ -69,17 +77,19 @@ const Inventory = () => {
         });
         setModalVisible1(true);
     };
-
     const handleEditSubmit = async () => {
         try {
             const response = await dispatch(fetchEditInventoryAsync(editInventoryData));
-            if (response.meta.requestStatus === 'fulfilled') {
-                Alert.alert("Success", successMessage, [{ text: "OK", onPress: () => setModalVisible1(false) }]);
-                dispatch(fetchInventory()); // Refresh inventory list after editing
+            if (response.type === 'inventory/EditInventoryData/fulfilled') {
+                setModalVisible1(false); 
+                setSnackbarMessage(successMessage);
+                setSnackbarVisible(true);
+                dispatch(fetchInventory()); 
             }
         } catch (error) {
+            setSnackbarMessage("Failed to edit inventory");
+            setSnackbarVisible(true);
             console.error("Error:", error);
-            Alert.alert("Error", "Failed to edit inventory");
         }
     };
 
@@ -91,22 +101,43 @@ const Inventory = () => {
     };
 
     const handleSubmit = async () => {
+        // Check if all required fields are filled
+        if (!inventoryData.name || !inventoryData.quantity || !inventoryData.societyId) {
+            setSnackbarMessage("Please fill out all fields");
+            setSnackbarVisible(true);
+            return;
+        }
+    
         try {
+            // Dispatch the action to add inventory
             const response = await dispatch(fetchaddInventory(inventoryData));
+            
+            // Handle successful response
             if (response.meta.requestStatus === 'fulfilled') {
-                Alert.alert("Success", successMessage, [{ text: "OK", onPress: () => setModalVisible(false) }]);
-                dispatch(fetchInventory()); 
+                console.log(response);
+                setSnackbarMessage("Inventory added successfully");
+                setSnackbarVisible(true);
+                dispatch(fetchInventory()); // Refresh the inventory list
+                setModalVisible(false); // Close modal after success
+            } else if (response.error) {
+                // Handle server errors more gracefully
+                setSnackbarMessage(`Failed to add inventory: ${response.error.message}`);
+                setSnackbarVisible(true);
             }
         } catch (error) {
+            // Handle any unexpected errors
             console.error("Error:", error);
-            Alert.alert("Error", "Failed to add inventory");
+            setSnackbarMessage(`Error: ${error.message || 'Something went wrong'}`);
+            setSnackbarVisible(true);
         }
     };
+    
+    
 
     if (status === 'loading') {
         return (
-            <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#630000" />
+            <View style={[styles.container, { justifyContent: "center", alignItems: "center" }]}>
+                <ActivityIndicator size={30} color="#630000" />
             </View>
         );
     }
@@ -118,7 +149,12 @@ const Inventory = () => {
     const capitalizeFirstLetter = (string) => {
         return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
     };
-
+    const handleEditChange = (name, value) => {
+        setEditInventoryData(prevState => ({
+            ...prevState,
+            [name]: value
+        }));
+    };
     return (
         <View style={styles.container}>
             <FlatList
@@ -139,7 +175,7 @@ const Inventory = () => {
                                     <Text>Edit</Text>
                                 </TouchableOpacity>
                                 <View style={styles.divider} />
-                                <TouchableOpacity onPress={() => handleDeleteSelected(item._id)} style={styles.menuItem}>
+                                <TouchableOpacity onPress={() => confirmDelete(item._id)} style={styles.menuItem}>
                                     <Text>Delete</Text>
                                 </TouchableOpacity>
                             </ScrollView>
@@ -188,7 +224,6 @@ const Inventory = () => {
                     </View>
                 </View>
             </Modal>
-
             {/* Edit Inventory Modal */}
             <Modal
                 animationType="slide"
@@ -207,15 +242,15 @@ const Inventory = () => {
                         <TextInput
                             style={styles.input}
                             placeholder="Name"
-                            value={editInventoryData.name}
-                            onChangeText={(value) => handleChange("name", value)}
+                            value={editInventoryData.name} // Bind to editInventoryData
+                            onChangeText={(value) => handleEditChange("name", value)} // Use handleEditChange
                         />
                         <TextInput
                             style={styles.input}
                             placeholder="Quantity"
-                            value={editInventoryData.quantity}
+                            value={editInventoryData.quantity} // Bind to editInventoryData
                             keyboardType="numeric"
-                            onChangeText={(value) => handleChange("quantity", value)}
+                            onChangeText={(value) => handleEditChange("quantity", value)} // Use handleEditChange
                         />
                         <TouchableOpacity style={styles.submitButton} onPress={handleEditSubmit}>
                             <Text style={styles.submitButtonText}>Update</Text>
@@ -223,6 +258,19 @@ const Inventory = () => {
                     </View>
                 </View>
             </Modal>
+            <Snackbar
+                visible={snackbarVisible}
+                onDismiss={() => setSnackbarVisible(false)}
+                duration={3000}
+                action={{
+                    label: 'Close',
+                    onPress: () => {
+                        setSnackbarVisible(false);
+                    },
+                }}
+            >
+                {snackbarMessage}
+            </Snackbar>
         </View>
     );
 };
@@ -233,11 +281,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         paddingTop: 10,
         backgroundColor: '#fff',
-    },
-    loadingContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
     },
     listItem: {
         flexDirection: 'row',
@@ -269,71 +312,85 @@ const styles = StyleSheet.create({
         borderRadius: 50,
         backgroundColor: '#630000',
     },
+    loadingText: {
+        fontSize: 18,
+        textAlign: 'center',
+        marginTop: 50,
+    },
+    errorText: {
+        fontSize: 18,
+        textAlign: 'center',
+        color: 'red',
+        marginTop: 50,
+    },
     emptyMessage: {
         textAlign: 'center',
-        padding: 20,
+        fontSize: 16,
         color: '#666',
+        marginTop: 20,
+    },
+    menuList: {
+        position: 'absolute',
+        right: 30,
+        backgroundColor: '#FFF',
+        borderRadius: 5,
+        elevation: 3,
+        padding: 5,
+        zIndex: 10,
+        overflow: "visible",
+    },
+    menuItem: {
+        padding: 10,
     },
     modalContainer: {
         flex: 1,
-        justifyContent: 'center',
+        justifyContent: 'flex-end',
         alignItems: 'center',
-        backgroundColor: 'rgba(0,0,0,0.5)',
-    },
-    modalContent: {
-        width: '80%',
-        backgroundColor: '#fff',
-        borderRadius: 8,
-        padding: 20,
-        elevation: 5,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
     modalHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
+        width: '100%',
         marginBottom: 20,
     },
     modalTitle: {
         fontSize: 18,
-        fontWeight: '600',
+        fontWeight: 'bold',
+        color: '#630000',
+    },
+    modalContent: {
+        width: '100%',
+        backgroundColor: 'white',
+        borderTopLeftRadius: 10,
+        borderTopRightRadius: 10,
+        padding: 20,
+        alignItems: 'center',
     },
     input: {
-        height: 40,
-        borderColor: '#ccc',
+        height: 50,
+        borderColor: '#630000',
         borderWidth: 1,
-        borderRadius: 4,
+        borderRadius: 5,
         paddingHorizontal: 10,
-        marginBottom: 15,
+        marginBottom: 20,
+        width: '100%',
     },
     submitButton: {
         backgroundColor: '#630000',
-        borderRadius: 4,
-        paddingVertical: 10,
+        padding: 15,
+        borderRadius: 5,
+        alignItems: 'center',
+        marginBottom: 10,
+        width: '100%',
     },
     submitButtonText: {
-        color: '#fff',
-        textAlign: 'center',
-        fontWeight: '600',
+        color: 'white',
+        fontWeight: 'bold',
     },
-    menuList: {
-        position: 'absolute',
-        right: 30,
-        backgroundColor: '#fff',
-        borderRadius: 5,
-        elevation: 3,
-        padding: 5,
-        zIndex: 10,
-        overflow:"visible"
-    },
-    menuItem: {
-        padding: 10,
-    },
-    
-    errorText: {
-        color: 'red',
-        textAlign: 'center',
-        padding: 20,
-    },
+
+
 });
 
 export default Inventory;

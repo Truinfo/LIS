@@ -1,12 +1,13 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axiosInstance from "../../../../../Security/helpers/axios";
+import axios from "axios";
 export const userLogin = createAsyncThunk(
     "auth/userLogin",
     async ({ email, password }, { rejectWithValue }) => {
         try {
-            const response = await axiosInstance.post(
-                "/user/userSignin",
+            const response = await axios.post(
+                "http://192.168.29.226:2000/api/user/userSignin",
                 {
                     email,
                     password,

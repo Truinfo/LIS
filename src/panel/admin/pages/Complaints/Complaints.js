@@ -11,6 +11,7 @@ import {
     SafeAreaView,
     StatusBar,
     ActivityIndicator,
+    Alert,
 } from "react-native";
 import { fetchComplaints, deleteComplaintAsync, updateComplaintStatusResolution } from "./ComplaintSlice";
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
@@ -38,13 +39,11 @@ const SocietyComplaints = ({ complaints, handleEdit, handleDelete }) => (
         keyExtractor={(item) => item.complaintId.toString()}
     />
 );
-
 const ComplaintItem = ({ item, handleEdit, handleDelete }) => {
     const [menuVisible, setMenuVisible] = useState(false);
     const handleMenuToggle = () => {
         setMenuVisible(!menuVisible);
     };
-
     const handleOutsidePress = () => {
         if (menuVisible) {
             setMenuVisible(false);

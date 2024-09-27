@@ -44,12 +44,12 @@ export default function Sidebar() {
   //   toggleDropdown();
   // };
   const handleLogout = async () => {
-    // try {
-    //   await AsyncStorage.removeItem('user');
-    //   await AsyncStorage.removeItem('userToken');
-    // } catch (e) {
-    //   console.log('Error clearing user from AsyncStorage:', e);
-    // }
+    try {
+      await AsyncStorage.removeItem('user');
+      await AsyncStorage.removeItem('userToken');
+    } catch (e) {
+      console.log('Error clearing user from AsyncStorage:', e);
+    }
     dispatch(logout());
     navigation.navigate('Login');
   };

@@ -157,7 +157,7 @@ const NoticeBoard = () => {
                     <Menu.Item onPress={() => handleEditNotice(selectedNotice)} title="Edit" />
                     <Menu.Item onPress={() => showDeleteDialog(selectedNotice)} title="Delete" />
                 </Menu>
-                <Dialog visible={dialogVisible} onDismiss={() => setDialogVisible(false)}>
+                <Dialog visible={dialogVisible} onDismiss={() => setDialogVisible(false)} >
                     <Dialog.Title>Notice Details</Dialog.Title>
                     <Dialog.Content>
                         {selectedNotice && (
@@ -237,6 +237,7 @@ const styles = StyleSheet.create({
         margin: 5,
         borderRadius: 8,
         elevation: 5,
+        backgroundColor:"#fff"
     },
     cardHeader: {
         flexDirection: 'row',

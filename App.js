@@ -94,6 +94,8 @@ import EditSecurity from './src/panel/admin/pages/Security/Edit';
 import ViewSequrity from './src/panel/admin/pages/Security/View';
 import AttendanceForm from './src/panel/admin/pages/Security/Attendance';
 import ViewEvents from './src/panel/admin/pages/Events/View';
+import AddEvents from './src/panel/admin/pages/Events/Add';
+import EditEvent from './src/panel/admin/pages/Events/Edit';
 import ReviewAdd from './src/panel/admin/pages/Advertisements/ReviewAdd';
 import AddAdvertisements from './src/panel/admin/pages/Advertisements/AddPost';
 
@@ -298,6 +300,8 @@ export default function App() {
             <Stack.Screen name="Attendance" component={AttendanceForm} />
             
             <Stack.Screen name="View Events" component={ViewEvents} />
+            <Stack.Screen name="Add Events" component={AddEvents} />
+            <Stack.Screen name="Edit Event" component={EditEvent} />
 
 
             <Stack.Screen name='View Details' component={ReviewAdd} />

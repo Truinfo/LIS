@@ -23,7 +23,7 @@ const Drawer = createDrawerNavigator();
 export default function Sidebar() {
   return (
     <Drawer.Navigator
-      initialRouteName="Services"
+      initialRouteName="Events"
       screenOptions={{
         headerRight: () => (
           <View style={{ flexDirection: 'row', alignItems: "center", gap: 15, marginRight: 10 }}>

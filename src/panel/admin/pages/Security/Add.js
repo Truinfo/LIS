@@ -350,7 +350,7 @@ if (status === 'failed') {
             </View>
           </View>
         </Modal>
-        <Toast />
+        <Toast ref={(ref) => Toast.setRef(ref)} />
       </View> 
     </ScrollView>
   );

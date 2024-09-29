@@ -51,12 +51,10 @@ const VisitorManagement = () => {
         setModalVisible(true);
     };
 
-
     const showDeleteDialog = (enntryId) => {
         setSelectedEntry(enntryId);
         setDeleteDialogVisible(true);
     };
-
     const hideDeleteDialog = () => {
         setDeleteDialogVisible(false);
     };
@@ -67,10 +65,11 @@ const VisitorManagement = () => {
                 .then((result) => {
                     if (result.meta.requestStatus === "fulfilled") {
                         setSnackbarMessage("Notice deleted successfully.");
-                        setSnackbarVisible(true);
                         dispatch(fetchVisitors());
+                        setSnackbarVisible(true);
                     } else {
                         setSnackbarMessage("Failed to delete the No. Please try again.");
+                        dispatch(fetchVisitors());
                         setSnackbarVisible(true);
                     }
                 })
@@ -110,7 +109,7 @@ const VisitorManagement = () => {
                 {/* Delete Icon in Top Right Corner */}
                 <TouchableOpacity
                     style={styles.deleteIcon}
-                    onPress={() => showDeleteDialog(item.visitorId)}
+                    onPress={() => showDeleteDialog(item)}
                 >
                     <Text style={styles.deleteText}>🗑️</Text>
                 </TouchableOpacity>

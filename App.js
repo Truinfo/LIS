@@ -109,6 +109,11 @@ import AddNotice from './src/panel/admin/pages/NoticeBoard/AddNotice';
 import EditNotice from './src/panel/admin/pages/NoticeBoard/EditNotice';
 import CreatePoll from './src/panel/admin/pages/Polls/CreatePoll';
 import EditPoll from './src/panel/admin/pages/Polls/EditPoll';
+import EditAmenity from './src/panel/admin/pages/Amenities/EditAmenity';
+import AddAmenity from './src/panel/admin/pages/Amenities/AddAmenity';
+import AmenityBookingsList from './src/panel/admin/pages/Amenities/Bookings';
+import EditBooking from './src/panel/admin/pages/Amenities/EditBooking';
+import AddBooking from './src/panel/admin/pages/Amenities/AddBooking';
 
 const Stack = createNativeStackNavigator();
 
@@ -314,6 +319,11 @@ export default function App() {
             <Stack.Screen name='Edit Notice' component={EditNotice} />
             <Stack.Screen name='Create Poll' component={CreatePoll} />
             <Stack.Screen name='Edit Poll' component={EditPoll} />
+            <Stack.Screen name='Edit Amenity' component={EditAmenity} />
+            <Stack.Screen name='Add Amenity' component={AddAmenity} />
+            <Stack.Screen name='Bookings' component={AmenityBookingsList} />
+            <Stack.Screen name='Edit Booking' component={EditBooking} />
+            <Stack.Screen name='Add Booking' component={AddBooking} />
           </Stack.Navigator>
         </SafeAreaView>
       </NavigationContainer>

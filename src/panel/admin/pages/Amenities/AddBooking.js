@@ -2,12 +2,10 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, Alert, ScrollView, Modal } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-<<<<<<< HEAD
+
 import Ionicons from 'react-native-vector-icons/Ionicons';
-=======
-// import { IoArrowBackSharp } from "react-icons/io5"; // You can replace this with a suitable icon library for React Native
-// import Dialog from '../../DialogBox/DialogBox';
->>>>>>> 90172ad65f0457982c9005be605dfa1cdef7e6ef
+
+
 import { bookAmenity } from './BookingSlice';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker'; // Import DateTimePicker

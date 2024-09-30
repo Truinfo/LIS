@@ -2,9 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, TextInput, Button, StyleSheet, Text, TouchableOpacity, Alert, ScrollView, Modal } from "react-native";
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSelector, useDispatch } from "react-redux";
-import { Picker } from '@react-native-picker/picker'; // For dropdown selection
-import { IoArrowBackSharp } from "react-icons/io5"; // You can use a similar icon package for React Native
-import Dialog from '../../DialogBox/DialogBox';
+import { Picker } from '@react-native-picker/picker';
 import { getAmenityByIdAndUserId, updateAmenityBooking } from "./BookingSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 

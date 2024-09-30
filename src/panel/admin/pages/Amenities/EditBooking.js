@@ -1,24 +1,29 @@
 import React, { useState, useEffect } from "react";
-import { View, TextInput, Button, StyleSheet, Text, TouchableOpacity, Alert, ScrollView } from "react-native";
+import { View, TextInput, Button, StyleSheet, Text, TouchableOpacity, Alert, ScrollView, Modal } from "react-native";
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSelector, useDispatch } from "react-redux";
 import { Picker } from '@react-native-picker/picker'; // For dropdown selection
-import { IoArrowBackSharp } from "react-icons/io5"; // You can use a similar icon package for React Native
-import Dialog from '../../DialogBox/DialogBox';
+import Ionicons from 'react-native-vector-icons/Ionicons'; // You can use a similar icon package for React Native
 import { getAmenityByIdAndUserId, updateAmenityBooking } from "./BookingSlice";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const EditBooking = () => {
   const route = useRoute();
   const { id, userId } = route.params;
   const dispatch = useDispatch();
-  const successMessage = useSelector((state) => state.bookings.successMessage);
-  const booking = useSelector((state) => state.bookings.booking);
+  const successMessage = useSelector((state) => state.adminBooking.successMessage);
+  const booking = useSelector((state) => state.adminBooking.booking);
   const statusOptions = ["InProgress", "Completed", "Cancelled"];
   const [errors, setErrors] = useState({});
   const navigation = useNavigation();
   const [showDialog, setShowDialog] = useState(false);
   const [editDate, setEditDate] = useState(false);
   const [initialDate, setInitialDate] = useState('');
+  const fetchSocietyId = async () => {
+    const storedAdmin = await AsyncStorage.getItem("societyAdmin");
+    const societyAdmin = JSON.parse(storedAdmin) || {};
+    return societyAdmin._id || "6683b57b073739a31e8350d0"; // Default ID
+  };
 
   const [formState, setFormState] = useState({
     payed: '',
@@ -26,20 +31,20 @@ const EditBooking = () => {
     dateOfBooking: '',
     status: '',
   });
-
   useEffect(() => {
-    dispatch(getAmenityByIdAndUserId({ id, userId }));
+    dispatch(getAmenityByIdAndUserId({ userId }));
   }, [dispatch]);
 
   useEffect(() => {
     if (booking) {
+      const matchedBookings = booking?.list.filter((booking) => booking._id === id);
       setFormState({
-        payed: booking.payed || '',
-        pending: booking.pending || '',
-        dateOfBooking: booking.dateOfBooking || '',
-        status: booking.status || '',
+        payed: matchedBookings[0].payed || '',
+        pending: matchedBookings[0].pending || '',
+        dateOfBooking: matchedBookings[0].dateOfBooking || '',
+        status: matchedBookings[0].status || '',
       });
-      setInitialDate(booking.dateOfBooking || '');
+      setInitialDate(matchedBookings[0].dateOfBooking || '');
     }
   }, [booking]);
 
@@ -60,30 +65,28 @@ const EditBooking = () => {
   const handleSubmit = () => {
     if (validateForm()) {
       const { ...formData } = formState;
-      dispatch(updateAmenityBooking({ id, userId, formData }))
-        .then(() => {
-          setShowDialog(true);
-          setTimeout(() => {
-            setShowDialog(false);
-            setFormState((prev) => ({ ...prev, dateOfBooking: initialDate }));
-          }, 2000);
-          dispatch(getAmenityByIdAndUserId({ id, userId }));
+      const societyId = fetchSocietyId()
+      dispatch(updateAmenityBooking({ societyId, userId, formData }))
+        .then((response) => {
+          if (response.type === "booking/updateAmenityBooking/fulfilled") {
+            setShowDialog(true);
+            setTimeout(() => {
+              setShowDialog(false);
+
+            }, 2000);
+
+            navigation.goBack()
+          } else {
+            Alert.alert("error", "failed")
+          }
         })
         .catch((error) => {
           Alert.alert("Error", "An error occurred while updating the booking.");
         });
     }
   };
-
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Text style={styles.backButtonText}><IoArrowBackSharp /></Text>
-        </TouchableOpacity>
-        <Text style={styles.title}>Edit Booking</Text>
-      </View>
-
       <View style={styles.formContainer}>
         <TextInput
           style={styles.input}
@@ -140,11 +143,20 @@ const EditBooking = () => {
         />
       </View>
 
-      <Dialog
-        message={successMessage}
-        showDialog={showDialog}
-        onClose={() => setShowDialog(false)}
-      />
+      {/* Modal for success dialog */}
+      <Modal
+        visible={showDialog}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowDialog(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.dialog}>
+            <Text style={styles.dialogText}>{successMessage || "Booking updated successfully!"}</Text>
+            <Button title="OK" onPress={() => setShowDialog(false)} color="#630000" />
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };
@@ -190,6 +202,23 @@ const styles = StyleSheet.create({
   errorText: {
     color: 'red',
     fontSize: 12,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  dialog: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+    alignItems: 'center',
+  },
+  dialogText: {
+    fontSize: 18,
+    marginBottom: 10,
   },
 });
 

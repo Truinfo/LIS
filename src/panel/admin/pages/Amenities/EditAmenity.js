@@ -27,7 +27,6 @@ const EditAmenity = () => {
   const route = useRoute();
   const { id } = route.params; // Get id from route params
   const navigation = useNavigation();
-
   const amenity = useSelector((state) => state.adminAmenities.amenities);
   const successMessage = useSelector(
     (state) => state.adminAmenities.successMessage
@@ -61,7 +60,6 @@ const EditAmenity = () => {
     requestPermission();
     dispatch(getAmenityById(id));
   }, [dispatch, id]);
-
   useEffect(() => {
     if (amenity) {
       setFormData({
@@ -146,16 +144,6 @@ const EditAmenity = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-        >
-          <Ionicons name="arrow-back-sharp" size={24} color="#fff" />
-        </TouchableOpacity>
-        <Text style={styles.headerText}>Edit Amenity</Text>
-      </View>
-
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
         {/* Image Preview */}
         <View style={styles.imagePreviewContainer}>

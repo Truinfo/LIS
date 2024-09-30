@@ -13,9 +13,8 @@ import { useNavigation, useFocusEffect } from "@react-navigation/native"; // Imp
 import { deleteAmenity, getAllAmenityBySocietyId } from "./AmenitiesSlice"; // Keep this as it is for your API actions
 import { ImagebaseURL } from "../../../Security/helpers/axios";
 import { Ionicons } from "@expo/vector-icons"; // Add icons from Expo
-import { Dialog, Portal, Paragraph, Button } from "react-native-paper"; // Import from react-native-paper
+import { Dialog, Portal, Paragraph, Button, FAB } from "react-native-paper"; // Import from react-native-paper
 import { Provider as PaperProvider } from "react-native-paper";
-
 const Amenities = () => {
   const [selectedAmenity, setSelectedAmenity] = useState(null);
   const [deleteDialogVisible, setDeleteDialogVisible] = useState(false); // State for Dialog visibility
@@ -40,6 +39,7 @@ const Amenities = () => {
   );
 
   const handleDeleteConfirm = () => {
+    console.log(selectedAmenity)
     dispatch(deleteAmenity({ id: selectedAmenity._id }))
       .then(() => {
         setDeleteDialogVisible(false);
@@ -61,7 +61,9 @@ const Amenities = () => {
     const isMenuOpen = selectedMenuId === item._id; // Check if this menu is open
 
     return (
-      <TouchableOpacity onPress={() => navigation.navigate("Bookings")}>
+      <TouchableOpacity
+      // onPress={() => navigation.navigate("Bookings")}
+      >
         <View style={styles.itemContainer}>
           {/* Image Section: 40% of card height */}
           <Image
@@ -98,6 +100,13 @@ const Amenities = () => {
                 <Text style={styles.actionText}>Edit</Text>
               </TouchableOpacity>
               <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate("Add Booking", { id: item._id })
+                }
+              >
+                <Text style={styles.actionText}>Booking</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
                 onPress={() => {
                   setSelectedAmenity(item);
                   setDeleteDialogVisible(true); // Open the delete dialog
@@ -120,9 +129,9 @@ const Amenities = () => {
           <Text style={styles.title}>Amenities</Text>
           <TouchableOpacity
             style={styles.addButton}
-            onPress={() => navigation.navigate("Add Amenity")}
+            onPress={() => navigation.navigate("Bookings")}
           >
-            <Text style={styles.addButtonText}>ADD</Text>
+            <Ionicons name="calendar" size={30} color="#7d0431" />
           </TouchableOpacity>
         </View>
         <FlatList
@@ -162,6 +171,12 @@ const Amenities = () => {
             </View>
           </View>
         </Modal>
+        <FAB
+          style={styles.fab}
+          icon="plus"
+          color='#fff'
+          onPress={() => navigation.navigate('Add Amenity')}
+        />
       </View>
     </PaperProvider>
   );
@@ -179,41 +194,36 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   addButton: {
-    width: 70,
+    width: 100,
     height: 40,
     borderWidth: 2,
-    borderColor: "#630000",
+    borderColor: "#7d0431",
     alignItems: "center",
     marginBottom: 16,
     borderRadius: 8,
-  },
-  addButtonText: {
-    color: "#630000",
-    fontWeight: "600",
-    textAlign: "center",
-    padding: 8,
+    paddingVertical: 2
   },
   itemContainer: {
-    padding: 0, // Removed padding to allow space for the image
+    padding: 0,
     backgroundColor: "#f9f9f9",
     borderRadius: 8,
     marginBottom: 16,
-    height: 250, // Adjust the card height as per your need
-    overflow: "hidden", // Ensure image and menu icon stay within the card
+    height: 250,
+    overflow: "hidden",
   },
   image: {
     width: "100%",
-    height: "40%", // Occupies 40% of the card height
+    height: "40%",
   },
   detailsContainer: {
-    height: "60%", // Occupies the remaining 60% of the card height
+    height: "60%",
     flexDirection: "column",
     justifyContent: "space-between",
     padding: 10,
   },
   detailsColumn: {
     flex: 1,
-    justifyContent: "flex-start", // Align details at the top
+    justifyContent: "flex-start",
   },
   text: {
     fontSize: 15,
@@ -228,7 +238,7 @@ const styles = StyleSheet.create({
   },
   menu: {
     position: "absolute",
-    bottom: 5, // Positioning this below the menu icon
+    bottom: 5,
     right: 40,
     backgroundColor: "#fff",
     padding: 10,
@@ -266,6 +276,18 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     fontSize: 16,
     textAlign: "center",
+  },
+  fab: {
+    position: 'absolute',
+    bottom: 30,
+    right: 30,
+    backgroundColor: '#630000',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 5,
   },
 });
 

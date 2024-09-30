@@ -3,8 +3,8 @@ import { View, TextInput, Button, StyleSheet, Text, TouchableOpacity, Alert, Scr
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSelector, useDispatch } from "react-redux";
 import { Picker } from '@react-native-picker/picker'; // For dropdown selection
-import { IoArrowBackSharp } from "react-icons/io5"; // You can use a similar icon package for React Native
-import Dialog from '../../DialogBox/DialogBox';
+// import { IoArrowBackSharp } from "react-icons/io5"; // You can use a similar icon package for React Native
+// import Dialog from '../../DialogBox/DialogBox';
 import { getAmenityByIdAndUserId, updateAmenityBooking } from "./BookingSlice";
 
 const EditBooking = () => {

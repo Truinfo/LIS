@@ -50,19 +50,6 @@ export default function Sidebar() {
   };
 
   return (
-<<<<<<< HEAD
-    <View style={{ flex: 1 }}>
-      <Drawer.Navigator
-        initialRouteName="Dashboard"
-        screenOptions={{
-          headerRight: () => (
-            <View style={{ flexDirection: 'row', alignItems: "center", gap: 15, marginRight: 10 }}>
-              <View>
-                <Icon name="bell-o" size={25} color="#202020" />
-                <View style={styles.badge}>
-                  <Text style={styles.badgeText}>3</Text>
-                </View>
-=======
     <Drawer.Navigator
       initialRouteName="Services"
       screenOptions={{
@@ -73,7 +60,6 @@ export default function Sidebar() {
               <Icon name="bell-o" size={25} color="#202020" />
               <View style={styles.badge}>
                 <Text style={styles.badgeText}>3</Text>
->>>>>>> 43e547569319a9ec84c273f5794244bd22a13788
               </View>
             </View>
             <Icon name="user-circle-o" size={25} color="#202020" />

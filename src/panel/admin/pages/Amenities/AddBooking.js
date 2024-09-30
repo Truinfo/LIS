@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { IoArrowBackSharp } from "react-icons/io5"; // You can replace this with a suitable icon library for React Native
-import Dialog from '../../DialogBox/DialogBox';
+// import { IoArrowBackSharp } from "react-icons/io5"; // You can replace this with a suitable icon library for React Native
+// import Dialog from '../../DialogBox/DialogBox';
 import { bookAmenity } from './BookingSlice';
 
 const AddBooking = () => {

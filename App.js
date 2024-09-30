@@ -147,6 +147,8 @@ export default function App() {
             setInitialRoute('Header');
           } else if (userRole === 'User') {
             setInitialRoute('Tabs');
+          } else if (userRole === 'SocietyAdmin') {
+            setInitialRoute('Sidebar');
           } else {
             setInitialRoute('Login');
           }

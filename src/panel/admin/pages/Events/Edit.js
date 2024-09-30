@@ -1,772 +1,679 @@
-import React, { useState, useEffect } from "react";
-import { TextField, Button, Grid, Box, Typography, IconButton, Input } from "@mui/material";
-import { useParams, useNavigate } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
-import { IoArrowBackSharp } from "react-icons/io5";
-import { createTheme, styled, ThemeProvider } from "@mui/material/styles";
-import Dialog from '../../DialogBox/DialogBox';
-import { fetchEventById, updateEvent } from "./EventSlice";
-import { ImagebaseURL } from "../../helpers/axios";
-
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#630000',
-    },
-  },
-});
-
-const GradientIconButton = styled(IconButton)(({ theme }) => ({
-  background: "linear-gradient(to right,#fb0707, #630000)",
-  color: "#fff",
-  border: "1px solid #fff",
-  marginLeft: "10px",
-  marginRight: "10px",
-  "&:hover": {
-    background: "#FFF",
-    border: "1px solid #630000",
-    "& svg": {
-      color: "#630000",
-    },
-  },
-  "& svg": {
-    fontSize: "20px",
-  },
-}));
-
-const ImageContainer = styled(Box)(({ theme }) => ({
-  position: 'relative',
-  width: 150,
-  height: 150,
-  overflow: 'hidden',
-  marginBottom: '20px',
-  marginRight: '10px',
-  '& img': {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
-  },
-}));
-
-const DeleteButton = styled(IconButton)(({ theme }) => ({
-  position: 'absolute',
-  top: 5,
-  right: 5,
-}));
+// EditEvent.js
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  ScrollView,
+  Modal,
+  FlatList,
+  Platform,
+} from 'react-native';
+import { ActivityIndicator, TextInput, Button } from 'react-native-paper';
+import Toast from 'react-native-toast-message';
+import * as ImagePicker from 'expo-image-picker';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { updateEvent } from './EventSlice';
+import { ImagebaseURL } from '../../../Security/helpers/axios'; // Adjust the path as needed
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const EditEvent = () => {
-  const { id } = useParams();
   const dispatch = useDispatch();
-  const event = useSelector(state => state.events.event);
-  const successMessage = useSelector(state => state.events.successMessage);
-  const [errors, setErrors] = useState({});
-  const navigate = useNavigate();
-  const [showDialog, setShowDialog] = useState(false);
-  const [pictures, setPictures] = useState([]);
-  const [previewImages, setPreviewImages] = useState([]);
-  const [uploadedImages, setUploadedImages] = useState([]);
+  const navigation = useNavigation();
+  const route = useRoute();
+  const { eventId } = route.params;
 
-  console.log(successMessage)
-  const [formState, setFormState] = useState({
+  const events = useSelector(state => state.societyEvents.event);
+  const event = events.find((event) => event._id === eventId);
+  console.log(event)
+  const successMessage = useSelector((state) => state.societyEvents.successMessage);
+  const status = useSelector((state) => state.societyEvents.status);
+  const error = useSelector((state) => state.societyEvents.error);
+
+  const [formData, setFormData] = useState({
     name: '',
-    startDate: '',
-    endDate: '',
+    startDate: new Date(),
+    endDate: new Date(),
     activities: [],
   });
 
-  useEffect(() => {
-    dispatch(fetchEventById(id));
-  }, [dispatch, id]);
+  const [pictures, setPictures] = useState([]); // Existing pictures
+  const [uploadedImages, setUploadedImages] = useState([]); // New images
+  const [previewImages, setPreviewImages] = useState([]); // Previews for display
+
+  const [modalVisible, setModalVisible] = useState(false);
+
+  // Separate Picker States
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [currentPickerField, setCurrentPickerField] = useState(null); // 'startDate', 'endDate', 'activity_start', 'activity_end'
+  const [currentActivityIndex, setCurrentActivityIndex] = useState(null);
+  const [tempDate, setTempDate] = useState(new Date());
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     if (event) {
-      setFormState({
+      setFormData({
         name: event.name || '',
-        startDate: event.startDate || '',
-        endDate: event.endDate || '',
-        activities: event.activities || [],
-
+        startDate: event.startDate ? new Date(event.startDate) : new Date(),
+        endDate: event.endDate ? new Date(event.endDate) : new Date(),
+        activities: event.activities
+          ? event.activities.map(activity => ({
+            type: activity.type || '',
+            startDate: activity.startDate ? new Date(activity.startDate) : new Date(),
+            endDate: activity.endDate ? new Date(activity.endDate) : new Date(),
+          }))
+          : [],
       });
       setPictures(event.pictures || []);
-      const imagePreviews = event.pictures?.map(pic => `${ImagebaseURL}${pic.img}`) || [];
+      const imagePreviews = event.pictures?.map((pic) => `${ImagebaseURL}${pic.img}`) || [];
       setPreviewImages(imagePreviews);
     }
   }, [event]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormState({ ...formState, [name]: value });
-  };
+  useEffect(() => {
+    if (successMessage) {
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: successMessage,
+      });
+      // Optionally navigate back after success
+      setTimeout(() => {
+        navigation.goBack();
+      }, 2000);
+    }
+  }, [successMessage, navigation]);
 
-  const handleDateChange = (name, value) => {
-    setFormState({ ...formState, [name]: value });
+  useEffect(() => {
+    if (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: error,
+      });
+    }
+  }, [error]);
+
+  const handleChange = (name, value) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
   const handleActivityChange = (index, field, value) => {
-    const updatedActivities = [...formState.activities];
+    const updatedActivities = [...formData.activities];
     updatedActivities[index] = { ...updatedActivities[index], [field]: value };
-    setFormState({ ...formState, activities: updatedActivities });
+    setFormData({ ...formData, activities: updatedActivities });
   };
 
-  const handlePictureChange = (e) => {
-    const files = Array.from(e.target.files);
+  const addActivity = () => {
+    setFormData((prevData) => ({
+      ...prevData,
+      activities: [...prevData.activities, { type: '', startDate: new Date(), endDate: new Date() }],
+    }));
+  };
 
-    // Check if selected files exceed the limit when combined with already uploaded files
-    if (files.length + uploadedImages.length > 5) {
-      alert("You can only upload up to 5 images.");
-      e.target.value = ''; // Clear the input
+  const removeActivity = (index) => {
+    const updatedActivities = [...formData.activities];
+    updatedActivities.splice(index, 1);
+    setFormData({ ...formData, activities: updatedActivities });
+  };
+
+  const handleImagePicker = async (source) => {
+    const permissionResult =
+      source === 'camera'
+        ? await ImagePicker.requestCameraPermissionsAsync()
+        : await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permissionResult.granted) {
+      Toast.show({
+        type: 'error',
+        text1: 'Permission Denied',
+        text2: 'You need to grant camera or gallery permissions.',
+      });
       return;
     }
 
-    // Create new picture objects
-    const newPictures = files.map(file => ({ file, preview: URL.createObjectURL(file) }));
+    const options = {
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsMultipleSelection: true,
+      quality: 1,
+    };
 
-    // Update state with new images
-    const updatedUploadedImages = [...uploadedImages, ...newPictures];
-    setUploadedImages(updatedUploadedImages);
-    setPreviewImages(updatedUploadedImages.map(picture => picture.preview));
+    let result;
+    if (source === 'camera') {
+      result = await ImagePicker.launchCameraAsync(options);
+    } else {
+      result = await ImagePicker.launchImageLibraryAsync(options);
+    }
 
-    // Clear the input value to allow re-selection of the same file
-    e.target.value = '';
+    if (!result.canceled) {
+      const selectedImages = result.assets.map((asset) => ({
+        uri: asset.uri,
+        name: asset.uri.split('/').pop(),
+        type: asset.type || 'image/jpeg', // Adjust if needed
+      }));
+
+      // Check if total images exceed 5
+      if (uploadedImages.length + selectedImages.length + pictures.length > 5) {
+        Toast.show({
+          type: 'error',
+          text1: 'Image Limit Exceeded',
+          text2: 'You can only upload up to 5 images.',
+        });
+        return;
+      }
+
+      setUploadedImages([...uploadedImages, ...selectedImages]);
+      setPreviewImages([
+        ...previewImages,
+        ...selectedImages.map((img) => img.uri),
+      ]);
+    }
+    setModalVisible(false);
   };
 
-  const handleDeleteImage = (index) => {
-    const updatedImages = [...uploadedImages];
-    updatedImages.splice(index, 1);
-    setUploadedImages(updatedImages);
-    setPreviewImages(updatedImages.map(picture => picture.preview));
+  const deleteImage = (index, isExisting = false) => {
+    if (isExisting) {
+      const updatedPictures = [...pictures];
+      updatedPictures.splice(index, 1);
+      setPictures(updatedPictures);
+      setPreviewImages(
+        updatedPictures.map((pic) => `${ImagebaseURL}${pic.img}`)
+      );
+    } else {
+      const imageIndex = index - pictures.length;
+      const updatedUploadedImages = [...uploadedImages];
+      updatedUploadedImages.splice(imageIndex, 1);
+      setUploadedImages(updatedUploadedImages);
+      setPreviewImages(updatedUploadedImages.map((img) => img.uri));
+    }
   };
 
   const validateForm = () => {
     let tempErrors = {};
-    tempErrors.name = formState.name ? "" : "Name is required.";
-    tempErrors.startDate = formState.startDate ? "" : "Start date is required.";
-    tempErrors.endDate = formState.endDate ? "" : "End date is required.";
+    tempErrors.name = formData.name ? '' : 'Name is required.';
+    tempErrors.startDate = formData.startDate ? '' : 'Start date is required.';
+    tempErrors.endDate = formData.endDate ? '' : 'End date is required.';
+    // Add more validations as needed, e.g., date ranges
+
+    // Validate activities
+    formData.activities.forEach((activity, index) => {
+      if (!activity.type) {
+        tempErrors[`activity_type_${index}`] = 'Title is required.';
+      }
+      if (!activity.startDate) {
+        tempErrors[`activity_startDate_${index}`] = 'Start date is required.';
+      }
+      if (!activity.endDate) {
+        tempErrors[`activity_endDate_${index}`] = 'End date is required.';
+      }
+    });
+
     setErrors(tempErrors);
-    return Object.values(tempErrors).every((x) => x === "");
+    return Object.values(tempErrors).every((x) => x === '');
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = () => {
     if (validateForm()) {
-      const formData = new FormData();
-      formData.append('name', formState.name);
-      formData.append('startDate', formState.startDate);
-      formData.append('endDate', formState.endDate);
-      formData.append('activities', JSON.stringify(formState.activities));
+      const data = new FormData();
+      data.append('name', formData.name);
+      data.append('startDate', formData.startDate.toISOString());
+      data.append('endDate', formData.endDate.toISOString());
+      data.append('activities', JSON.stringify(formData.activities.map(activity => ({
+        type: activity.type,
+        startDate: activity.startDate.toISOString(),
+        endDate: activity.endDate.toISOString(),
+      }))));
 
-
-      uploadedImages.forEach(picture => {
-        formData.append('pictures', picture.file);
+      // Append new uploaded images
+      uploadedImages.forEach((image, index) => {
+        data.append('pictures', {
+          uri: image.uri,
+          name: image.name || `image_${index}.jpg`,
+          type: image.type,
+        });
       });
 
-       dispatch(updateEvent({ id, formData })).then((response) => {
-        if (response.meta.requestStatus === 'fulfilled') {
-          setShowDialog(true);
-          setTimeout(() => {
-            setShowDialog(false);
-          }, 2000);
-          dispatch(fetchEventById(id));
-        }
-      }).catch((error) => {
-        console.error("Error:", error);
+      // Optionally, handle removal of existing pictures by sending their IDs or filenames
+      // This depends on your backend implementation
+
+      dispatch(updateEvent({ id: eventId, formData: data }));
+    } else {
+      Toast.show({
+        type: 'error',
+        text1: 'Validation Error',
+        text2: 'Please fix the errors before submitting.',
       });
-    };
-  }
+    }
+  };
+
+  // Date Picker Handler
+  const onChangeDate = (event, selectedDate) => {
+    if (event.type === 'dismissed') {
+      // Close the date picker without doing anything
+      setShowDatePicker(false);
+      setCurrentPickerField(null);
+      setCurrentActivityIndex(null);
+      return;
+    }
+
+    const currentDate = selectedDate || tempDate;
+    setTempDate(currentDate);
+    setShowDatePicker(false);  // Close the date picker immediately
+
+    // Open time picker after a small delay to avoid flicker
+    setTimeout(() => setShowTimePicker(true), 100);
+  };
+
+  // Time Picker Handler
+  const onChangeTime = (event, selectedTime) => {
+    if (event.type === 'dismissed') {
+      setShowTimePicker(false);
+      setCurrentPickerField(null);
+      setCurrentActivityIndex(null);
+      return;
+    }
+
+    const currentTime = selectedTime || tempDate;
+    setShowTimePicker(false);
+
+    // Combine date and time
+    const combinedDate = new Date(tempDate);
+    combinedDate.setHours(currentTime.getHours());
+    combinedDate.setMinutes(currentTime.getMinutes());
+
+    setFieldDate(combinedDate);
+    setCurrentPickerField(null);
+    setCurrentActivityIndex(null);
+  };
+
+  const setFieldDate = (date) => {
+    const { field, activityIndex } = { field: currentPickerField, activityIndex: currentActivityIndex };
+    if (field === 'startDate') {
+      setFormData(prevData => ({
+        ...prevData,
+        startDate: date,
+      }));
+    } else if (field === 'endDate') {
+      setFormData(prevData => ({
+        ...prevData,
+        endDate: date,
+      }));
+    } else if (field === 'activity_start') {
+      const updatedActivities = [...formData.activities];
+      updatedActivities[activityIndex].startDate = date;
+      setFormData({ ...formData, activities: updatedActivities });
+    } else if (field === 'activity_end') {
+      const updatedActivities = [...formData.activities];
+      updatedActivities[activityIndex].endDate = date;
+      setFormData({ ...formData, activities: updatedActivities });
+    }
+  };
+
+  // Function to open the picker
+  const openPicker = (field, activityIndex = null) => {
+    setCurrentPickerField(field);
+    setCurrentActivityIndex(activityIndex);
+    setShowTimePicker(false); // Ensure time picker is closed when opening date picker
+    setShowDatePicker(true);
+  };
 
   return (
-    <ThemeProvider theme={theme}>
-      <Box style={{ padding: "20px" }}>
-        <Box sx={{
-          width: "100%", padding: "10px", borderRadius: "8px", display: "flex",
-          justifyContent: "space-between", alignItems: "center", position: 'relative'
-        }}>
-          <Box sx={{ display: "flex", position: 'relative', alignItems: 'center' }}>
-            <GradientIconButton onClick={() => navigate(-1)}>
-              <IoArrowBackSharp />
-            </GradientIconButton>
-            <Typography variant="body1" sx={{ fontFamily: 'Red Hat Display, sans-serif', fontSize: "23px", fontWeight: '700', color: '#630000' }}>
-              Edit Event
-            </Typography>
-          </Box>
-        </Box>
-        <Box sx={{ marginBottom: 2 }}>
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, overflowX: 'auto', padding: '10px 0' }}>
-            {previewImages.map((image, index) => (
-              <ImageContainer key={index}>
-                <img src={image} alt={`Event ${index}`} />
-                <DeleteButton onClick={() => handleDeleteImage(index)}>
-                  <Typography variant="body1" sx={{ color: 'red', fontWeight: 'bold', fontSize: '16px' }}>x</Typography>
-                </DeleteButton>
-              </ImageContainer>
-            ))}
-          </Box>
-          <label htmlFor="upload-pictures">
-            <Button
-              variant="contained"
-              component="span"
-              sx={{
-                color: '#630000',
-                backgroundColor: '#fff',
-                border: '1px solid #630000',
-                fontWeight: '600',
-                fontSize: 15,
-                fontFamily: 'Red Hat Display, sans-serif',
-                '&:hover': {
-                  backgroundColor: '#630000',
-                  color: '#fff',
-                },
-              }}
-            >
-              Upload Image
-            </Button>
-            <Input
-              accept="image/*"
-              id="upload-pictures"
-              type="file"
-              multiple
-              onChange={handlePictureChange}
-              sx={{ display: 'none' }}
-            />
-          </label>
-        </Box>
-        <form style={{ padding: "20px" }} onSubmit={handleSubmit}>
-          <Grid container spacing={2}>
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                label="Name*"
-                name="name"
-                variant="outlined"
-                value={formState.name}
-                onChange={handleInputChange}
-                error={!!errors.name}
-                helperText={errors.name}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                label="Start Date*"
-                name="startDate"
-                type="datetime-local"
-                value={formState.startDate.substring(0, 16)}
-                onChange={(e) => handleDateChange('startDate', e.target.value)}
-                InputLabelProps={{ shrink: true }}
-                error={!!errors.startDate}
-                helperText={errors.startDate}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                label="End Date*"
-                name="endDate"
-                type="datetime-local"
-                value={formState.endDate.substring(0, 16)}
-                onChange={(e) => handleDateChange('endDate', e.target.value)}
-                InputLabelProps={{ shrink: true }}
-                error={!!errors.endDate}
-                helperText={errors.endDate}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="body1" sx={{ fontFamily: 'Red Hat Display, sans-serif', fontSize: 22, fontWeight: 600, color: "#630000" }}>Activities</Typography>
-              {formState.activities.map((activity, index) => (
-                <Box key={index} sx={{ marginBottom: 2, padding: 2, border: '1px solid #ddd', borderRadius: '8px' }}>
-                  <Typography variant="subtitle1" sx={{ fontFamily: 'Red Hat Display, sans-serif', fontSize: 18, fontWeight: 600, }}>Activity {index + 1}</Typography>
-                  <Grid container spacing={2} mt={2}>
-                    <Grid item xs={6} >
-                      <TextField
-                        fullWidth
-                        label="Title"
-                        value={activity.type}
-                        onChange={(e) => handleActivityChange(index, 'title', e.target.value)}
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <TextField
-                        fullWidth
-                        label="Start Date"
-                        type="datetime-local"
-                        value={activity.startDate.substring(0, 16)}
-                        InputLabelProps={{ shrink: true }}
-                        onChange={(e) => handleActivityChange(index, 'startDate', e.target.value)}
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <TextField
-                        fullWidth
-                        label="End Date"
-                        type="datetime-local"
-                        value={activity.endDate.substring(0, 16)}
-                        InputLabelProps={{ shrink: true }}
-                        onChange={(e) => handleActivityChange(index, 'endDate', e.target.value)}
-                      />
-                    </Grid>
-                  </Grid>
-                </Box>
-              ))}
-            </Grid>
+    <ScrollView style={styles.container}>
 
-          </Grid>
-          <Box sx={{ marginTop: 2, }}>
-            <Button
-              variant="contained"
-              color="primary"
-              type="submit"
-
-            >
-              Update
-            </Button>
-          </Box>
-        </form>
-        {/* <Grid item xs={12}>
-              <Typography variant="h6">Registrations</Typography>
-              {formState.registrations.map(registration => (
-                <Box key={registration._id} sx={{marginBottom: 2, border: "1px solid lightgrey", padding: "10px", borderRadius: "8px", }}>
-                  <Typography variant="body1">Registration ID: {registration._id}</Typography>
-                  <Typography variant="body1">Participant Name: {registration.participantName}</Typography>
-                  <Typography variant="body1">Activities: {registration.activity.join(', ')}</Typography>
-                </Box>
-              ))}
-            </Grid> */}
-        <Dialog
-          message={successMessage}
-          showDialog={showDialog}
-          onClose={() => setShowDialog(false)}
+      <View style={styles.form}>
+        {/* Event Name */}
+        <TextInput
+          mode="outlined"
+          label="Event Name *"
+          value={formData.name}
+          onChangeText={(value) => handleChange('name', value)}
+          style={styles.textInput}
+          theme={{ colors: { primary: "#7d0431" } }}
+          error={!!errors.name}
         />
-      </Box>
-    </ThemeProvider>
+        {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
+
+        {/* Start Date */}
+        <TouchableOpacity
+          onPress={() => openPicker('startDate')}
+          style={styles.datePickerButton}
+        >
+          <Text style={styles.datePickerText}>Start Date *</Text>
+          <Text style={styles.selectedDateText}>{formData.startDate.toLocaleString()}</Text>
+        </TouchableOpacity>
+        {errors.startDate && <Text style={styles.errorText}>{errors.startDate}</Text>}
+
+        {/* End Date */}
+        {/* End Date */}
+        <TouchableOpacity
+          onPress={() => openPicker('endDate')}
+          style={styles.datePickerButton}
+        >
+          <Text style={styles.datePickerText}>End Date *</Text>
+          <Text style={styles.selectedDateText}>{formData.endDate.toLocaleString()}</Text>
+        </TouchableOpacity>
+        {errors.endDate && <Text style={styles.errorText}>{errors.endDate}</Text>}
+
+        {/* Activities */}
+        <Text style={styles.activitiesHeader}>Activities</Text>
+        {formData.activities.map((activity, index) => (
+          <View key={index} style={styles.activityContainer}>
+            <TextInput
+              mode="outlined"
+              label={`Activity Title *`}
+              value={activity.type}
+              onChangeText={(value) => handleActivityChange(index, 'type', value)}
+              style={styles.textInput}
+              error={!!errors[`activity_type_${index}`]}
+              theme={{ colors: { primary: "#7d0431" } }}
+            />
+            {errors[`activity_type_${index}`] && (
+              <Text style={styles.errorText}>{errors[`activity_type_${index}`]}</Text>
+            )}
+
+            <TouchableOpacity
+              onPress={() => openPicker('activity_start', index)}
+              style={styles.datePickerButton}
+            >
+              <Text style={styles.datePickerText}>Activity Start Date *</Text>
+              <Text style={styles.selectedDateText}>{activity.startDate.toLocaleString()}</Text>
+            </TouchableOpacity>
+            {errors[`activity_startDate_${index}`] && (
+              <Text style={styles.errorText}>{errors[`activity_startDate_${index}`]}</Text>
+            )}
+
+            <TouchableOpacity
+              onPress={() => openPicker('activity_end', index)}
+              style={styles.datePickerButton}
+            >
+              <Text style={styles.datePickerText}>Activity End Date *</Text>
+              <Text style={styles.selectedDateText}>{activity.endDate.toLocaleString()}</Text>
+            </TouchableOpacity>
+            {errors[`activity_endDate_${index}`] && (
+              <Text style={styles.errorText}>{errors[`activity_endDate_${index}`]}</Text>
+            )}
+
+            <TouchableOpacity onPress={() => removeActivity(index)} style={styles.removeActivityButton}>
+              <Icon name="delete" size={24} color="red" />
+            </TouchableOpacity>
+          </View>
+        ))}
+        <Button mode="contained" onPress={addActivity} style={styles.addActivityButton}>
+          Add Activity
+        </Button>
+
+        {/* Image Upload */}
+        <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.imageUploadButton}>
+          <Text style={styles.imageUploadButtonText}>Upload Images</Text>
+        </TouchableOpacity>
+
+        <Text style={styles.sectionTitle}>Images</Text>
+        <FlatList
+          data={previewImages}
+          horizontal
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item, index }) => (
+            <View style={styles.imageWrapper}>
+              <Image source={{ uri: item }} style={styles.image} />
+              <TouchableOpacity
+                style={styles.removeImageButton}
+                onPress={() => deleteImage(index, index < pictures.length)}
+              >
+                <Icon name="close" size={20} color="#fff" />
+              </TouchableOpacity>
+            </View>
+          )}
+        />
+        {previewImages.length < 5 && (
+          <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.addImageButton}>
+            <Icon name="add-a-photo" size={30} color="#7D0431" />
+            <Text style={styles.addImageText}>Add Image</Text>
+          </TouchableOpacity>
+        )}
+
+        {/* Submit Button */}
+        <Button mode="contained" onPress={handleSubmit} style={styles.submitButton}>
+          Update Event
+        </Button>
+      </View>
+
+      {/* Modal for Image Picker */}
+      <Modal visible={modalVisible} transparent={true} animationType="slide">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Select Image Source</Text>
+            <TouchableOpacity onPress={() => handleImagePicker('camera')} style={styles.modalButtonIcon}>
+              <Text>Take a Photo  </Text>
+              <Icon name="photo-camera" size={24} color="#7D0431" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => handleImagePicker('gallery')} style={styles.modalButton}>
+              <Text style={styles.modalButtonText}>Pick from Gallery  </Text>
+              <Icon name="photo-library" size={24} color="#7D0431" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.modalCloseButton}>
+              <Text style={styles.modalButtonCancel}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+
+      {/* <Modal visible={modalVisible} transparent={true} animationType="slide">
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Select Image Source</Text>
+              <TouchableOpacity onPress={pickImage} style={styles.modalButtonIcon}>
+                <Text>Pick from Gallery  </Text>
+                <Icon name="photo-library" size={24} color="#7D0431" />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={takePhoto} style={styles.modalButtonIcon}>
+                <Text>Take a Photo  </Text>
+                <Icon name="photo-camera" size={24} color="#7D0431" />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.modalButton}>
+                <Text style={styles.modalButtonCancel} >Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal> */}
+
+      {/* Date Picker */}
+      {showDatePicker && (
+        <DateTimePicker
+          value={tempDate}
+          mode="date"
+          display="default"
+          onChange={onChangeDate}
+        />
+      )}
+      {showTimePicker && (
+        <DateTimePicker
+          value={tempDate}
+          mode="time"
+          display="default"
+          onChange={onChangeTime}
+        />
+      )}
+    </ScrollView>
   );
 };
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#fff',
+  },
+  loader: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#630000',
+    padding: 10,
+    borderRadius: 8,
+    marginBottom: 20,
+  },
+  backButton: {
+    marginRight: 10,
+  },
+  headerTitle: {
+    fontSize: 20,
+    color: '#fff',
+    fontWeight: '700',
+  },
+  form: {
+    flex: 1,
+  },
+  textInput: {
+    marginBottom: 10,
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 10,
+  },
+  activitiesHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  activitiesTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#630000',
+  },
+  addButton: {
+    backgroundColor: '#7D0431',
+  },
+  activityContainer: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 15,
+  },
+  activityLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 10,
+    color: '#630000',
+  },
+  removeActivityButton: {
+    marginTop: 10,
+    
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#630000',
+    marginVertical: 10,
+  },
+  imageWrapper: {
+    position: 'relative',
+    marginRight: 10,
+  },
+  image: {
+    width: 100,
+    height: 100,
+    borderRadius: 8,
+  },
+  removeImageButton: {
+    position: 'absolute',
+    top: -10,
+    right: -10,
+    backgroundColor: 'red',
+    borderRadius: 15,
+    padding: 2,
+  },
+  addImageButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f2f2f2',
+    padding: 10,
+    borderRadius: 8,
+    marginTop: 10,
+  },
+  addImageText: {
+    marginTop: 5,
+    color: '#7D0431',
+  },
+  submitButton: {
+    backgroundColor: '#7D0431',
+    padding: 10,
+    borderRadius: 8,
+    marginTop: 20,
+  },
+  datePickerButton: {
+    flexDirection: 'column',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  datePickerText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  selectedDateText: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 4,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContent: {
+    width: '80%',
+    backgroundColor: 'white',
+    borderRadius: 8,
+    padding: 20,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    marginBottom: 20,
+    color: '#7D0431',
+    fontWeight: '600',
+  },
+  modalButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    width: '100%',
+    borderBottomWidth: 1,
+    borderColor: '#ddd',
+  },
+  modalButtonText: {
+    marginLeft: 10,
+    fontSize: 16,
+    color: '#7D0431',
+  },
+  modalCancelButton: {
+    marginTop: 20,
+  },
+  modalCancelText: {
+    color: 'red',
+    fontSize: 16,
+  },
+});
+
+
 export default EditEvent;
-
-
-// import React, { useState, useEffect } from "react";
-// import {
-//   TextField,
-//   Button,
-//   Grid,
-//   Box,
-//   Typography,
-//   IconButton,
-//   Input,
-// } from "@mui/material";
-// import { useParams, useNavigate } from "react-router-dom";
-// import { useSelector, useDispatch } from "react-redux";
-// import { IoArrowBackSharp } from "react-icons/io5";
-// import DeleteIcon from "@mui/icons-material/Delete";
-// import { createTheme, styled, ThemeProvider } from "@mui/material/styles";
-// import Dialog from "../../DialogBox/DialogBox";
-// import { fetchEventById, updateEvent } from "./EventSlice";
-
-// const theme = createTheme({
-//   palette: {
-//     primary: {
-//       main: "#630000",
-//     },
-//   },
-// });
-
-// const GradientIconButton = styled(IconButton)(({ theme }) => ({
-//   background: "linear-gradient(to right,#fb0707, #630000)",
-//   color: "#fff",
-//   border: "1px solid #fff",
-//   marginLeft: "10px",
-//   marginRight: "10px",
-//   "&:hover": {
-//     background: "#FFF",
-//     border: "1px solid #630000",
-//     "& svg": {
-//       color: "#630000",
-//     },
-//   },
-//   "& svg": {
-//     fontSize: "20px",
-//   },
-// }));
-
-// const ImageContainer = styled(Box)(({ theme }) => ({
-//   position: "relative",
-//   width: 150,
-//   height: 150,
-//   overflow: "hidden",
-//   marginBottom: "20px",
-//   marginRight: "10px",
-//   "& img": {
-//     width: "100%",
-//     height: "100%",
-//     objectFit: "cover",
-//   },
-// }));
-
-// const DeleteButton = styled(IconButton)(({ theme }) => ({
-//   position: "absolute",
-//   top: 5,
-//   right: 5,
-// }));
-
-// const EditEvent = () => {
-//   const { id } = useParams();
-//   const dispatch = useDispatch();
-//   const event = useSelector((state) => state.events.event);
-//   const successMessage = useSelector((state) => state.events.successMessage);
-//   const [errors, setErrors] = useState({});
-//   const navigate = useNavigate();
-//   const [showDialog, setShowDialog] = useState(false);
-//   const [pictures, setPictures] = useState([]);
-//   const [previewImages, setPreviewImages] = useState([]);
-//   const [uploadedImages, setUploadedImages] = useState([]);
-//   const registrations = event && event.registrations ? event.registrations : [];
-//   console.log(registrations)
-//   const [formState, setFormState] = useState({
-//     name: "",
-//     startDate: "",
-//     endDate: "",
-//     activities: [],
-//   });
-
-//   useEffect(() => {
-//     dispatch(fetchEventById(id));
-//   }, [dispatch, id]);
-
-//   useEffect(() => {
-//     if (event) {
-//       setFormState({
-//         name: event.name || "",
-//         startDate: event.startDate || "",
-//         endDate: event.endDate || "",
-//         activities: event.activities || [],
-//       });
-//       setPictures(event.pictures || []);
-//       const imagePreviews =
-//         event.pictures?.map((pic) => `${ImagebaseURL}${pic.img}`) || [];
-//       setPreviewImages(imagePreviews);
-//     }
-//   }, [event]);
-
-//   const handleInputChange = (e) => {
-//     const { name, value } = e.target;
-//     setFormState({ ...formState, [name]: value });
-//   };
-
-//   const handleDateChange = (name, value) => {
-//     setFormState({ ...formState, [name]: value });
-//   };
-
-//   const handleActivityChange = (index, field, value) => {
-//     const updatedActivities = [...formState.activities];
-//     updatedActivities[index] = { ...updatedActivities[index], [field]: value };
-//     setFormState({ ...formState, activities: updatedActivities });
-//   };
-
-//   const handleAddActivity = () => {
-//     setFormState({
-//       ...formState,
-//       activities: [
-//         ...formState.activities,
-//         { title: "", startDate: "", endDate: "" },
-//       ],
-//     });
-//   };
-
-//   const handleRemoveActivity = (index) => {
-//     const updatedActivities = formState.activities.filter(
-//       (activity, i) => i !== index
-//     );
-//     setFormState({ ...formState, activities: updatedActivities });
-//   };
-
-//   const handlePictureChange = (e) => {
-//     const files = Array.from(e.target.files);
-
-//     // Check if selected files exceed the limit when combined with already uploaded files
-//     if (files.length + uploadedImages.length > 5) {
-//       alert("You can only upload up to 5 images.");
-//       e.target.value = ""; // Clear the input
-//       return;
-//     }
-
-//     // Create new picture objects
-//     const newPictures = files.map((file) => ({
-//       file,
-//       preview: URL.createObjectURL(file),
-//     }));
-
-//     // Update state with new images
-//     const updatedUploadedImages = [...uploadedImages, ...newPictures];
-//     setUploadedImages(updatedUploadedImages);
-//     setPreviewImages(updatedUploadedImages.map((picture) => picture.preview));
-
-//     // Clear the input value to allow re-selection of the same file
-//     e.target.value = "";
-//   };
-
-//   const handleDeleteImage = (index) => {
-//     const updatedImages = [...uploadedImages];
-//     updatedImages.splice(index, 1);
-//     setUploadedImages(updatedImages);
-//     setPreviewImages(updatedImages.map((picture) => picture.preview));
-//   };
-
-//   const validateForm = () => {
-//     let tempErrors = {};
-//     tempErrors.name = formState.name ? "" : "Name is required.";
-//     tempErrors.startDate = formState.startDate ? "" : "Start date is required.";
-//     tempErrors.endDate = formState.endDate ? "" : "End date is required.";
-//     setErrors(tempErrors);
-//     return Object.values(tempErrors).every((x) => x === "");
-//   };
-
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-//     if (validateForm()) {
-//       const formData = new FormData();
-//       formData.append("name", formState.name);
-//       formData.append("startDate", formState.startDate);
-//       formData.append("endDate", formState.endDate);
-//       formData.append("activities", JSON.stringify(formState.activities));
-
-//       uploadedImages.forEach((picture) => {
-//         formData.append("pictures", picture.file);
-//       });
-
-//       dispatch(updateEvent({ id, formData }))
-//         .then((response) => {
-//           if (response.meta.requestStatus === "fulfilled") {
-//             setShowDialog(true);
-//             setTimeout(() => {
-//               setShowDialog(false);
-//             }, 2000);
-//             dispatch(fetchEventById(id));
-//           }
-//         })
-//         .catch((error) => {
-//           console.error("Error:", error);
-//         });
-//     }
-//   };
-//   return (
-//     <ThemeProvider theme={theme}>
-//       <Box style={{ padding: "20px" }}>
-//         <Box sx={{
-//           width: "100%", padding: "10px", borderRadius: "8px", display: "flex",
-//           justifyContent: "space-between", alignItems: "center", position: 'relative'
-//         }}>
-//           <Box sx={{ display: "flex", position: 'relative', alignItems: 'center' }}>
-//             <GradientIconButton onClick={() => navigate(-1)}>
-//               <IoArrowBackSharp />
-//             </GradientIconButton>
-//             <Typography variant="body1" sx={{ fontFamily: 'Red Hat Display, sans-serif', fontSize: "23px", fontWeight: '700', color: '#630000' }}>
-//               Edit Event
-//             </Typography>
-//           </Box>
-//         </Box>
-//         <Box sx={{ marginBottom: 2 }}>
-//           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, overflowX: 'auto', padding: '10px 0' }}>
-//             {previewImages.map((image, index) => (
-//               <ImageContainer key={index}>
-//                 <img src={image} alt={`Event ${index}`} />
-//                 <DeleteButton onClick={() => handleDeleteImage(index)}>
-//                   <Typography variant="body1" sx={{ color: 'red', fontWeight: 'bold', fontSize: '16px' }}>x</Typography>
-//                 </DeleteButton>
-//               </ImageContainer>
-//             ))}
-//           </Box>
-//           <label htmlFor="upload-pictures">
-//             <Button
-//               variant="contained"
-//               component="span"
-//               sx={{
-//                 color: '#630000',
-//                 backgroundColor: '#fff',
-//                 border: '1px solid #630000',
-//                 fontWeight: '600',
-//                 fontSize: 15,
-//                 fontFamily: 'Red Hat Display, sans-serif',
-//                 '&:hover': {
-//                   backgroundColor: '#630000',
-//                   color: '#fff',
-//                 },
-//               }}
-//             >
-//               Upload Image
-//             </Button>
-//             <Input
-//               accept="image/*"
-//               id="upload-pictures"
-//               type="file"
-//               multiple
-//               onChange={handlePictureChange}
-//               sx={{ display: 'none' }}
-//             />
-//           </label>
-//         </Box>
-//         <form style={{ padding: "20px" }} onSubmit={handleSubmit}>
-//           <Grid container spacing={2}>
-//             <Grid item xs={6}>
-//               <TextField
-//                 fullWidth
-//                 label="Event Name*"
-//                 name="name"
-//                 variant="outlined"
-//                 value={formState.name}
-//                 onChange={handleInputChange}
-//                 error={!!errors.name}
-//                 helperText={errors.name}
-//               />
-//             </Grid>
-//             <Grid item xs={6}>
-//               <TextField
-//                 fullWidth
-//                 label="Start Date*"
-//                 name="startDate"
-//                 type="datetime-local"
-//                 value={formState.startDate.substring(0, 16)}
-//                 onChange={(e) => handleDateChange('startDate', e.target.value)}
-//                 InputLabelProps={{ shrink: true }}
-//                 error={!!errors.startDate}
-//                 helperText={errors.startDate}
-//               />
-//             </Grid>
-//             <Grid item xs={6}>
-//               <TextField
-//                 fullWidth
-//                 label="End Date*"
-//                 name="endDate"
-//                 type="datetime-local"
-//                 value={formState.endDate.substring(0, 16)}
-//                 onChange={(e) => handleDateChange('endDate', e.target.value)}
-//                 InputLabelProps={{ shrink: true }}
-//                 error={!!errors.endDate}
-//                 helperText={errors.endDate}
-//               />
-//             </Grid>
-//             <Grid item xs={12}>
-//               <Box sx={{ display: "flex", alignItems: "center", marginBottom: 1 }}>
-//                 <Typography
-//                   variant="body1"
-//                   sx={{
-//                     fontFamily: "Red Hat Display, sans-serif",
-//                     fontWeight: "700",
-//                     fontSize: 25,
-//                     color: "#630000"
-//                   }}
-//                 >
-//                   Activities
-//                 </Typography>
-//               </Box>
-//               {formState.activities.map((activity, index) => (
-//                 <Box key={index} sx={{ marginBottom: 2, padding: 2, border: '1px solid #ddd', borderRadius: '8px' }}>
-//                   <Typography variant="subtitle1" sx={{ fontFamily: 'Red Hat Display, sans-serif', fontSize: 18, fontWeight: 600, }}>Activity {index + 1}</Typography>
-//                   <Grid container spacing={2} mt={2}>
-//                     <Grid item xs={6} >
-//                       <TextField
-//                         fullWidth
-//                         label="Title"
-//                         value={activity.type}
-//                         onChange={(e) => handleActivityChange(index, 'title', e.target.value)}
-//                       />
-//                     </Grid>
-//                     <Grid item xs={6}>
-//                       <TextField
-//                         fullWidth
-//                         label="Start Date"
-//                         type="datetime-local"
-//                         value={activity.startDate.substring(0, 16)}
-//                         InputLabelProps={{ shrink: true }}
-//                         onChange={(e) => handleActivityChange(index, 'startDate', e.target.value)}
-//                       />
-//                     </Grid>
-//                     <Grid item xs={6}>
-//                       <TextField
-//                         fullWidth
-//                         label="End Date"
-//                         type="datetime-local"
-//                         value={activity.endDate.substring(0, 16)}
-//                         InputLabelProps={{ shrink: true }}
-//                         onChange={(e) => handleActivityChange(index, 'endDate', e.target.value)}
-//                       />
-//                     </Grid>
-//                     <Grid item xs={12} sm={12} sx={{ display: "flex", justifyContent: "flex-end" }}>
-//                       <IconButton
-//                         color="error"
-//                         onClick={() => handleRemoveActivity(index)}
-//                       >
-//                         <DeleteIcon />
-//                       </IconButton>
-//                     </Grid>
-//                   </Grid>
-//                 </Box>
-//               ))}
-//               <Button
-//                 variant="contained"
-//                 component="span"
-//                 sx={{
-//                   color: '#630000',
-//                   backgroundColor: '#fff',
-//                   border: '1px solid #630000',
-//                   fontWeight: '600',
-//                   fontSize: 15,
-//                   fontFamily: 'Red Hat Display, sans-serif',
-//                   '&:hover': {
-//                     backgroundColor: '#630000',
-//                     color: '#fff',
-//                   },
-//                 }}
-//                 onClick={handleAddActivity}
-//               >
-//                 Add Activity
-//               </Button>
-//             </Grid>
-
-//           </Grid>
-//           <Box sx={{ marginTop: 5, display: "flex", justifyContent: "center" }}>
-//             <Button
-//               variant="contained"
-//               type="submit"
-//             >
-//               Update
-//             </Button>
-//           </Box>
-//         </form>
-//         {registrations.length > 0 && (
-//           <Grid item xs={12}>
-//             <Typography variant="h6" sx={{
-//               fontFamily: "Red Hat Display, sans-serif",
-//               fontWeight: "700",
-//               fontSize: 25,
-//               color: "#630000"
-//             }}>
-//               Registrations
-//             </Typography>
-//             {registrations.map((registration) => (
-//               <Box
-//                 key={registration._id}
-//                 sx={{
-//                   marginBottom: 2,
-//                   border: "1px solid lightgrey",
-//                   padding: "10px",
-//                   borderRadius: "8px",
-//                 }}
-//               >
-//                 <Typography variant="body1"><strong>Registration ID:</strong> {registration._id}</Typography>
-//                 <Typography variant="body1"><strong>Participant Name:</strong> {registration.participantName}</Typography>
-//                 <Typography variant="body1"><strong>Activities:</strong> {registration.activity.join(', ')}</Typography>
-//               </Box>
-//             ))}
-//           </Grid>
-//         )}
-//         <Dialog
-//           message={successMessage}
-//           showDialog={showDialog}
-//           onClose={() => setShowDialog(false)}
-//         />
-//       </Box>
-//     </ThemeProvider>
-//   );
-// };
-
-// export default EditEvent;

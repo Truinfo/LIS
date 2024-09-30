@@ -92,60 +92,59 @@ const Security = () => {
 
 
     const renderItem = ({ item }) => (
-        <View style={styles.row}>
+        <TouchableOpacity onPress={() => handleView(item)}>
+            <View style={styles.row}>
 
-            <Image
-                source={{ uri: `${ImagebaseURL}${item.pictures}` }}
-                style={styles.image}
-            />
+                <Image
+                    source={{ uri: `${ImagebaseURL}${item.pictures}` }}
+                    style={styles.image}
+                />
 
-            <View style={styles.details}>
-                <Text style={styles.detailLabel}>Security ID</Text>
-                <Text style={styles.detailValue}>{item.sequrityId}</Text>
-            </View>
-            <View style={styles.details}>
-                <Text style={styles.detailLabel}>Name</Text>
-                <Text style={styles.detailValue}>{item.name}</Text>
-            </View>
-            <View style={styles.details}>
-                <Text style={styles.detailLabel}>Email</Text>
-                <Text style={styles.detailValue}>{item.email}</Text>
-            </View>
-            <View style={styles.details}>
-                <Text style={styles.detailLabel}>Mobile</Text>
-                <Text style={styles.detailValue}>{item.phoneNumber}</Text>
-            </View>
-            <View style={styles.details}>
-                <Text style={styles.detailLabel}>Aadhar</Text>
-                <Text style={styles.detailValue}>{item.aadharNumber}</Text>
-            </View>
-
-            {/* Three dots button */}
-            <TouchableOpacity
-                onPress={() => setActionMenuVisible(actionMenuVisible === item._id ? null : item._id)}
-                style={styles.dotsButton}
-            >
-                <Icon name="more-vert" size={24} color="#7D0431" />
-            </TouchableOpacity>
-
-            {/* Action Menu */}
-            {actionMenuVisible === item._id && (
-                <View style={styles.actionMenu}>
-                    <TouchableOpacity onPress={() => handleView(item)} style={styles.menuButton}>
-                        <Text style={styles.buttonText}>View</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => handleEdit(item)} style={styles.menuButton}>
-                        <Text style={styles.buttonText}>Edit</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => handleAttendance(item)} style={styles.menuButton}>
-                        <Text style={styles.buttonText}>Attendance</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => handleDelete(item)} style={styles.menuButton}>
-                        <Text style={styles.buttonText}>Delete</Text>
-                    </TouchableOpacity>
+                <View style={styles.details}>
+                    <Text style={styles.detailLabel}>Security ID</Text>
+                    <Text style={styles.detailValue}>{item.sequrityId}</Text>
                 </View>
-            )}
-        </View>
+                <View style={styles.details}>
+                    <Text style={styles.detailLabel}>Name</Text>
+                    <Text style={styles.detailValue}>{item.name}</Text>
+                </View>
+                <View style={styles.details}>
+                    <Text style={styles.detailLabel}>Email</Text>
+                    <Text style={styles.detailValue}>{item.email}</Text>
+                </View>
+                <View style={styles.details}>
+                    <Text style={styles.detailLabel}>Mobile</Text>
+                    <Text style={styles.detailValue}>{item.phoneNumber}</Text>
+                </View>
+                <View style={styles.details}>
+                    <Text style={styles.detailLabel}>Aadhar</Text>
+                    <Text style={styles.detailValue}>{item.aadharNumber}</Text>
+                </View>
+
+                {/* Three dots button */}
+                <TouchableOpacity
+                    onPress={() => setActionMenuVisible(actionMenuVisible === item._id ? null : item._id)}
+                    style={styles.dotsButton}
+                >
+                    <Icon name="more-vert" size={24} color="#7D0431" />
+                </TouchableOpacity>
+
+                {/* Action Menu */}
+                {actionMenuVisible === item._id && (
+                    <View style={styles.actionMenu}>
+                        <TouchableOpacity onPress={() => handleAttendance(item)} style={styles.menuButton}>
+                            <Text style={styles.buttonText}>Attendance</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => handleEdit(item)} style={styles.menuButton}>
+                            <Text style={styles.buttonText}>Edit</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => handleDelete(item)} style={styles.menuButton}>
+                            <Text style={[styles.buttonText, {color: "#7D0431"}]}>Delete</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
+            </View>
+        </TouchableOpacity>
     );
 
     return (

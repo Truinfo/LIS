@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet, Modal, Alert } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchEvent, deleteEvent } from './EventSlice';
 import { useNavigation } from '@react-navigation/native';
 import { ImagebaseURL } from '../../../Security/helpers/axios';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import Modal from 'react-native-modal';
 
 const Events = () => {
     const dispatch = useDispatch();
@@ -19,9 +20,7 @@ const Events = () => {
     }, [dispatch]);
 
     const handleView = (event) => {
-      console.log("clicked")
         navigation.navigate('View Events', { eventId: event._id });
-
         setActionMenuVisible(null);
     };
 
@@ -54,46 +53,52 @@ const Events = () => {
         setDeleteDialogOpen(false);
     };
 
-    const renderItem = ({ item }) => (
-        <View style={styles.row}>
-            <Image
-              source={{ uri: `${ImagebaseURL}${item.pictures[0]?.img}` }}
-              style={styles.image}
-            />
-            <View style={styles.details}>
-                <Text style={styles.detailLabel}>Event Name:</Text>
-                <Text style={styles.detailValue}>{item.name}</Text>
-            </View>
-            <View style={styles.details}>
-                <Text style={styles.detailLabel}>Start Date:</Text>
-                <Text style={styles.detailValue}>{item.startDate}</Text>
-            </View>
-            <View style={styles.details}>
-                <Text style={styles.detailLabel}>End Date:</Text>
-                <Text style={styles.detailValue}>{item.endDate}</Text>
-            </View>
-            <TouchableOpacity
-                onPress={() => setActionMenuVisible(actionMenuVisible === item._id ? null : item._id)}
-                style={styles.dotsButton}
-            >
-                <Icon name="more-vert" size={24} color="#7D0431" />
-            </TouchableOpacity>
+    if (status === 'loading') {
+        return <ActivityIndicator size="large" color="#630000" style={styles.loader} />;
+    }
 
-            {/* Action Menu */}
-            {actionMenuVisible === item._id && (
-                <View style={styles.actionMenu}>
-                    <TouchableOpacity onPress={() => handleView(item)} style={styles.menuButton}>
-                        <Text style={styles.buttonText}>View</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => handleEdit(item)} style={styles.menuButton}>
-                        <Text style={styles.buttonText}>Edit</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => handleDelete(item)} style={styles.menuButton}>
-                        <Text style={styles.buttonText}>Delete</Text>
-                    </TouchableOpacity>
+    if (status === 'failed') {
+        return <Text style={styles.errorText}>Error: {error}</Text>;
+    }
+
+    const renderItem = ({ item }) => (
+        <TouchableOpacity onPress={() => handleView(item)}>
+            <View style={styles.row}>
+                <Image
+                    source={{ uri: `${ImagebaseURL}${item.pictures[0]?.img}` }}
+                    style={styles.image}
+                />
+                <View style={styles.details}>
+                    <Text style={styles.detailLabel}>Event</Text>
+                    <Text style={styles.detailValue}>{item.name}</Text>
                 </View>
-            )}
-        </View>
+                <View style={styles.details}>
+                    <Text style={styles.detailLabel}>Start Date</Text>
+                    <Text style={styles.detailValue}>{new Date(item.startDate).toLocaleString()}</Text>
+                </View>
+                <View style={styles.details}>
+                    <Text style={styles.detailLabel}>End Date</Text>
+                    <Text style={styles.detailValue}>{new Date(item.endDate).toLocaleString()}</Text>
+                </View>
+                <TouchableOpacity
+                    onPress={() => setActionMenuVisible(actionMenuVisible === item._id ? null : item._id)}
+                    style={styles.dotsButton}
+                >
+                    <Icon name="more-vert" size={24} color="#7D0431" />
+                </TouchableOpacity>
+
+                {actionMenuVisible === item._id && (
+                    <View style={styles.actionMenu}>
+                        <TouchableOpacity onPress={() => handleEdit(item)} style={styles.menuButton}>
+                            <Text style={styles.buttonText}>Edit</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => handleDelete(item)} style={styles.menuButton}>
+                            <Text style={[styles.buttonText, { color: "#7D0431" }]}>Delete</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
+            </View>
+        </TouchableOpacity>
     );
 
     return (
@@ -105,17 +110,22 @@ const Events = () => {
                 keyboardShouldPersistTaps="handled"
             />
 
-            {/* Floating Action Button */}
             <TouchableOpacity
                 style={styles.floatingButton}
-                onPress={() => navigation.navigate('Add Event')}
+                onPress={() => navigation.navigate('Add Events')}
             >
                 <Icon name="add" size={24} color="#fff" />
             </TouchableOpacity>
 
-            {/* Delete Confirmation Modal */}
-            <Modal visible={deleteDialogOpen} transparent={true}>
+            <Modal
+                isVisible={deleteDialogOpen}
+                onBackdropPress={cancelDelete}
+                style={styles.modal}
+                animationIn="slideInUp"
+                animationOut="slideOutDown"
+            >
                 <View style={styles.modalContent}>
+                    <Text style={styles.modalMainText}>Delete Confirmation</Text>
                     <Text style={styles.modalText}>Are you sure you want to delete this event?</Text>
                     <View style={styles.modalButtons}>
                         <TouchableOpacity onPress={cancelDelete} style={styles.modalButton}>
@@ -136,6 +146,10 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 10,
     },
+    loader: {
+        flex: 1,
+        justifyContent: 'center',
+    },
     row: {
         flexDirection: 'column',
         padding: 10,
@@ -154,12 +168,12 @@ const styles = StyleSheet.create({
         marginBottom: 5,
     },
     detailLabel: {
-        fontWeight: 'bold',
+        fontWeight: "600",
         flex: 1,
         fontSize: 16,
     },
     detailValue: {
-        flex: 2,
+        flex: 2.5,
         fontSize: 16,
         color: '#333',
     },
@@ -194,22 +208,27 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         elevation: 6,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.3,
-        shadowRadius: 4,
+    },
+    modal: {
+        justifyContent: 'center',
+        margin: 0,
     },
     modalContent: {
         backgroundColor: '#fff',
         padding: 20,
         borderRadius: 10,
-        marginHorizontal: 20,
-        justifyContent: 'center',
         alignItems: 'center',
     },
-    modalText: {
-        fontSize: 18,
+    modalMainText: {
+        fontSize: 20,
         marginBottom: 20,
+        textAlign: 'center',
+        color: '#7D0431',
+    },
+    modalText: {
+        fontSize: 16,
+        marginBottom: 20,
+        textAlign: 'center',
     },
     modalButtons: {
         flexDirection: 'row',

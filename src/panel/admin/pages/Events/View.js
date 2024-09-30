@@ -10,12 +10,10 @@ const ViewEvents = () => {
     const route = useRoute();
     const { eventId } = route.params;
 
-    // Access the events from the Redux store
-    const events = useSelector(state => state.societyEvents.event); // Assuming you have an array of events
-    const event = events.find((event) => event._id === eventId); // Match event by ID
-
+    const events = useSelector(state => state.societyEvents.event); 
+    const event = events.find((event) => event._id === eventId); 
     if (!event) {
-        return <View style={styles.container}><Text>Event not found.</Text></View>; // Handle case when event is not found
+        return <View style={styles.container}><Text>Event not found.</Text></View>;
     }
 
     return (
@@ -26,7 +24,7 @@ const ViewEvents = () => {
                     width={300}
                     height={200}
                     autoPlay
-                    data={event.pictures} 
+                    data={event.pictures}
                     renderItem={({ item }) => (
                         <Image
                             key={item._id}
@@ -39,45 +37,58 @@ const ViewEvents = () => {
                 />
                 <Text style={styles.sectionTitle}>Society Profile Details:</Text>
                 <View style={styles.detailsContainer}>
-                    <DetailItem style={styles.text} label="Name" value={event.name} />
-                    <DetailItem label="Start Date" value={new Date(event.startDate).toLocaleString()} />
-                    <DetailItem label="End Date" value={new Date(event.endDate).toLocaleString()} />
+                    <View style={styles.details}>
+                        <Text style={styles.textLabel}>Name</Text>
+                        <Text style={styles.textValue}>{event.name}</Text>
+                    </View>
+                    <View style={styles.details}>
+                        <Text style={styles.textLabel}>Start Date</Text>
+                        <Text style={styles.textValue}>{new Date(event.startDate).toLocaleString()}</Text>
+                    </View>
+                    <View style={styles.details}>
+                        <Text style={styles.textLabel}>End Date</Text>
+                        <Text style={styles.textValue}>{new Date(event.endDate).toLocaleString()}</Text>
+                    </View>
                 </View>
 
                 {/* Activities Section */}
                 {event.activities && event.activities.length > 0 && (
-    <>
-        <Text style={styles.sectionTitle}>Activities:</Text>
-        <View style={styles.detailsContainer}>
-            {event.activities.map((activity) => (
-                <DetailItem key={activity._id} label="Activity Type" value={activity.type} />
-            ))}
-        </View>
-    </>
-)}
+                    <>
+                        <Text style={styles.sectionTitle}>Activities:</Text>
+                        <View style={styles.detailsContainer}>
+                            {event.activities.map((activity) => (
+                                <View key={activity._id} style={styles.details}>
+                                    <Text style={styles.textLabel}>Activity Type:</Text>
+                                    <Text style={styles.textValue}>{activity.type}</Text>
+                                </View>
+                            ))}
+                        </View>
+                    </>
+                )}
+
 
                 {/* Registrations Section */}
                 {event.registrations && event.registrations.length > 0 && (
-    <>
-        <Text style={styles.sectionTitle}>Registrations:</Text>
-        <View style={styles.detailsContainer}>
-            <View style={styles.tableHeader}>
-                <Text style={styles.tableHeaderText}>Participant ID</Text>
-                <Text style={styles.tableHeaderText}>Participant Name</Text>
-                <Text style={styles.tableHeaderText}>Activities</Text>
-            </View>
-            {event.registrations.map((registration) => (
-                <View key={registration._id} style={styles.tableRow}>
-                    <Text style={styles.tableCell}>{registration.participantId}</Text>
-                    <Text style={styles.tableCell}>{registration.participantName}</Text>
-                    <Text style={styles.tableCell}>
-                        {registration.activity.join(", ")} {/* Join activities in a string */}
-                    </Text>
-                </View>
-            ))}
-        </View>
-    </>
-)}
+                    <>
+                        <Text style={styles.sectionTitle}>Registrations:</Text>
+                        <View style={styles.detailsContainer}>
+                            <View style={styles.tableHeader}>
+                                <Text style={styles.tableHeaderText}>Participant ID</Text>
+                                <Text style={styles.tableHeaderText}>Name</Text>
+                                <Text style={styles.tableHeaderText}>Activities</Text>
+                            </View>
+                            {event.registrations.map((registration) => (
+                                <View key={registration._id} style={styles.tableRow}>
+                                    <Text style={styles.tableCell}>{registration.participantId}</Text>
+                                    <Text style={styles.tableCell}>{registration.participantName}</Text>
+                                    <Text style={styles.tableCell}>
+                                        {registration.activity.join(", ")} {/* Join activities in a string */}
+                                    </Text>
+                                </View>
+                            ))}
+                        </View>
+                    </>
+                )}
 
             </View>
         </ScrollView>
@@ -98,9 +109,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
     },
     card: {
-        borderColor: 'lightgrey',
-        borderWidth: 1,
-        borderRadius: 10,
         padding: 20,
         marginBottom: 20,
     },
@@ -108,6 +116,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         borderRadius: 10,
         overflow: 'hidden',
+        alignSelf: "center",
     },
     image: {
         width: '100%',
@@ -116,11 +125,11 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 20,
         fontWeight: '700',
-        color: "#630000",
+        color: "#7D0431",
         marginVertical: 10,
     },
     detailsContainer: {
-        borderColor: 'lightgrey',
+        borderColor: '#7D0431',
         borderWidth: 1,
         borderRadius: 8,
         padding: 10,
@@ -129,12 +138,12 @@ const styles = StyleSheet.create({
     tableHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        borderBottomColor: 'lightgrey',
+        borderBottomColor: '#7D0431',
         borderBottomWidth: 1,
         paddingVertical: 10,
     },
     tableHeaderText: {
-        fontWeight: '700',
+        fontWeight: '600',
         flex: 1,
         textAlign: 'center',
     },
@@ -157,9 +166,23 @@ const styles = StyleSheet.create({
     detailValue: {
         fontSize: 16,
     },
-    text: {
-        flexDirection: "row", 
-    }
+    details: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 5,
+    },
+    textValue: {
+        flex: 3,
+        fontSize: 16,
+        color: '#333',
+    },
+    textLabel: {
+        flex: 2,
+        fontSize: 16,
+        color: '#333',
+        fontWeight: "600",
+    },
+
 });
 
 export default ViewEvents;

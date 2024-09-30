@@ -47,7 +47,6 @@ const AddService = () => {
 
     const [snackbarVisible, setSnackbarVisible] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
-
     const handleSubmit = () => {
         const formData = new FormData();
         formData.append('societyId', societyId);
@@ -55,25 +54,57 @@ const AddService = () => {
         formData.append('name', name);
         formData.append('phoneNumber', mobileNumber);
         formData.append('address', address);
+        
         selectedTimings.forEach(timing => formData.append('timings', timing));
+      
         if (image) {
-            formData.append('pictures', {
-                uri: image.uri,
-                type: image.type,
-                name: image.uri.split('/').pop(),
-            });
+          const imageName = image.uri.split('/').pop();
+          const imageType = image.uri.split('.').pop(); // Example: 'jpg', 'png'
+          
+          formData.append('pictures', {
+            uri: image.uri,
+            name: imageName,
+            type: `image/${imageType}`, // Correct MIME type based on file extension
+          });
         }
-console.log((formData))
-        dispatch(createService(formData)).then((response) => {
+      
+        dispatch(createService(formData))
+          .then(response => {
             if (response.meta.requestStatus === 'fulfilled') {
-                setSnackbarMessage(`${response.payload.message}`);
-                setSnackbarVisible(true);
-                setTimeout(() => navigation.navigate("Services"), 3000); // Navigate after 2 seconds
+              setSnackbarMessage(`${response.payload.message}`);
+              setSnackbarVisible(true);
+              setTimeout(() => navigation.navigate("Services"), 3000);
             }
-        }).catch((error) => {
+          })
+          .catch(error => {
             console.error("Error:", error);
-        });
-    };
+          });
+      };
+    // const handleSubmit = () => {
+    //     const formData = new FormData();
+    //     formData.append('societyId', societyId);
+    //     formData.append('serviceType', serviceType);
+    //     formData.append('name', name);
+    //     formData.append('phoneNumber', mobileNumber);
+    //     formData.append('address', address);
+    //     selectedTimings.forEach(timing => formData.append('timings', timing));
+    //     if (image) {
+    //         formData.append('pictures', {
+    //             uri: image.uri,
+    //             type: image.type,
+    //             name: image.uri.split('/').pop(),
+    //         });
+    //     }
+    //     dispatch(createService(formData)).then((response) => {
+    //         if (response.meta.requestStatus === 'fulfilled') {
+    //             setSnackbarMessage(`${response.payload.message}`);
+    //             setSnackbarVisible(true);
+    //             setTimeout(() => navigation.navigate("Services"), 3000); 
+    //         }
+    //     }).catch((error) => {
+    //         console.error("Error:", error);
+    //     });
+    // };
 
     const toggleTiming = (timing) => {
         setSelectedTimings((prevTimings) =>

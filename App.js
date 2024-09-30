@@ -110,13 +110,13 @@ import EditAdd from './src/panel/admin/pages/Advertisements/EditAdd';
 import AddNotice from './src/panel/admin/pages/NoticeBoard/AddNotice';
 import EditNotice from './src/panel/admin/pages/NoticeBoard/EditNotice';
 import CreatePoll from './src/panel/admin/pages/Polls/CreatePoll';
-
+import EditPoll from './src/panel/admin/pages/Polls/EditPoll';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
-  const [initialRoute, setInitialRoute] = useState('Sidebar');
+  const [initialRoute, setInitialRoute] = useState('Onboard');
   useEffect(() => {
     const checkTokenExpiry = async () => {
       try {
@@ -144,9 +144,14 @@ export default function App() {
         if (user !== null && userToken !== null) {
           if (userRole === 'Sequrity') {
             setInitialRoute('Header');
-          } else {
+          } else if (userRole === 'SocietyAdmin') {
             setInitialRoute('Sidebar');
-          }
+          } else
+            if (userRole === 'User') {
+              setInitialRoute('Tabs');
+            } else {
+              setInitialRoute('Login');
+            }
         }
       } catch (error) {
       } finally {
@@ -298,7 +303,7 @@ export default function App() {
             <Stack.Screen name="Edit Security" component={EditSecurity} />
             <Stack.Screen name="View Security" component={ViewSequrity} />
             <Stack.Screen name="Attendance" component={AttendanceForm} />
-            
+
             <Stack.Screen name="View Events" component={ViewEvents} />
             <Stack.Screen name="Add Events" component={AddEvents} />
             <Stack.Screen name="Edit Event" component={EditEvent} />
@@ -312,6 +317,7 @@ export default function App() {
             <Stack.Screen name='Add Notice' component={AddNotice} />
             <Stack.Screen name='Edit Notice' component={EditNotice} />
             <Stack.Screen name='Create Poll' component={CreatePoll} />
+            <Stack.Screen name='Edit Poll' component={EditPoll} />
           </Stack.Navigator>
         </SafeAreaView>
       </NavigationContainer>

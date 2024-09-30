@@ -1,7 +1,7 @@
-import * as React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import  React, { useState } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import Icon from 'react-native-vector-icons/FontAwesome'; // Import FontAwesome icons
+import Icon from 'react-native-vector-icons/FontAwesome'; 
 import Dashboard from '../pages/Dashboard/Dashboard';
 import Advertisements from '../pages/Advertisements/Advertisements';
 import ResidentialUnit from '../pages/ResidentialUnit/ResidentialUnit';
@@ -17,13 +17,46 @@ import Security from '../pages/Security/Security';
 import Services from '../pages/Services/Services';
 import Maintenance from '../pages/Maintenance/Maintenance';
 import NoticeBoard from '../pages/NoticeBoard/NoticeBoard';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { logout } from '../../User/Redux/Slice/AuthSlice/Login/LoginSlice';
+import { useDispatch } from 'react-redux';
+import { useNavigation } from '@react-navigation/native';
 
 const Drawer = createDrawerNavigator();
 
 export default function Sidebar() {
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
+
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+
+  const toggleDropdown = () => {
+    setDropdownVisible(!dropdownVisible);
+  };
+
+  const handleProfile = () => {
+    // Handle navigation to profile page
+    toggleDropdown();
+  };
+
+  // const handleLogout = () => {
+  //   console.log("Logout clicked");
+  //   toggleDropdown();
+  // };
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem('user');
+      await AsyncStorage.removeItem('userToken');
+    } catch (e) {
+      console.log('Error clearing user from AsyncStorage:', e);
+    }
+    dispatch(logout());
+    navigation.navigate('Login');
+  };
+
   return (
     <Drawer.Navigator
-      initialRouteName="Events"
+      initialRouteName="Services"
       screenOptions={{
         headerRight: () => (
           <View style={{ flexDirection: 'row', alignItems: "center", gap: 15, marginRight: 10 }}>
@@ -58,7 +91,6 @@ export default function Sidebar() {
   );
 }
 
-
 const styles = StyleSheet.create({
   badge: {
     position: 'absolute',
@@ -75,5 +107,22 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 10,
     fontWeight: 'bold',
+  },
+  dropdown: {
+    position: 'absolute',
+    right: 0,
+    top: 30,
+    backgroundColor: 'white',
+    borderRadius: 8,
+    elevation: 3,
+    padding: 10,
+    width: 120,
+    zIndex: 1,
+  },
+  menuItem: {
+    paddingVertical: 10,
+  },
+  menuText: {
+    fontSize: 16,
   },
 });

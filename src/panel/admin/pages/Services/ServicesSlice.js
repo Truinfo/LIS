@@ -10,11 +10,8 @@ export const createService = createAsyncThunk(
     'staff/createService',
     async (formData) => {
         try {
-            const response = await axiosInstance.post('/createService', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data' 
-                }
-            });
+            console.log(formData)
+            const response = await axiosInstance.post('/createService', formData);
             return response.data;
         } catch (error) {
             console.error('Error creating service:', error);
@@ -56,7 +53,8 @@ export const fetchServicePersonById = createAsyncThunk(
 export const updateServicePerson = createAsyncThunk(
     'staff/updateServicePerson',
     async (formData) => {
-        const response = await axiosInstance.put(`/updateServicePerson`, formData, {
+        console.log("slice ",formData)
+        const response = await axiosInstance.put('/updateServicePerson', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data' // Ensure proper content type for FormData
             }
@@ -177,6 +175,8 @@ const staffSlice = createSlice({
             })
             .addCase(updateServicePerson.rejected, (state, action) => {
                 state.status = 'failed';
+                console.log("Delete error:", action.error);
+
                 state.error = action.error.message;
             })
 
@@ -191,7 +191,6 @@ const staffSlice = createSlice({
             })
             .addCase(deleteServicePerson.rejected, (state, action) => {
                 state.status = 'failed';
-                console.log("Delete error:", action.error);
                 state.error = action.error.message;
             })
 

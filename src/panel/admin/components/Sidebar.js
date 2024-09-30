@@ -55,39 +55,52 @@ export default function Sidebar() {
   };
 
   return (
-    <Drawer.Navigator
-      initialRouteName="Services"
-      screenOptions={{
-        headerRight: () => (
-          <View style={{ flexDirection: 'row', alignItems: "center", gap: 15, marginRight: 10 }}>
-
-            <View>
-              <Icon name="bell-o" size={25} color="#202020" />
-              <View style={styles.badge}>
-                <Text style={styles.badgeText}>3</Text>
+    <View style={{ flex: 1 }}>
+      <Drawer.Navigator
+        initialRouteName="Dashboard"
+        screenOptions={{
+          headerRight: () => (
+            <View style={{ flexDirection: 'row', alignItems: "center", gap: 15, marginRight: 10 }}>
+              <View>
+                <Icon name="bell-o" size={25} color="#202020" />
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>3</Text>
+                </View>
               </View>
+              <TouchableOpacity onPress={toggleDropdown}>
+                <Icon name="user-circle-o" size={25} color="#202020" />
+              </TouchableOpacity>
+              {dropdownVisible && (
+                <View style={styles.dropdown}>
+                  <TouchableOpacity onPress={handleProfile} style={styles.menuItem}>
+                    <Text style={styles.menuText}>Profile</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={handleLogout} style={styles.menuItem}>
+                    <Text style={styles.menuText}>Logout</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
             </View>
-            <Icon name="user-circle-o" size={25} color="#202020" />
-          </View>
-        ),
-      }}
-    >
-      <Drawer.Screen name="Dashboard" component={Dashboard} />
-      <Drawer.Screen name="Advertisements" component={Advertisements} />
-      <Drawer.Screen name="Residential Management" component={ResidentialUnit} />
-      <Drawer.Screen name="Security" component={Security} />
-      <Drawer.Screen name="Services" component={Services} />
-      <Drawer.Screen name="Complaints" component={Complaints} />
-      <Drawer.Screen name="Documents" component={Documents} />
-      <Drawer.Screen name="Notice Board" component={NoticeBoard} />
-      <Drawer.Screen name="Events" component={Events} />
-      <Drawer.Screen name="Polls" component={Polls} />
-      <Drawer.Screen name="Visitor Management" component={VisitorManagement} />
-      <Drawer.Screen name="Amenities" component={Amenities} />
-      <Drawer.Screen name="Inventory" component={Inventory} />
-      <Drawer.Screen name="Society Bills" component={SocietyBills} />
-      <Drawer.Screen name="Maintenance Bills" component={Maintenance} />
-    </Drawer.Navigator>
+          ),
+        }}
+      >
+        <Drawer.Screen name="Dashboard" component={Dashboard} />
+        <Drawer.Screen name="Advertisements" component={Advertisements} />
+        <Drawer.Screen name="Residential Management" component={ResidentialUnit} />
+        <Drawer.Screen name="Security" component={Security} />
+        <Drawer.Screen name="Services" component={Services} />
+        <Drawer.Screen name="Complaints" component={Complaints} />
+        <Drawer.Screen name="Documents" component={Documents} />
+        <Drawer.Screen name="Notice Board" component={NoticeBoard} />
+        <Drawer.Screen name="Events" component={Events} />
+        <Drawer.Screen name="Polls" component={Polls} />
+        <Drawer.Screen name="Visitor Management" component={VisitorManagement} />
+        <Drawer.Screen name="Amenities" component={Amenities} />
+        <Drawer.Screen name="Inventory" component={Inventory} />
+        <Drawer.Screen name="Society Bills" component={SocietyBills} />
+        <Drawer.Screen name="Maintenance Bills" component={Maintenance} />
+      </Drawer.Navigator>
+    </View>
   );
 }
 

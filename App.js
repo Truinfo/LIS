@@ -7,16 +7,12 @@ import Header from "./src/panel/Security/Component/Header/Header";
 import Residents from "./src/panel/Security/Navigations/Residents";
 import { Provider } from 'react-redux';
 import store from './src/panel/User/Redux/Store';
-
 import Messages from "./src/panel/Security/Navigations/Messages";
 import Notice from "./src/panel/Security/Navigations/Notice";
-// import EditProfile from "./src/panel/Security/Navigations/EditProfile";
 import TermsandConditions from "./src/panel/Security/Navigations/TermsandConditions";
-// import Support from "./src/panel/Security/Navigations/Support";
 import AddVisitors from "./src/panel/Security/Navigations/AddVisitors";
 import Cab from "./src/panel/Security/Navigations/AddCab";
 import Others from "./src/panel/Security/Navigations/AddOthers";
-// import FrequentVisitors from "./src/panel/Security/Navigations/FrequentVisitors";
 import ApartmentDetails from "./src/panel/User/Navigations/Authentication/ApartmentDetails";
 import ForgotPassword from "./src/panel/User/Navigations/Authentication/ForgotPassword";
 import Onboard from "./src/panel/User/Navigations/Authentication/Onboard";
@@ -149,14 +145,13 @@ export default function App() {
         if (user !== null && userToken !== null) {
           if (userRole === 'Sequrity') {
             setInitialRoute('Header');
+          } else if (userRole === 'User') {
+            setInitialRoute('Tabs');
           } else if (userRole === 'SocietyAdmin') {
             setInitialRoute('Sidebar');
-          } else
-            if (userRole === 'User') {
-              setInitialRoute('Tabs');
-            } else {
-              setInitialRoute('Login');
-            }
+          } else {
+            setInitialRoute('Login');
+          }
         }
       } catch (error) {
       } finally {

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchServicePersonById, updateServicePerson, deleteUserService } from './ServicesSlice';
 import { View, Alert, ScrollView, TouchableOpacity, Modal, TouchableWithoutFeedback, StyleSheet } from 'react-native';
-import { Text, TextInput, Button, IconButton, Avatar } from 'react-native-paper';
+import { Text, TextInput, Button, IconButton, Avatar, ActivityIndicator, Snackbar } from 'react-native-paper';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { ImagebaseURL } from '../../../Security/helpers/axios';
 import { Ionicons } from '@expo/vector-icons';
@@ -35,7 +35,10 @@ const EditService = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedTimings, setSelectedTimings] = useState([]);
     const profile = useSelector((state) => state.staff.data);
-    const successMessage = useSelector((state) => state.staff.successMessage);
+
+    const [snackbarVisible, setSnackbarVisible] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (serviceType && userid) {
@@ -74,10 +77,9 @@ const EditService = () => {
     };
     const handleUpdate = () => {
         if (serviceType && userid) {
-            // Update timings in updatedData before submitting
             const updatedFormData = {
                 ...updatedData,
-                timings: selectedTimings, // Ensure timings are set from selectedTimings
+                timings: selectedTimings,
             };
 
             const { name, phoneNumber, address, timings } = updatedFormData;
@@ -95,60 +97,31 @@ const EditService = () => {
 
             if (newPicturesFile) {
                 const fileToUpload = {
-                  uri: newPicturesFile.uri,
-                  name: 'picture.jpg',
-                  type: 'image/jpeg',
+                    uri: newPicturesFile.uri,
+                    name: 'picture.jpg',
+                    type: 'image/jpeg',
                 };
                 formData.append('pictures', fileToUpload);
-              }
+            }
+
+            setLoading(true); // Start loading
             dispatch(updateServicePerson(formData))
                 .then((response) => {
                     if (response.type === 'staff/updateServicePerson/fulfilled') {
-                        Alert.alert("Success", response.type);
-                        // Fetch updated service person information
+                        setSnackbarMessage(`${response.payload.message}`);
+                        setSnackbarVisible(true);
                         dispatch(fetchServicePersonById({ serviceType, userid }));
                     }
                 })
                 .catch((error) => {
-                    console.error("Error:", error);
+                    setSnackbarMessage(`${error.message}`);
+                    setSnackbarVisible(true);
+                })
+                .finally(() => {
+                    setLoading(false); // Stop loading
                 });
         }
     };
-
-
-    // const handleUpdate = () => {
-    //     if (serviceType && userid) {
-    //         const { name, phoneNumber, address, timings } = updatedData;
-    //         const formData = new FormData();
-    //         formData.append('societyId', societyId);
-    //         formData.append('serviceType', serviceType);
-    //         formData.append('userid', userid);
-    //         formData.append('name', name);
-    //         formData.append('phoneNumber', phoneNumber);
-    //         formData.append('address', address);
-
-    //         timings.forEach((timing) => {
-    //             formData.append('timings', timing);
-    //         });
-
-    //         if (newPicturesFile) {
-    //             formData.append('pictures', newPicturesFile);
-    //         }
-
-    //         dispatch(updateServicePerson(formData))
-    //             .then((response) => {
-    //                 // Check if the response type matches
-    //                 if (response.type === 'staff/updateServicePerson/fulfilled') {
-    //                     Alert.alert("Success", response.type);
-    //                     // Fetch updated service person information
-    //                     dispatch(fetchServicePersonById({ serviceType, userid }));
-    //                 }
-    //             })
-    //             .catch((error) => {
-    //                 console.error("Error:", error);
-    //             });
-    //     }
-    // };
     const handleUpdateTimings = () => {
         setUpdatedData({ ...updatedData, timings: selectedTimings });
         setModalVisible(false);
@@ -203,7 +176,7 @@ const EditService = () => {
     };
     console.log(userid)
     return (
-        <ScrollView style={{ padding: 20 }}>
+        <ScrollView style={{flex:1, padding: 20,position:"relative" }}>
             <View>
                 {profile && (
                     <View>
@@ -228,12 +201,15 @@ const EditService = () => {
                             mode="outlined"
                             value={serviceType}
                             disabled={true}
+                            theme={{ colors: { primary: "#7d0431" } }}
+
                             style={{ marginBottom: 10 }}
                         />
                         <TextInput
                             label="Name"
                             value={updatedData.name}
                             onChangeText={(text) => handleInputChange('name', text)}
+                            theme={{ colors: { primary: "#7d0431" } }}
                             mode="outlined"
                             style={{ marginBottom: 10 }}
                         />
@@ -242,12 +218,16 @@ const EditService = () => {
                             value={updatedData.phoneNumber}
                             onChangeText={(text) => handleInputChange('phoneNumber', text)}
                             mode="outlined"
+                            theme={{ colors: { primary: "#7d0431" } }}
+                            maxLength={10}
+                            keyboardType="numeric"
                             style={{ marginBottom: 10 }}
                         />
                         <TextInput
                             label="Address"
                             value={updatedData.address}
                             onChangeText={(text) => handleInputChange('address', text)}
+                            theme={{ colors: { primary: "#7d0431" } }}
                             mode="outlined"
                             style={{ marginBottom: 10 }}
                         />
@@ -303,14 +283,26 @@ const EditService = () => {
                                 </View>
                             </TouchableWithoutFeedback>
                         </Modal>
-
-
-                        <Button mode="contained" onPress={handleUpdate} style={{ marginTop: 20 }}>
+                        <Button mode="contained" onPress={handleUpdate} theme={{ colors: { primary: "#7d0431" } }} style={{ marginTop: 100 }}>
                             Update
                         </Button>
+                        {loading && ( // Show activity indicator while loading
+                            <ActivityIndicator size="large" color="#7d0431" style={styles.loadingIndicator} />
+                        )}
                     </View>
                 )}
             </View>
+            <Snackbar
+                visible={snackbarVisible}
+                onDismiss={() => setSnackbarVisible(false)}
+                duration={3000}
+                action={{
+                    label: 'Dismiss',
+                    onPress: () => setSnackbarVisible(false),
+                }}
+            >
+                {snackbarMessage}
+            </Snackbar>
         </ScrollView>
     );
 };
@@ -323,6 +315,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'rgba(0, 0, 0, 0.5)', // Dark overlay
+    },loadingIndicator: {
+        marginTop: 20,
     },
     modalView: {
         width: '80%',
@@ -350,7 +344,7 @@ const styles = StyleSheet.create({
     },
     selectedOption: {
         fontWeight: 'bold',
-        color: '#7d0431', // Selected option color
+        color: '#7d0431', 
     },
     closeButtonText: {
         marginTop: 10,

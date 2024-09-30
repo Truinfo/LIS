@@ -37,49 +37,78 @@ const societyId = "6683b57b073739a31e8350d0";
 const AddService = () => {
     const dispatch = useDispatch();
     const navigation = useNavigation();
+
     const [serviceType, setServiceType] = useState('');
     const [name, setName] = useState('');
     const [mobileNumber, setMobileNumber] = useState('');
     const [address, setAddress] = useState('');
     const [image, setImage] = useState(null);
-    const [modalVisible, setModalVisible] = useState(false);
     const [selectedTimings, setSelectedTimings] = useState([]);
+
+    const [modalVisible, setModalVisible] = useState(false);
 
     const [snackbarVisible, setSnackbarVisible] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
+
+    // Validation state
+    const [errors, setErrors] = useState({});
+    const validateForm = () => {
+        const newErrors = {};
+
+        if (!serviceType) newErrors.serviceType = 'Please select a service type.';
+        if (!name) newErrors.name = 'Name is required.';
+        if (!mobileNumber) newErrors.mobileNumber = 'Mobile number is required.';
+        if (!address) newErrors.address = 'Address is required.';
+        if (!selectedTimings.length) newErrors.timings = 'Please select at least one timing.';
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0; // Return true if no errors
+    };
     const handleSubmit = () => {
-        const formData = new FormData();
-        formData.append('societyId', societyId);
-        formData.append('serviceType', serviceType);
-        formData.append('name', name);
-        formData.append('phoneNumber', mobileNumber);
-        formData.append('address', address);
-        
-        selectedTimings.forEach(timing => formData.append('timings', timing));
-      
-        if (image) {
-          const imageName = image.uri.split('/').pop();
-          const imageType = image.uri.split('.').pop(); // Example: 'jpg', 'png'
-          
-          formData.append('pictures', {
-            uri: image.uri,
-            name: imageName,
-            type: `image/${imageType}`, // Correct MIME type based on file extension
-          });
-        }
-      
-        dispatch(createService(formData))
-          .then(response => {
-            if (response.meta.requestStatus === 'fulfilled') {
-              setSnackbarMessage(`${response.payload.message}`);
-              setSnackbarVisible(true);
-              setTimeout(() => navigation.navigate("Services"), 3000);
+        if (validateForm()) {
+            const formData = new FormData();
+            formData.append('societyId', societyId);
+            formData.append('serviceType', serviceType);
+            formData.append('name', name);
+            formData.append('phoneNumber', mobileNumber);
+            formData.append('address', address);
+    
+            selectedTimings.forEach(timing => formData.append('timings', timing));
+    
+            if (image) {
+                const imageName = image.uri.split('/').pop();
+                const imageType = image.uri.split('.').pop(); // Example: 'jpg', 'png'
+    
+                formData.append('pictures', {
+                    uri: image.uri,
+                    name: imageName,
+                    type: `image/${imageType}`, 
+                });
             }
-          })
-          .catch(error => {
-            console.error("Error:", error);
-          });
-      };
+    
+            dispatch(createService(formData))
+                .then(response => {
+                    if (response.meta.requestStatus === 'fulfilled') {
+                        setSnackbarMessage(`${response.payload.message}`);
+                        setSnackbarVisible(true);
+                        
+                        // Clear the form fields
+                        setName('');
+                        setMobileNumber('');
+                        setAddress('');
+                        setSelectedTimings([]);
+                        setImage(null);
+    
+                        // Navigate to Services page after a short delay
+                        setTimeout(() => navigation.navigate("Services"), 3000);
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                });
+        }
+    };
+    
     // const handleSubmit = () => {
     //     const formData = new FormData();
     //     formData.append('societyId', societyId);
@@ -148,8 +177,8 @@ const AddService = () => {
         });
 
         if (!result.canceled) {
-            setImage(result.assets[0].uri); 
-            setImage(result.assets[0]); 
+            setImage(result.assets[0].uri);
+            setImage(result.assets[0]);
         }
     };
     return (
@@ -179,37 +208,62 @@ const AddService = () => {
                     </Picker>
                 </View>
             </View>
-
+            {errors.serviceType && <Text style={styles.errorText}>{errors.serviceType}</Text>}
             <TextInput
                 mode="outlined"
                 label="Name"
                 theme={{ colors: { primary: "#7d0431" } }}
                 value={name}
-                onChangeText={(text) => setName(text)}
+                onChangeText={(text) => {
+                    setName(text);
+                    if (text.length > 0) {
+                        setErrors((prevErrors) => ({ ...prevErrors, name: null })); // Clear error when field is filled
+                    }
+                }}
                 style={[styles.input, { backgroundColor: '#fff' }]}
+                error={!!errors.name}
             />
-
+            {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
             <TextInput
                 mode="outlined"
                 label="Mobile Number"
                 keyboardType="numeric"
                 theme={{ colors: { primary: "#7d0431" } }}
                 value={mobileNumber}
-                onChangeText={(text) => setMobileNumber(text)}
+                onChangeText={(text) => {
+                    setMobileNumber(text);
+                    if (text.length === 10) {
+                        setErrors((prevErrors) => ({ ...prevErrors, mobileNumber: null })); // Clear the error when valid
+                    }
+                }}
                 style={[styles.input, { backgroundColor: '#fff' }]}
+                maxLength={10}  // Set the limit to 10 digits
+                error={!!errors.mobileNumber}
             />
-
+            {errors.mobileNumber && <Text style={styles.errorText}>{errors.mobileNumber}</Text>}
             <TextInput
                 mode="outlined"
                 label="Address"
                 value={address}
                 theme={{ colors: { primary: "#7d0431" } }}
-                onChangeText={(text) => setAddress(text)}
-                style={[styles.input, { backgroundColor: '#fff' }]}
+               
+                style={[styles.input, { backgroundColor: '#fff' }]} 
+                error={!!errors.address}
+                onChangeText={(text) => {
+                    setAddress(text);
+                    if (text.length > 0) {
+                        setErrors((prevErrors) => ({ ...prevErrors, address: null })); // Clear error when field is filled
+                    }
+                }}
             />
-
+            {errors.address && <Text style={styles.errorText}>{errors.address}</Text>}
             <View style={styles.formGroup}>
-                <TouchableOpacity onPress={() => setModalVisible(true)}>
+                <TouchableOpacity  onPress={() => {
+            setModalVisible(true);
+            if (selectedTimings.length > 0) {
+                setErrors((prevErrors) => ({ ...prevErrors, timings: null })); // Clear error when a timing is selected
+            }
+        }}>
                     <Text style={styles.addButtonText}>Add Timing +</Text>
                 </TouchableOpacity>
                 <ScrollView
@@ -229,6 +283,7 @@ const AddService = () => {
                         </View>
                     )}
                 </ScrollView>
+                {errors.timings && <Text style={styles.errorText}>{errors.timings}</Text>}
             </View>
 
             <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
@@ -404,7 +459,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontSize: 16,
     },
-
+    errorText: { color: 'red', fontSize: 12 },
 });
 
 export default AddService;

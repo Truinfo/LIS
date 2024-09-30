@@ -35,21 +35,16 @@ export default function Sidebar() {
   };
 
   const handleProfile = () => {
-    // Handle navigation to profile page
     toggleDropdown();
   };
 
-  // const handleLogout = () => {
-  //   console.log("Logout clicked");
-  //   toggleDropdown();
-  // };
   const handleLogout = async () => {
-    // try {
-    //   await AsyncStorage.removeItem('user');
-    //   await AsyncStorage.removeItem('userToken');
-    // } catch (e) {
-    //   console.log('Error clearing user from AsyncStorage:', e);
-    // }
+    try {
+      await AsyncStorage.removeItem('user');
+      await AsyncStorage.removeItem('userToken');
+    } catch (e) {
+      console.log('Error clearing user from AsyncStorage:', e);
+    }
     dispatch(logout());
     navigation.navigate('Login');
   };
@@ -57,7 +52,7 @@ export default function Sidebar() {
   return (
     <View style={{ flex: 1 }}>
       <Drawer.Navigator
-        initialRouteName="Services"
+        initialRouteName="Dashboard"
         screenOptions={{
           headerRight: () => (
             <View style={{ flexDirection: 'row', alignItems: "center", gap: 15, marginRight: 10 }}>

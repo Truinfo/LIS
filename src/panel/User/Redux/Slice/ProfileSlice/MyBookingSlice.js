@@ -1,5 +1,6 @@
 
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import axiosInstance from "../../../../Security/helpers/axios"
 export const fetchAmenityBookings = createAsyncThunk(
     'amenityBooking/fetchAmenityBookings',
     async ({ id, userId }) => {
@@ -34,4 +35,4 @@ const amenityBookingSlice = createSlice({
     },
 });
 
-export default amenityBookingSlice.reducer;
+export const userAmenintyBookingReducer= amenityBookingSlice.reducer;

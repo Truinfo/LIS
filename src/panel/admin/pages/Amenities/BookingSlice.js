@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from "axios"
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axiosInstance from '../../../Security/helpers/axios';
 
 const fetchSocietyId = async () => {
     const storedAdmin = await AsyncStorage.getItem("societyAdmin");
@@ -12,7 +13,7 @@ export const getAmenityOfCommunityHal = createAsyncThunk(
     'booking/getAmenityOfCommunityHal',
     async () => {
         const societyId = await fetchSocietyId();
-        const response = await axios.get(`http://192.168.29.151:2000/api/getAmenityOfCommunityHal/${societyId}`);
+        const response = await axiosInstance.get(`/getAmenityOfCommunityHal/${societyId}`);
         return response.data.amenity;
     }
 );
@@ -22,7 +23,7 @@ export const getAmenityByIdAndUserId = createAsyncThunk(
     'booking/getAmenityByIdAndUserId',
     async ({ userId }) => {
         const societyId = await fetchSocietyId();
-        const response = await axios.get(`http://192.168.29.151:2000/api/getAmenityByIdAndUserId/${societyId}/${userId}`);
+        const response = await axiosInstance.get(`/getAmenityByIdAndUserId/${societyId}/${userId}`);
         return response.data.booking;
     }
 );
@@ -31,7 +32,9 @@ export const getAmenityByIdAndUserId = createAsyncThunk(
 export const bookAmenity = createAsyncThunk(
     'booking/bookAmenity',
     async ({ id, formData }) => {
-        const response = await axios.put(`http://192.168.29.151:2000/api/bookAmenity/${id}`, formData);
+        const response = await axiosInstance.post(`/bookAmenity/${id}`, formData, {
+            headers: { 'Content-Type': 'application/json' }
+        });
         return response.data;
     }
 );
@@ -41,8 +44,8 @@ export const updateAmenityBooking = createAsyncThunk(
     'booking/updateAmenityBooking',
     async ({ userId, formData }) => {
         const societyId = await fetchSocietyId();
-        console.log(societyId)
-        const response = await axios.put(`http://192.168.29.151:2000/api/updateAmenityBooking/${societyId}/${userId}`, formData);
+        const response = await axiosInstance.put(`/updateAmenityBooking/${societyId}/${userId}`, formData);
+        console.log(response, "updated")
         return response.data;
     }
 );
@@ -51,9 +54,12 @@ export const updateAmenityBooking = createAsyncThunk(
 export const deleteAmenityBooking = createAsyncThunk(
     "booking/deleteAmenityBooking",
     async (userId) => {
-        const id = userId.userId
+        const id = userId
         const societyId = await fetchSocietyId();
-        const response = await axios.delete(`http://192.168.29.151:2000/api/deleteAmenityBooking/${societyId}/${id}`);
+        console.log(societyId, userId, "delete")
+        const response = await axiosInstance.delete(`/deleteAmenityBooking/${societyId}/${id}`, {
+            headers: { 'Content-Type': 'application/json' }
+        });
         console.log(response.data, "hello")
         return response.data;
     }
@@ -106,6 +112,7 @@ const BookingSlice = createSlice({
             .addCase(bookAmenity.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.error.message;
+                console.log()
             })
             .addCase(updateAmenityBooking.pending, (state) => {
                 state.status = 'loading';

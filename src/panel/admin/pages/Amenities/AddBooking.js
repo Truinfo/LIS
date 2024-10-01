@@ -2,13 +2,10 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, Alert, ScrollView, Modal } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-
-import Ionicons from 'react-native-vector-icons/Ionicons';
-
-
-import { bookAmenity } from './BookingSlice';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker'; // Import DateTimePicker
+import { bookAmenity } from './BookingSlice';
+import { Snackbar } from 'react-native-paper'; // Import Snackbar
 
 const AddBooking = () => {
   const dispatch = useDispatch();
@@ -27,6 +24,8 @@ const AddBooking = () => {
   const [showDialog, setShowDialog] = useState(false);
   const successMessage = useSelector((state) => state.adminBooking.successMessage);
   const [showDatePicker, setShowDatePicker] = useState(false); // State for DatePicker visibility
+  const [snackVisible, setSnackVisible] = useState(false); // State for Snackbar visibility
+  const [snackMessage, setSnackMessage] = useState(''); // State for Snackbar message
   const statusOptions = ["InProgress", "Completed", "Cancelled"];
 
   const handleChange = (name, value) => {
@@ -52,25 +51,31 @@ const AddBooking = () => {
     }
     try {
       const response = await dispatch(bookAmenity({ id, formData }));
-      if (response.meta.requestStatus === 'fulfilled') {
+      if (response.type === 'booking/bookAmenity/fulfilled') {
         setFormData({
           userId: '',
           payed: '',
           pending: '',
-          dateOfBooking: new Date(), // Reset to current date
+          dateOfBooking: new Date(),
           status: '',
         });
         setShowDialog(true);
+        setSnackMessage('Amenity added successfully!');
+        setSnackVisible(true); // Show Snackbar
         setTimeout(() => {
           setShowDialog(false);
-          navigation.navigate("Bookings"); // Update with your actual route name
+          navigation.navigate("Bookings");
         }, 2000);
+      } else {
+        Alert.alert("Error", "Add booking failed, try again.");
       }
     } catch (error) {
       console.error("Error:", error);
       Alert.alert("Error", "An error occurred while booking the amenity.");
     }
   };
+
+  const handleDismissSnack = () => setSnackVisible(false); // Function to dismiss Snackbar
 
   return (
     <View style={styles.container}>
@@ -102,20 +107,19 @@ const AddBooking = () => {
 
         <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.input}>
           <Text style={styles.dateText}>
-            {formData.dateOfBooking.toLocaleString()}
+            {formData.dateOfBooking.toLocaleDateString()}
           </Text>
         </TouchableOpacity>
         {errors.dateOfBooking && <Text style={styles.errorText}>{errors.dateOfBooking}</Text>}
 
         {showDatePicker && (
           <DateTimePicker
-            value={new Date(formData.dateOfBooking) || new Date()} // Ensure this value is valid
+            value={new Date(formData.dateOfBooking) || new Date()}
             mode="date"
             display="default"
             onChange={handleDateChange}
           />
         )}
-
         <View style={styles.selectContainer}>
           <Text style={styles.selectLabel}>Status</Text>
           <Picker
@@ -133,7 +137,6 @@ const AddBooking = () => {
         </TouchableOpacity>
       </ScrollView>
 
-      {/* Inline Dialog Box */}
       <Modal
         transparent={true}
         visible={showDialog}
@@ -147,6 +150,15 @@ const AddBooking = () => {
           </View>
         </View>
       </Modal>
+
+      <Snackbar
+        visible={snackVisible}
+        onDismiss={handleDismissSnack}
+        duration={3000}
+        style={styles.snackbar}
+      >
+        {snackMessage}
+      </Snackbar>
     </View>
   );
 };
@@ -235,6 +247,9 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     fontSize: 18,
     textAlign: 'center',
+  },
+  snackbar: {
+    backgroundColor: '#630000', // Snackbar color
   },
 });
 

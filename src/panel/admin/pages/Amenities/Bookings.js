@@ -13,27 +13,27 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { deleteAmenityBooking, getAmenityOfCommunityHal } from './BookingSlice';
 import { Ionicons } from "@expo/vector-icons";
 import { ImagebaseURL } from '../../../Security/helpers/axios';
-import { Modal } from 'react-native-paper';
+import { ActivityIndicator, Modal } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AmenityBookingsList = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const status = useSelector((state) => state.adminBooking.status);
-  const error = useSelector((state) => state.adminBooking.error);
   const Allbooking = useSelector((state) => state.adminBooking.booking);
   const booking = Allbooking && Allbooking.list ? Allbooking.list : [];
   const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
-  const [menuDialogVisible, setMenuDialogVisible] = useState(false);
-  const [selectedAmenity, setSelectedAmenity] = useState(null);
   const [selectDeletedItem, setSelectDeletedItem] = useState(null);
+  const [anchor, setAnchor] = useState(null);
+
   useFocusEffect(
     React.useCallback(() => {
       dispatch(getAmenityOfCommunityHal());
+      setAnchor(false)
     }, [dispatch])
   );
   const confirmDelete = () => {
-    const userId = selectDeletedItem
+    const userId = selectDeletedItem.userId
     dispatch(deleteAmenityBooking(userId))
       .then((response) => {
         console.log(response.type, "respo")
@@ -53,12 +53,10 @@ const AmenityBookingsList = () => {
   const handleDelete = (item) => {
     setSelectDeletedItem(item)
     confirmDelete();
-    setMenuDialogVisible(false);
   };
-  const [anchor, setAnchor] = useState(null);
 
   const handleMenuPress = (item) => {
-    setSelectedAmenity(item);
+    ;
     setAnchor(anchor ? null : item._id);
   };
   // const societyId = fetchSocietyId()
@@ -89,12 +87,24 @@ const AmenityBookingsList = () => {
     </View>
   );
 
-  if (status === 'loading') {
-    return <Text>Loading...</Text>;
+  if (status === "loading") { // Show spinner while loading
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#7d0431" />
+      </View>
+    );
   }
-
-  if (status === 'failed') {
-    return <Text>Error: {error}</Text>;
+  if (status === "failed") { // Show spinner while loading
+    return (
+      <View style={styles.noDataContainer}>
+        <Image
+          source={require('../../../../assets/Admin/Imgaes/nodatadound.png')}
+          style={styles.noDataImage}
+          resizeMode="contain"
+        />
+        <Text style={styles.noDataText}>No Amenities Found</Text>
+      </View>
+    );
   }
 
   const BookingData = [...booking].reverse();
@@ -282,6 +292,29 @@ const styles = StyleSheet.create({
     padding: 5,
     zIndex: 10,
     overflow: 'hidden',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: "#f6f6f6",
+  },
+  noDataContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  noDataImage: {
+    width: 300,
+    height: 300,
+    marginTop: 100,
+    alignItems: "center",
+  },
+  noDataText: {
+    fontSize: 16,
+    color: '#7D0431',
+    fontWeight: '700',
   },
 });
 export default AmenityBookingsList;

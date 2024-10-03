@@ -110,6 +110,11 @@ import AddAmenity from './src/panel/admin/pages/Amenities/AddAmenity';
 import AmenityBookingsList from './src/panel/admin/pages/Amenities/Bookings';
 import EditBooking from './src/panel/admin/pages/Amenities/EditBooking';
 import AddBooking from './src/panel/admin/pages/Amenities/AddBooking';
+import SecurityTabs from './src/panel/Security/Component/BottomTabs/SecurityTabs';
+import Profile from './src/panel/admin/pages/Profile/Profile';
+import EditAdminMaintaince from './src/panel/admin/pages/Maintenance/EditBill';
+import AdminResetPassword from './src/panel/admin/pages/Profile/AdminResetPassword';
+import AddMaintenanceBill from './src/panel/admin/pages/Maintenance/AddMaintenanceBill';
 
 const Stack = createNativeStackNavigator();
 
@@ -323,6 +328,9 @@ export default function App() {
             <Stack.Screen name='Bookings' component={AmenityBookingsList} />
             <Stack.Screen name='Edit Booking' component={EditBooking} />
             <Stack.Screen name='Add Booking' component={AddBooking} />
+            <Stack.Screen name='Edit Maintenance' component={EditAdminMaintaince} />
+            <Stack.Screen name='Resetpassword' component={AdminResetPassword} />
+            <Stack.Screen name='Add Maintenance Bill' component={AddMaintenanceBill} />
           </Stack.Navigator>
         </SafeAreaView>
       </NavigationContainer>

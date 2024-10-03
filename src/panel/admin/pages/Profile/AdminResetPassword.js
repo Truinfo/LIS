@@ -10,7 +10,7 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons'; // Ensure to install react-native-vector-icons
 import { useDispatch } from 'react-redux'; // Import useDispatch from react-redux
 import { resetPassword } from './resetPasswordSlice';
-const ResetPassword = () => {
+const AdminResetPassword = () => {
     const [showPassword, setShowPassword] = useState({
         currentPassword: false,
         newPassword: false,
@@ -180,4 +180,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default ResetPassword;
+export default AdminResetPassword;

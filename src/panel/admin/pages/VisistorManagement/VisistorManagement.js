@@ -14,7 +14,7 @@ import {
 import { fetchVisitors, deleteVisitor, deleteEntry } from './EntrySlice'; // Assuming you have a deleteVisitor action
 import { ImagebaseURL } from '../../../Security/helpers/axios';
 import dummyAvatar from '../../../../assets/Admin/Imgaes/dummyProfile.png'; // Import your dummy avatar image
-import { Dialog, Paragraph, Button, Snackbar } from 'react-native-paper';
+import { Dialog, Paragraph, Button, Snackbar, ActivityIndicator } from 'react-native-paper';
 
 const VisitorManagement = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -33,12 +33,25 @@ const VisitorManagement = () => {
         dispatch(fetchVisitors());
     }, [dispatch]);
 
-    if (status === 'loading') {
-        return <Text>Loading...</Text>;
+    if (status === "loading") {
+        return (
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#7d0431" />
+            </View>
+        );
     }
-    if (status === 'failed') {
-        return <Text>Error: {error}</Text>;
+
+    if (status === "failed") {
+        return (<View style={styles.noDataContainer}>
+            <Image
+                source={require('../../../../assets/Admin/Imgaes/nodatadound.png')}
+                style={styles.noDataImage}
+                resizeMode="contain"
+            />
+            <Text style={styles.noDataText}>No Bills Found</Text>
+        </View>);
     }
+
 
     const filteredVisitors = Array.isArray(visitors)
         ? visitors.filter(visitor =>
@@ -337,6 +350,27 @@ const styles = StyleSheet.create({
     deleteText: {
         fontSize: 20,
         color: 'red',
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    noDataContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+    },
+    noDataImage: {
+        width: 300,
+        height: 300,
+        alignItems: "center",
+    },
+    noDataText: {
+        fontSize: 16,
+        color: '#7D0431',
+        fontWeight: '700',
     },
 });
 

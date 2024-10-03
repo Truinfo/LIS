@@ -8,7 +8,8 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { ImagebaseURL } from '../../../Security/helpers/axios';
-
+import { FAB } from 'react-native-paper';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 const Maintenance = ({ navigation }) => {
     const dispatch = useDispatch();
     const { status, error } = useSelector((state) => state.adminMaintainance);
@@ -19,7 +20,12 @@ const Maintenance = ({ navigation }) => {
     const [searchText, setSearchText] = useState('');
     const [showPicker, setShowPicker] = useState(false);
     const [selectedMenuId, setSelectedMenuId] = useState(null);
-
+    const [fabModalVisible, setFabModalVisible] = useState(false)
+    const [inventoryData, setInventoryData] = useState({
+        societyId: "6683b57b073739a31e8350d0",
+        amount: '',
+        monthAndYear: ''
+    });
     const DateAndMonth = (dateStr) => {
         const date = new Date(dateStr);
         const year = date.getFullYear();
@@ -31,8 +37,9 @@ const Maintenance = ({ navigation }) => {
         React.useCallback(() => {
             const year = date.getFullYear();
             const month = String(date.getMonth() + 1).padStart(2, '0');
-            // dispatch(getByMonthAndYear(`${year}-${month}`));
-            dispatch(getByMonthAndYear(`2024-07`));
+            dispatch(getByMonthAndYear(`${year}-${month}`));
+            setModalVisible(false)
+            setSelectedMenuId(null)
         }, [dispatch, date])
     );
 
@@ -60,7 +67,56 @@ const Maintenance = ({ navigation }) => {
         setShowPicker(false);
         setDate(currentDate);
     };
+    const handleChange = (name, value) => {
+        setInventoryData(prevState => ({
+            ...prevState,
+            [name]: value
+        }));
+    };
+    // State for DateTimePicker visibility
+    const [selectedDate, setSelectedDate] = useState(new Date()); // State for selected date
 
+    const onDateAddChange = (event, date) => {
+        if (date) {
+            setSelectedDate(date);
+            const month = date.getMonth() + 1; // Month is 0-indexed
+            const year = date.getFullYear();
+            handleChange('monthAndYear', `${year}-${month < 10 ? `0${month}` : month}`); // Format as YYYY-MM
+        }
+        setShowPicker(false); // Hide the picker after selecting
+    };
+
+    const handleBillSubmit = async () => {
+        // Check if all required fields are filled
+        if (!inventoryData.amount || !inventoryData.monthAndYear) {
+            setSnackbarMessage("Please fill out all fields");
+            setSnackbarVisible(true);
+            return;
+        }
+        console.log(inventoryData)
+        try {
+            const response = await dispatch(fetchaddInventory(inventoryData));
+            if (response.meta.requestStatus === 'fulfilled') {
+                setSnackbarMessage(`${response.payload.message}`);
+                setSnackbarVisible(true);
+                setFabModalVisible(false); // Close modal after submission
+
+                // Clear the fields by resetting inventoryData
+                setInventoryData({
+                    societyId: "6683b57b073739a31e8350d0",
+                    amount: '',
+                    monthAndYear: '',
+                });
+            } else if (response.error) {
+                setSnackbarMessage(`Failed to add inventory: ${response.error.message}`);
+                setSnackbarVisible(true);
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            setSnackbarMessage(`Error: ${error.message || 'Something went wrong'}`);
+            setSnackbarVisible(true);
+        }
+    };
     const renderMenu = (item) => {
         if (selectedMenuId !== item._id) return null;
         return (
@@ -85,9 +141,8 @@ const Maintenance = ({ navigation }) => {
             </View>
         );
     }
-    if (status === "error") {
-        return <Text>Error fetching data...</Text>;
-    }
+
+
     return (
         <View style={styles.container}>
             <TextInput
@@ -107,37 +162,118 @@ const Maintenance = ({ navigation }) => {
                     onChange={onDateChange}
                 />
             )}
-            <FlatList
-                data={filteredMaintainances}
-                keyExtractor={(item) => item._id}
-                renderItem={({ item }) => (
-                    <TouchableOpacity onPress={() => handleViewDetails(item)}>
-                        <View style={styles.itemContainer}>
-                            <View style={styles.infoContainer}>
-                                <View style={styles.infoRow}>
-                                    <Text style={styles.label}>Month</Text>
-                                    <Text style={styles.value}>: {DateAndMonth(item.payedOn)}</Text>
+            {!maintainances || !maintainances.paymentDetails || maintainances.paymentDetails.length === 0 ? (
+                // Display "Data not found" message if amenities is empty
+                <View style={styles.noDataContainer}>
+                    <Image
+                        source={require('../../../../assets/Admin/Imgaes/nodatadound.png')}
+                        style={styles.noDataImage}
+                        resizeMode="contain"
+                    />
+                    <Text style={styles.noDataText}>No Bills Found in this</Text>
+                </View>
+            ) : filteredMaintainances.length === 0 ? (
+                // Display "No bills found for the selected month" message if no filtered maintainances are found
+                <View style={styles.noDataContainer}>
+                    <Image
+                        source={require('../../../../assets/Admin/Imgaes/nodatadound.png')}
+                        style={styles.noDataImage}
+                        resizeMode="contain"
+                    />
+                    <Text style={styles.noDataText}>No Bills Found for the Selected Month</Text>
+                </View>
+            ) : (
+                <FlatList
+                    data={filteredMaintainances}
+                    keyExtractor={(item) => item._id}
+                    renderItem={({ item }) => (
+                        <TouchableOpacity onPress={() => handleViewDetails(item)}>
+                            <View style={styles.itemContainer}>
+                                <View style={styles.infoContainer}>
+                                    <View style={styles.infoRow}>
+                                        <Text style={styles.label}>Month</Text>
+                                        <Text style={styles.value}>: {DateAndMonth(item.payedOn)}</Text>
+                                    </View>
+                                    <View style={styles.infoRow}>
+                                        <Text style={styles.label}>Name</Text>
+                                        <Text style={styles.value}>: {item.name}</Text>
+                                    </View>
+                                    <View style={styles.infoRow}>
+                                        <Text style={styles.label}>Details</Text>
+                                        <Text style={styles.value}>: {item.blockno}/ {item.flatno}</Text>
+                                    </View>
+                                    {item.status === "Paid" ? "" : <View style={styles.infoRow}>
+                                        <Text style={styles.label}>Status</Text>
+                                        <Text style={styles.value}>: {item.status}</Text>
+                                    </View>}
                                 </View>
-                                <View style={styles.infoRow}>
-                                    <Text style={styles.label}>Name</Text>
-                                    <Text style={styles.value}>: {item.name}</Text>
-                                </View>
-                                <View style={styles.infoRow}>
-                                    <Text style={styles.label}>Details</Text>
-                                    <Text style={styles.value}>: {item.blockno}/ {item.flatno}</Text>
-                                </View>
+                                <TouchableOpacity style={styles.menuIcon} onPress={() => handleMenuClick(item._id)}>
+                                    <Icon name="ellipsis-vertical" size={24} color="#630000" />
+                                </TouchableOpacity>
+                                {renderMenu(item)}
                             </View>
-                            <TouchableOpacity style={styles.menuIcon} onPress={() => handleMenuClick(item._id)}>
-                                <Icon name="ellipsis-vertical" size={24} color="#630000" />
-                            </TouchableOpacity>
-                            {renderMenu(item)}
-                        </View>
-                    </TouchableOpacity>
-                )}
+                        </TouchableOpacity>
+                    )}
+                />
+            )}
+
+
+
+            <FAB
+                style={styles.fab}
+                icon="plus"
+                color='#fff'
+                onPress={() => setFabModalVisible(true)}
             />
-            <TouchableOpacity style={styles.addButton} onPress={() => Alert.alert('Add Monthly Maintenance clicked')}>
-                <Text style={styles.addButtonText}>Add Month</Text>
-            </TouchableOpacity>
+
+
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={fabModalVisible}
+                onRequestClose={() => setFabModalVisible(false)}
+            >
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        <View style={styles.modalHeader}>
+                            <Text style={styles.modalTitle}>Add Bill</Text>
+                            <TouchableOpacity onPress={() => setFabModalVisible(false)}>
+                                <MaterialCommunityIcons name="close" size={24} color="#630000" />
+                            </TouchableOpacity>
+                        </View>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Amount"
+                            value={inventoryData.amount}
+                            keyboardType="numeric" // To accept only numbers
+                            onChangeText={(value) => handleChange("amount", value)}
+                        />
+                        <TouchableOpacity
+                            style={styles.input}
+                            onPress={() => setShowPicker(true)} // Show the date picker when pressed
+                        >
+                            <Text style={styles.datePickerText}>
+                                {inventoryData.monthAndYear || 'Select Month and Year'}
+                            </Text>
+                        </TouchableOpacity>
+                        {showPicker && (
+                            <DateTimePicker
+                                value={selectedDate}
+                                mode="date"
+                                display="default"
+                                onChange={onDateAddChange}
+                            />
+                        )}
+                        <TouchableOpacity style={styles.submitButton} onPress={handleBillSubmit}>
+                            <Text style={styles.submitButtonText}>Add</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+
+
+
+
             {selectedUser && (
                 <Modal visible={modalVisible} animationType="slide" transparent={true}>
                     <View style={styles.modalContainer}>
@@ -184,6 +320,7 @@ const Maintenance = ({ navigation }) => {
                     </View>
                 </Modal>
             )}
+
         </View>
     );
 };
@@ -233,26 +370,24 @@ const styles = StyleSheet.create({
         color: "#222"
     },
     addButton: {
-        backgroundColor: '#630000',
-        padding: 15,
-        borderRadius: 5,
-        marginTop: 20,
-    },
-    addButtonText: {
-        color: '#fff',
-        textAlign: 'center',
-        fontSize: 16,
-    },
-    dateButton: {
+        backgroundColor: '#7d0431',
         padding: 10,
-        backgroundColor: '#007BFF',
         borderRadius: 5,
         alignItems: 'center',
-        marginBottom: 20,
+        marginTop: 16
+    },
+    addButtonText: {
+        color: '#fff'
+    },
+    dateButton: {
+        backgroundColor: '#7d0431',
+        padding: 10,
+        borderRadius: 5,
+        marginBottom: 16
     },
     dateButtonText: {
         color: '#fff',
-        fontSize: 16,
+        textAlign: 'center'
     },
     menuIcon: {
         position: 'absolute',
@@ -321,6 +456,80 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    noDataContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+    },
+    noDataImage: {
+        width: 300,
+        height: 300,
+        alignItems: "center",
+    },
+    noDataText: {
+        fontSize: 16,
+        color: '#7D0431',
+        fontWeight: '700',
+    },
+    fab: {
+        position: 'absolute',
+        bottom: 30,
+        right: 30,
+        backgroundColor: '#7d0431',
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '100%',
+        marginBottom: 20,
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#630000',
+    },
+    modalContent: {
+        width: '100%',
+        backgroundColor: 'white',
+        borderTopLeftRadius: 10,
+        borderTopRightRadius: 10,
+        padding: 20,
+        alignItems: 'center',
+    },
+    input: {
+        height: 50,
+        borderColor: '#630000',
+        borderWidth: 1,
+        borderRadius: 5,
+        paddingHorizontal: 10,
+        marginBottom: 20,
+        width: '100%',
+    },
+    submitButton: {
+        backgroundColor: '#630000',
+        padding: 15,
+        borderRadius: 5,
+        alignItems: 'center',
+        marginBottom: 10,
+        width: '100%',
+    },
+    submitButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
     },
 });
 

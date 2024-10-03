@@ -24,7 +24,6 @@ export const getOne = createAsyncThunk(
     async ({ blockno, flatno, monthAndYear }) => {
         const societyId = await fetchSocietyId()
         const response = await axiosInstance.get(`/getOne/${societyId}/${blockno}/${flatno}/${monthAndYear}`);
-        console.log(response)
         return response.data.maintanance;
     }
 );
@@ -44,13 +43,17 @@ export const createMaintenanceRecords = createAsyncThunk(
 
 export const updatePaymentDetails = createAsyncThunk(
     'maintainances/updatePaymentDetails',
-    async ({ formData }) => {
-        const response = await axiosInstance.put('/updatePaymentDetails', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data' // Ensure proper content type for FormData
-            }
-        });
-        return response.data;
+    async ({ formData }, { rejectWithValue }) => {
+        try {
+            const response = await axiosInstance.put('/updatePaymentDetails', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data' // Ensure proper content type for FormData
+                }
+            });
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response ? error.response.data : error.message);
+        }
     }
 );
 
@@ -82,7 +85,7 @@ const MaintainanceSlice = createSlice({
             })
             .addCase(getByMonthAndYear.fulfilled, (state, action) => {
                 state.status = 'succeeded';
-                state.maintainances = action.payload;
+                state.maintainances = action.payload || [];
             })
             .addCase(getByMonthAndYear.rejected, (state, action) => {
                 state.status = 'failed';
@@ -100,7 +103,6 @@ const MaintainanceSlice = createSlice({
                 state.status = 'failed';
                 state.error = action.error.message;
             })
-
             .addCase(createMaintenanceRecords.pending, (state) => {
                 state.status = 'loading';
             })
@@ -121,10 +123,12 @@ const MaintainanceSlice = createSlice({
                 state.status = 'succeeded';
                 state.maintainances = action.payload;
                 state.successMessage = action.payload.message;
+                console.log(action.payload.message, "success")
             })
             .addCase(updatePaymentDetails.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.error.message;
+                console.log(action.error.message, "error")
             })
 
             .addCase(updatePaymentStatus.pending, (state) => {
@@ -139,6 +143,7 @@ const MaintainanceSlice = createSlice({
             })
             .addCase(updatePaymentStatus.rejected, (state, action) => {
                 state.status = 'failed';
+
                 state.error = action.payload ? action.payload : 'Failed to fetch inventory';
             });
     },

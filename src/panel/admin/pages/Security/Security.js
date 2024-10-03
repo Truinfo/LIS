@@ -96,7 +96,7 @@ const Security = () => {
             <View style={styles.row}>
 
                 <Image
-                    source={{ uri: `http://192.168.29.226:2000${item.pictures}` }}
+                    source={{ uri: `${ImagebaseURL}${item.pictures}` }}
                     style={styles.image}
                 />
 

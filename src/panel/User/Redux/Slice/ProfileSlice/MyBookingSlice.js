@@ -1,19 +1,28 @@
 
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axiosInstance from "../../../../Security/helpers/axios"
+import axiosInstance from '../../../../Security/helpers/axios';
+
 export const fetchAmenityBookings = createAsyncThunk(
     'amenityBooking/fetchAmenityBookings',
     async ({ id, userId }) => {
-        const response = await axiosInstance.get(`/getAmenityByIdAndUserId/${id}/${userId}`);
-        return response.data;
+        console.log("id", id);
+        console.log("userId", userId);
+        try {
+            const response = await axiosInstance.get(`/getAmenityByIdAndUserId/${id}/${userId}`);
+            return response.data;
+        } catch (error) {
+            throw error; 
+        }
     }
 );
+
 
 const amenityBookingSlice = createSlice({
     name: 'amenityBooking',
     initialState: {
         bookings: [],
         loading: false,
+        status: null,
         error: null,
     },
     reducers: {},

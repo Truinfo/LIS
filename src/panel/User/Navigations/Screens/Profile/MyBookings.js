@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { fetchAmenityBookings } from "../../../Redux/Slice/ProfileSlice/MyBookingSlice";
@@ -8,7 +8,14 @@ const MyBookings = () => {
     const dispatch = useDispatch();
     const [userId, setUserId] = useState("");
     const [societyId, setSocietyId] = useState("");
-    const { bookings } = useSelector((state) => state.myBookings.bookings);
+    const Allbookings = useSelector(state => state.myBookings.bookings);
+    const bookings = Allbookings?.bookings;
+
+    useEffect(() => {
+        if (societyId && userId) {
+            dispatch(fetchAmenityBookings({ id: societyId, userId }));
+        }
+    }, [dispatch, societyId, userId]);
 
     useEffect(() => {
         const getUserName = async () => {
@@ -27,39 +34,68 @@ const MyBookings = () => {
         getUserName();
     }, []);
 
-    useEffect(() => {
-        if (societyId && userId) {
-            dispatch(fetchAmenityBookings({ id: societyId, userId }));
-        }
-    }, [dispatch, societyId, userId]);
     return (
-        <View style={styles.container}>
+        <ScrollView style={styles.container}>
             {bookings && bookings.length > 0 ? (
                 bookings.map((booking) => (
                     <View key={booking._id} style={styles.card}>
-                        {/* Status Chip */}
-                        <View style={styles.statusChip}>
+                        <View>
+                            <Text style={styles.amenityName}>{Allbookings.amenityName}</Text>
+                        </View>
+
+                        <View
+                            style={[
+                                styles.statusChip,
+                                {
+                                    backgroundColor:
+                                        booking.status === "Completed"
+                                            ? "#4caf50"
+                                            : booking.status === "InProgress"
+                                            ? "#ff9800"
+                                            : "#f44336",
+                                },
+                            ]}
+                        >
                             <Text style={styles.statusText}>{booking.status}</Text>
                         </View>
 
-                        <Text style={styles.title}>{booking.eventName}</Text>
-                        <Text>bookedDate: {booking.bookedDate}</Text>
-                        <Text>dateOfBooking: {booking.dateOfBooking}</Text>
-                        <Text>payed: {booking.payed}</Text>
+                        {/* Booking Details */}
+                        <View style={styles.row}>
+                            <Text style={styles.label}>Booked Date:</Text>
+                            <Text style={styles.value}>{new Date(booking.bookedDate).toDateString()}</Text>
+                        </View>
+                        <View style={styles.row}>
+                            <Text style={styles.label}>Date of Booking:</Text>
+                            <Text style={styles.value}>{new Date(booking.dateOfBooking).toDateString()}</Text>
+                        </View>
+                        <View style={styles.row}>
+                            <Text style={styles.label}>Paid:</Text>
+                            <Text style={styles.value}>{booking.payed}</Text>
+                        </View>
+                        <View style={styles.row}>
+                            <Text style={styles.label}>Pending:</Text>
+                            <Text style={styles.value}>{booking.pending}</Text>
+                        </View>
                         {booking.pending === 0 && (
                             <>
-                                <Text>pending: {booking.pending}</Text>
+                                <View style={styles.row}>
+                                    <Text style={styles.label}>Pending:</Text>
+                                    <Text style={styles.value}>{booking.pending}</Text>
+                                </View>
                                 {booking.paymentDetails && (
-                                    <Text>Total amount: {booking.paymentDetails.amount}</Text>
+                                    <View style={styles.row}>
+                                        <Text style={styles.label}>Total Amount:</Text>
+                                        <Text style={styles.value}>{booking.paymentDetails.amount}</Text>
+                                    </View>
                                 )}
                             </>
                         )}
                     </View>
                 ))
             ) : (
-                <Text>No bookings found</Text>
+                <Text style={styles.noBookingsText}>No bookings found</Text>
             )}
-        </View>
+        </ScrollView>
     );
 };
 
@@ -67,38 +103,60 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 16,
-        backgroundColor: "#f0f0f0",
+        backgroundColor: "#f9f9f9", // Softer background color for better contrast
     },
     card: {
-        padding: 16,
-        marginBottom: 16,
+        padding: 20,
+        marginBottom: 20,
         backgroundColor: "#fff",
-        borderRadius: 8,
+        borderRadius: 10,
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.1,
         shadowRadius: 4,
-        elevation: 3,
-        position: "relative", // To enable absolute positioning inside
+        elevation: 4, // Higher elevation for stronger shadow
+        position: "relative",
     },
     statusChip: {
         position: "absolute",
-        top: 10,
-        right: 10,
-        backgroundColor: "#4caf50", // Green color for approved, change as needed
-        paddingVertical: 4,
-        paddingHorizontal: 8,
-        borderRadius: 12,
+        top: 12,
+        right: 12,
+        paddingVertical: 6,
+        paddingHorizontal: 12,
+        borderRadius: 20,
     },
     statusText: {
         color: "#fff",
         fontSize: 12,
         fontWeight: "bold",
+        textTransform: "uppercase", // Makes status text all caps
     },
-    title: {
+    amenityName: {
         fontSize: 18,
         fontWeight: "bold",
+        color: "#333", // Darker text for better readability
+        marginBottom: 10,
+    },
+    row: {
+        flexDirection: "row",
+        justifyContent: "space-between",
         marginBottom: 8,
+    },
+    label: {
+        fontSize: 14,
+        color: "#777", // Muted color for labels
+        fontWeight: "500",
+    },
+    value: {
+        fontSize: 14,
+        color: "#000",
+        fontWeight: "600", // Slightly bolder for values
+    },
+    noBookingsText: {
+        fontSize: 16,
+        color: "#999",
+        textAlign: "center",
+        marginTop: 20,
     },
 });
 

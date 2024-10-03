@@ -92,6 +92,8 @@ const AddService = () => {
                         setSnackbarMessage(`${response.payload.message}`);
                         setSnackbarVisible(true);
                         
+                        // Navigate to Services page after a short delay
+                        setTimeout(() => navigation.navigate("Services"), 3000);
                         // Clear the form fields
                         setName('');
                         setMobileNumber('');
@@ -99,8 +101,6 @@ const AddService = () => {
                         setSelectedTimings([]);
                         setImage(null);
     
-                        // Navigate to Services page after a short delay
-                        setTimeout(() => navigation.navigate("Services"), 3000);
                     }
                 })
                 .catch(error => {

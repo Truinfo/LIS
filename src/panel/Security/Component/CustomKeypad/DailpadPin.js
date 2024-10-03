@@ -37,12 +37,13 @@ export default DialpadPin;
 const styles = StyleSheet.create({
   dialPadPinContainer: {
     flexDirection: "row",
-    backgroundColor: "#F8E9DC",
+    backgroundColor: "#f6f6f6",
     alignItems: "flex-end",
     borderRadius: 10,
     paddingHorizontal: 8,
     marginTop: 40,
-    paddingVertical: 8
+    paddingVertical: 8,
+    elevation:6
   },
   pinDigit: {
     fontSize: 28,

@@ -1,17 +1,18 @@
 import * as ImagePicker from "expo-image-picker";
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, Modal } from 'react-native'
-import { ActivityIndicator, TextInput } from 'react-native-paper';
+import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, Modal, Alert } from 'react-native'
+import { ActivityIndicator, Avatar, TextInput } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { createSequrity } from './GateKeeperSlice';
 import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
+import { Ionicons } from '@expo/vector-icons';
 const AddSecurity = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
-  const status = useSelector((state) => state.gateKeepers.status);
+  const { status } = useSelector((state) => state.gateKeepers);
   const [formData, setFormData] = useState({
     societyId: '6683b57b073739a31e8350d0',
     name: '',
@@ -93,45 +94,45 @@ const AddSecurity = () => {
 
   const handleAdd = async () => {
     const newErrors = {};
-  
+
     // Required field validation
     Object.keys(formData).forEach((key) => {
       if (!formData[key] && key !== 'details') {
         newErrors[key] = 'This field is required';
       }
     });
-  
+
     // Address field validation
     Object.keys(formData.address).forEach((key) => {
       if (!formData.address[key]) {
         newErrors[`address.${key}`] = 'This field is required';
       }
     });
-  
+
     // Email format validation
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (formData.email && !emailRegex.test(formData.email)) {
       newErrors.email = 'Invalid email format';
     }
-  
+
     // Mobile number format validation
     const mobileNumberRegex = /^\d{10}$/;
     if (formData.phoneNumber && !mobileNumberRegex.test(formData.phoneNumber)) {
       newErrors.phoneNumber = 'Mobile number must be 10 digits';
     }
-  
+
     // Aadhar number format validation
     const aadharNumberRegex = /^\d{12}$/;
     if (formData.aadharNumber && !aadharNumberRegex.test(formData.aadharNumber)) {
       newErrors.aadharNumber = 'Aadhar Number must be 12 digits';
     }
-  
+
     // Check for errors
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-  
+
     // Prepare submission data
     const submissionData = new FormData();
     Object.keys(formData).forEach((key) => {
@@ -142,36 +143,36 @@ const AddSecurity = () => {
     Object.keys(formData.address).forEach((key) => {
       submissionData.append(`address[${key}]`, formData.address[key]);
     });
-  
+
     if (imageFile) {
-      submissionData.append('picture', {
+      submissionData.append('pictures', {
         uri: imageFile.uri,
         name: imageFile.name,
         type: imageFile.type,
       });
     }
-  
+
     try {
       const response = await dispatch(createSequrity(submissionData));
-  
+      console.log(response)
       if (response.meta.requestStatus === 'fulfilled') {
         Toast.show({
           text1: 'Success',
           text2: 'Security added successfully!',
           type: 'success',
         });
-  
+
         setTimeout(() => {
           navigation.goBack();
         }, 2000);
-  
+
         // Reset form data and errors
         setFormData({
-          societyId: '6683b57b073739a31e8350d0',
+          societyId: '',
           name: '',
           email: '',
           phoneNumber: '',
-          role: 'Security',
+          role: 'Sequrity',
           details: '',
           aadharNumber: '',
           address: {
@@ -185,6 +186,9 @@ const AddSecurity = () => {
         setErrors({});
         setImageFile(null);
       }
+      else {
+        Alert.alert("failed")
+      }
     } catch (error) {
       console.error('Error:', error);
       Toast.show({
@@ -194,25 +198,38 @@ const AddSecurity = () => {
       });
     }
   };
-  
+
 
   if (status === 'loading') {
     return (
-      <Modal transparent={true} animationType="none" visible={status === 'loading'}>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#630000" />
-        </View>
-      </Modal>
+
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#630000" />
+      </View>
     );
   }
 
-if (status === 'failed') {
-    return <Text style={styles.errorText}>Error: {error}</Text>;
-}
+  // if (status === 'failed') {
+  //     return <Text style={styles.errorText}>Error: {error}</Text>;
+  // }
 
   return (
     <ScrollView>
       <View style={styles.container}>
+        <View style={styles.avatarContainer}>
+          <Avatar.Image
+            size={120}
+            source={
+              imageFile
+                ? { uri: imageFile.uri }
+                : { uri: "https://thumbs.dreamstime.com/b/default-avatar-profile-trendy-style-social-media-user-icon-187599373.jpg" } // Fallback to a local image
+            }
+            style={styles.avatar}
+          />
+          <TouchableOpacity style={styles.cameraButton} onPress={() => setModalVisible(true)} >
+            <Ionicons name="camera" size={20} color="white" />
+          </TouchableOpacity>
+        </View>
         <View style={styles.form}>
 
           <View style={styles.textInputFields}>
@@ -312,7 +329,7 @@ if (status === 'failed') {
             />
             {errors.password && <Text style={styles.error}>{errors.password}</Text>}
           </View>
-          {/* Image Preview */}
+          {/* Image Preview
           {imageFile && (
             <View style={styles.imagePreview}>
               <Image source={{ uri: imageFile.uri }} style={styles.image} />
@@ -325,12 +342,11 @@ if (status === 'failed') {
           <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.uploadButton}>
             <Text style={styles.uploadButtonText}>{imageFile ? 'Change Profile Photo' : 'Add Profile Photo'}</Text>
           </TouchableOpacity>
-
+          */}
           <TouchableOpacity onPress={handleAdd} style={styles.submitButton}>
             <Text style={styles.submitButtonText}>Add Security</Text>
           </TouchableOpacity>
         </View>
-
         {/* Image Selection Modal */}
         <Modal visible={modalVisible} transparent={true} animationType="slide">
           <View style={styles.modalContainer}>
@@ -351,7 +367,7 @@ if (status === 'failed') {
           </View>
         </Modal>
         <Toast ref={(ref) => Toast.setRef(ref)} />
-      </View> 
+      </View>
     </ScrollView>
   );
 };
@@ -451,7 +467,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: '#7d0431',
   },
- 
+
   textInputFields: {
     marginBottom: 20,
   },
@@ -466,7 +482,22 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  avatarContainer: {
+    alignSelf: 'center',
+    marginBottom: 20,
+    position: 'relative',
+  },
+  avatar: {
+    alignSelf: 'center',
+  },
+  cameraButton: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Your primary color
+    borderRadius: 50,
+    padding: 5,
   },
 });
 

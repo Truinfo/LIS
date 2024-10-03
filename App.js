@@ -111,6 +111,7 @@ import AddAmenity from './src/panel/admin/pages/Amenities/AddAmenity';
 import AmenityBookingsList from './src/panel/admin/pages/Amenities/Bookings';
 import EditBooking from './src/panel/admin/pages/Amenities/EditBooking';
 import AddBooking from './src/panel/admin/pages/Amenities/AddBooking';
+import EditAdminMaintaince from './src/panel/admin/pages/Maintenance/EditBill';
 
 const Stack = createNativeStackNavigator();
 
@@ -321,6 +322,7 @@ export default function App() {
             <Stack.Screen name='Bookings' component={AmenityBookingsList} />
             <Stack.Screen name='Edit Booking' component={EditBooking} />
             <Stack.Screen name='Add Booking' component={AddBooking} />
+            <Stack.Screen name='Edit Maintenance' component={EditAdminMaintaince} />
           </Stack.Navigator>
         </SafeAreaView>
       </NavigationContainer>

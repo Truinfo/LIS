@@ -140,11 +140,11 @@ const EditSecurity = () => {
   };
   if (status === 'loading') {
     return <ActivityIndicator size="large" color="#630000" style={styles.loader} />;
-}
+  }
 
-if (status === 'failed') {
+  if (status === 'failed') {
     return <Text style={styles.errorText}>Error: {error}</Text>;
-}
+  }
   return (
     <ScrollView style={styles.container}>
       <View style={styles.form}>
@@ -244,8 +244,8 @@ if (status === 'failed') {
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Select Image Source</Text>
             <TouchableOpacity onPress={() => handleImagePicker('gallery')} style={styles.modalButtonIcon}>
-            <Text>Pick from Gallery  </Text>
-            <Icon name="photo-library" size={24} color="#7D0431" />
+              <Text>Pick from Gallery  </Text>
+              <Icon name="photo-library" size={24} color="#7D0431" />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => handleImagePicker('camera')} style={styles.modalButtonIcon}>
               <Text>Take a Photo  </Text>

@@ -4,7 +4,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const fetchSocietyId = async () => {
-    const storedAdmin = await AsyncStorage.getItem("societyAdmin");
+    const storedAdmin = await AsyncStorage.getItem('societyAdmin');
     const societyAdmin = JSON.parse(storedAdmin) || {};
     return societyAdmin._id || "6683b57b073739a31e8350d0"; // Default ID
 };
@@ -12,10 +12,8 @@ const fetchSocietyId = async () => {
 export const getByMonthAndYear = createAsyncThunk(
     'maintainances/getByMonthAndYear',
     async (monthAndYear) => {
-        const societyId = "6683b57b073739a31e8350d0"
-        console.log(monthAndYear, societyId)
-        const response = await axios.get(`http://192.168.29.151:2000/api/getByMonthAndYear/${societyId}/${monthAndYear}`);
-        console.log(response.data)
+        const societyId = await fetchSocietyId()
+        const response = await axiosInstance.get(`/getByMonthAndYear/${societyId}/${monthAndYear}`);
         return response.data.maintenance.society;
     }
 );
@@ -24,10 +22,10 @@ export const getByMonthAndYear = createAsyncThunk(
 export const getOne = createAsyncThunk(
     'maintainancess/getOne',
     async ({ blockno, flatno, monthAndYear }) => {
-        const societyId = fetchSocietyId()
+        const societyId = await fetchSocietyId()
         const response = await axiosInstance.get(`/getOne/${societyId}/${blockno}/${flatno}/${monthAndYear}`);
+        console.log(response)
         return response.data.maintanance;
-
     }
 );
 

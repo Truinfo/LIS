@@ -61,6 +61,9 @@ import { staffReducer } from "../../admin/pages/Services/ServicesSlice";
 import { AdminEntriesReducer } from "../../admin/pages/VisistorManagement/EntrySlice";
 import { AdminAmenitiesReducer } from "../../admin/pages/Amenities/AmenitiesSlice";
 import { AdminBookingReducer } from "../../admin/pages/Amenities/BookingSlice";
+import { AdminprofileReducer } from "../../admin/pages/Profile/profileSlice";
+import { CommityMembersReducer } from "../../admin/pages/Profile/committeeSlice";
+import { AdminMaintainanceReducer } from "../../admin/pages/Maintenance/SocietyMaintainanceSlice";
 
 const store = configureStore({
   reducer: {

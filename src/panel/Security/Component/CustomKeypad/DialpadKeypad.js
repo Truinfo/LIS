@@ -38,7 +38,8 @@ const DialpadKeypad = ({
               <View
                 style={[
                   {
-                    backgroundColor: item === "Y" ? "#7d0431" : "#F8E9DC",
+                    backgroundColor: item === "Y" ? "#f6f6f6" : "#7d0431",
+                    elevation:3,
                     width: dialPadSize,
                     height: dialPadSize,
                   },
@@ -46,9 +47,9 @@ const DialpadKeypad = ({
                 ]}
               >
                 {item === "X" ? (
-                  <Feather name="delete" size={24} color="#800336" />
+                  <Feather name="delete" size={24} color="#fff" />
                 ) : item === "Y" ? (
-                  <MaterialIcons name="qr-code-scanner" size={32} color="#ffffff" />
+                  <MaterialIcons name="qr-code-scanner" size={32} color="#7d0431" />
                 ) : (
                   <Text style={[{ fontSize: dialPadTextSize }, styles.dialPadText]}>{item}</Text>
                 )}
@@ -72,6 +73,6 @@ const styles = StyleSheet.create({
     borderColor: "transparent",
   },
   dialPadText: {
-    color: "#7d0431",
+    color: "#fff",
   },
 });

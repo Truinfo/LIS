@@ -36,6 +36,12 @@ export default function Sidebar() {
 
   const handleProfile = () => {
     // Handle navigation to profile page
+    navigation.navigate("AdminProfile")
+    toggleDropdown();
+  };
+  const handlePassword = () => {
+    // Handle navigation to profile page
+    navigation.navigate("Resetpassword")
     toggleDropdown();
   };
 
@@ -75,6 +81,12 @@ export default function Sidebar() {
                   <TouchableOpacity onPress={handleProfile} style={styles.menuItem}>
                     <Text style={styles.menuText}>Profile</Text>
                   </TouchableOpacity>
+                  <View style={{borderBottomWidth:1,borderColor:"#ccc"}}/>
+                  <TouchableOpacity onPress={handlePassword} style={styles.menuItem}>
+                    <Text style={styles.menuText}>Reset Password</Text>
+                  </TouchableOpacity>
+                  <View style={{borderBottomWidth:1,borderColor:"#ccc"}}/>
+
                   <TouchableOpacity onPress={handleLogout} style={styles.menuItem}>
                     <Text style={styles.menuText}>Logout</Text>
                   </TouchableOpacity>
@@ -90,7 +102,6 @@ export default function Sidebar() {
         <Drawer.Screen name="Security" component={Security} />
         <Drawer.Screen name="Services" component={Services} />
         <Drawer.Screen name="Complaints" component={Complaints} />
-        <Drawer.Screen name="Documents" component={Documents} />
         <Drawer.Screen name="Notice Board" component={NoticeBoard} />
         <Drawer.Screen name="Events" component={Events} />
         <Drawer.Screen name="Polls" component={Polls} />
@@ -136,6 +147,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   menuText: {
-    fontSize: 16,
+    fontSize: 16
   },
 });

@@ -3,7 +3,7 @@ import axiosInstance from '../../../Security/helpers/axios';
 import axios from 'axios';
 
 // const societyAdmin = JSON.parse(localStorage.getItem('societyAdmin')) || {};
-const societyId =  "6683b57b073739a31e8350d0";
+const societyId = "6683b57b073739a31e8350d0";
 
 // router.post('/createService', createService);
 export const createService = createAsyncThunk(
@@ -53,7 +53,7 @@ export const fetchServicePersonById = createAsyncThunk(
 export const updateServicePerson = createAsyncThunk(
     'staff/updateServicePerson',
     async (formData) => {
-        console.log("slice ",formData)
+        console.log("slice ", formData)
         const response = await axiosInstance.put('/updateServicePerson', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data' // Ensure proper content type for FormData
@@ -65,15 +65,22 @@ export const updateServicePerson = createAsyncThunk(
 // router.delete('/deleteServicePerson', deleteServicePerson);
 export const deleteServicePerson = createAsyncThunk(
     'user/deleteServicePerson',
-    async ( {userid, serviceType, societyId}) => {
-        console.log(userid, serviceType, societyId)
-        const response = await axiosInstance.delete('/deleteServicePerson', {
-            data: { societyId, serviceType, userid }
-        });
-        return response.data;
+    async ({ userid, serviceType, societyId }) => {
+        console.log('Payload:', { userid, serviceType, societyId });
+
+        try {
+            const response = await axiosInstance.delete('/deleteServicePerson', {
+                data: { societyId, serviceType, userid },
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            return response.data;
+        } catch (error) {
+            throw error; // Handle as needed
+        }
     }
 );
-
 
 // router.put('/addList', addList);
 // export const addList = createAsyncThunk(
@@ -191,6 +198,7 @@ const staffSlice = createSlice({
             })
             .addCase(deleteServicePerson.rejected, (state, action) => {
                 state.status = 'failed';
+                console.log(action.error.message)
                 state.error = action.error.message;
             })
 

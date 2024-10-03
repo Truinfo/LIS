@@ -6,7 +6,7 @@ export const fetchSocietyByLicence = createAsyncThunk(
     'societyByLicence/fetchSocietyByLicence',
     async ({societyLicense}) => {
         try {
-            const response = await axios.get(`http://192.168.29.24:2000/api/society/getSocietyByLicenceId/${societyLicense}`);
+            const response = await axios.get(`society/getSocietyByLicenceId/${societyLicense}`);
             return response.data.society;
         } catch (error) {
             throw Error('Failed to fetch visitors: ' + error.message);

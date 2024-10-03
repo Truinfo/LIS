@@ -34,11 +34,13 @@ const Inventory = () => {
 
     const handleMenuPress = (item) => {
         setAnchor(anchor === item._id ? null : item._id);
+        
     };
 
     
 
     const confirmDelete = (id) => {
+        setAnchor(false)
         Alert.alert(
             'Confirm Delete',
             'Are you sure you want to delete this inventory?',
@@ -76,15 +78,26 @@ const Inventory = () => {
             quantity: item.quantity,
         });
         setModalVisible1(true);
+        setAnchor(false)
     };
     const handleEditSubmit = async () => {
         try {
-            const response = await dispatch(fetchEditInventoryAsync(editInventoryData));
+            // Pass both id and editInventoryData properly
+            const response = await dispatch(fetchEditInventoryAsync({
+                id: editInventoryData.id, // extract the id
+                editInventoryData: {
+                    name: editInventoryData.name,
+                    quantity: editInventoryData.quantity
+                }
+            }));
+            
+            console.log(editInventoryData);
+            
             if (response.type === 'inventory/EditInventoryData/fulfilled') {
-                setModalVisible1(false); 
-                setSnackbarMessage(successMessage);
+                setModalVisible1(false);
+                setSnackbarMessage(`${response.payload.message}`);
                 setSnackbarVisible(true);
-                dispatch(fetchInventory()); 
+                dispatch(fetchInventory()); // Refresh the inventory list
             }
         } catch (error) {
             setSnackbarMessage("Failed to edit inventory");
@@ -92,6 +105,7 @@ const Inventory = () => {
             console.error("Error:", error);
         }
     };
+    
 
     const handleChange = (name, value) => {
         setInventoryData(prevState => ({
@@ -109,31 +123,30 @@ const Inventory = () => {
         }
     
         try {
-            // Dispatch the action to add inventory
             const response = await dispatch(fetchaddInventory(inventoryData));
-            
-            // Handle successful response
+            console.log(response)
             if (response.meta.requestStatus === 'fulfilled') {
-                console.log(response);
-                setSnackbarMessage("Inventory added successfully");
+                setSnackbarMessage(`${response.payload.message}`);
                 setSnackbarVisible(true);
-                dispatch(fetchInventory()); // Refresh the inventory list
-                setModalVisible(false); // Close modal after success
+                dispatch(fetchInventory()); 
+                setModalVisible(false); 
+                   
+            // Clear the fields by resetting inventoryData to its initial state
+            setInventoryData({
+                name: "",
+                quantity: "",
+                societyId: "" // default societyId
+            });
             } else if (response.error) {
-                // Handle server errors more gracefully
                 setSnackbarMessage(`Failed to add inventory: ${response.error.message}`);
                 setSnackbarVisible(true);
             }
         } catch (error) {
-            // Handle any unexpected errors
             console.error("Error:", error);
             setSnackbarMessage(`Error: ${error.message || 'Something went wrong'}`);
             setSnackbarVisible(true);
         }
     };
-    
-    
-
     if (status === 'loading') {
         return (
             <View style={[styles.container, { justifyContent: "center", alignItems: "center" }]}>
@@ -141,11 +154,9 @@ const Inventory = () => {
             </View>
         );
     }
-
     if (status === 'failed') {
         return <Text style={styles.errorText}>Error: {error}</Text>;
     }
-
     const capitalizeFirstLetter = (string) => {
         return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
     };
@@ -224,7 +235,6 @@ const Inventory = () => {
                     </View>
                 </View>
             </Modal>
-            {/* Edit Inventory Modal */}
             <Modal
                 animationType="slide"
                 transparent={true}

@@ -4,7 +4,6 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { SafeAreaView, StatusBar } from 'react-native';
 import Login from "./src/panel/User/Navigations/Authentication/Login";
 import Header from "./src/panel/Security/Component/Header/Header";
-import Residents from "./src/panel/Security/Navigations/Residents";
 import { Provider } from 'react-redux';
 import store from './src/panel/User/Redux/Store';
 import Messages from "./src/panel/Security/Navigations/Messages";
@@ -112,6 +111,9 @@ import AddAmenity from './src/panel/admin/pages/Amenities/AddAmenity';
 import AmenityBookingsList from './src/panel/admin/pages/Amenities/Bookings';
 import EditBooking from './src/panel/admin/pages/Amenities/EditBooking';
 import AddBooking from './src/panel/admin/pages/Amenities/AddBooking';
+import Profile from './src/panel/admin/pages/Profile/Profile';
+import AdminResetPassword from './src/panel/admin/pages/Profile/AdminResetPassword';
+import SecurityTabs from './src/panel/Security/Component/BottomTabs/SecurityTabs';
 
 const Stack = createNativeStackNavigator();
 
@@ -144,7 +146,7 @@ export default function App() {
         const userRole = JSON.parse(user).role
         if (user !== null && userToken !== null) {
           if (userRole === 'Sequrity') {
-            setInitialRoute('Header');
+            setInitialRoute('SecurityTabs');
           } else if (userRole === 'User') {
             setInitialRoute('Tabs');
           } else if (userRole === 'SocietyAdmin') {
@@ -202,6 +204,9 @@ export default function App() {
               headerShown: false,
             }} />
             <Stack.Screen name="Verification" component={Verification} />
+            <Stack.Screen name="SecurityTabs" component={SecurityTabs} options={{
+              headerShown: false,
+            }} />
             <Stack.Screen name="Verification " component={ForgotVerification} />
             <Stack.Screen name="Reset Password" component={ResetPassword} />
             <Stack.Screen name="SignUp" component={SignUp} options={{
@@ -213,7 +218,6 @@ export default function App() {
             <Stack.Screen name="Header" component={Header} options={{
               headerShown: false,
             }} />
-            <Stack.Screen name="Residents" component={Residents} />
             <Stack.Screen name="Manage Daily Help" component={ManageDailyHelp} />
             <Stack.Screen name="Messages" component={Messages} />
             <Stack.Screen name="Add Service" component={AddService} />
@@ -274,6 +278,7 @@ export default function App() {
             <Stack.Screen name="Payment" component={Payment} />
             <Stack.Screen name="Residents " component={Resident} />
             <Stack.Screen name="Notification" component={Notifications} />
+            <Stack.Screen name="AdminProfile" component={Profile} />
             <Stack.Screen name="Pre Approval Visitors" component={PreApproval} />
             <Stack.Screen name="Household" component={Household} />
             <Stack.Screen name="GetHelp" component={GetHelp} />
@@ -323,6 +328,7 @@ export default function App() {
             <Stack.Screen name='Bookings' component={AmenityBookingsList} />
             <Stack.Screen name='Edit Booking' component={EditBooking} />
             <Stack.Screen name='Add Booking' component={AddBooking} />
+            <Stack.Screen name='Resetpassword' component={AdminResetPassword} />
           </Stack.Navigator>
         </SafeAreaView>
       </NavigationContainer>

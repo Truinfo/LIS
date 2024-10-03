@@ -5,8 +5,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export const fetchAdvertisements = createAsyncThunk(
   'adds/fetchAdvertisements',
   async () => {
-    const societyAdmin = await AsyncStorage.getItem('societyAdmin');
-    const societyId = JSON.parse(societyAdmin)?._id || "6683b57b073739a31e8350d0";
+    const societyAdmin = await AsyncStorage.getItem('user');
+    const societyId = JSON.parse(societyAdmin)?._id;
 
     const response = await axiosInstance.get(`/getAdvertisements/${societyId}`);
     return response.data.addv;

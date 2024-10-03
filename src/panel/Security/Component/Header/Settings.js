@@ -68,7 +68,7 @@ const Settings = () => {
     }, [societyId, sequrityId, dispatch]);
 
     const handleMessagesPress = () => {
-        navigation.navigate("Messages");
+        navigation.navigate("Residents ");
     };
     const handleGuard = () => {
         navigation.navigate("Security");
@@ -113,7 +113,17 @@ const Settings = () => {
                         style={styles.Image2}
                     />
                     <View style={styles.imagecontent}>
-                        <Text style={styles.rowText}>Messages</Text>
+                        <Text style={styles.rowText}>Residents</Text>
+                    </View>
+                    <Icon name="navigate-next" size={25} color="lightgrey" />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.rowContent} onPress={()=>navigation.navigate("Staff")}>
+                    <Image
+                        source={require("../../../../assets/Security/images/email.png")}
+                        style={styles.Image2}
+                    />
+                    <View style={styles.imagecontent}>
+                        <Text style={styles.rowText}>Service</Text>
                     </View>
                     <Icon name="navigate-next" size={25} color="lightgrey" />
                 </TouchableOpacity>

@@ -11,7 +11,7 @@ const SocietyBills = () => {
     const dispatch = useDispatch();
     const [societyId, setSocietyId] = useState('');
     const { society } = useSelector((state) => state.societyBills.societyBills);
-    const { loading } = useSelector((state) => state.societyBills.loading);
+    const { loading} = useSelector((state) => state.societyBills);
     useEffect(() => {
         const getUserName = async () => {
             try {
@@ -114,9 +114,6 @@ const SocietyBills = () => {
         return spinner(); // Show spinner when loading
     }
 
-    if (error) {
-        return <Text>Error: {error}</Text>; // Show error if exists
-    }
     return (
         <View style={styles.container}>
             <FlatList

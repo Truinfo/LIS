@@ -42,7 +42,9 @@ const Settings = () => {
         }
     }, [societyId, sequrityId, dispatch]);
 
-    
+    const handleMessagesPress = () => {
+        navigation.navigate("Messages");
+    };
     const handleGuard = () => {
         navigation.navigate("Security");
     };
@@ -79,6 +81,18 @@ const Settings = () => {
                         </View>
                     </View>
                 </TouchableOpacity>
+
+                <TouchableOpacity style={styles.rowContent} onPress={handleMessagesPress}>
+                    <Image
+                        source={require("../../../../assets/Security/images/email.png")}
+                        style={styles.Image2}
+                    />
+                    <View style={styles.imagecontent}>
+                        <Text style={styles.rowText}>Messages</Text>
+                    </View>
+                    <Icon name="navigate-next" size={25} color="lightgrey" />
+                </TouchableOpacity>
+
                 <TouchableOpacity style={styles.rowContent} onPress={handleNoticePress}>
                     <Image
                         source={require("../../../../assets/Security/images/notice.png")}

@@ -1,10 +1,11 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../../Security/helpers/axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 const getSocietyId = async () => {
-  const societyAdmin = await AsyncStorage.getItem('societyAdmin');
-  return JSON.parse(societyAdmin)?._id || "6683b57b073739a31e8350d0";
+  const societyAdmin = await AsyncStorage.getItem('user');
+  return JSON.parse(societyAdmin)?._id ;
 };
 
 
@@ -65,7 +66,7 @@ export const updateSequrity = createAsyncThunk(
   'sequrity/updateSequrity',
   async ({ sequrityId, formData }, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.put(`/sequrity/updateSequrityById/${sequrityId}`, formData, {
+      const response = await axiosInstance.put(`//sequrity/updateSequrityById/${sequrityId}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -191,6 +192,7 @@ const GateKeeperSlice = createSlice({
       })
       .addCase(createSequrity.rejected, (state, action) => {
         state.status = 'failed';
+        console.log(action.payload.message)
         state.error = action.payload.message;
       })
 

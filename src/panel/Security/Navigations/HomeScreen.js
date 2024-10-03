@@ -3,17 +3,18 @@ import { View, Text, StyleSheet, Dimensions, TouchableOpacity, ScrollView, Image
 import DialpadPin from "../Component/CustomKeypad/DailpadPin";
 import DialpadKeypad from "../Component/CustomKeypad/DialpadKeypad";
 import { useNavigation } from '@react-navigation/native';
-import { Ionicons, AntDesign } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import MyDialog from '../DialogBox/DialogBox';
 import { fetchVisitorVerify, resetState } from '../../User/Redux/Slice/Security_Panel/HomeScreenSlice';
+import { FAB, RadioButton } from 'react-native-paper';
 const { width, height } = Dimensions.get("window");
 const dialPadContent = [1, 2, 3, 4, 5, 6, 7, 8, 9, "Y", 0, "X"];
 const dialPadSize = width * 0.2;
 const dialPadTextSize = dialPadSize * 0.38;
 const pinLength = 6;
-const pinContainerSize = width / 1.8;
+const pinContainerSize = width / 1.5;
 const pinSize = pinContainerSize / pinLength;
 const modalDuration = 5000;
 const HomeScreen = ({ }) => {
@@ -27,6 +28,7 @@ const HomeScreen = ({ }) => {
     const successMessage = useSelector(state => state.homeScreen.successMessage);
     const error = useSelector(state => state.homeScreen.error);
     const [showDialog, setShowDialog] = useState(false);
+    const [openFab, setOpenFab] = useState(false);
     console.log(selectedOption)
     useEffect(() => {
         if (selectedOption !== null) {
@@ -95,12 +97,35 @@ const HomeScreen = ({ }) => {
         };
     };
     const handleOptionSelect = (option) => {
-        setSelectedOption(option === 'guests' ? 'Guest' : 'Service');
+        setSelectedOption(option); // No need for additional logic here
     };
-    const renderPinAndKeypad = () => {
-        return (
+
+    return (
+        <View style={styles.container}>
             <View style={styles.pinContainer}>
-                <View style={{ marginTop: -50 }}>
+                <View style={styles.radioContainer}>
+                    <View style={{ flexDirection: 'row', justifyContent: "center", alignItems: 'center' }}>
+                        <RadioButton
+                            value="guests"
+                            status={selectedOption === 'guests' ? 'checked' : 'unchecked'}  // Compare with "guests"
+                            onPress={() => handleOptionSelect('guests')}  // Pass "guests"
+                            color="#7d0431"
+                        />
+                        <Text style={styles.radioText}>Guests</Text>
+                    </View>
+
+                    <View style={{ flexDirection: 'row', alignItems: 'center', paddingLeft: 20 }}>
+                        <RadioButton
+                            value="service"
+                            status={selectedOption === 'service' ? 'checked' : 'unchecked'}  // Compare with "service"
+                            onPress={() => handleOptionSelect('service')}  // Pass "service"
+                            color="#7d0431"
+                        />
+                        <Text style={styles.radioText}>Service</Text>
+                    </View>
+                </View>
+
+                <View style={{ marginTop: -30,marginBottom:10 }}>
                     <DialpadPin
                         pinLength={pinLength}
                         pinSize={pinSize}
@@ -119,69 +144,89 @@ const HomeScreen = ({ }) => {
                         disabled={!pinEnabled}
                     />
                 </View>
-                <TouchableOpacity style={[styles.enterButton,{marginTop:-40}]} onPress={handleEnter} disabled={!pinEnabled}>
+                <TouchableOpacity style={[styles.enterButton]} onPress={handleEnter} disabled={!pinEnabled}>
                     <Text style={styles.enterButtonText}>Enter</Text>
                 </TouchableOpacity>
             </View>
-        );
-    }
-    return (
-        <View style={styles.container}>
-            <View style={styles.radioContainer}>
-                {selectedOption !== null ? null : (
-                    <>
-                        <TouchableOpacity style={[styles.radioButton, selectedOption === 'guests' && styles.selectedRadioButton,{paddingLeft:20}]} onPress={() => handleOptionSelect('guests')}>
-                            <Text style={styles.radioText}>Guests</Text>
-                            <View  >
-                                <Image source={require("../../../assets/Security/images/guest.png")} style={styles.image} />
-                            </View>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={[styles.radioButton, selectedOption === 'service' && styles.selectedRadioButton]} onPress={() => handleOptionSelect('service')}>
-                            <Text style={styles.radioText}>Service</Text>
-                            <View  >
-                                <Image source={require("../../../assets/Security/images/Lucky.png")} style={styles.image} />
-                            </View>
-                        </TouchableOpacity>
-                    </>
-                )}
-            </View>
-            {selectedOption !== null && renderPinAndKeypad()}
-            <View style={styles.scrollContainer}>
-                <ScrollView horizontal={true} contentContainerStyle={styles.horizontalScroll}>
-                    <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("Staff")}>
-                        <View style={styles.menuView}>
-                            <Text style={styles.menuText}>Staff</Text>
-                            <Image source={require("../../../assets/Security/images/guest-list.png")} style={styles.menuImage} />
-                        </View>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("Add Visitor")}>
-                        <View style={styles.menuView}>
-                            <Text style={styles.menuText}>Add Visitors</Text>
-                            <Image source={require("../../../assets/Security/images/new (1).png")} style={styles.menuImage} />
-                        </View>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("Residents")}>
-                        <View style={styles.menuView}>
-                            <Text style={styles.menuText}>Residents</Text>
-                            <Image source={require("../../../assets/Security/images/male.png")} style={styles.menuImage} />
-                        </View>
-                    </TouchableOpacity>
-                </ScrollView>
-            </View>
+
             <MyDialog
                 message={successMessage || error}
                 showDialog={showDialog}
                 onClose={() => setShowDialog(false)}
             />
-        </View>
+            <FAB.Group
+                open={openFab}
+                icon={openFab ? 'close' : 'plus'}
+                actions={[
+                    {
+                        icon: 'account',
+                        label: 'Add Guest',
+                        onPress: () => {
+                            setOpenFab(false);
+                            navigation.navigate("Add Guest");
+                        },
+                        style: { backgroundColor: '#7d0431' }, // Set background color for this action
+                        color: 'white'
+                    },
+                    {
+                        icon: 'package',
+                        label: 'Add Delivery',
+                        onPress: () => {
+                            setOpenFab(false);
+                            navigation.navigate("Add Delivery");
+                        },
+                        style: { backgroundColor: '#7d0431' }, // Set background color for this action
+                        color: 'white'
+                    },
+                    {
+                        icon: 'cog',
+                        label: 'Add Service',
+                        onPress: () => {
+                            setOpenFab(false);
+                            navigation.navigate("Add Service");
+                        },
+                        style: { backgroundColor: '#7d0431' }, // Set background color for this action
+                        color: 'white'
+                    },
+                    {
+                        icon: 'car',
+                        label: 'Add Cab',
+                        onPress: () => {
+                            setOpenFab(false);
+                            navigation.navigate("Add Cab");
+                        },
+                        style: { backgroundColor: '#7d0431' }, // Set background color for this action
+                        color: 'white'
+                    },
+                    {
+                        icon: 'dots-horizontal',
+                        label: 'Add Others',
+                        onPress: () => {
+                            setOpenFab(false);
+                            navigation.navigate("Add Others");
+                        },
+                        style: { backgroundColor: '#7d0431' }, // Set background color for this action
+                        color: 'white'
+                    },
+                ]}
+                onStateChange={({ open }) => setOpenFab(open)}
+                onPress={() => {
+                    if (openFab) {
+                        setOpenFab(false);
+                    }
+                }}
+                color="white"
+                fabStyle={{ backgroundColor: '#7d0431' }}
+            />
+        </View >
     );
 };
 export default HomeScreen;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+        backgroundColor: "#fff",
+        paddingHorizontal: 10,
     },
     image: {
         width: 80,
@@ -194,10 +239,10 @@ const styles = StyleSheet.create({
     radioButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginHorizontal:10,
+        marginHorizontal: 10,
         backgroundColor: '#F3E1D5',
-        paddingHorizontal:10,
-        paddingVertical:10,
+        paddingHorizontal: 10,
+        paddingVertical: 10,
         borderRadius: 10,
     },
     selectedRadioButton: {
@@ -209,10 +254,7 @@ const styles = StyleSheet.create({
         color: '#800336',
         fontWeight: "bold"
     },
-    pinContainer: {
-        marginTop: -180,
-        alignItems: 'center',
-    },
+
     textContainer: {
         justifyContent: 'center',
         alignItems: 'center',
@@ -243,6 +285,9 @@ const styles = StyleSheet.create({
     menuItem: {
         marginHorizontal: 5,
     },
+    pinContainer: {
+        alignItems: "center"
+    },
     menuView: {
         height: 110,
         width: 160,
@@ -261,5 +306,11 @@ const styles = StyleSheet.create({
     menuImage: {
         height: 65,
         width: 65,
+    }, fab: {
+        position: 'absolute',
+        margin: 16,
+        right: 0,
+        bottom: 0,
+        backgroundColor: '#7D0431', // Customize the color if needed
     },
 });

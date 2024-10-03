@@ -1,0 +1,266 @@
+import React, { useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView, Linking } from 'react-native';
+import { fetchResidentProfile } from './profileSlice';
+import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { ImagebaseURL } from '../../../Security/helpers/axios';
+import { fetchCitiesById } from '../../../User/Redux/Slice/AuthSlice/Signup/citySlice';
+import { fetchCommityMembers } from './committeeSlice';
+const Profile = () => {
+    const dispatch = useDispatch();
+    const navigation = useNavigation();
+    const resident = useSelector(state => state.profile.profile); // Adjusted to get the profile directly
+    const city = useSelector(state => state.citiesState.currentCity || null);
+
+
+    const [selectedBlock, setSelectedBlock] = useState('');
+    const [blocks, setBlocks] = useState([]);
+    const [gates, setGates] = useState([]);
+    const [documents, setDocuments] = useState([]);
+    const commityMember = useSelector(state => state.commityMembers.commityMember || []);
+    const [cityName, setCityName] = useState(''); // New state for city name
+    const societyId = "6683b57b073739a31e8350d0";
+    useEffect(() => {
+        if (societyId) {
+
+            dispatch(fetchResidentProfile(societyId));
+            dispatch(fetchCommityMembers());
+
+        }
+    }, [dispatch, societyId]);
+
+    useEffect(() => {
+        if (resident) {
+            setBlocks(resident.blocks || []);
+            setGates(resident.gates || []);
+            setDocuments(resident.documents || []);
+            if (!selectedBlock && resident.blocks.length > 0) {
+                setSelectedBlock(resident.blocks[0]._id);
+            }
+            if (resident.city) {
+                dispatch(fetchCitiesById({ cityId: resident.city })).then((action) => {
+                    console.log("action", action)
+                    if (action.payload) {
+                        setCityName(action.payload.name);
+                    }
+                });
+            }
+        }
+    }, [resident, selectedBlock, dispatch]);
+    if (!resident) return <Text>No resident data available.</Text>;
+
+    const totalBlocks = blocks.length;
+    let totalFlats = 0;
+    blocks.forEach((block) => {
+        totalFlats += block.flats.length;
+    });
+
+    const totalGates = gates.length;
+    console.log(commityMember.length)
+    return (
+        <ScrollView style={styles.container}>
+
+
+            <View style={styles.content}>
+                {resident.societyImage && resident.societyImage[0] ? (
+                    <Image
+                        source={{ uri: `${ImagebaseURL}${resident.societyImage[0]}` }}
+                        style={styles.societyImage}
+                    />
+                ) : (
+                    <Text>No image available</Text>
+                )}
+
+                <Text style={styles.sectionTitle}>Society Details</Text>
+                <View style={styles.Row}>
+                    <View style={styles.infoRow}>
+                        <Text style={styles.label}>Society Name</Text>
+                        <Text style={styles.value}>{resident.societyName}</Text>
+                    </View>
+                    <View style={styles.infoRow}>
+                        <Text style={styles.label}>City</Text>
+                        <Text style={styles.value}>{cityName || 'Loading...'}</Text>
+                    </View>
+                </View>
+
+                <View style={styles.Row}>
+                    <View style={styles.infoRow}>
+                        <Text style={styles.label}>Email</Text>
+                        <Text style={styles.value}>{resident.email}</Text>
+                    </View>
+                    <View style={styles.infoRow}>
+                        <Text style={styles.label}>Society Number</Text>
+                        <Text style={styles.value}>{resident.societyMobileNumber}</Text>
+                    </View>
+                </View>
+                <View style={styles.infoRow}>
+                    <Text style={styles.label}>Society Address</Text>
+                    <Text style={styles.value}>{resident.societyAdress?.addressLine1}</Text>
+                    <Text style={styles.value}>{resident.societyAdress?.addressLine2}</Text>
+                    <Text style={styles.value}>{`${resident.societyAdress?.state}, ${resident.societyAdress?.postalCode}`}</Text>
+                </View>
+
+
+                <View style={styles.Row}>
+                    <View style={styles.card}>
+                        <View style={styles.infoRow}>
+                            <Text style={[styles.label, { textAlign: "center", fontSize: 28 }]}> {totalBlocks}</Text>
+                            <Text style={styles.label}> <Icon name="office-building" size={20} color="#000" />Blocks</Text>
+
+                        </View>
+                    </View>
+
+                    <View style={styles.card}>
+                        <View style={styles.infoRow}>
+                            <Text style={[styles.label, { textAlign: "center", fontSize: 28 }]}>{totalFlats}</Text>
+
+                            <Text style={styles.label}>  <Icon name="home-city" size={20} color="#000" /> Flats</Text>
+
+                        </View>
+                    </View>
+
+                    <View style={styles.card}>
+                        <View style={styles.infoRow}>
+                            <Text style={[styles.label, { textAlign: "center", fontSize: 28 }]}>{totalGates}</Text>
+
+                            <Text style={styles.label}>  <Icon name="gate" size={20} color="#000" /> Gates</Text>
+
+                        </View>
+                    </View>
+                </View>
+                <Text style={styles.sectionTitle}>Committee Members</Text>
+                {commityMember.length > 0 ? (
+                    commityMember.map((member, index) => (
+                        <View key={index} style={styles.infoRow}>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                                <View style={{ flexDirection: "column" }}>
+                                    <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                        <Icon name="account" size={20} color="#000" style={styles.icon} />
+                                        <Text style={styles.label}>{member.name}</Text>
+                                    </View>
+                                    <Text style={styles.memberRole}>{member.designation} - {member.phoneNumber}</Text>
+                                </View>
+                                {/* Add the designation and phone number with the call functionality */}
+
+                                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                                    {/* Touchable Icon to Open Dialer */}
+                                    <TouchableOpacity
+                                        onPress={() => Linking.openURL(`tel:${member.phoneNumber}`)}
+                                        style={styles.iconButton}
+                                    >
+                                        <Icon name="phone" size={20} color="green" style={styles.icon} />
+                                    </TouchableOpacity>
+
+                                    {/* Three Dots Icon */}
+                                    <TouchableOpacity style={styles.iconButton}>
+                                        <Icon name="dots-vertical" size={20} color="#000" />
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </View>
+                    ))
+                ) : (
+                    <Text>No committee members available.</Text>
+                )}
+                <Text style={styles.sectionTitle}>License Details</Text>
+                <View style={styles.Row}>
+                    <View style={styles.infoRow}>
+                        <Text style={styles.label}>License</Text>
+                        <Text style={styles.value}>{resident.license}</Text>
+                    </View>
+                    <View style={styles.infoRow}>
+                        <Text style={styles.label}>Membership</Text>
+                        <Text style={styles.value}>{resident.memberShip}</Text>
+                    </View>
+                </View>
+                <View style={styles.Row}>
+
+                    <View style={styles.infoRow}>
+                        <Text style={styles.label}>Start Date</Text>
+                        <Text style={styles.value}>
+                            {new Date(resident.startDate).toLocaleDateString()}
+                        </Text>
+                    </View>
+                    <View style={styles.infoRow}>
+                        <Text style={styles.label}>Expiry Date</Text>
+                        <Text style={styles.value}>
+                            {new Date(resident.expiryDate).toLocaleDateString()}
+                        </Text>
+                    </View>
+                </View>
+                {new Date(resident.expiryDate) < new Date() && (
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={() => {
+                            // Handle renewal action here
+                            console.log("Renewal button pressed");
+                        }}
+                    >
+                        <Text style={styles.buttonText}>Renewal Now with {resident.price}/-</Text>
+                    </TouchableOpacity>
+                )}
+            </View>
+        </ScrollView>
+    );
+};
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        padding: 10,
+        backgroundColor: '#fff',
+    }, button: {
+        backgroundColor: '#7d0431', // Change to your desired button color
+        padding: 10,
+        borderRadius: 5,
+        alignItems: 'center',
+        marginTop: 20,
+    },
+    buttonText: {
+        color: '#FFFFFF', // Change to your desired text color
+        fontSize: 16,
+        fontWeight: 'bold',
+    }, sectionTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginVertical: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: 'lightgrey',
+        paddingBottom: 5,
+    }, Row: {
+        flexDirection: 'row', justifyContent: "space-between"
+    },
+    content: {
+        padding: 10,
+        borderRadius: 5,
+        borderColor: 'lightgrey',
+        borderWidth: 1, marginBottom: 30
+    },
+    societyImage: {
+        width: 200,
+        height: 200,
+        borderRadius: 5,
+        marginBottom: 20,
+    },
+    infoRow: {
+        marginBottom: 15,
+    },
+    label: {
+        fontSize: 16,
+        fontWeight: '700',
+    },
+    value: {
+        fontSize: 14,
+    },
+    card: {
+        backgroundColor: '#fff', // White background to mimic a card
+        borderRadius: 8, // Rounded corners
+        padding: 10, // Padding inside the card
+        elevation: 3, // Shadow for Android
+    },
+
+
+});
+
+export default Profile;

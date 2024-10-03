@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { getSequrityPerson, updateSequrity } from './GateKeeperSlice';
-import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, Modal } from 'react-native';
-import { ActivityIndicator, TextInput } from 'react-native-paper';
+import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, Modal, Alert } from 'react-native';
+import { ActivityIndicator, Avatar, TextInput } from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 import * as ImagePicker from 'expo-image-picker';
 import { ImagebaseURL } from '../../../Security/helpers/axios';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { Ionicons } from '@expo/vector-icons';
 const EditSecurity = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -15,6 +16,8 @@ const EditSecurity = () => {
   const { sequrityId } = route.params;
   const profile = useSelector((state) => state.gateKeepers.sequrity);
   const successMessage = useSelector((state) => state.gateKeepers.successMessage);
+  const [imageUri, setImageUri] = useState(null); // State to hold image URI
+  const [photo, setPhoto] = useState('');
   const status = useSelector((state) => state.gateKeepers.status);
   const [formData, setFormData] = useState({
     name: '',
@@ -52,7 +55,7 @@ const EditSecurity = () => {
           state: profile.address?.state || '',
           postalCode: profile.address?.postalCode || '',
         },
-        picture: null,
+        pictures: null,
       });
       setPreviewImage(`${ImagebaseURL}${profile.pictures}`);
     }
@@ -73,6 +76,42 @@ const EditSecurity = () => {
         ...prevData,
         [name]: value,
       }));
+    }
+  };
+
+
+  const handleImagePick = async () => {
+    Alert.alert(
+      'Select Image Source',
+      'Choose an option to upload an image:',
+      [
+        {
+          text: 'Camera',
+          onPress: () => pickImage(ImagePicker.launchCameraAsync),
+        },
+        {
+          text: 'Gallery',
+          onPress: () => pickImage(ImagePicker.launchImageLibraryAsync),
+        },
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+      ]
+    );
+  };
+
+  const pickImage = async (launchFunction) => {
+    let result = await launchFunction({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setImageUri(result.assets[0].uri); // Store the URI for use in the image upload
+      setPhoto(result.assets[0]); // Store the asset for form submission
     }
   };
 
@@ -104,33 +143,92 @@ const EditSecurity = () => {
   const deletePhoto = () => {
     setPreviewImage(null);
   };
+  //   const handleSubmit = async () => {
+  //     const data = new FormData();
+
+  //     // Append individual fields to FormData
+  //     data.append('name', formData.name);
+  //     data.append('email', formData.email);
+  //     data.append('mobileNumber', formData.phoneNumber);
+  //     data.append('role', formData.role);
+  //     data.append('aadharNumber', formData.aadharNumber);
+  // console.log("formData.aadharNumber",formData.aadharNumber)
+  //     // Handle nested address object
+  //     if (formData.address) {
+  //       data.append('address[addressLine1]', formData.address.addressLine1);
+  //       data.append('address[addressLine2]', formData.address.addressLine2);
+  //       data.append('address[state]', formData.address.state);
+  //       data.append('address[postalCode]', formData.address.postalCode);
+  //     }
+
+  //     // Only append the image if it exists
+  //     if (imageUri) {
+  //       data.append('pictures', {
+  //           uri: imageUri,
+  //           name: `security-${Date.now()}.jpeg`,
+  //           type: 'image/jpeg',
+  //       });
+  //   }
+
+  //     console.log( imageUri);
+  //     console.log("Submitting with sequrityId:", sequrityId);
+
+  //     try {
+  //       // Dispatch the update and wait for the response
+  //       const response = await dispatch(updateSequrity({ sequrityId, formData: data }));
+
+  //       // Log the response
+  //       console.log(response);
+  //     } catch (err) {
+  //       console.log("Error during update:", err);
+  //       Toast.show({
+  //         text1: 'Error',
+  //         text2: err.message || 'Failed to update security. Please try again.',
+  //         type: 'error',
+  //       });
+  //     }
+  //   };
+
 
   const handleSubmit = async () => {
     const data = new FormData();
+
+    // Append form data to FormData
     Object.keys(formData).forEach(key => {
       if (key === 'address') {
         Object.keys(formData[key]).forEach(nestedKey => {
           data.append(`address[${nestedKey}]`, formData[key][nestedKey]);
         });
-      } else if (key === 'picture' && formData[key]) {
-        data.append('picture', formData[key]);
+      } else if (key === 'pictures' && imageUri) {
+        data.append('pictures', {
+          uri: imageUri,
+          name: `security-${Date.now()}.jpeg`,
+          type: 'image/jpeg',
+        });
       } else {
         data.append(key, formData[key]);
       }
     });
 
     try {
+      // Dispatch the update action
       await dispatch(updateSequrity({ sequrityId, formData: data }));
+
+      // Show success message
       Toast.show({
         text1: 'Success',
         text2: successMessage || 'Security updated successfully!',
         type: 'success',
       });
+
+      // Navigate back after a short delay
       setTimeout(() => {
         navigation.goBack();
       }, 2000);
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error updating security:", error);
+
+      // Show error message
       Toast.show({
         text1: 'Error',
         text2: 'Failed to update security. Please try again.',
@@ -138,15 +236,32 @@ const EditSecurity = () => {
       });
     }
   };
+
   if (status === 'loading') {
     return <ActivityIndicator size="large" color="#630000" style={styles.loader} />;
   }
 
-  if (status === 'failed') {
+if (status === 'failed') {
     return <Text style={styles.errorText}>Error: {error}</Text>;
-  }
+}
   return (
     <ScrollView style={styles.container}>
+      <View style={styles.avatarContainer}>
+        <Avatar.Image
+          size={120}
+          source={
+            imageUri
+              ? { uri: imageUri }
+              : previewImage
+                ? { uri: previewImage }
+                : { uri: "https://thumbs.dreamstime.com/b/default-avatar-profile-trendy-style-social-media-user-icon-187599373.jpg" } // Fallback to a local image
+          }
+          style={styles.avatar}
+        />
+        <TouchableOpacity style={styles.cameraButton} onPress={handleImagePick}>
+          <Ionicons name="camera" size={20} color="white" />
+        </TouchableOpacity>
+      </View>
       <View style={styles.form}>
         <TextInput
           mode="outlined"
@@ -216,23 +331,22 @@ const EditSecurity = () => {
           theme={{ colors: { primary: "#7d0431" } }}
           style={styles.textInput}
         />
-
         {/* Preview Image */}
-        {previewImage ? (
+        {/* {previewImage ? (
           <View style={styles.imageContainer}>
             <Image source={{ uri: previewImage }} style={styles.image} />
             <TouchableOpacity onPress={deletePhoto} style={styles.removeImageButton}>
               <Text style={styles.removeImageText}>Remove Image</Text>
             </TouchableOpacity>
           </View>
-        ) : null}
+        ) : null} */}
 
 
 
         {/* Image Picker Modal */}
-        <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.imageButton}>
+        {/* <TouchableOpacity onPress={handleImagePick} style={styles.imageButton}>
           <Text style={styles.imageButtonText}>Choose Image</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         <TouchableOpacity onPress={handleSubmit} style={styles.submitButton}>
           <Text style={styles.submitButtonText}>Update Security Person</Text>
@@ -360,6 +474,22 @@ const styles = StyleSheet.create({
   loader: {
     flex: 1,
     justifyContent: 'center',
+  },
+  avatarContainer: {
+    alignSelf: 'center',
+    marginBottom: 20,
+    position: 'relative',
+  },
+  avatar: {
+    alignSelf: 'center',
+  },
+  cameraButton: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Your primary color
+    borderRadius: 50,
+    padding: 5,
   },
 });
 

@@ -99,7 +99,7 @@ const EditResidents = ({ route }) => {
                 type: 'image/jpeg', // Set appropriate MIME type
             });
         }
-
+console.log(imageUri)
         const updatedResident = { formData, id: resident._id };
 
         try {

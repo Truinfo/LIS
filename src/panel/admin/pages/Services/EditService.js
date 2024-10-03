@@ -111,6 +111,7 @@ const EditService = () => {
                         setSnackbarMessage(`${response.payload.message}`);
                         setSnackbarVisible(true);
                         dispatch(fetchServicePersonById({ serviceType, userid }));
+                        navigation.navigate("Services")
                     }
                 })
                 .catch((error) => {
@@ -176,7 +177,7 @@ const EditService = () => {
     };
     console.log(userid)
     return (
-        <ScrollView style={{flex:1, padding: 20,position:"relative" }}>
+        <ScrollView style={{ flex: 1, padding: 20, position: "relative" }}>
             <View>
                 {profile && (
                     <View>
@@ -315,7 +316,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'rgba(0, 0, 0, 0.5)', // Dark overlay
-    },loadingIndicator: {
+    }, loadingIndicator: {
         marginTop: 20,
     },
     modalView: {
@@ -344,7 +345,7 @@ const styles = StyleSheet.create({
     },
     selectedOption: {
         fontWeight: 'bold',
-        color: '#7d0431', 
+        color: '#7d0431',
     },
     closeButtonText: {
         marginTop: 10,

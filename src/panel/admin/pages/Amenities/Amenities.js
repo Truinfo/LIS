@@ -13,33 +13,38 @@ import { useNavigation, useFocusEffect } from "@react-navigation/native"; // Imp
 import { deleteAmenity, getAllAmenityBySocietyId } from "./AmenitiesSlice"; // Keep this as it is for your API actions
 import { ImagebaseURL } from "../../../Security/helpers/axios";
 import { Ionicons } from "@expo/vector-icons"; // Add icons from Expo
-import { Dialog, Portal, Paragraph, Button } from "react-native-paper"; // Import from react-native-paper
+import { Dialog, Portal, Paragraph, Button, FAB, ActivityIndicator } from "react-native-paper"; // Import from react-native-paper
 import { Provider as PaperProvider } from "react-native-paper";
-
 const Amenities = () => {
   const [selectedAmenity, setSelectedAmenity] = useState(null);
   const [deleteDialogVisible, setDeleteDialogVisible] = useState(false); // State for Dialog visibility
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [selectedMenuId, setSelectedMenuId] = useState(null); // Track which menu is open
-
   const navigation = useNavigation();
   const dispatch = useDispatch();
-
   const amenities = useSelector(
     (state) => state.adminAmenities.amenities || []
   );
   const successMessage = useSelector(
     (state) => state.adminAmenities.successMessage
   );
+  const status = useSelector(
+    (state) => state.adminAmenities.status
+  );
+  const error = useSelector(
+    (state) => state.adminAmenities.error
+  );
 
   // Use useFocusEffect to fetch amenities whenever the screen is focused
   useFocusEffect(
     React.useCallback(() => {
       dispatch(getAllAmenityBySocietyId());
+      setSelectedMenuId(null)
     }, [dispatch])
   );
 
   const handleDeleteConfirm = () => {
+    console.log(selectedAmenity);
     dispatch(deleteAmenity({ id: selectedAmenity._id }))
       .then(() => {
         setDeleteDialogVisible(false);
@@ -54,62 +59,79 @@ const Amenities = () => {
         console.error("Error:", error);
       });
   };
-
   const hideDeleteDialog = () => setDeleteDialogVisible(false); // Function to close the dialog
-
+  if (status === "loading") { // Show spinner while loading
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#7d0431" />
+      </View>
+    );
+  }
+  if (error) { // Show spinner while loading
+    return (
+      <View style={styles.noDataContainer}>
+        <Image
+          source={require('../../../../assets/Admin/Imgaes/nodatadound.png')}
+          style={styles.noDataImage}
+          resizeMode="contain"
+        />
+        <Text style={styles.noDataText}>No Amenities Found</Text>
+      </View>
+    );
+  }
   const renderItem = ({ item }) => {
-    const isMenuOpen = selectedMenuId === item._id; // Check if this menu is open
+    const isMenuOpen = selectedMenuId === item._id;
 
     return (
-      <TouchableOpacity onPress={() => navigation.navigate("Bookings")}>
-        <View style={styles.itemContainer}>
-          {/* Image Section: 40% of card height */}
-          <Image
-            source={{ uri: `${ImagebaseURL}${item.image}` }}
-            style={styles.image}
-          />
-          {/* Details Section: 60% of card height */}
-          <View style={styles.detailsContainer}>
-            <View style={styles.detailsColumn}>
-              <Text style={styles.text}>Name: {item.amenityName}</Text>
-              <Text style={styles.text}>Capacity: {item.capacity || "0"}</Text>
-              <Text style={styles.text}>Timings: {item.timings}</Text>
-              <Text style={styles.text}>Location: {item.location}</Text>
-              <Text style={styles.text}>Cost: {item.cost || "0"}</Text>
-            </View>
+      <View style={styles.itemContainer}>
+        {/* Details Section: Left aligned content */}
+        <Image
+          source={{ uri: `${ImagebaseURL}${item.image}` }}
+          style={styles.image}
+        />
+        <View style={styles.detailsContainer}>
+          <View style={styles.detailsColumn}>
+            <Text style={styles.text}>Name: {item.amenityName}</Text>
+            <Text style={styles.text}>Capacity: {item.capacity || "0"}</Text>
+            <Text style={styles.text}>Timings: {item.timings}</Text>
+            <Text style={styles.text}>Location: {item.location}</Text>
+            <Text style={styles.text}>Cost: {item.cost || "0"}</Text>
           </View>
 
-          {/* Menu Icon in Bottom Right */}
+          {/* Menu Icon in Top Right of the Details Section */}
           <TouchableOpacity
             style={styles.menuIcon}
-            onPress={() => setSelectedMenuId(isMenuOpen ? null : item._id)} // Toggle the menu
+            onPress={() => setSelectedMenuId(isMenuOpen ? null : item._id)}
           >
             <Ionicons name="ellipsis-vertical" size={24} color="#666562" />
           </TouchableOpacity>
-
-          {/* Menu Actions */}
-          {isMenuOpen && (
-            <View style={styles.menu}>
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate("Edit Amenity", { id: item._id })
-                }
-              >
-                <Text style={styles.actionText}>Edit</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => {
-                  setSelectedAmenity(item);
-                  setDeleteDialogVisible(true); // Open the delete dialog
-                  setSelectedMenuId(null); // Close the menu when the delete dialog opens
-                }}
-              >
-                <Text style={styles.actionText}>Delete</Text>
-              </TouchableOpacity>
-            </View>
-          )}
         </View>
-      </TouchableOpacity>
+
+        {/* Menu Actions */}
+        {isMenuOpen && (
+          <View style={styles.menu}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Edit Amenity", { id: item._id })}
+            >
+              <Text style={styles.actionText}>Edit</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Add Booking", { id: item._id })}
+            >
+              <Text style={styles.actionText}>Booking</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                setSelectedAmenity(item);
+                setDeleteDialogVisible(true);
+                setSelectedMenuId(null);
+              }}
+            >
+              <Text style={styles.actionText}>Delete</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
     );
   };
 
@@ -120,16 +142,29 @@ const Amenities = () => {
           <Text style={styles.title}>Amenities</Text>
           <TouchableOpacity
             style={styles.addButton}
-            onPress={() => navigation.navigate("Add Amenity")}
+            onPress={() => navigation.navigate("Bookings")}
           >
-            <Text style={styles.addButtonText}>ADD</Text>
+            <Ionicons name="calendar" size={30} color="#7d0431" />
           </TouchableOpacity>
         </View>
-        <FlatList
-          data={amenities} // Now displaying all amenities without pagination
-          keyExtractor={(item) => item._id}
-          renderItem={renderItem}
-        />
+
+        {amenities.length === 0 ? (
+          // Display "Data not found" message if amenities is empty
+          <View style={styles.noDataContainer}>
+            <Image
+              source={require('../../../../assets/Admin/Imgaes/nodatadound.png')}
+              style={styles.noDataImage}
+              resizeMode="contain"
+            />
+            <Text style={styles.noDataText}>No Amenities Found</Text>
+          </View>
+        ) : (
+          <FlatList
+            data={amenities} // Now displaying all amenities without pagination
+            keyExtractor={(item) => item._id}
+            renderItem={renderItem}
+          />
+        )}
 
         {/* Portal is required for Dialog */}
         <Portal>
@@ -162,6 +197,13 @@ const Amenities = () => {
             </View>
           </View>
         </Modal>
+
+        <FAB
+          style={styles.fab}
+          icon="plus"
+          color='#fff'
+          onPress={() => navigation.navigate('Add Amenity')}
+        />
       </View>
     </PaperProvider>
   );
@@ -179,41 +221,37 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   addButton: {
-    width: 70,
+    width: 100,
     height: 40,
     borderWidth: 2,
-    borderColor: "#630000",
+    borderColor: "#7d0431",
     alignItems: "center",
     marginBottom: 16,
     borderRadius: 8,
-  },
-  addButtonText: {
-    color: "#630000",
-    fontWeight: "600",
-    textAlign: "center",
-    padding: 8,
+    paddingVertical: 2,
   },
   itemContainer: {
-    padding: 0, // Removed padding to allow space for the image
+    padding: 0,
     backgroundColor: "#f9f9f9",
     borderRadius: 8,
     marginBottom: 16,
-    height: 250, // Adjust the card height as per your need
-    overflow: "hidden", // Ensure image and menu icon stay within the card
+    height: 320,
+    overflow: "hidden",
+    position: 'relative', // Added to position children absolutely
   },
   image: {
     width: "100%",
-    height: "40%", // Occupies 40% of the card height
+    height: "50%",
   },
   detailsContainer: {
-    height: "60%", // Occupies the remaining 60% of the card height
+    height: "60%",
     flexDirection: "column",
     justifyContent: "space-between",
     padding: 10,
   },
   detailsColumn: {
     flex: 1,
-    justifyContent: "flex-start", // Align details at the top
+    justifyContent: "flex-start",
   },
   text: {
     fontSize: 15,
@@ -221,15 +259,16 @@ const styles = StyleSheet.create({
   },
   menuIcon: {
     position: "absolute",
-    bottom: 10,
-    right: 10,
-    paddingTop: 20,
+    top: 10, // Set top position to place it near the top
+    right: 10, // Set right position to align it at the right
+    padding: 5,
     borderRadius: 50,
+    backgroundColor: 'rgba(255, 255, 255, 0.5)', // Optional: Add a background for better visibility
   },
   menu: {
     position: "absolute",
-    bottom: 5, // Positioning this below the menu icon
-    right: 40,
+    bottom: 50,
+    right: 45,
     backgroundColor: "#fff",
     padding: 10,
     borderRadius: 8,
@@ -249,24 +288,57 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginBottom: 10,
   },
+  noDataContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noDataImage: {
+    width: 150,
+    height: 150,
+    marginBottom: 16,
+  },
+  noDataText: {
+    fontSize: 18,
+    color: '#7d0431',
+    textAlign: 'center',
+  },
   modalContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   modalContent: {
-    width: 300,
-    padding: 16,
     backgroundColor: "#fff",
-    borderRadius: 8,
+    padding: 20,
+    borderRadius: 10,
     alignItems: "center",
   },
   modalText: {
-    marginBottom: 16,
     fontSize: 16,
-    textAlign: "center",
+    fontWeight: "bold",
+    color: "#7d0431",
+  },
+  fab: {
+    position: 'absolute',
+    bottom: 30,
+    right: 30,
+    backgroundColor: '#630000',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 5,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: "#f6f6f6",
   },
 });
 
 export default Amenities;
+

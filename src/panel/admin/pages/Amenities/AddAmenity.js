@@ -3,7 +3,8 @@ import { View, Text, TextInput, Button, TouchableOpacity, StyleSheet, Image, Ale
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import { createAmenity } from './AmenitiesSlice';
-import * as ImagePicker from 'expo-image-picker'; // Using Expo Image Picker for image selection
+import * as ImagePicker from 'expo-image-picker';
+import { Snackbar } from 'react-native-paper'; // Import Snackbar
 
 const AddAmenity = () => {
   const dispatch = useDispatch();
@@ -21,6 +22,8 @@ const AddAmenity = () => {
   });
 
   const [errors, setErrors] = useState({});
+  const [snackbarVisible, setSnackbarVisible] = useState(false); // Snackbar visibility state
+  const [snackbarMessage, setSnackbarMessage] = useState(''); // Snackbar message state
   const successMessage = useSelector((state) => state.adminAmenities.successMessage || state.adminAmenities.error);
 
   const statusOptions = ['Available', 'Booked'];
@@ -30,14 +33,12 @@ const AddAmenity = () => {
   };
 
   const handleFileChange = async () => {
-    // Request permission for camera roll access
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (permissionResult.granted === false) {
       Alert.alert('Permission to access camera roll is required!');
       return;
     }
 
-    // Open the image picker
     const result = await ImagePicker.launchImageLibraryAsync();
     if (!result.canceled) {
       const selectedImage = result.assets[0];
@@ -73,8 +74,8 @@ const AddAmenity = () => {
     if (formData.image) {
       submissionData.append('image', {
         uri: formData.image,
-        type: 'image/jpeg', // adjust according to your image type
-        name: 'amenity_image.jpg', // you can also get the actual name from the picker
+        type: 'image/jpeg',
+        name: 'amenity_image.jpg',
       });
     }
 
@@ -91,16 +92,25 @@ const AddAmenity = () => {
           image: null,
           picturePreview: null,
         });
-        Alert.alert("Success", successMessage);
-        navigation.goBack(); // Adjust the route name according to your navigation setup
+        setSnackbarMessage(successMessage);
+        setSnackbarVisible(true);
+        // Show Snackbar on success
+        setTimeout(() => {
+          navigation.goBack();
+        }, 2000);
+
       } else {
-        Alert.alert("Error", successMessage);
+        setSnackbarMessage(successMessage);
+        setSnackbarVisible(true); // Show Snackbar on error
       }
     }).catch((error) => {
       console.error('Error:', error);
-      Alert.alert("Error", "There was an error creating the amenity.");
+      setSnackbarMessage("There was an error creating the amenity.");
+      setSnackbarVisible(true); // Show Snackbar on error
     });
   };
+
+  const handleDismissSnackbar = () => setSnackbarVisible(false); // Dismiss Snackbar
 
   useEffect(() => {
     return () => {
@@ -110,7 +120,6 @@ const AddAmenity = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Add Amenity</Text>
       <TextInput
         style={styles.input}
         placeholder='Amenity Name'
@@ -118,7 +127,6 @@ const AddAmenity = () => {
         onChangeText={(value) => handleChange('amenityName', value)}
       />
       {errors.amenityName && <Text style={styles.error}>{errors.amenityName}</Text>}
-
       <TextInput
         style={styles.input}
         placeholder='Capacity'
@@ -127,7 +135,6 @@ const AddAmenity = () => {
         onChangeText={(value) => handleChange('capacity', value)}
       />
       {errors.capacity && <Text style={styles.error}>{errors.capacity}</Text>}
-
       <TextInput
         style={styles.input}
         placeholder='Timings'
@@ -135,7 +142,6 @@ const AddAmenity = () => {
         onChangeText={(value) => handleChange('timings', value)}
       />
       {errors.timings && <Text style={styles.error}>{errors.timings}</Text>}
-
       <TextInput
         style={styles.input}
         placeholder='Location'
@@ -143,7 +149,6 @@ const AddAmenity = () => {
         onChangeText={(value) => handleChange('location', value)}
       />
       {errors.location && <Text style={styles.error}>{errors.location}</Text>}
-
       <TextInput
         style={styles.input}
         placeholder='Cost'
@@ -151,7 +156,6 @@ const AddAmenity = () => {
         onChangeText={(value) => handleChange('cost', value)}
       />
       {errors.cost && <Text style={styles.error}>{errors.cost}</Text>}
-
       <Text style={styles.label}>Status</Text>
       {statusOptions.map((status) => (
         <TouchableOpacity
@@ -163,19 +167,31 @@ const AddAmenity = () => {
         </TouchableOpacity>
       ))}
       {errors.status && <Text style={styles.error}>{errors.status}</Text>}
-
-      {/* Image Preview above the Upload Image button */}
       {formData.picturePreview && (
         <Image
           source={{ uri: formData.picturePreview }}
           style={styles.imagePreview}
         />
       )}
-
-      <Button title="Upload Image" onPress={handleFileChange} />
-      <View style={{ marginTop: 30 }}>
-        <Button title="Submit" onPress={handleSubmit} style={styles.submitButton} />
-      </View>
+      <TouchableOpacity style={styles.submitButton} onPress={handleFileChange}>
+        <Text theme={{ colors: { primary: '#7d0431' } }} style={styles.buttonText} >UPLOAD IMAGE</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+        <Text theme={{ colors: { primary: '#7d0431' } }} style={styles.buttonText} >SUBMIT</Text>
+      </TouchableOpacity>
+      <Snackbar
+        visible={snackbarVisible}
+        onDismiss={handleDismissSnackbar}
+        duration={3000}
+        action={{
+          label: 'Close',
+          onPress: () => {
+            handleDismissSnackbar();
+          },
+        }}
+      >
+        {snackbarMessage}
+      </Snackbar>
     </ScrollView>
   );
 };
@@ -208,16 +224,18 @@ const styles = StyleSheet.create({
   },
   option: {
     padding: 10,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#dedede',
     marginBottom: 5,
     borderRadius: 4,
   },
   selectedOption: {
     backgroundColor: '#630000',
     color: '#fff',
+    padding: 10
   },
   optionText: {
     color: '#630000',
+
   },
   imagePreview: {
     width: 250,
@@ -226,7 +244,17 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     marginTop: 30,
+    backgroundColor: "#7d0431",
+    height: 50,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 2
   },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: "400",
+    color: "#fff"
+  }
 });
 
 export default AddAmenity;

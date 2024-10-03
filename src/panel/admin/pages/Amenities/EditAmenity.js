@@ -12,10 +12,8 @@ import {
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { Ionicons } from "@expo/vector-icons"; // Icons from Expo
 import * as ImagePicker from "expo-image-picker"; // Import image picker
 import {
-  getAllAmenityBySocietyId,
   getAmenityById,
   updateAmenity,
 } from "./AmenitiesSlice";
@@ -27,7 +25,6 @@ const EditAmenity = () => {
   const route = useRoute();
   const { id } = route.params; // Get id from route params
   const navigation = useNavigation();
-
   const amenity = useSelector((state) => state.adminAmenities.amenities);
   const successMessage = useSelector(
     (state) => state.adminAmenities.successMessage
@@ -132,30 +129,19 @@ const EditAmenity = () => {
         if (response.type === "amenities/updateAmenity/fulfilled") {
           setSnackMessage(successMessage || "Updated successfully");
           setSnackVisible(true); // Show the Snackbar
-          dispatch(getAllAmenityBySocietyId());
+          dispatch(getAmenityById(id));
           navigation.goBack(); // Navigate back after successful update
         }
-        console.log(response);
       })
       .catch((error) => {
         console.error("Error:", error);
+        setSnackMessage("Update failed. Please try again."); // Set error message
+        setSnackVisible(true); // Show Snackbar on error
       });
   };
-
   const onDismissSnackBar = () => setSnackVisible(false); // Dismiss the Snackbar
-
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-        >
-          <Ionicons name="arrow-back-sharp" size={24} color="#fff" />
-        </TouchableOpacity>
-        <Text style={styles.headerText}>Edit Amenity</Text>
-      </View>
-
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
         {/* Image Preview */}
         <View style={styles.imagePreviewContainer}>
@@ -167,7 +153,6 @@ const EditAmenity = () => {
             />
           ))}
         </View>
-
         <TouchableOpacity
           style={styles.uploadButton}
           onPress={pickImage} // Call the image picker function
@@ -243,22 +228,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  backButton: {
-    backgroundColor: "#630000",
-    padding: 10,
-    borderRadius: 8,
-    marginRight: 10,
-  },
-  headerText: {
-    fontSize: 23,
-    fontWeight: "700",
-    color: "#630000",
   },
   scrollViewContainer: {
     paddingBottom: 40,

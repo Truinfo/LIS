@@ -30,7 +30,7 @@ import manageserviceReducer from "./Slice/ProfileSlice/manageServiceSlice";
 import addServiceSlice from "./Slice/ServiceSlice/AddServiceSlice";
 import SocietyByIdReducer from "./Slice/Security_Panel/SocietyByIdSlice";
 import notificationReducer from "./Slice/NotificationSlice/NotificationSlice";
-import BookingReducer from "./Slice/ProfileSlice/MyBookingSlice";
+import BookingReducer, { userAmenintyBookingReducer } from "./Slice/ProfileSlice/MyBookingSlice";
 
 import HomeScreen from "./Slice/Security_Panel/HomeScreenSlice";
 import DenyEntry from "./Slice/Security_Panel/DenySlice";
@@ -61,8 +61,6 @@ import { staffReducer } from "../../admin/pages/Services/ServicesSlice";
 import { AdminEntriesReducer } from "../../admin/pages/VisistorManagement/EntrySlice";
 import { AdminAmenitiesReducer } from "../../admin/pages/Amenities/AmenitiesSlice";
 import { AdminBookingReducer } from "../../admin/pages/Amenities/BookingSlice";
-import { AdminprofileReducer } from "../../admin/pages/Profile/profileSlice";
-import { CommityMembersReducer } from "../../admin/pages/Profile/committeeSlice";
 
 const store = configureStore({
   reducer: {
@@ -85,7 +83,7 @@ const store = configureStore({
     profileEdit: profileEditReducer,
     manageServices: manageserviceReducer,
     mybills: billsReducer,
-    myBookings: BookingReducer,
+    myBookings: userAmenintyBookingReducer,
     amenities: AmenitiesReducer,
     documentGetted: GetDocumentSlice,
     document: DocumentSlice,
@@ -140,6 +138,7 @@ const store = configureStore({
     adiminEntries: AdminEntriesReducer,
     adminAmenities: AdminAmenitiesReducer,
     adminBooking: AdminBookingReducer,
+    adminMaintainance: AdminMaintainanceReducer,
   },
 });
 export default store;

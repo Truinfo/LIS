@@ -33,32 +33,7 @@ const Settings = () => {
     
         getUserName();
       }, []);
-    // useEffect(() => {
-    //     const getAllAsyncStorageData = async () => {
-    //         try {
-    //             const keys = await AsyncStorage.getAllKeys();
-    //             if (keys.length > 0) {
-    //                 const result = await AsyncStorage.multiGet(keys);
-    //                 const data = result.map(([key, value]) => {
-    //                     try {
-    //                         return { [key]: JSON.parse(value) };
-    //                     } catch (error) {
-    //                         return { [key]: value };
-    //                     }
-    //                 });
 
-    //                 const userString = data.find(item => item.user)?.user;
-    //                 if (userString) {
-    //                     setSocietyId(userString.societyId);
-    //                     setSequrityId(userString.sequrityId);
-    //                 }
-    //             }
-    //         } catch (error) {
-    //             console.error("Failed to fetch all data from AsyncStorage", error);
-    //         }
-    //     };
-    //     getAllAsyncStorageData();
-    // }, []);
 
     useEffect(() => {
         if (societyId && sequrityId) {
@@ -68,7 +43,7 @@ const Settings = () => {
     }, [societyId, sequrityId, dispatch]);
 
     const handleMessagesPress = () => {
-        navigation.navigate("Residents ");
+        navigation.navigate("Messages");
     };
     const handleGuard = () => {
         navigation.navigate("Security");
@@ -113,17 +88,7 @@ const Settings = () => {
                         style={styles.Image2}
                     />
                     <View style={styles.imagecontent}>
-                        <Text style={styles.rowText}>Residents</Text>
-                    </View>
-                    <Icon name="navigate-next" size={25} color="lightgrey" />
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.rowContent} onPress={()=>navigation.navigate("Staff")}>
-                    <Image
-                        source={require("../../../../assets/Security/images/email.png")}
-                        style={styles.Image2}
-                    />
-                    <View style={styles.imagecontent}>
-                        <Text style={styles.rowText}>Service</Text>
+                        <Text style={styles.rowText}>Messages</Text>
                     </View>
                     <Icon name="navigate-next" size={25} color="lightgrey" />
                 </TouchableOpacity>

@@ -6,7 +6,6 @@ import Login from "./src/panel/User/Navigations/Authentication/Login";
 import Header from "./src/panel/Security/Component/Header/Header";
 import { Provider } from 'react-redux';
 import store from './src/panel/User/Redux/Store';
-import Messages from "./src/panel/Security/Navigations/Messages";
 import Notice from "./src/panel/Security/Navigations/Notice";
 import TermsandConditions from "./src/panel/Security/Navigations/TermsandConditions";
 import AddVisitors from "./src/panel/Security/Navigations/AddVisitors";
@@ -219,7 +218,6 @@ export default function App() {
               headerShown: false,
             }} />
             <Stack.Screen name="Manage Daily Help" component={ManageDailyHelp} />
-            <Stack.Screen name="Messages" component={Messages} />
             <Stack.Screen name="Add Service" component={AddService} />
             <Stack.Screen name="Add Delivery" component={AddDelivery} />
             <Stack.Screen name="Add Guest" component={AddGuest} />

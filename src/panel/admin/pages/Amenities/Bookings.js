@@ -5,44 +5,61 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
-  StyleSheet,
+  StyleSheet, ScrollView,
+  Alert
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { deleteAmenityBooking, getAmenityOfCommunityHal } from './BookingSlice';
-import { Icon } from 'react-native-elements'; // Ensure you have this library installed
+import { Ionicons } from "@expo/vector-icons";
 import { ImagebaseURL } from '../../../Security/helpers/axios';
-import { Modal } from 'react-native-paper';
+import { ActivityIndicator, Modal } from 'react-native-paper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AmenityBookingsList = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const status = useSelector((state) => state.adminBooking.status);
-  const error = useSelector((state) => state.adminBooking.error);
   const Allbooking = useSelector((state) => state.adminBooking.booking);
   const booking = Allbooking && Allbooking.list ? Allbooking.list : [];
-  
-  const [showDialog, setShowDialog] = useState(false);
-  const [showMenu, setShowMenu] = useState(false);
-  const [selectedAmenity, setSelectedAmenity] = useState(null);
   const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
-  
-  useEffect(() => {
-    dispatch(getAmenityOfCommunityHal());
-  }, [dispatch]);
+  const [selectDeletedItem, setSelectDeletedItem] = useState(null);
+  const [anchor, setAnchor] = useState(null);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      dispatch(getAmenityOfCommunityHal());
+      setAnchor(false)
+    }, [dispatch])
+  );
   const confirmDelete = () => {
-    dispatch(deleteAmenityBooking({ id: Allbooking._id, userId: selectedAmenity._id }))
-      .then(() => {
-        setSelectedAmenity(null);
-        setDeleteDialogVisible(false);
-        dispatch(getAmenityOfCommunityHal());
+    const userId = selectDeletedItem.userId
+    dispatch(deleteAmenityBooking(userId))
+      .then((response) => {
+        console.log(response.type, "respo")
+        if (response.type === "booking/deleteAmenityBooking/fulfilled") {
+          dispatch(getAmenityOfCommunityHal());
+          Alert.alert("Success", "deleted")
+        } else {
+          dispatch(getAmenityOfCommunityHal());
+          Alert.alert("error", "failed")
+        }
       })
       .catch((error) => {
-        console.error("Error:", error);
+        Alert.alert("Error", "An error occurred while updating the booking.");
       });
   };
 
+  const handleDelete = (item) => {
+    setSelectDeletedItem(item)
+    confirmDelete();
+  };
+
+  const handleMenuPress = (item) => {
+    ;
+    setAnchor(anchor ? null : item._id);
+  };
+  // const societyId = fetchSocietyId()
   const renderBookingCard = (item) => (
     <View style={styles.bookingCard}>
       <Text style={styles.bookingId}>{item._id}</Text>
@@ -50,72 +67,68 @@ const AmenityBookingsList = () => {
       <Text>{item.payed}</Text>
       <Text>{item.pending}</Text>
       <Text>{item.status}</Text>
-      <TouchableOpacity style={styles.menuButton} onPress={() => {
-        setSelectedAmenity(item);
-        setShowMenu(!showMenu); // Toggle the menu visibility
-      }}>
-        <Icon name="menu" />
+
+      <TouchableOpacity
+        style={styles.menuButton}
+        onPress={() => handleMenuPress(item)}
+      >
+        <Ionicons name="ellipsis-vertical" size={24} color="#666562" />
       </TouchableOpacity>
-      {showMenu && selectedAmenity === item && ( // Render the menu if the item is selected
-        <View style={styles.menu}>
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate("Edit Booking", { id: selectedAmenity._id });
-              setShowMenu(false);
-            }}
-          >
-            <Text style={styles.actionText}>Edit</Text>
+      {anchor === item._id && (
+        <ScrollView style={[styles.menuList, { top: 0 }]}>
+          <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("Edit Booking", ({ id: item._id, userId: item.userId }))}>
+            <Text>Edit</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              setDeleteDialogVisible(true); // Open the delete dialog
-              setShowMenu(false); // Close the menu
-            }}
-          >
-            <Text style={styles.actionText}>Delete</Text>
+          <TouchableOpacity onPress={() => handleDelete(item)} style={styles.menuItem}>
+            <Text>Delete</Text>
           </TouchableOpacity>
-        </View>
+        </ScrollView>
       )}
     </View>
   );
 
-  if (status === 'loading') {
-    return <Text>Loading...</Text>;
+  if (status === "loading") { // Show spinner while loading
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#7d0431" />
+      </View>
+    );
+  }
+  if (status === "failed") { // Show spinner while loading
+    return (
+      <View style={styles.noDataContainer}>
+        <Image
+          source={require('../../../../assets/Admin/Imgaes/nodatadound.png')}
+          style={styles.noDataImage}
+          resizeMode="contain"
+        />
+        <Text style={styles.noDataText}>No Amenities Found</Text>
+      </View>
+    );
   }
 
-  if (status === 'failed') {
-    return <Text>Error: {error}</Text>;
-  }
-
+  const BookingData = [...booking].reverse();
   return (
     <View style={styles.container}>
-      {/* Add Button at Top Right Corner */}
-      <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate('AddBookings', { id: Allbooking._id })}>
-        <Icon name="add" size={30} />
-      </TouchableOpacity>
-
       <View style={styles.amenityCard}>
         <Image
-          source={{ uri: `${ImagebaseURL}${Allbooking.image}` }}
+          source={{ uri: `${ImagebaseURL}${Allbooking?.image}` || "" }}
           style={styles.amenityImage}
         />
-        <Text style={styles.amenityName}>{Allbooking.amenityName}</Text>
+        <Text style={styles.amenityName}>{Allbooking?.amenityName}</Text>
         <Text style={styles.capacityText}>
-          <Text style={styles.boldText}>Capacity:</Text> {Allbooking.capacity}
+          <Text style={styles.boldText}>Capacity:</Text> {Allbooking?.capacity}
         </Text>
         <Text style={styles.chargeText}>
-          <Text style={styles.boldText}>Total Charge:</Text> {Allbooking.cost}
+          <Text style={styles.boldText}>Total Charge:</Text> {Allbooking?.cost}
         </Text>
       </View>
-
       <FlatList
-        data={booking}
+        data={BookingData}
         renderItem={({ item }) => renderBookingCard(item)}
         keyExtractor={item => item._id}
         ListEmptyComponent={<Text>No bookings found</Text>}
       />
-      
-      {/* Delete Confirmation Dialog */}
       <Modal
         transparent={true}
         animationType="slide"
@@ -256,6 +269,52 @@ const styles = StyleSheet.create({
   boldText: {
     fontWeight: 'bold',
   },
+  addBookingButton: {
+    width: 40,
+    height: 40,
+    borderWidth: 2,
+    borderColor: "#7d0431",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    alignSelf: "flex-end",
+    marginBottom: 16,
+    borderRadius: 8,
+    paddingVertical: 2
+  }, menuItem: {
+    padding: 10,
+  },
+  menuList: {
+    position: 'absolute',
+    right: 35,
+    backgroundColor: '#fff',
+    borderRadius: 5,
+    elevation: 3,
+    padding: 5,
+    zIndex: 10,
+    overflow: 'hidden',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: "#f6f6f6",
+  },
+  noDataContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  noDataImage: {
+    width: 300,
+    height: 300,
+    marginTop: 100,
+    alignItems: "center",
+  },
+  noDataText: {
+    fontSize: 16,
+    color: '#7D0431',
+    fontWeight: '700',
+  },
 });
-
 export default AmenityBookingsList;

@@ -66,8 +66,6 @@ const NoticeBoard = () => {
                     setSnackbarMessage("An error occurred. Please check your network and try again.");
                     setSnackbarVisible(true);
                 });
-
-
         }
     };
 

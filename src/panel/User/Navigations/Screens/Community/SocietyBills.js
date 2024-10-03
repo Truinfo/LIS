@@ -114,6 +114,9 @@ const SocietyBills = () => {
         return spinner(); // Show spinner when loading
     }
 
+    if (error) {
+        return <Text>Error: {error}</Text>; // Show error if exists
+    }
     return (
         <View style={styles.container}>
             <FlatList

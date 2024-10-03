@@ -1,15 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
-    View,
-    Text,
-    FlatList,
-    TouchableOpacity,
-    Modal,
-    StyleSheet,
-    TextInput,
-    Button,
-    Alert,
-    Image
+    View, Text, FlatList, TouchableOpacity, Modal, StyleSheet, TextInput, Button, Alert, Image, ActivityIndicator
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { getByMonthAndYear } from './SocietyMaintainanceSlice';
@@ -28,20 +19,19 @@ const Maintenance = ({ navigation }) => {
     const [searchText, setSearchText] = useState('');
     const [showPicker, setShowPicker] = useState(false);
     const [selectedMenuId, setSelectedMenuId] = useState(null);
+
     const DateAndMonth = (dateStr) => {
         const date = new Date(dateStr);
-        // Extract the year and month
         const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based, so add 1
-
-        // Format the output as "YYYY-MM"
-        const formattedDate = `${year} - ${month}`;
-        return formattedDate
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        return `${year}-${month}`;
     }
+
     useFocusEffect(
         React.useCallback(() => {
             const year = date.getFullYear();
             const month = String(date.getMonth() + 1).padStart(2, '0');
+            // dispatch(getByMonthAndYear(`${year}-${month}`));
             dispatch(getByMonthAndYear(`2024-07`));
         }, [dispatch, date])
     );
@@ -53,7 +43,7 @@ const Maintenance = ({ navigation }) => {
 
     const handleCloseModal = () => {
         setModalVisible(false);
-        setSelectedUser(null); // Reset selected user when closing modal
+        setSelectedUser(null);
     };
 
     const handleMenuClick = (userId) => {
@@ -73,27 +63,31 @@ const Maintenance = ({ navigation }) => {
 
     const renderMenu = (item) => {
         if (selectedMenuId !== item._id) return null;
-
         return (
             <View style={styles.menu}>
-                <TouchableOpacity
-                    onPress={() => navigation.navigate("Edit Amenity", { id: item._id })}
-                >
+                <TouchableOpacity onPress={() => navigation.navigate("Edit Maintenance", { blockno: item.blockno, flatno: item.flatno, monthAndYear: "2024-07", })}>
                     <Text style={styles.actionText}>Edit</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
-                    onPress={() => {
-                        setSelectedUser(item);
-                        setModalVisible(true);
-                        setSelectedMenuId(null);
-                    }}
-                >
+                <TouchableOpacity onPress={() => {
+                    setSelectedUser(item);
+                    setModalVisible(true);
+                    setSelectedMenuId(null);
+                }}>
                     <Text style={styles.actionText}>Delete</Text>
                 </TouchableOpacity>
             </View>
         );
     };
-
+    if (status === "loading") {
+        return (
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#7d0431" />
+            </View>
+        );
+    }
+    if (status === "error") {
+        return <Text>Error fetching data...</Text>;
+    }
     return (
         <View style={styles.container}>
             <TextInput
@@ -105,7 +99,6 @@ const Maintenance = ({ navigation }) => {
             <TouchableOpacity style={styles.dateButton} onPress={() => setShowPicker(true)}>
                 <Text style={styles.dateButtonText}>Select Month and Year</Text>
             </TouchableOpacity>
-
             {showPicker && (
                 <DateTimePicker
                     value={date}
@@ -114,7 +107,6 @@ const Maintenance = ({ navigation }) => {
                     onChange={onDateChange}
                 />
             )}
-
             <FlatList
                 data={filteredMaintainances}
                 keyExtractor={(item) => item._id}
@@ -135,88 +127,64 @@ const Maintenance = ({ navigation }) => {
                                     <Text style={styles.value}>: {item.blockno}/ {item.flatno}</Text>
                                 </View>
                             </View>
-                            <TouchableOpacity
-                                style={styles.menuIcon}
-                                onPress={() => handleMenuClick(item._id)}
-                            >
+                            <TouchableOpacity style={styles.menuIcon} onPress={() => handleMenuClick(item._id)}>
                                 <Icon name="ellipsis-vertical" size={24} color="#630000" />
                             </TouchableOpacity>
                             {renderMenu(item)}
                         </View>
                     </TouchableOpacity>
-                )
-                }
+                )}
             />
-            < TouchableOpacity
-                style={styles.addButton}
-                onPress={() => Alert.alert('Add Monthly Maintenance clicked')}
-            >
+            <TouchableOpacity style={styles.addButton} onPress={() => Alert.alert('Add Monthly Maintenance clicked')}>
                 <Text style={styles.addButtonText}>Add Month</Text>
-            </TouchableOpacity >
-
-            {/* Modal for displaying selected user details */}
-            {
-                selectedUser && (
-                    <Modal
-                        visible={modalVisible}
-                        animationType="slide"
-                        transparent={true}
-                    >
-                        {console.log(selectedUser)}
-                        <View style={styles.modalContainer}>
-                            <View style={styles.modalContent}>
-                                <Image
-                                    source={{ uri: `${ImagebaseURL}${selectedUser.pictures}` }} // Use the image URL
-                                    style={styles.modalImage}
-                                    resizeMode="cover"
-                                />
-                                {/* Align names and values */}
-                                <View style={styles.infoContainer}>
-                                    <View style={styles.infoRow}>
-                                        <Text style={styles.label}>Name</Text>
-                                        <Text style={styles.value}>: {selectedUser.name}</Text>
-                                    </View>
-                                    <View style={styles.infoRow}>
-                                        <Text style={styles.label}>Block</Text>
-                                        <Text style={styles.value}>: {selectedUser.blockno}</Text>
-                                    </View>
-                                    <View style={styles.infoRow}>
-                                        <Text style={styles.label}>Flat No</Text>
-                                        <Text style={styles.value}>: {selectedUser.flatno}</Text>
-                                    </View>
-                                    <View style={styles.infoRow}>
-                                        <Text style={styles.label}>TX Mode</Text>
-                                        <Text style={styles.value}>: {selectedUser.transactionType}</Text>
-                                    </View>
-                                    <View style={styles.infoRow}>
-                                        <Text style={styles.label}>Amount</Text>
-                                        <Text style={styles.value}>: {selectedUser.paidAmount}</Text>
-                                    </View>
-                                    <View style={styles.infoRow}>
-                                        <Text style={styles.label}>Paid Date</Text>
-                                        <Text style={styles.value}>: {new Date(selectedUser.payedOn).toLocaleDateString()}</Text>
-
-                                    </View>
-                                    <View style={styles.infoRow}>
-                                        <Text style={styles.label}>Time</Text>
-                                        <Text style={styles.value}>: {new Date(selectedUser.payedOn).toLocaleTimeString()}</Text>
-
-                                    </View>
-                                    <View style={styles.infoRow}>
-                                        <Text style={styles.label}>Status</Text>
-                                        <Text style={styles.value}>: {selectedUser.status}</Text>
-                                    </View>
+            </TouchableOpacity>
+            {selectedUser && (
+                <Modal visible={modalVisible} animationType="slide" transparent={true}>
+                    <View style={styles.modalContainer}>
+                        <View style={styles.modalContent}>
+                            <Image source={{ uri: `${ImagebaseURL}${selectedUser.pictures}` }} style={styles.modalImage} resizeMode="cover" />
+                            <View style={styles.infoContainer}>
+                                <View style={styles.infoRow}>
+                                    <Text style={styles.label}>Name</Text>
+                                    <Text style={styles.value}>: {selectedUser.name}</Text>
                                 </View>
-                                <TouchableOpacity style={styles.closeButton} onPress={handleCloseModal}>
-                                    <Text style={styles.closeButtonText}>Close</Text>
-                                </TouchableOpacity>
+                                <View style={styles.infoRow}>
+                                    <Text style={styles.label}>Block</Text>
+                                    <Text style={styles.value}>: {selectedUser.blockno}</Text>
+                                </View>
+                                <View style={styles.infoRow}>
+                                    <Text style={styles.label}>Flat No</Text>
+                                    <Text style={styles.value}>: {selectedUser.flatno}</Text>
+                                </View>
+                                <View style={styles.infoRow}>
+                                    <Text style={styles.label}>TX Mode</Text>
+                                    <Text style={styles.value}>: {selectedUser.transactionType}</Text>
+                                </View>
+                                <View style={styles.infoRow}>
+                                    <Text style={styles.label}>Amount</Text>
+                                    <Text style={styles.value}>: {selectedUser.paidAmount}</Text>
+                                </View>
+                                <View style={styles.infoRow}>
+                                    <Text style={styles.label}>Paid Date</Text>
+                                    <Text style={styles.value}>: {new Date(selectedUser.payedOn).toLocaleDateString()}</Text>
+                                </View>
+                                <View style={styles.infoRow}>
+                                    <Text style={styles.label}>Time</Text>
+                                    <Text style={styles.value}>: {new Date(selectedUser.payedOn).toLocaleTimeString()}</Text>
+                                </View>
+                                <View style={styles.infoRow}>
+                                    <Text style={styles.label}>Status</Text>
+                                    <Text style={styles.value}>: {selectedUser.status}</Text>
+                                </View>
                             </View>
+                            <TouchableOpacity style={styles.closeButton} onPress={handleCloseModal}>
+                                <Text style={styles.closeButtonText}>Close</Text>
+                            </TouchableOpacity>
                         </View>
-                    </Modal>
-                )
-            }
-
-        </View >
+                    </View>
+                </Modal>
+            )}
+        </View>
     );
 };
 
@@ -240,7 +208,6 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         position: 'relative',
     },
-
     menu: {
         position: "absolute",
         top: 0,
@@ -296,7 +263,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
     modalContent: {
         width: '80%',
@@ -339,16 +306,21 @@ const styles = StyleSheet.create({
     },
     infoRow: {
         flexDirection: 'row',
-        justifyContent: 'space-between', // This will ensure name and value are spaced out
+        justifyContent: 'space-between',
         marginVertical: 2,
     },
     label: {
         fontWeight: '500',
-        width: '30%', // Adjust this width as needed
+        width: '30%',
         color: "#222"
     },
     value: {
-        width: '70%', // Adjust this width as needed
+        width: '70%',
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });
 

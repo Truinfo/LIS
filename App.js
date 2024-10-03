@@ -110,9 +110,6 @@ import AddAmenity from './src/panel/admin/pages/Amenities/AddAmenity';
 import AmenityBookingsList from './src/panel/admin/pages/Amenities/Bookings';
 import EditBooking from './src/panel/admin/pages/Amenities/EditBooking';
 import AddBooking from './src/panel/admin/pages/Amenities/AddBooking';
-import Profile from './src/panel/admin/pages/Profile/Profile';
-import AdminResetPassword from './src/panel/admin/pages/Profile/AdminResetPassword';
-import SecurityTabs from './src/panel/Security/Component/BottomTabs/SecurityTabs';
 
 const Stack = createNativeStackNavigator();
 
@@ -326,7 +323,6 @@ export default function App() {
             <Stack.Screen name='Bookings' component={AmenityBookingsList} />
             <Stack.Screen name='Edit Booking' component={EditBooking} />
             <Stack.Screen name='Add Booking' component={AddBooking} />
-            <Stack.Screen name='Resetpassword' component={AdminResetPassword} />
           </Stack.Navigator>
         </SafeAreaView>
       </NavigationContainer>

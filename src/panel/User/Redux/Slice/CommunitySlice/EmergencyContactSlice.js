@@ -1,15 +1,12 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axiosInstance from "../../../../Security/helpers/axios";
 
-// Define thunk to fetch emergency contacts from backend
-// Define thunk to fetch emergency contacts from backend
 export const fetchEmergencyContacts = createAsyncThunk(
   'emergencyContacts/fetchContacts',
   async (societyId, { rejectWithValue }) => {
     if (!societyId) {
       return rejectWithValue({ message: "Invalid society ID" });
     }
-
     try {
       const response = await axiosInstance.get(`/getEmergencyContactBySocietyId/${societyId}`);
       return response.data;
@@ -39,12 +36,10 @@ const emergencyContactsSlice = createSlice({
       .addCase(fetchEmergencyContacts.fulfilled, (state, action) => {
         state.status = 'succeeded';
         state.contacts = action.payload;
-        console.log("Contacts fetched successfully");
       })
       .addCase(fetchEmergencyContacts.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload?.message || "Failed to fetch contacts";
-        console.log("Failed to fetch contacts:", action.payload);
       });
   },
 });

@@ -36,20 +36,14 @@ export default function Sidebar() {
   };
 
   const handleProfile = () => {
-    // Handle navigation to profile page
     navigation.navigate("AdminProfile")
     toggleDropdown();
   };
   const handlePassword = () => {
-    // Handle navigation to profile page
     navigation.navigate("Resetpassword")
     toggleDropdown();
   };
 
-  // const handleLogout = () => {
-  //   console.log("Logout clicked");
-  //   toggleDropdown();
-  // };
   const handleLogout = async () => {
     try {
       await AsyncStorage.removeItem('user');
@@ -61,7 +55,7 @@ export default function Sidebar() {
     navigation.dispatch(
       CommonActions.reset({
         index: 0,
-        routes: [{ name: 'Login' }], // Adjust 'Login' to the correct name of your login screen
+        routes: [{ name: 'Login' }],
       })
     );
   };
@@ -74,13 +68,13 @@ export default function Sidebar() {
           headerRight: () => (
             <View style={{ flexDirection: 'row', alignItems: "center", gap: 15, marginRight: 10 }}>
               <View>
-                <Icon name="bell-o" size={25} color="#202020" />
+                <Icon name="bell-o" size={25} color="#7d0431" />
                 <View style={styles.badge}>
                   <Text style={styles.badgeText}>3</Text>
                 </View>
               </View>
               <TouchableOpacity onPress={toggleDropdown}>
-                <Icon name="user-circle-o" size={25} color="#202020" />
+                <Icon name="user-circle-o" size={25} color="#7d0431" />
               </TouchableOpacity>
               {dropdownVisible && (
                 <View style={styles.dropdown}>
@@ -100,7 +94,10 @@ export default function Sidebar() {
               )}
             </View>
           ),
+          drawerActiveTintColor: '#7d0431',  
+          drawerInactiveTintColor: 'gray',
         }}
+        
       >
         <Drawer.Screen name="Dashboard" component={Dashboard} />
         <Drawer.Screen name="Advertisements" component={Advertisements} />

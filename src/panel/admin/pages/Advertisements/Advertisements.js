@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, FlatList, Image, TouchableOpacity, Modal, StyleSheet, Alert, ActivityIndicator, TouchableWithoutFeedback, } from 'react-native';
+import { View, Text, FlatList, Image, TouchableOpacity,  StyleSheet, Alert, ActivityIndicator, TouchableWithoutFeedback, } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAdvertisements, deleteAdvertisement } from './AdvertisementSlice';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -7,7 +7,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { ImagebaseURL } from '../../../Security/helpers/axios';
 
 const Advertisements = () => {
-  const [menuVisible, setMenuVisible] = useState(null); // Track which item's menu is open
+  const [menuVisible, setMenuVisible] = useState(null); 
   const dispatch = useDispatch();
   const navigate = useNavigation();
 
@@ -23,10 +23,12 @@ const Advertisements = () => {
 
   const handleView = (item) => {
     navigate.navigate('View Details', { id: item._id });
+    setMenuVisible(false)
   };
 
   const handleEdit = (item) => {
     navigate.navigate('Edit Post', { id: item._id });
+    setMenuVisible(false)
   };
 
   const handleDelete = (item) => {
@@ -52,7 +54,7 @@ const Advertisements = () => {
   };
 
   const toggleMenu = (itemId) => {
-    setMenuVisible(menuVisible === itemId ? null : itemId); // Toggle the menu for the specific item
+    setMenuVisible(menuVisible === itemId ? null : itemId); 
   };
 
   const handleOutsidePress = () => {

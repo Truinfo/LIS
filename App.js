@@ -332,7 +332,6 @@ export default function App() {
             <Stack.Screen name='Edit Booking' component={EditBooking} />
             <Stack.Screen name='Add Booking' component={AddBooking} />
             <Stack.Screen name='Edit Maintenance' component={EditAdminMaintaince} />
-            <Stack.Screen name='Resetpassword' component={AdminResetPassword} />
             <Stack.Screen name='Add Maintenance Bill' component={AddMaintenanceBill} />
           </Stack.Navigator>
         </SafeAreaView>

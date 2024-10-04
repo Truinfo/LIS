@@ -1,19 +1,16 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../../Security/helpers/axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
 
 export const fetchAdvertisements = createAsyncThunk(
   'adds/fetchAdvertisements',
   async () => {
-    const societyAdmin = await AsyncStorage.getItem('user');
+    const societyAdmin = await AsyncStorage.getItem('societyAdmin');
     const societyId = JSON.parse(societyAdmin)?._id;
-
     const response = await axiosInstance.get(`/getAdvertisements/${societyId}`);
     return response.data.addv;
   }
 );
-
 export const getAdvertisementsById = createAsyncThunk(
   'adds/getAdvertisementsById',
   async (id) => {
@@ -21,7 +18,6 @@ export const getAdvertisementsById = createAsyncThunk(
     return response.data.advertisement;
   }
 );
-
 export const getAdvertisementsByAdv = createAsyncThunk(
   'adds/getAdvertisementsByAdv',
   async (adv) => {
@@ -29,7 +25,6 @@ export const getAdvertisementsByAdv = createAsyncThunk(
     return response.data.sequrity;
   }
 );
-
 export const createAdvertisements = createAsyncThunk(
   'adds/createAdvertisements',
   async (formData, { rejectWithValue }) => {
@@ -45,7 +40,6 @@ export const createAdvertisements = createAsyncThunk(
     }
   }
 );
-
 export const editAdvertisement = createAsyncThunk(
   'adds/editAdvertisement',
   async ({ id, formData }) => {
@@ -57,7 +51,6 @@ export const editAdvertisement = createAsyncThunk(
     return response.data;
   }
 );
-
 export const deleteAdvertisement = createAsyncThunk(
   'adds/deleteAdvertisement',
   async ({ id }) => {
@@ -65,7 +58,6 @@ export const deleteAdvertisement = createAsyncThunk(
     return response.data;
   }
 );
-
 const AdvertisementSlice = createSlice({
   name: 'adds',
   initialState: {

@@ -54,12 +54,10 @@ const visitorsSlice = createSlice({
       .addCase(deleteEntry.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.successMessage = action.payload.message;
-        console.log(action.payload.message)
       })
       .addCase(deleteEntry.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
-        console.log(action.error.message)
       });
   },
 });

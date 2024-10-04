@@ -122,7 +122,6 @@ const store = configureStore({
 
     //Admin
     //Residents
-    gateKeepers: GateKeeperReducer,
     advertisements: AdvertisementReducer,
     gateKeepers: GateKeeperReducer,
     adminProfile: AdminProfileReducer,
@@ -130,7 +129,6 @@ const store = configureStore({
     staff: staffReducer,
     profile:AdminprofileReducer,
     commityMembers:CommityMembersReducer,
-
     societyEvents: SocietyEventReducer,
     inventory: inventoryReducer,
     adminNotices: AdminNoticeReducer,

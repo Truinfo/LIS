@@ -1,34 +1,35 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../../Security/helpers/axios';
-
-const societyId = "6683b57b073739a31e8350d0";
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
+const fetchSocietyId = async () => {
+    const storedAdmin = await AsyncStorage.getItem('societyAdmin');
+    const societyAdmin = JSON.parse(storedAdmin) || {};
+    return societyAdmin._id || "6683b57b073739a31e8350d0"; // Default ID
+};
 export const fetchUsers = createAsyncThunk(
     'user/fetchUsers',
     async () => {
+        const societyId = await fetchSocietyId()
         const response = await axiosInstance.get(`/user/getAllUserProfilesBySocietyId/${societyId}`);
         return response.data.userProfiles;
     }
 );
-
 export const getAllOwners = createAsyncThunk(
     'user/getAllOwners',
     async () => {
+        const societyId = await fetchSocietyId()
         const response = await axiosInstance.get(`/user/getAllOwners/${societyId}`);
         return response.data.userProfiles;
     }
 );
-
 export const fetchUserProfiles = createAsyncThunk(
     'user/fetchUserProfiles',
     async ({ userId }) => {
+        const societyId = await fetchSocietyId()
         const response = await axiosInstance.get(`/user/getUserProfiles/${userId}/${societyId}`);
         return response.data.userProfiles;
     }
 );
-
-
-
 export const deleteUser = createAsyncThunk(
     'user/deleteUser',
     async ({ _id }) => {
@@ -36,13 +37,23 @@ export const deleteUser = createAsyncThunk(
         return response.data;
     }
 );
+export const fetchResidentProfile = createAsyncThunk(
+    'profile/fetchResidentProfile',
+    async () => {
+        const societyId = await fetchSocietyId()
+        console, log(societyId)
+        const response = await axiosInstance.get(`/society/profile/${societyId}`);
+        console.log(response.data)
+        return response.data.admins;
 
-
+    }
+);
 const ResidentsSlice = createSlice({
     name: 'user',
     initialState: {
         users: [],
         profiles: [],
+        profile: [],
         status: 'idle',
         error: null,
         successMessage: null,
@@ -75,7 +86,6 @@ const ResidentsSlice = createSlice({
                 state.error = action.error.message;
             })
 
-
             .addCase(fetchUserProfiles.pending, (state) => {
                 state.status = 'loading';
             })
@@ -98,7 +108,20 @@ const ResidentsSlice = createSlice({
             .addCase(deleteUser.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.error.message;
-            });
+            })
+            .addCase(fetchResidentProfile.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchResidentProfile.fulfilled, (state, action) => {
+                state.loading = false;
+                state.profiles = action.payload;
+                state.error = null;
+            })
+            .addCase(fetchResidentProfile.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
     }
 });
 

@@ -54,9 +54,7 @@ export const updateAmenity = createAsyncThunk(
 export const deleteAmenity = createAsyncThunk(
   "amenities/deleteAmenity",
   async ({ id }) => {
-    console.log(id);
     const response = await axiosInstance.delete(`/deleteAmenity/${id}`);
-    console.log(response)
     return response.data;
   }
 );

@@ -1,4 +1,4 @@
-import { useNavigation } from "@react-navigation/native";
+import { CommonActions, useNavigation } from "@react-navigation/native";
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -61,7 +61,12 @@ const ProfileScreen = () => {
       console.log('Error clearing user from AsyncStorage:', e);
     }
     dispatch(logout());
-    navigation.navigate('Login');
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: 'Login' }], // Adjust 'Login' to the correct name of your login screen
+      })
+    );
   };
 
 

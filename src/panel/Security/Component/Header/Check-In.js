@@ -46,7 +46,6 @@ const CheckIn = ({ data, setActiveTab }) => {
         setTimeout(() => {
           dispatch(fetchVisitors(societyId));
           setShowDialog(false);
-          setActiveTab('Check Out');
         }, 2000);
       } else {
         setShowDialog(true);
@@ -106,7 +105,7 @@ const CheckIn = ({ data, setActiveTab }) => {
   const sortedData = data.sort((a, b) => new Date(b.checkInDateTime) - new Date(a.checkInDateTime));
 
   return (
-    <>
+    <View style={styles.container}>
       <FlatList
         data={sortedData}
         renderItem={renderItem}
@@ -118,11 +117,15 @@ const CheckIn = ({ data, setActiveTab }) => {
         showDialog={showDialog}
         onClose={() => setShowDialog(false)}
       />
-    </>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex:1,
+    backgroundColor:"#fff"
+  },
   itemContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -132,10 +135,8 @@ const styles = StyleSheet.create({
     borderBottomColor: '#eee',
   },
   avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 50,
-    backgroundColor:"#ccc"
+    backgroundColor:"#ccc",marginTop:10
+
   },
   noImageText: {
     width: 80,

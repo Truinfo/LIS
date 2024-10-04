@@ -1,17 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet,ActivityIndicator, TouchableOpacity, SafeAreaView } from 'react-native';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
+import { fetchVisitors } from '../../../User/Redux/Slice/Security_Panel/InandOutSlice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { NavigationContainer, useFocusEffect } from '@react-navigation/native';
 import CheckIn from './Check-In';
 import CheckOut from './Check-Out';
 import Waiting from './Waiting';
-import { fetchVisitors } from '../../../User/Redux/Slice/Security_Panel/InandOutSlice';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const Tab = createMaterialTopTabNavigator();
 
 const InandOut1 = () => {
-    const [activeTab, setActiveTab] = useState('Waiting');
     const dispatch = useDispatch();
     const [societyId, setSocietyId] = useState(null);
-    const { visitors = [], status, error } = useSelector((state) => state.visitors);
+    const { visitors = [], status } = useSelector((state) => state.visitors);
 
     useEffect(() => {
         const getSocietyId = async () => {
@@ -30,85 +33,50 @@ const InandOut1 = () => {
         getSocietyId();
     }, []);
 
-    useEffect(() => {
-        if (societyId) {
-            dispatch(fetchVisitors(societyId));
-        }
-    }, [dispatch, societyId]);
-
-    const checkInData = visitors.filter((visitor) => visitor.status === 'Check In' && (visitor));
-    const checkOutData = visitors.filter((visitor) => visitor.status === 'Check Out' && (visitor));
-    const waitingData = visitors.filter((visitor) => visitor.status === 'Waiting' && (visitor));
+    useFocusEffect(
+        React.useCallback(() => {
+            if (societyId) {
+                dispatch(fetchVisitors(societyId));
+            }
+        }, [dispatch, societyId])
+    );
+    const checkInData = visitors.filter((visitor) => visitor.status === 'Check In');
+    const checkOutData = visitors.filter((visitor) => visitor.status === 'Check Out');
+    const waitingData = visitors.filter((visitor) => visitor.status === 'Waiting');
 
     if (status === 'loading') {
-        return(
+        return (
             <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color="#7d0431" />
             </View>
         );
     }
 
-    const renderContent = () => {
-        switch (activeTab) {
-            case 'Check In':
-                return <CheckIn data={checkInData} setActiveTab={setActiveTab} />;
-            case 'Check Out':
-                return <CheckOut data={checkOutData} setActiveTab={setActiveTab} />;
-            case 'Waiting':
-                return <Waiting data={waitingData} setActiveTab={setActiveTab} />;
-            default:
-                return null;
-        }
-    };
-
     return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.topHalf}>
-                <View style={styles.topNav}>
-                    <TouchableOpacity style={styles.tabView} onPress={() => setActiveTab('Check In')}>
-                        <Text style={{ color: activeTab === 'Check In' ? '#800336' : 'black',fontWeight:"bold" }}>Check In</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.tabView} onPress={() => setActiveTab('Waiting')}>
-                        <Text style={{ color: activeTab === 'Waiting' ? '#800336' : 'black',fontWeight:"bold" }}>Waiting</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.tabView} onPress={() => setActiveTab('Check Out')}>
-                        <Text style={{ color: activeTab === 'Check Out' ? '#800336' : 'black',fontWeight:"bold" }}>Check Out</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
-            <View style={styles.bottomHalf}>
-                {renderContent()}
-            </View>
-        </SafeAreaView>
+        <Tab.Navigator
+            screenOptions={{
+                tabBarActiveTintColor: '#800336',
+                tabBarLabelStyle: { fontWeight: 'bold' },
+                tabBarIndicatorStyle: { backgroundColor: '#800336' },
+                tabBarStyle: { backgroundColor: '#f6f6f6' },
+            }}
+        >
+            <Tab.Screen name="Check In">
+                {() => <CheckIn data={checkInData} />}
+            </Tab.Screen>
+            <Tab.Screen name="Waiting">
+                {() => <Waiting data={waitingData} />}
+            </Tab.Screen>
+            <Tab.Screen name="Check Out">
+                {() => <CheckOut data={checkOutData} />}
+            </Tab.Screen>
+        </Tab.Navigator>
     );
 };
 
 export default InandOut1;
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    topHalf: {
-        flex: 1,
-        alignItems: 'center',
-        backgroundColor: '#F8E9DC',
-    },
-    bottomHalf: {
-        flex: 8,
-        backgroundColor: '#ffffff',
-    },
-    topNav: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        width: "100%",
-        paddingHorizontal: 50,
-        paddingVertical: 20,
-    },
-    tabView: {
-        alignItems: "center"
-    },
     loadingContainer: {
         flex: 1,
         justifyContent: "center",

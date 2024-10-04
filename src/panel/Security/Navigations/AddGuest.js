@@ -39,12 +39,14 @@ const AddGuest = ({ route, navigation }) => {
   const [blockError, setBlockError] = useState("");
   const [flatNoError, setFlatNoError] = useState("");
   const error = useSelector((state) => state.visitor.error);
-  const successMessage = useSelector((state) => state.visitor.successMessage);
   const [buildings, setBuildings] = useState([]);
   const [flatsForSelectedBlock, setFlatsForSelectedBlock] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [isImageModalVisible, setImageModalVisible] = useState(false);
+  const [dialogMessage, setDialogMessage] = useState("");
   const dispatch = useDispatch();
+  const [image, setImage] = useState(null);
+
 
   const [societyId, setSocietyId] = useState(null);
   useEffect(() => {
@@ -64,8 +66,6 @@ const AddGuest = ({ route, navigation }) => {
     getSocietyId();
   }, []);
   const { society } = useSelector((state) => state.societyById);
-  console.log(successMessage);
-
   useEffect(() => {
     if (society) {
       setBuildings(society.blocks);
@@ -125,7 +125,6 @@ const AddGuest = ({ route, navigation }) => {
     }
     return isValid;
   };
-
   const handleConfirm = async () => {
     console.log("handleConfirm clicked");
     if (validateInputs()) {
@@ -142,119 +141,89 @@ const AddGuest = ({ route, navigation }) => {
       formData.append("block", block);
       formData.append("flatNo", flatNo);
       formData.append("date", date);
+      console.log(image)
+      if (image) {
+        const imageName = image.uri.split('/').pop();
+        const imageType = image.uri.split('.').pop(); // Example: 'jpg', 'png'
 
-      if (imageFile) {
-        formData.append("pictures", {
-          uri: imageFile.uri,
-          name: imageFile.name,
-          type: imageFile.type,
+        formData.append('pictures', {
+          uri: image.uri,
+          name: imageName,
+          type: `image/${imageType}`,
         });
       }
       try {
         const response = await dispatch(createVisitor(formData));
-        if (response.meta.requestStatus === "fulfilled") {
+        if (response.type === "visitor/createVisitor/fulfilled") {
+          console.log(response);
           setName("");
           setPhoneNumber("");
           setBlock("");
           setFlatNo("");
-          setImageFile(null);
-          setImagePreview(null);
+          setImage(null);
+          setDialogMessage(response.payload.message); 
           setShowDialog(true);
           setTimeout(() => {
             setShowDialog(false);
             dispatch(resetState());
-            navigation.navigate("InandOut1");
+            navigation.navigate("SecurityTabs", { screen: "Visitors Entries" });
           }, 1000);
         } else {
+          setDialogMessage(response.payload.message || "An error occurred"); 
           setShowDialog(true);
           setTimeout(() => {
             setShowDialog(false);
           }, 1000);
         }
       } catch (error) {
-        setLoading(false);
+        console.error(error); 
+        setDialogMessage("An error occurred while creating the visitor."); 
+        setShowDialog(true);
+        setTimeout(() => {
+          setShowDialog(false);
+        }, 1000);
       } finally {
         setLoading(false);
       }
     }
   };
+  const handleImagePick = async () => {
+    Alert.alert(
+      'Select Image Source',
+      'Choose an option to upload an image:',
+      [
+        {
+          text: 'Camera',
+          onPress: () => pickImage(ImagePicker.launchCameraAsync),
+        },
+        {
+          text: 'Gallery',
+          onPress: () => pickImage(ImagePicker.launchImageLibraryAsync),
+        },
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+      ]
+    );
+  };
 
-  const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+  const pickImage = async (launchFunction) => {
+    let result = await launchFunction({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: false,
+      aspect: [4, 3],
       quality: 1,
     });
 
     if (!result.canceled) {
-      const uri = result.assets[0]?.uri;
-      if (uri) {
-        setImageFile({ uri, name: uri.split("/").pop(), type: "image/jpeg" });
-        setImagePreview(uri);
-        setShowModal(false);
-      }
+      setImage(result.assets[0].uri);
+      setImage(result.assets[0]);
     }
   };
 
-  const takePhoto = async () => {
-    try {
-      const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: false,
-        quality: 1,
-      });
 
-      if (!result.canceled) {
-        const uri = result.assets && result.assets[0]?.uri;
-        if (uri) {
-          setImageFile({ uri, name: uri.split("/").pop(), type: "image/jpeg" });
-          setImagePreview(uri);
-          setShowModal(false);
-        }
-      }
-    } catch (error) {
-      console.error("Error launching camera:", error);
-    }
-  };
 
-  const deletePhoto = () => {
-    Alert.alert(
-      "Remove Profile Photo",
-      "Are you sure you want to remove the profile photo?",
-      [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-        {
-          text: "Remove",
-          onPress: () => {
-            setImageFile(null);
-            setImagePreview(null);
-            setShowModal(false);
-          },
-          style: "destructive",
-        },
-      ],
-      { cancelable: true }
-    );
-  };
-
-  const handleOpenModal = () => {
-    setShowModal(true);
-  };
-
-  const closeCross = () => {
-    setShowModal(false);
-  };
-
-  const handleAvatarPress = () => {
-    if (imagePreview) {
-      setImageModalVisible(true);
-    } else {
-      Alert.alert("No Image", "Please upload an image.");
-    }
-  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -262,27 +231,17 @@ const AddGuest = ({ route, navigation }) => {
         <View style={styles.avatarWrapper}>
           <TouchableOpacity
             style={styles.avatarContainer}
-            onPress={handleAvatarPress}
           >
-            {imagePreview ? (
-              <Avatar.Image
-                style={styles.avatar}
-                resizeMode="cover"
-                size={174}
-                source={{ uri: imagePreview }}
-              />
-            ) : (
-              <Avatar.Image
-                size={174}
-                style={styles.avatar}
-                color="#fff"
-                source={require("../../../assets/Security/images/user.png")}
-              />
-            )}
+            <Avatar.Image
+              size={174}
+              style={styles.avatar}
+              color="#fff"
+              source={image ? { uri: image } : require('../../../assets/Security/images/user.png')}
+            />
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.cameraIconContainer}
-            onPress={handleOpenModal}
+            onPress={handleImagePick}
           >
             <MaterialCommunityIcons
               name="camera-outline"
@@ -414,7 +373,7 @@ const AddGuest = ({ route, navigation }) => {
             </View>
           )}
         </View>
-     
+
         <TouchableOpacity
           style={styles.confirmButton}
           onPress={handleConfirm}
@@ -422,13 +381,13 @@ const AddGuest = ({ route, navigation }) => {
         >
           <Text style={styles.confirmButtonText}>Add</Text>
         </TouchableOpacity>
-        </ScrollView>
-        <MyDialog
-          message={successMessage || error}
-          showDialog={showDialog}
-          onClose={() => setShowDialog(false)}
-        />
-        <Modal
+      </ScrollView>
+      <MyDialog
+        message={dialogMessage || error}
+        showDialog={showDialog}
+        onClose={() => setShowDialog(false)}
+      />
+      {/* <Modal
           animationType="fade"
           transparent={true}
           visible={showModal}
@@ -470,17 +429,17 @@ const AddGuest = ({ route, navigation }) => {
                     <Text style={styles.camText}>Gallery</Text>
                   </TouchableOpacity>
                 </View>
-                <View>
+                 <View>
                   <TouchableOpacity onPress={deletePhoto}>
                     <AntDesign name="delete" size={27} color="#800336" />
                     <Text style={styles.camText}>Delete</Text>
                   </TouchableOpacity>
-                </View>
+                </View> 
               </View>
             </View>
           </View>
-        </Modal>
-    
+        </Modal> */}
+
       <Modal
         visible={isImageModalVisible}
         transparent={true}
@@ -490,8 +449,8 @@ const AddGuest = ({ route, navigation }) => {
         <View style={styles.fullScreenImageContainer}>
           <View style={styles.profileHeader}>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <TouchableOpacity onPress={()=> setImageModalVisible(false)}>
-                
+              <TouchableOpacity onPress={() => setImageModalVisible(false)}>
+
                 <AntDesign name="arrowleft" size={28} color="#fff" />
               </TouchableOpacity>
               <Text style={styles.profileText}>Profile Photo</Text>

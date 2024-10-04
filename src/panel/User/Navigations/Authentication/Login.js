@@ -57,7 +57,7 @@ const Login = () => {
           } else if (userRole === 'Sequrity') {
             navigation.reset({
               index: 0,
-              routes: [{ name: "Header" }],
+              routes: [{ name: "SecurityTabs" }],
             });
           } else if (userRole === 'SocietyAdmin') {
             navigation.reset({

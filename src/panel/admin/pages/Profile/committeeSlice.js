@@ -19,12 +19,9 @@ export const createCommityMembers = createAsyncThunk(
 // router.get('/getCommityMembersBySocietyId/:societyId', getCommityMembersBySocietyId);
 export const fetchCommityMembers = createAsyncThunk(
   'fetchCommityMembers',
-  async () => {
-    const societyAdmin = await AsyncStorage.getItem('user');
-    const societyId = JSON.parse(societyAdmin)?._id;
+  async (societyId) => {
     const response = await axiosInstance.get(`/getCommityMembersBySocietyId/${societyId}`);
-    return response.data.commityMember
-      ;
+    return response.data.commityMember;
   }
 );
 

@@ -60,16 +60,22 @@ const CheckOut = ({ data, setActiveTab }) => {
   const sortedData = data.sort((a, b) => new Date(b.checkOutDateTime) - new Date(a.checkOutDateTime));
 
   return (
-    <FlatList
-      data={sortedData}
-      renderItem={renderItem}
-      keyExtractor={item => item._id}
-      style={styles.list}
-    />
+    <View style={styles.container}>
+      <FlatList
+        data={sortedData}
+        renderItem={renderItem}
+        keyExtractor={item => item._id}
+        style={styles.list}
+      />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff"
+  },
   itemContainer: {
     flexDirection: 'row',
     alignItems: 'center',

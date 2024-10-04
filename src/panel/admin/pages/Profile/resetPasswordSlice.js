@@ -1,5 +1,4 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
 import axiosInstance from '../../../Security/helpers/axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -27,7 +26,7 @@ export const resetPassword = createAsyncThunk(
             headers: {'Content-Type': 'application/json'}
         });
             return response.data;
-        } catch (error) {console.log(error.response.data.message)
+        } catch (error) {
             return rejectWithValue(error.response.data.message);
         }
     }

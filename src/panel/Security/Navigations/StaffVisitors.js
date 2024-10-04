@@ -6,17 +6,15 @@ import CheckOut from './StaffCheckOut';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchStaffVisitors } from '../../User/Redux/Slice/Security_Panel/StaffInandOutSlice';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useFocusEffect } from '@react-navigation/native';
 
 const Tab = createMaterialTopTabNavigator();
 
-const InandOut1 = () => {
+const StaffVisitors = () => {
     const dispatch = useDispatch();
     const [societyId, setSocietyId] = useState(null);
     const { status } = useSelector((state) => state.staffVisitor);
     const staffVisitors = useSelector((state) => state.staffVisitor.staffVisitors);
-    console.log(staffVisitors);
-
     useEffect(() => {
         const getSocietyId = async () => {
             try {
@@ -34,12 +32,13 @@ const InandOut1 = () => {
         getSocietyId();
     }, []);
 
-    useEffect(() => {
-        console.log(societyId);
-        if (societyId) {
-            dispatch(fetchStaffVisitors(societyId));
-        }
-    }, [dispatch, societyId]);
+    useFocusEffect(
+        React.useCallback(() => {
+            if (societyId) {
+                dispatch(fetchStaffVisitors(societyId));
+            }
+        }, [dispatch, societyId])
+    );
 
     const checkInData = staffVisitors.filter(visitor => visitor.checkInDateTime && !visitor.checkOutDateTime);
     const checkOutData = staffVisitors.filter(visitor => visitor.checkOutDateTime);
@@ -60,7 +59,7 @@ const InandOut1 = () => {
                         tabBarActiveTintColor: '#800336',
                         tabBarInactiveTintColor: 'black',
                         tabBarIndicatorStyle: { backgroundColor: '#800336' },
-                        tabBarStyle: { backgroundColor: '#F8E9DC' },
+                        tabBarStyle: { backgroundColor: '#f6f6f6' },
                     }}
                 >
                     <Tab.Screen name="Check In">
@@ -74,7 +73,7 @@ const InandOut1 = () => {
     );
 };
 
-export default InandOut1;
+export default StaffVisitors;
 
 const styles = StyleSheet.create({
     container: {

@@ -279,7 +279,6 @@ export default function App() {
             <Stack.Screen name="Payment" component={Payment} />
             <Stack.Screen name="Residents " component={Resident} />
             <Stack.Screen name="Notification" component={Notifications} />
-            <Stack.Screen name="AdminProfile" component={Profile} />
             <Stack.Screen name="Pre Approval Visitors" component={PreApproval} />
             <Stack.Screen name="Household" component={Household} />
             <Stack.Screen name="GetHelp" component={GetHelp} />
@@ -297,6 +296,10 @@ export default function App() {
             <Stack.Screen name="Sidebar" component={Sidebar} options={{
               headerShown: false,
             }} />
+
+            <Stack.Screen name="AdminProfile" component={Profile} />
+            <Stack.Screen name="Resetpassword" component={AdminResetPassword} />
+
 
             <Stack.Screen name="Add Residents" component={AddResidents} />
             <Stack.Screen name="Residents Details" component={ResidentDetails} />
@@ -330,7 +333,6 @@ export default function App() {
             <Stack.Screen name='Edit Booking' component={EditBooking} />
             <Stack.Screen name='Add Booking' component={AddBooking} />
             <Stack.Screen name='Edit Maintenance' component={EditAdminMaintaince} />
-            <Stack.Screen name='Resetpassword' component={AdminResetPassword} />
             <Stack.Screen name='Add Maintenance Bill' component={AddMaintenanceBill} />
             <Stack.Screen name='Residential Approvals' component={ResindetialRequests} />
           </Stack.Navigator>

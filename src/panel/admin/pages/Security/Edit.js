@@ -240,9 +240,9 @@ const EditSecurity = () => {
     return <ActivityIndicator size="large" color="#630000" style={styles.loader} />;
   }
 
-  if (status === 'failed') {
-    return <Text style={styles.errorText}>Error: {error}</Text>;
-  }
+// if (status === 'failed') {
+//     return <Text style={styles.errorText}>Error: {error}</Text>;
+// }
   return (
     <ScrollView style={styles.container}>
       <View style={styles.avatarContainer}>

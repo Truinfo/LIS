@@ -60,14 +60,13 @@ const Dashboard = () => {
         <ScrollView contentContainerStyle={styles.container}>
             <View style={styles.row}>
                 <DashboardCard title="Blocks" count={blocksCount} onPress={() => handleNavigation('UserManagement')} />
-                <DashboardCard title="Flats" count={flatsCount} onPress={() => handleNavigation('UserManagement')} />
+                <DashboardCard title="Flats" count={flatsCount ? flatsCount : 0} onPress={() => handleNavigation('UserManagement')} />
                 <DashboardCard title="Complaints" count={complaintsCount} onPress={() => handleNavigation('Complaints')} />
             </View>
             <View>
                 {unverifiedResidents.length > 0 && (
                     <Text style={styles.ApprovalHeader}>Residential Approval Request</Text>
                 )}
-
                 <ScrollView
                     horizontal
                     showsHorizontalScrollIndicator={false}

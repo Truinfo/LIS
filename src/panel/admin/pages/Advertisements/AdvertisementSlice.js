@@ -2,11 +2,16 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../../Security/helpers/axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+const fetchSocietyId = async () => {
+  const storedAdmin = await AsyncStorage.getItem("societyAdmin");
+  const societyAdmin = JSON.parse(storedAdmin) || {};
+  return societyAdmin._id || "6683b57b073739a31e8350d0";
+};
+
 export const fetchAdvertisements = createAsyncThunk(
   'adds/fetchAdvertisements',
   async () => {
-    const societyAdmin = await AsyncStorage.getItem('societyAdmin');
-    const societyId = JSON.parse(societyAdmin)?._id;
+    const societyId = await fetchSocietyId()
     const response = await axiosInstance.get(`/getAdvertisements/${societyId}`);
     return response.data.addv;
   }

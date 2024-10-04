@@ -41,7 +41,6 @@ export const fetchaddInventory = createAsyncThunk(
 export const fetchEditInventoryAsync = createAsyncThunk(
   'inventory/EditInventoryData',
   async ({ id, editInventoryData }) => {
-    console.log(id,editInventoryData)
     const response = await axiosInstance.put(`/updateInventory/${id}`,
       editInventoryData,
       {

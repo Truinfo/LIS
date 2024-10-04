@@ -16,7 +16,6 @@ export const resetPassword = createAsyncThunk(
     async ({ currentPassword, password }, { rejectWithValue }) => {
         const societyAdmin = await AsyncStorage.getItem('user');
         const societyId = JSON.parse(societyAdmin)?._id;
-        console.log(currentPassword, password,societyId)
         try {
          
             const response = await axiosInstance.post('/society/resetPassword', {

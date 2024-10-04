@@ -31,7 +31,6 @@ export const deleteComplaintAsync = createAsyncThunk(
 export const createComplaint = createAsyncThunk(
   'complaints/createComplaint',
   async (complaintData, thunkAPI) => {
-    console.log(complaintData, "complait data")
     try {
       const response = await axiosInstance.post('/createComplaint', complaintData);
       return response.data;
@@ -44,13 +43,11 @@ export const createComplaint = createAsyncThunk(
 export const updateComplaintStatusResolution = createAsyncThunk(
   'complaints/updateComplaintResolution',
   async ({ complaintId, resolution }, thunkAPI) => {
-    console.log("status")
     try {
       const storedAdmin = await AsyncStorage.getItem('societyAdmin');
       const societyAdmin = JSON.parse(storedAdmin) || {};
       const societyId = societyAdmin._id || "6683b57b073739a31e8350d0"; // Default ID
       const response = await axiosInstance.put(`/updateComplaintStatus/${societyId}/${complaintId}`, { resolution });
-      console.log(response.data)
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -123,8 +120,7 @@ const ComplaintSlice = createSlice({
       })
       .addCase(updateComplaintStatusResolution.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message; 
-        console.log(action.error, "fail")
+        state.error = action.error.message;
         state.status = "Failed";
       });
   }

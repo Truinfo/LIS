@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from "../../../Security/helpers/axios";
-import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const fetchSocietyId = async () => {
@@ -18,7 +17,6 @@ export const getByMonthAndYear = createAsyncThunk(
     }
 );
 
-// /getOne/:societyId/:blockno/:flatno
 export const getOne = createAsyncThunk(
     'maintainancess/getOne',
     async ({ blockno, flatno, monthAndYear }) => {

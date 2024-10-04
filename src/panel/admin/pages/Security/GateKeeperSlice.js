@@ -192,7 +192,6 @@ const GateKeeperSlice = createSlice({
       })
       .addCase(createSequrity.rejected, (state, action) => {
         state.status = 'failed';
-        console.log(action.payload.message)
         state.error = action.payload.message;
       })
 

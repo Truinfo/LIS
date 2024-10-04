@@ -10,7 +10,6 @@ export const createService = createAsyncThunk(
     'staff/createService',
     async (formData) => {
         try {
-            console.log(formData)
             const response = await axiosInstance.post('/createService', formData);
             return response.data;
         } catch (error) {
@@ -49,11 +48,9 @@ export const fetchServicePersonById = createAsyncThunk(
     }
 );
 
-// router.put('/updateServicePerson', updateServicePerson);
 export const updateServicePerson = createAsyncThunk(
     'staff/updateServicePerson',
     async (formData) => {
-        console.log("slice ", formData)
         const response = await axiosInstance.put('/updateServicePerson', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data' // Ensure proper content type for FormData
@@ -66,7 +63,6 @@ export const updateServicePerson = createAsyncThunk(
 export const deleteServicePerson = createAsyncThunk(
     'user/deleteServicePerson',
     async ({ userid, serviceType, societyId }) => {
-        console.log('Payload:', { userid, serviceType, societyId });
 
         try {
             const response = await axiosInstance.delete('/deleteServicePerson', {
@@ -182,7 +178,6 @@ const staffSlice = createSlice({
             })
             .addCase(updateServicePerson.rejected, (state, action) => {
                 state.status = 'failed';
-                console.log("Delete error:", action.error);
 
                 state.error = action.error.message;
             })
@@ -198,24 +193,10 @@ const staffSlice = createSlice({
             })
             .addCase(deleteServicePerson.rejected, (state, action) => {
                 state.status = 'failed';
-                console.log(action.error.message)
                 state.error = action.error.message;
             })
 
-            //addList
-            // .addCase(addList.pending, (state) => {
-            //     state.status = 'loading';
-            // })
-            // .addCase(addList.fulfilled, (state, action) => {
-            //     state.status = 'succeeded';
-            //     state.data = action.payload;
-            // })
-            // .addCase(addList.rejected, (state, action) => {
-            //     state.status = 'failed';
-            //     state.error = action.error.message;
-            // })
-
-            //deleteUserService
+          
             .addCase(deleteUserService.pending, (state) => {
                 state.status = 'loading';
             })

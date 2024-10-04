@@ -45,22 +45,18 @@ export const updateAmenityBooking = createAsyncThunk(
     async ({ userId, formData }) => {
         const societyId = await fetchSocietyId();
         const response = await axiosInstance.put(`/updateAmenityBooking/${societyId}/${userId}`, formData);
-        console.log(response, "updated")
         return response.data;
     }
 );
 
-// router.delete('/deleteAmenityBooking/:id/:userId', deleteAmenityBooking);
 export const deleteAmenityBooking = createAsyncThunk(
     "booking/deleteAmenityBooking",
     async (userId) => {
         const id = userId
         const societyId = await fetchSocietyId();
-        console.log(societyId, userId, "delete")
         const response = await axiosInstance.delete(`/deleteAmenityBooking/${societyId}/${id}`, {
             headers: { 'Content-Type': 'application/json' }
         });
-        console.log(response.data, "hello")
         return response.data;
     }
 );
@@ -112,7 +108,6 @@ const BookingSlice = createSlice({
             .addCase(bookAmenity.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.error.message;
-                console.log()
             })
             .addCase(updateAmenityBooking.pending, (state) => {
                 state.status = 'loading';

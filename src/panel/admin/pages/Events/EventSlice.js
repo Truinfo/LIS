@@ -22,10 +22,8 @@ export const fetchEvent = createAsyncThunk(
 export const fetchEventById = createAsyncThunk(
     'event/fetchEventById',
     async (id) => {
-        console.log("this is cksmwgvoae")
         const societyId = await getSocietyId();
         const response = await axiosInstance.get(`/events/getEventById/${id}/${societyId}`);
-        console.log(response.data.event)
         return response.data.event;
     }
 );

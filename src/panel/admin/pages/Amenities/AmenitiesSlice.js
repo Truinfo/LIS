@@ -54,9 +54,7 @@ export const updateAmenity = createAsyncThunk(
 export const deleteAmenity = createAsyncThunk(
   "amenities/deleteAmenity",
   async ({ id }) => {
-    console.log(id);
     const response = await axiosInstance.delete(`/deleteAmenity/${id}`);
-    console.log(response)
     return response.data;
   }
 );
@@ -103,12 +101,10 @@ const amenitiesSlice = createSlice({
       .addCase(getAmenityById.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.amenities = action.payload;
-        console.log(action.payload,"successed")
       })
       .addCase(getAmenityById.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
-        console.log(action.payload,"failed")
       })
 
       .addCase(updateAmenity.pending, (state) => {

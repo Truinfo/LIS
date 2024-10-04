@@ -39,51 +39,6 @@ const Polls = () => {
         getUserName();
     }, []);
 
-    // useEffect(() => {
-    //     socketServices.initializeSocket();
-    //     if (societyId) {
-    //         socketServices.emit('get_polls_by_society_id', { societyId });
-    //     }
-
-    //     const handlePollsBySocietyId = (fetchedPolls) => {
-    //         setPolls(fetchedPolls);
-    //         setLoading(false)
-    //     };
-
-    //     const handleVoteUpdate = (data) => {
-    //         alert(data.message);
-    //         setPolls(prevPolls => {
-    //             const updatedPollIndex = prevPolls.findIndex(poll => poll._id === data.votes._id);
-    //             if (updatedPollIndex !== -1) {
-    //                 const updatedPolls = [...prevPolls];
-    //                 updatedPolls[updatedPollIndex] = data.votes;
-    //                 return updatedPolls;
-    //             } else {
-    //                 return prevPolls;
-    //             }
-    //         });
-    //     };
-    //     const handlePollDeleted = (pollId) => {
-    //         setPolls(prevPolls => prevPolls.filter(poll => poll._id !== pollId));
-    //         setLoading(false)
-    //     };
-    //     const handleNewPollCreated = (newPoll) => {
-    //         setPolls(prevPolls => [newPoll, ...prevPolls]);
-    //     };
-
-    //     socketServices.on('polls_by_society_id', handlePollsBySocietyId);
-    //     socketServices.on('vote_update', handleVoteUpdate);
-    //     socketServices.on('new_poll_created', handleNewPollCreated);
-    //     socketServices.on('poll_deleted', handlePollDeleted);
-
-    //     return () => {
-    //         socketServices.removeListener('polls_by_society_id', handlePollsBySocietyId);
-    //         socketServices.removeListener('new_poll_created', handleNewPollCreated);
-    //         socketServices.removeListener('vote_update', handleVoteUpdate);
-    //         socketServices.removeListener('poll_deleted', handlePollDeleted);
-    //     };
-    // }, [societyId, userId]);
-
 
     useFocusEffect(
         React.useCallback(() => {

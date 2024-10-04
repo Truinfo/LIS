@@ -16,6 +16,7 @@ const EditSecurity = () => {
   const { sequrityId } = route.params;
   const profile = useSelector((state) => state.gateKeepers.sequrity);
   const successMessage = useSelector((state) => state.gateKeepers.successMessage);
+  const error = useSelector((state) => state.gateKeepers.error);
   const [imageUri, setImageUri] = useState(null); // State to hold image URI
   const [photo, setPhoto] = useState('');
   const status = useSelector((state) => state.gateKeepers.status);
@@ -36,11 +37,9 @@ const EditSecurity = () => {
 
   const [previewImage, setPreviewImage] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
-
   useEffect(() => {
     dispatch(getSequrityPerson(sequrityId));
   }, [dispatch, sequrityId]);
-
   useEffect(() => {
     if (profile) {
       setFormData({

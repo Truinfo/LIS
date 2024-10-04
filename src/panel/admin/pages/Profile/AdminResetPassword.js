@@ -12,7 +12,7 @@ import { useDispatch } from 'react-redux'; // Import useDispatch from react-redu
 import { resetPassword } from './resetPasswordSlice';
 import { useNavigation } from '@react-navigation/native';
 import { Snackbar } from 'react-native-paper';
-const ResetPassword = () => {
+const AdminResetPassword = () => {
     const [showPassword, setShowPassword] = useState({
         currentPassword: false,
         newPassword: false,
@@ -195,4 +195,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default ResetPassword;
+export default AdminResetPassword;

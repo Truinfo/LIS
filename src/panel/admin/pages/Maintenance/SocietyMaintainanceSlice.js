@@ -28,12 +28,17 @@ export const getOne = createAsyncThunk(
     }
 );
 
-
 export const createMaintenanceRecords = createAsyncThunk(
     'maintainances/createMaintenanceRecords',
     async (formData, { rejectWithValue }) => {
+
         try {
-            const response = await axiosInstance.post('/createMaintenanceRecords', formData)
+            const response = await axiosInstance.post('/createMaintenanceRecords', formData, {
+                headers: {
+                    'Content-Type': 'application/json' // Ensure proper content type for FormData
+                }
+            })
+
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response ? error.response.data : error.message);
@@ -45,11 +50,7 @@ export const updatePaymentDetails = createAsyncThunk(
     'maintainances/updatePaymentDetails',
     async ({ formData }, { rejectWithValue }) => {
         try {
-            const response = await axiosInstance.put('/updatePaymentDetails', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data' // Ensure proper content type for FormData
-                }
-            });
+            const response = await axiosInstance.put('/updatePaymentDetails', formData);
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response ? error.response.data : error.message);
@@ -90,14 +91,15 @@ const MaintainanceSlice = createSlice({
             .addCase(getByMonthAndYear.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.error.message;
+                state.maintainances = action.payload || [];
             })
-
             .addCase(getOne.pending, (state) => {
                 state.status = 'loading';
             })
             .addCase(getOne.fulfilled, (state, action) => {
                 state.status = 'succeeded';
                 state.maintainances = action.payload;
+
             })
             .addCase(getOne.rejected, (state, action) => {
                 state.status = 'failed';
@@ -123,12 +125,10 @@ const MaintainanceSlice = createSlice({
                 state.status = 'succeeded';
                 state.maintainances = action.payload;
                 state.successMessage = action.payload.message;
-                console.log(action.payload.message, "success")
             })
             .addCase(updatePaymentDetails.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.error.message;
-                console.log(action.error.message, "error")
             })
 
             .addCase(updatePaymentStatus.pending, (state) => {

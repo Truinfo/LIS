@@ -3,12 +3,12 @@ import {
     View, Text, FlatList, TouchableOpacity, Modal, StyleSheet, TextInput, Button, Alert, Image, ActivityIndicator
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { getByMonthAndYear } from './SocietyMaintainanceSlice';
+import { createMaintenanceRecords, getByMonthAndYear } from './SocietyMaintainanceSlice';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { ImagebaseURL } from '../../../Security/helpers/axios';
-import { FAB } from 'react-native-paper';
+import { FAB, Snackbar } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 const Maintenance = ({ navigation }) => {
     const dispatch = useDispatch();
@@ -32,7 +32,8 @@ const Maintenance = ({ navigation }) => {
         const month = String(date.getMonth() + 1).padStart(2, '0');
         return `${year}-${month}`;
     }
-
+    const [snackbarVisible, setSnackbarVisible] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState("");
     useFocusEffect(
         React.useCallback(() => {
             const year = date.getFullYear();
@@ -63,9 +64,11 @@ const Maintenance = ({ navigation }) => {
     });
 
     const onDateChange = (event, selectedDate) => {
-        const currentDate = selectedDate || date;
-        setShowPicker(false);
-        setDate(currentDate);
+        if (selectedDate) {
+            setDate(selectedDate);
+            setShowPicker(false);
+        }
+
     };
     const handleChange = (name, value) => {
         setInventoryData(prevState => ({
@@ -73,7 +76,6 @@ const Maintenance = ({ navigation }) => {
             [name]: value
         }));
     };
-    // State for DateTimePicker visibility
     const [selectedDate, setSelectedDate] = useState(new Date()); // State for selected date
 
     const onDateAddChange = (event, date) => {
@@ -82,31 +84,30 @@ const Maintenance = ({ navigation }) => {
             const month = date.getMonth() + 1; // Month is 0-indexed
             const year = date.getFullYear();
             handleChange('monthAndYear', `${year}-${month < 10 ? `0${month}` : month}`); // Format as YYYY-MM
+            setShowPicker(false);
         }
-        setShowPicker(false); // Hide the picker after selecting
     };
-
     const handleBillSubmit = async () => {
-        // Check if all required fields are filled
         if (!inventoryData.amount || !inventoryData.monthAndYear) {
             setSnackbarMessage("Please fill out all fields");
             setSnackbarVisible(true);
             return;
         }
-        console.log(inventoryData)
         try {
-            const response = await dispatch(fetchaddInventory(inventoryData));
+            const response = await dispatch(createMaintenanceRecords(inventoryData));
             if (response.meta.requestStatus === 'fulfilled') {
                 setSnackbarMessage(`${response.payload.message}`);
                 setSnackbarVisible(true);
-                setFabModalVisible(false); // Close modal after submission
+                setFabModalVisible(false);
+                dispatch(getByMonthAndYear(`${inventoryData.monthAndYear}`));
+                setTimeout(() => {
+                    setInventoryData({
+                        societyId: "6683b57b073739a31e8350d0",
+                        amount: '',
+                        monthAndYear: '',
+                    });
+                }, 2000);
 
-                // Clear the fields by resetting inventoryData
-                setInventoryData({
-                    societyId: "6683b57b073739a31e8350d0",
-                    amount: '',
-                    monthAndYear: '',
-                });
             } else if (response.error) {
                 setSnackbarMessage(`Failed to add inventory: ${response.error.message}`);
                 setSnackbarVisible(true);
@@ -121,15 +122,8 @@ const Maintenance = ({ navigation }) => {
         if (selectedMenuId !== item._id) return null;
         return (
             <View style={styles.menu}>
-                <TouchableOpacity onPress={() => navigation.navigate("Edit Maintenance", { blockno: item.blockno, flatno: item.flatno, monthAndYear: "2024-07", })}>
+                <TouchableOpacity onPress={() => navigation.navigate("Edit Maintenance", { blockno: item.blockno, flatno: item.flatno, monthAndYear: maintainances.monthAndYear, })}>
                     <Text style={styles.actionText}>Edit</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => {
-                    setSelectedUser(item);
-                    setModalVisible(true);
-                    setSelectedMenuId(null);
-                }}>
-                    <Text style={styles.actionText}>Delete</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -141,13 +135,11 @@ const Maintenance = ({ navigation }) => {
             </View>
         );
     }
-
-
     return (
         <View style={styles.container}>
             <TextInput
                 style={styles.input}
-                placeholder="Search"
+                placeholder="Enter name to search"
                 value={searchText}
                 onChangeText={setSearchText}
             />
@@ -160,10 +152,10 @@ const Maintenance = ({ navigation }) => {
                     mode="date"
                     display="default"
                     onChange={onDateChange}
+
                 />
             )}
             {!maintainances || !maintainances.paymentDetails || maintainances.paymentDetails.length === 0 ? (
-                // Display "Data not found" message if amenities is empty
                 <View style={styles.noDataContainer}>
                     <Image
                         source={require('../../../../assets/Admin/Imgaes/nodatadound.png')}
@@ -173,7 +165,6 @@ const Maintenance = ({ navigation }) => {
                     <Text style={styles.noDataText}>No Bills Found in this</Text>
                 </View>
             ) : filteredMaintainances.length === 0 ? (
-                // Display "No bills found for the selected month" message if no filtered maintainances are found
                 <View style={styles.noDataContainer}>
                     <Image
                         source={require('../../../../assets/Admin/Imgaes/nodatadound.png')}
@@ -192,7 +183,7 @@ const Maintenance = ({ navigation }) => {
                                 <View style={styles.infoContainer}>
                                     <View style={styles.infoRow}>
                                         <Text style={styles.label}>Month</Text>
-                                        <Text style={styles.value}>: {DateAndMonth(item.payedOn)}</Text>
+                                        <Text style={styles.value}>: {DateAndMonth(maintainances.monthAndYear)}</Text>
                                     </View>
                                     <View style={styles.infoRow}>
                                         <Text style={styles.label}>Name</Text>
@@ -216,17 +207,12 @@ const Maintenance = ({ navigation }) => {
                     )}
                 />
             )}
-
-
-
             <FAB
                 style={styles.fab}
                 icon="plus"
                 color='#fff'
                 onPress={() => setFabModalVisible(true)}
             />
-
-
             <Modal
                 animationType="slide"
                 transparent={true}
@@ -245,12 +231,12 @@ const Maintenance = ({ navigation }) => {
                             style={styles.input}
                             placeholder="Amount"
                             value={inventoryData.amount}
-                            keyboardType="numeric" // To accept only numbers
+                            keyboardType="numeric"
                             onChangeText={(value) => handleChange("amount", value)}
                         />
                         <TouchableOpacity
-                            style={styles.input}
-                            onPress={() => setShowPicker(true)} // Show the date picker when pressed
+                            style={styles.inputDatePicker}
+                            onPress={() => setShowPicker(true)}
                         >
                             <Text style={styles.datePickerText}>
                                 {inventoryData.monthAndYear || 'Select Month and Year'}
@@ -270,47 +256,43 @@ const Maintenance = ({ navigation }) => {
                     </View>
                 </View>
             </Modal>
-
-
-
-
             {selectedUser && (
                 <Modal visible={modalVisible} animationType="slide" transparent={true}>
                     <View style={styles.modalContainer}>
                         <View style={styles.modalContent}>
-                            <Image source={{ uri: `${ImagebaseURL}${selectedUser.pictures}` }} style={styles.modalImage} resizeMode="cover" />
+                            <Image source={{ uri: `${ImagebaseURL}${selectedUser.pictures}` }} alt='No Bill Updated' style={styles.modalImage} resizeMode="cover" />
                             <View style={styles.infoContainer}>
                                 <View style={styles.infoRow}>
                                     <Text style={styles.label}>Name</Text>
-                                    <Text style={styles.value}>: {selectedUser.name}</Text>
+                                    <Text style={styles.value}>: {selectedUser.name || "---"}</Text>
                                 </View>
                                 <View style={styles.infoRow}>
                                     <Text style={styles.label}>Block</Text>
-                                    <Text style={styles.value}>: {selectedUser.blockno}</Text>
+                                    <Text style={styles.value}>: {selectedUser.blockno || "---"}</Text>
                                 </View>
                                 <View style={styles.infoRow}>
                                     <Text style={styles.label}>Flat No</Text>
-                                    <Text style={styles.value}>: {selectedUser.flatno}</Text>
+                                    <Text style={styles.value}>: {selectedUser.flatno || "---"}</Text>
                                 </View>
                                 <View style={styles.infoRow}>
                                     <Text style={styles.label}>TX Mode</Text>
-                                    <Text style={styles.value}>: {selectedUser.transactionType}</Text>
+                                    <Text style={styles.value}>: {selectedUser.transactionType || "---"}</Text>
                                 </View>
                                 <View style={styles.infoRow}>
                                     <Text style={styles.label}>Amount</Text>
-                                    <Text style={styles.value}>: {selectedUser.paidAmount}</Text>
+                                    <Text style={styles.value}>: {selectedUser.amount || "---"}</Text>
                                 </View>
                                 <View style={styles.infoRow}>
                                     <Text style={styles.label}>Paid Date</Text>
-                                    <Text style={styles.value}>: {new Date(selectedUser.payedOn).toLocaleDateString()}</Text>
+                                    <Text style={styles.value}>: {selectedUser.payedOn ? new Date(selectedUser.payedOn).toLocaleDateString() : "---"}</Text>
                                 </View>
                                 <View style={styles.infoRow}>
                                     <Text style={styles.label}>Time</Text>
-                                    <Text style={styles.value}>: {new Date(selectedUser.payedOn).toLocaleTimeString()}</Text>
+                                    <Text style={styles.value}>: {selectedUser.payedOn ? new Date(selectedUser.payedOn).toLocaleTimeString() : "---"}</Text>
                                 </View>
                                 <View style={styles.infoRow}>
                                     <Text style={styles.label}>Status</Text>
-                                    <Text style={styles.value}>: {selectedUser.status}</Text>
+                                    <Text style={styles.value}>: {selectedUser.status || "---"}</Text>
                                 </View>
                             </View>
                             <TouchableOpacity style={styles.closeButton} onPress={handleCloseModal}>
@@ -320,7 +302,19 @@ const Maintenance = ({ navigation }) => {
                     </View>
                 </Modal>
             )}
-
+            <Snackbar
+                visible={snackbarVisible}
+                onDismiss={() => setSnackbarVisible(false)}
+                duration={3000}
+                action={{
+                    label: 'Close',
+                    onPress: () => {
+                        setSnackbarVisible(false);
+                    },
+                }}
+            >
+                {snackbarMessage}
+            </Snackbar>
         </View>
     );
 };
@@ -519,6 +513,15 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         width: '100%',
     },
+    inputDatePicker: {
+        height: 50,
+        borderColor: '#630000',
+        borderWidth: 1,
+        borderRadius: 5,
+        padding: 15,
+        marginBottom: 20,
+        width: '100%',
+    },
     submitButton: {
         backgroundColor: '#630000',
         padding: 15,
@@ -531,6 +534,9 @@ const styles = StyleSheet.create({
         color: 'white',
         fontWeight: 'bold',
     },
+    datePickerText: {
+        color: "#757573",
+    }
 });
 
 export default Maintenance;

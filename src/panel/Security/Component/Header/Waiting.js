@@ -46,18 +46,16 @@ const Waiting = ({ data, setActiveTab }) => {
       visitorType: "Guest"
     };
     dispatch(fetchVisitorVerify(payload)).then((response) => {
+
       setShowDialog(true);
       setTimeout(() => {
         dispatch(fetchVisitors(societyId));
         setShowDialog(false);
-        if (response.meta.requestStatus === 'fulfilled') {
-          setActiveTab('Check In');
-        }
-      }, 2000);
+      }, 1000);
     }).catch((error) => {
       console.error('Error:', error);
       setShowDialog(true);
-      setTimeout(() => setShowDialog(false), 2000);
+      setTimeout(() => setShowDialog(false),1000);
     });
   };
 
@@ -84,9 +82,11 @@ const Waiting = ({ data, setActiveTab }) => {
       <View style={styles.itemContainer}>
         <View style={styles.imageContainer}>
           <Text style={styles.imageText}>{item.visitorId}</Text>
+    
           {item.pictures ? (
             <Avatar.Image
               source={{ uri: `${ImagebaseURL}${item.pictures}` }}
+               
               style={styles.avatar}
             />
           ) : (
@@ -153,24 +153,28 @@ const Waiting = ({ data, setActiveTab }) => {
 
   const sortedData = data.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-return (
-  <>
-    <FlatList
-      data={sortedData}
-      renderItem={renderItem}
-      keyExtractor={item => item._id}
-      style={styles.list}
-    />
-    <MyDialog
-      message={successMessage || error}
-      showDialog={showDialog}
-      onClose={() => setShowDialog(false)}
-    />
-  </>
-);
+  return (
+    <View style={styles.container}>
+      <FlatList
+        data={sortedData}
+        renderItem={renderItem}
+        keyExtractor={item => item._id}
+        style={styles.list}
+      />
+      <MyDialog
+        message={successMessage || error}
+        showDialog={showDialog}
+        onClose={() => setShowDialog(false)}
+      />
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff"
+  },
   itemContainer: {
     paddingVertical: 15,
     borderBottomWidth: 1,
@@ -180,10 +184,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   avatar: {
-    width: 70,
-    height: 70,
-    borderRadius: 50,
-    backgroundColor:"#ccc"
+    backgroundColor: "#ccc",marginTop:10
 
   },
   noImageText: {
@@ -217,7 +218,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#800336',
     textAlign: 'center',
-    marginTop: 10,
   },
   itemTime: {
     color: 'orange',

@@ -3,7 +3,7 @@ import axiosInstance from '../../../../Security/helpers/axios';
 
 export const fetchVisitorVerify = createAsyncThunk(
   "visitorVerify/fetchVisitorVerify",
-  async (payload, {rejectWithValue }) => {
+  async (payload, { rejectWithValue }) => {
     try {
       const { societyId, id, visitorType } = payload;
       let response;
@@ -11,12 +11,17 @@ export const fetchVisitorVerify = createAsyncThunk(
       if (visitorType === "Guest") {
         response = await axiosInstance.put(`/${endpoint}`, {
           societyId,
-          visitorId : id,
+          visitorId: id,
+        }, {
+          headers: { 'Content-Type': "application/json" }
         });
+
       } else {
         response = await axiosInstance.post(`/${endpoint}`, {
           societyId,
           userid: id,
+        }, {
+          headers: { 'Content-Type': "application/json" }
         });
       }
       return response.data;

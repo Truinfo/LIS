@@ -110,6 +110,9 @@ import AddAmenity from './src/panel/admin/pages/Amenities/AddAmenity';
 import AmenityBookingsList from './src/panel/admin/pages/Amenities/Bookings';
 import EditBooking from './src/panel/admin/pages/Amenities/EditBooking';
 import AddBooking from './src/panel/admin/pages/Amenities/AddBooking';
+import SecurityTabs from './src/panel/Security/Component/BottomTabs/SecurityTabs';
+import Profile from './src/panel/admin/pages/Profile/Profile';
+import AdminResetPassword from './src/panel/admin/pages/Profile/AdminResetPassword';
 
 const Stack = createNativeStackNavigator();
 
@@ -273,7 +276,6 @@ export default function App() {
             <Stack.Screen name="Payment" component={Payment} />
             <Stack.Screen name="Residents " component={Resident} />
             <Stack.Screen name="Notification" component={Notifications} />
-            <Stack.Screen name="AdminProfile" component={Profile} />
             <Stack.Screen name="Pre Approval Visitors" component={PreApproval} />
             <Stack.Screen name="Household" component={Household} />
             <Stack.Screen name="GetHelp" component={GetHelp} />
@@ -291,6 +293,10 @@ export default function App() {
             <Stack.Screen name="Sidebar" component={Sidebar} options={{
               headerShown: false,
             }} />
+
+            <Stack.Screen name="AdminProfile" component={Profile} />
+            <Stack.Screen name="Resetpassword" component={AdminResetPassword} />
+
 
             <Stack.Screen name="Add Residents" component={AddResidents} />
             <Stack.Screen name="Residents Details" component={ResidentDetails} />

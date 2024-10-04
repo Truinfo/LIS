@@ -66,7 +66,7 @@ export const updateSequrity = createAsyncThunk(
   'sequrity/updateSequrity',
   async ({ sequrityId, formData }, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.put(`//sequrity/updateSequrityById/${sequrityId}`, formData, {
+      const response = await axiosInstance.put(`/sequrity/updateSequrityById/${sequrityId}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

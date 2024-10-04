@@ -75,14 +75,15 @@ export default function Sample() {
         setShowDialog(true);
         setTimeout(() => {
           dispatch(resetState());
-          navigation.navigate('Header');
+          navigation.navigate('SecurityTabs');
+
           setShowDialog(false);
         }, 2000);
       } else {
         setShowDialog(true);
         setTimeout(() => {
           dispatch(resetState());
-          navigation.navigate('Header');
+          navigation.navigate('SecurityTabs');
           setShowDialog(false);
         }, 2000);
       }

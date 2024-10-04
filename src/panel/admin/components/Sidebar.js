@@ -20,7 +20,8 @@ import NoticeBoard from '../pages/NoticeBoard/NoticeBoard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { logout } from '../../User/Redux/Slice/AuthSlice/Login/LoginSlice';
 import { useDispatch } from 'react-redux';
-import { useNavigation } from '@react-navigation/native';
+import { CommonActions, useNavigation } from '@react-navigation/native';
+import EmergencyContact from '../pages/EmergencyContacts/EmergencyContact';
 
 const Drawer = createDrawerNavigator();
 
@@ -57,7 +58,12 @@ export default function Sidebar() {
       console.log('Error clearing user from AsyncStorage:', e);
     }
     dispatch(logout());
-    navigation.navigate('Login');
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: 'Login' }], // Adjust 'Login' to the correct name of your login screen
+      })
+    );
   };
 
   return (
@@ -110,6 +116,7 @@ export default function Sidebar() {
         <Drawer.Screen name="Inventory" component={Inventory} />
         <Drawer.Screen name="Society Bills" component={SocietyBills} />
         <Drawer.Screen name="Maintenance Bills" component={Maintenance} />
+        <Drawer.Screen name="Emergency Contacts" component={EmergencyContact} />
       </Drawer.Navigator>
     </View>
   );

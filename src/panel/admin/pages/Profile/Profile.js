@@ -19,13 +19,13 @@ const Profile = () => {
     const [gates, setGates] = useState([]);
     const [documents, setDocuments] = useState([]);
     const commityMember = useSelector(state => state.commityMembers.commityMember || []);
-    const [cityName, setCityName] = useState(''); // New state for city name
+    const [cityName, setCityName] = useState(''); 
     const societyId = "6683b57b073739a31e8350d0";
     useEffect(() => {
         if (societyId) {
 
             dispatch(fetchResidentProfile(societyId));
-            dispatch(fetchCommityMembers());
+            dispatch(fetchCommityMembers(societyId));
 
         }
     }, [dispatch, societyId]);
@@ -35,12 +35,11 @@ const Profile = () => {
             setBlocks(resident.blocks || []);
             setGates(resident.gates || []);
             setDocuments(resident.documents || []);
-            if (!selectedBlock && resident.blocks.length > 0) {
+            if (!selectedBlock && resident.blocks?.length > 0) {
                 setSelectedBlock(resident.blocks[0]._id);
             }
             if (resident.city) {
                 dispatch(fetchCitiesById({ cityId: resident.city })).then((action) => {
-                    console.log("action", action)
                     if (action.payload) {
                         setCityName(action.payload.name);
                     }
@@ -49,15 +48,13 @@ const Profile = () => {
         }
     }, [resident, selectedBlock, dispatch]);
     if (!resident) return <Text>No resident data available.</Text>;
-
-    const totalBlocks = blocks.length;
+    const totalBlocks = blocks?.length;
     let totalFlats = 0;
     blocks.forEach((block) => {
-        totalFlats += block.flats.length;
+        totalFlats += block.flats?.length;
     });
 
-    const totalGates = gates.length;
-    console.log(commityMember.length)
+    const totalGates = gates?.length;
     return (
         <ScrollView style={styles.container}>
 
@@ -130,7 +127,7 @@ const Profile = () => {
                     </View>
                 </View>
                 <Text style={styles.sectionTitle}>Committee Members</Text>
-                {commityMember.length > 0 ? (
+                {commityMember?.length > 0 ? (
                     commityMember.map((member, index) => (
                         <View key={index} style={styles.infoRow}>
                             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
@@ -141,10 +138,7 @@ const Profile = () => {
                                     </View>
                                     <Text style={styles.memberRole}>{member.designation} - {member.phoneNumber}</Text>
                                 </View>
-                                {/* Add the designation and phone number with the call functionality */}
-
                                 <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                    {/* Touchable Icon to Open Dialer */}
                                     <TouchableOpacity
                                         onPress={() => Linking.openURL(`tel:${member.phoneNumber}`)}
                                         style={styles.iconButton}
@@ -152,10 +146,7 @@ const Profile = () => {
                                         <Icon name="phone" size={20} color="green" style={styles.icon} />
                                     </TouchableOpacity>
 
-                                    {/* Three Dots Icon */}
-                                    <TouchableOpacity style={styles.iconButton}>
-                                        <Icon name="dots-vertical" size={20} color="#000" />
-                                    </TouchableOpacity>
+                                  
                                 </View>
                             </View>
                         </View>
@@ -193,7 +184,6 @@ const Profile = () => {
                     <TouchableOpacity
                         style={styles.button}
                         onPress={() => {
-                            // Handle renewal action here
                             console.log("Renewal button pressed");
                         }}
                     >
@@ -254,7 +244,7 @@ const styles = StyleSheet.create({
         fontSize: 14,
     },
     card: {
-        backgroundColor: '#fff', // White background to mimic a card
+        backgroundColor: '#fff', 
         borderRadius: 8, // Rounded corners
         padding: 10, // Padding inside the card
         elevation: 3, // Shadow for Android

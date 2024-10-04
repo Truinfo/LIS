@@ -78,16 +78,22 @@ const CheckOut = ({ data,  }) => {
   const sortedData = data.sort((a, b) => new Date(b.checkOutDateTime) - new Date(a.checkOutDateTime));
 
   return (
+    <View style={styles.container}>
     <FlatList
       data={sortedData}
       renderItem={renderItem}
       keyExtractor={item => item._id}
       style={styles.list}
     />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex:1,
+    backgroundColor:"#fff"
+  },
   itemContainer: {
     display: 'flex',
     borderBottomWidth: 1,
@@ -98,17 +104,11 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 50,
-    backgroundColor:"#ccc"
+    backgroundColor:"#ccc",marginTop:10
 
   },
   noImageText: {
-    width: 80,
-    height: 80,
-    borderRadius: 50,
-    marginTop: 25
+    marginTop: 15
   },
   imageContainer: {
     marginRight: 15,

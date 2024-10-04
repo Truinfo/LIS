@@ -103,12 +103,10 @@ const amenitiesSlice = createSlice({
       .addCase(getAmenityById.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.amenities = action.payload;
-        console.log(action.payload,"successed")
       })
       .addCase(getAmenityById.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
-        console.log(action.payload,"failed")
       })
 
       .addCase(updateAmenity.pending, (state) => {

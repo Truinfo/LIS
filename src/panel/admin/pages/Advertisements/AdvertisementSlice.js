@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../../Security/helpers/axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 export const fetchAdvertisements = createAsyncThunk(
   'adds/fetchAdvertisements',
@@ -48,12 +49,11 @@ export const createAdvertisements = createAsyncThunk(
 export const editAdvertisement = createAsyncThunk(
   'adds/editAdvertisement',
   async ({ id, formData }) => {
-    const response = await axiosInstance.put(`/editAdvertisement/${id}`, formData, {
+    const response = await axiosInstance.put(`editAdvertisement/${id}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
-    console.log(response.data, "response")
     return response.data;
   }
 );
@@ -133,6 +133,7 @@ const AdvertisementSlice = createSlice({
       })
       .addCase(editAdvertisement.rejected, (state, action) => {
         state.status = 'failed';
+        console.log(action.error)
         state.error = action.error.message;
       })
       .addCase(deleteAdvertisement.pending, (state) => {

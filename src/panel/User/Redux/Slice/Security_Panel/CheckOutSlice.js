@@ -12,13 +12,19 @@ export const fetchCheckOut = createAsyncThunk(
         response = await axiosInstance.put(`/${endpoint}`, {
           societyId,
           visitorId : id,
+        },
+        {
+          headers: { 'Content-Type': "application/json" }
         });
       } else {
         response = await axiosInstance.put(`/${endpoint}`, {
           societyId,
           userId: id,
+        },{
+          headers: { 'Content-Type': "application/json" }
         });
       }
+      console.log(response)
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response ? error.response.data : error.message);

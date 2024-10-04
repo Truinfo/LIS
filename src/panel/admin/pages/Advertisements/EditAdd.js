@@ -122,7 +122,7 @@ const EditAdd = () => {
 
     const handleSubmit = () => {
         const data = new FormData();
-
+    
         // Append form fields to FormData
         Object.keys(formData).forEach((key) => {
             if (key === 'details') {
@@ -133,37 +133,28 @@ const EditAdd = () => {
                 data.append(key, formData[key]);
             }
         });
-
-        // Append existing images to FormData
+    
+        // Handle existing and new images separately
         formData.pictures.forEach((file, index) => {
-            // If the image has a URI and is not a new file, append it to FormData
             if (file.uri) {
+                const isExistingImage = !newFilesSelected; // Adjust condition if needed
+    
                 data.append('pictures', {
                     uri: file.uri,
-                    type: file.type,
-                    name: file.fileName || `existingImage${index}.jpg`, // Provide a default name if fileName is undefined
+                    type: 'image/jpeg', // Ensure 'type' exists or provide default
+                    name: file.fileName || (isExistingImage ? `existingImage${index}.jpg` : `newImage${index}.jpg`), // Differentiate between new and existing
                 });
             }
         });
-
-        // Append new images to FormData
-        if (newFilesSelected) {
-            formData.pictures.forEach(file => {
-                data.append('pictures', {
-                    uri: file.uri,
-                    type: file.type,
-                    name: file.fileName || `newImage.jpg`, // Provide a default name if fileName is undefined
-                });
-            });
-        }
+    
+        // Dispatch formData to the API
         dispatch(editAdvertisement({ id, formData: data }))
             .then((response) => {
                 if (response.meta.requestStatus === 'fulfilled') {
                     Alert.alert("Success", "Advertisement updated successfully.");
                     navigation.goBack();
-                }
-                else {
-                    Alert.alert("failed", `${error}`);
+                } else {
+                    Alert.alert("Failed", `${response.error.message || 'An error occurred'}`);
                 }
             })
             .catch((error) => {
@@ -171,6 +162,7 @@ const EditAdd = () => {
                 console.error("Error:", error);
             });
     };
+    
     const handleImagePick = async () => {
         try {
             const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -271,6 +263,7 @@ const EditAdd = () => {
                                 source={{ uri: image.startsWith('/') ? `${ImagebaseURL}${image}` : image }}
                                 style={{ width: 80, height: 80, borderRadius: 10 }}
                             />
+                            
                             <TouchableOpacity
                                 onPress={() => handleRemoveImage(index)}
                                 style={styles.removeIcon}

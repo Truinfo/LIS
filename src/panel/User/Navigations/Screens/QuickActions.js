@@ -109,7 +109,6 @@ const QuickActions = ({ navigation }) => {
     setIsCheckboxChecked(false);
     setSelectedDate("")
   };
-  //  const { loading, error, success } = useSelector((state) => state.visitor);
 
   useEffect(() => {
     const getUserName = async () => {
@@ -167,6 +166,7 @@ const QuickActions = ({ navigation }) => {
           if (createVisitor.fulfilled.match(result)) {
             Alert.alert('Success', 'Cab entry created successfully');
             const { visitors } = result.payload.data.savedVisitor.society;
+            
             const qrImage = result.payload.data.qrCodeUrl;
             const newVisitor = visitors[visitors.length - 1];
             const { visitorId } = newVisitor;
@@ -278,7 +278,10 @@ const QuickActions = ({ navigation }) => {
     // All fields are valid, proceed to dispatch the createVisitor action
     dispatch(createVisitor(formData))
       .then((result) => {
+        console.log(result)
+
         if (createVisitor.fulfilled.match(result)) {
+
           Alert.alert('Success', 'Visitor entry created successfully');
           const { visitors } = result.payload.data.savedVisitor.society;
           const qrImage = result.payload.data.qrCodeUrl;

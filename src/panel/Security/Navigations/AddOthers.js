@@ -33,7 +33,7 @@ const AddOthers = ({ route, navigation  }) => {
   const [block, setBlock] = useState("");
   const [blockError, setBlockError] = useState("");
   const [flatNo, setFlatNo] = useState("");
-  
+  const [dialogMessage, setDialogMessage] = useState("");
   const [buildings, setBuildings] = useState();
   const [flatsForSelectedBlock, setFlatsForSelectedBlock] = useState([]);
   const [flatNoError, setFlatNoError] = useState("");
@@ -176,20 +176,27 @@ const AddOthers = ({ route, navigation  }) => {
           setFlatNo("");
           setImageFile(null);
           setImagePreview(null);
+          setDialogMessage(response.payload.message); 
           setShowDialog(true);
           setTimeout(() => {
             setShowDialog(false);
             dispatch(resetState());
-            navigation.navigate("InandOut1");
+            navigation.navigate("SecurityTabs", { screen: "Visitors Entries" });
           }, 1000);
         } else {
+          setDialogMessage(response.payload.message || "An error occurred"); 
           setShowDialog(true);
           setTimeout(() => {
             setShowDialog(false);
           }, 1000);
         }
       } catch (error) {
-        setLoading(false);
+        console.error(error); 
+        setDialogMessage("An error occurred while creating the visitor."); 
+        setShowDialog(true);
+        setTimeout(() => {
+          setShowDialog(false);
+        }, 1000);
       } finally {
         setLoading(false);
       }
@@ -410,7 +417,7 @@ const AddOthers = ({ route, navigation  }) => {
       </TouchableOpacity>
       </ScrollView>
       <MyDialog
-          message={successMessage || error}
+          message={dialogMessage || error}
           showDialog={showDialog}
           onClose={() => setShowDialog(false)}
         />

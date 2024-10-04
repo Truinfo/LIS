@@ -3,186 +3,207 @@ import { View, Image, Text, TouchableOpacity, StyleSheet, Linking, ScrollView } 
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../../../User/Redux/Slice/AuthSlice/Login/LoginSlice";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchGuard } from "../../../User/Redux/Slice/Security_Panel/SettingsSlice";
 import { ImagebaseURL } from "../../helpers/axios";
-import { fetchCommityMembers } from "../../../User/Redux/Slice/Security_Panel/QuickContactsSlice";
 import { Avatar } from "react-native-paper";
+import { fetchCommityMembers } from "../../../admin/pages/Profile/committeeSlice";
 const Settings = () => {
     const navigation = useNavigation();
     const dispatch = useDispatch();
     const [societyId, setSocietyId] = useState(null);
-    
     const [sequrityId, setSequrityId] = useState(null);
     const Guard = useSelector((state) => state.setting.settings);
-    const QuickContacts = useSelector((state) => state.quickContact.quickContacts);
+    const commityMember = useSelector(state => state.commityMembers.commityMember || []);
     useEffect(() => {
         const getUserName = async () => {
-          try {
-            const userString = await AsyncStorage.getItem("user");
-            if (userString !== null) {
-              const user = JSON.parse(userString);
-              setSocietyId(user.societyId); 
-              setSequrityId(user.sequrityId); 
+            try {
+                const userString = await AsyncStorage.getItem("user");
+                if (userString !== null) {
+                    const user = JSON.parse(userString);
+                    setSocietyId(user.societyId);
+                    setSequrityId(user.sequrityId);
+                }
+            } catch (error) {
+                console.error("Failed to fetch the user from async storage", error);
             }
-          } catch (error) {
-            console.error("Failed to fetch the user from async storage", error);
-          }
         };
-    
+
         getUserName();
-      }, []);
+    }, []);
 
 
     useEffect(() => {
         if (societyId && sequrityId) {
             dispatch(fetchGuard({ societyId, sequrityId }));
-            dispatch(fetchCommityMembers({ societyId }));
+            dispatch(fetchCommityMembers(societyId ));
         }
     }, [societyId, sequrityId, dispatch]);
 
     const handleMessagesPress = () => {
-        navigation.navigate("Messages");
+        navigation.navigate("Residents ");
     };
-    const handleGuard = () => {
-        navigation.navigate("Security");
-    };
+
     const handleNoticePress = () => {
         navigation.navigate("Notice");
     };
-    const handleLogout = async () => {
-        try {
-            await AsyncStorage.removeItem('user');
-            await AsyncStorage.removeItem('userToken');
-        } catch (e) {
-            console.log('Error clearing user from AsyncStorage:', e);
-        }
-        dispatch(logout());
-        navigation.navigate('Login');
-    };
+  
     const handlePhonePress = (phoneNumber) => {
         const dialNumber = `tel:${phoneNumber}`;
         Linking.openURL(dialNumber);
     };
-
     return (
         <ScrollView contentContainerStyle={styles.container}>
-                <TouchableOpacity style={styles.content} onPress={handleGuard}>
-                    <Avatar.Image
-                        source={{ uri: `${ImagebaseURL}${Guard.pictures}` } || require("../../../../assets/Security/images/policeman.png")}
-                        style={styles.image}
-                    />
-                    <View style={styles.textContainer}>
-                        <Text style={styles.heading}>{Guard.name}</Text>
-                        <View style={styles.subheadingContainer}>
-                            <Icon name="lens" size={20} color="green" />
-                            <Text style={styles.subheading}>On Duty</Text>
+            <View style={styles.card}>
+                <Avatar.Image
+                    source={{ uri: `${ImagebaseURL}${Guard.pictures}` } || require("../../../../assets/Security/images/policeman.png")}
+                    style={styles.image}
+                    size={90} // Larger avatar size for emphasis
+                />
+                <View style={styles.textContainer}>
+                    <Text style={styles.name}>{Guard.name}</Text>
+
+                    <Text style={styles.id}>{Guard.sequrityId}</Text>
+
+                    <Text style={styles.email}>{Guard.email}</Text>
+
+                    <Text style={styles.aadhar}>{Guard.aadharNumber}</Text>
+
+                    {Guard.address && (
+                        <View style={styles.addressContainer}>
+                            <Text style={styles.address}>
+                                {Guard.address.addressLine1}
+                                {Guard.address.addressLine2 && <Text>, {Guard.address.addressLine2}</Text>}
+                                {Guard.address.state && <Text>, {Guard.address.state}</Text>}
+                                {Guard.address.postalCode && <Text> - {Guard.address.postalCode}</Text>}
+                            </Text>
                         </View>
-                    </View>
-                </TouchableOpacity>
+                    )}
+                </View>
+            </View>
 
-                <TouchableOpacity style={styles.rowContent} onPress={handleMessagesPress}>
-                    <Image
-                        source={require("../../../../assets/Security/images/email.png")}
-                        style={styles.Image2}
-                    />
-                    <View style={styles.imagecontent}>
-                        <Text style={styles.rowText}>Messages</Text>
-                    </View>
-                    <Icon name="navigate-next" size={25} color="lightgrey" />
-                </TouchableOpacity>
 
-                <TouchableOpacity style={styles.rowContent} onPress={handleNoticePress}>
-                    <Image
-                        source={require("../../../../assets/Security/images/notice.png")}
-                        style={styles.Image2}
-                    />
-                    <View style={styles.imagecontent}>
-                        <Text style={styles.rowText}>Notice</Text>
-                    </View>
-                    <Icon name="navigate-next" size={25} color="lightgrey" />
-                </TouchableOpacity>
+            <TouchableOpacity style={styles.rowContent} onPress={handleMessagesPress}>
+                <Image
+                    source={require("../../../../assets/Security/images/email.png")}
+                    style={styles.Image2}
+                />
+                <View style={styles.imagecontent}>
+                    <Text style={styles.rowText}>Residents</Text>
+                </View>
+                <Icon name="navigate-next" size={25} color="lightgrey" />
+            </TouchableOpacity>
 
-                <Text style={{ marginTop: 10, marginRight: "56%", fontSize: 18, fontWeight: "bold" }}>
-                    Quick Contacts
-                </Text>
+            <TouchableOpacity style={styles.rowContent} onPress={handleNoticePress}>
+                <Image
+                    source={require("../../../../assets/Security/images/notice.png")}
+                    style={styles.Image2}
+                />
+                <View style={styles.imagecontent}>
+                    <Text style={styles.rowText}>Notice</Text>
+                </View>
+                <Icon name="navigate-next" size={25} color="lightgrey" />
+            </TouchableOpacity>
 
-                {QuickContacts.map((contact) => (
-                    <TouchableOpacity key={contact._id} onPress={() => handlePhonePress(contact.phoneNumber)}>
-                        <View style={styles.rowContent}>
-                            <Image
-                               source={require("../../../../assets/Security/images/telephone.png")}
-                               style={styles.Image2}
-                            />
-                            <View style={styles.imagecontent}>
-                                <Text style={styles.rowText}>{contact.name}</Text>
-                                <Text style={styles.rowSubText}>{contact.designation}</Text>
-                            </View>
-                            <Icon name="navigate-next" size={25} color="lightgrey" />
-                        </View>
-                    </TouchableOpacity>
-                ))}
+            <Text style={{ marginTop: 10, fontSize: 16, fontWeight: "600" ,color:"#777",marginLeft:5,marginBottom:3}}>
+                Quick Contacts
+            </Text>
 
-                <Text style={{ marginTop: 10, marginRight: "78%", fontSize: 18, fontWeight: "bold" }}>
-                    More
-                </Text>
-                <TouchableOpacity onPress={() => navigation.navigate("Terms and Conditions")}>
+            {commityMember.map((contact) => (
+                <TouchableOpacity key={contact._id} onPress={() => handlePhonePress(contact.phoneNumber)}>
                     <View style={styles.rowContent}>
                         <Image
-                            source={require("../../../../assets/Security/images/terms-and-conditions.png")}
+                            source={require("../../../../assets/Security/images/telephone.png")}
                             style={styles.Image2}
                         />
                         <View style={styles.imagecontent}>
-                            <Text style={styles.rowText}>Terms and Conditions</Text>
+                            <Text style={styles.rowText}>{contact.name}</Text>
+                            <Text style={styles.rowSubText}>{contact.designation}</Text>
                         </View>
+                        <Icon name="navigate-next" size={25} color="lightgrey" />
                     </View>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={handleLogout}>
-                    <View style={styles.rowContent}>
-                        <Image
-                            source={require("../../../../assets/Security/images/log-out.png")}
-                            style={styles.Image2}
-                        />
-                        <View style={styles.imagecontent}>
-                            <Text style={styles.rowText}>Logout</Text>
-                        </View>
+            ))}
+
+            {/* <Text style={{ marginTop: 10, marginRight: "78%", fontSize: 18, fontWeight: "bold" }}>
+                More
+            </Text>
+            <TouchableOpacity onPress={() => navigation.navigate("Terms and Conditions")}>
+                <View style={styles.rowContent}>
+                    <Image
+                        source={require("../../../../assets/Security/images/terms-and-conditions.png")}
+                        style={styles.Image2}
+                    />
+                    <View style={styles.imagecontent}>
+                        <Text style={styles.rowText}>Terms and Conditions</Text>
                     </View>
-                </TouchableOpacity>
+                </View>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleLogout}>
+                <View style={styles.rowContent}>
+                    <Image
+                        source={require("../../../../assets/Security/images/log-out.png")}
+                        style={styles.Image2}
+                    />
+                    <View style={styles.imagecontent}>
+                        <Text style={styles.rowText}>Logout</Text>
+                    </View>
+                </View>
+            </TouchableOpacity> */}
         </ScrollView>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-       alignItems: "center",
+        flex:1,
+        paddingHorizontal:16,
         backgroundColor: "white",
-        width:"100%",
+        width: "100%",
     },
-    content: {
-        flexDirection: "row",
-        alignItems: "center",
+
+    card: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        backgroundColor: '#FFFFFF',
+        borderRadius: 12,
         padding: 10,
-        width: "90%",
-        borderRadius: 10,
-        backgroundColor: "#F3E1D5",
+        marginVertical: 16,
         elevation: 5,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        marginTop: 10,
+        borderWidth: 1,
+        borderColor: '#E8E8E8',
     },
     image: {
-        width: 70,
-        height: 70,
+        marginRight: 20,
         borderRadius: 50,
-        marginRight: 10,
-        backgroundColor:"#ccc"
+        backgroundColor: '#F0F0F0',
+        alignSelf:'center'
     },
     textContainer: {
         flex: 1,
-        marginRight: 10,
+        justifyContent: 'center',
+    },
+    name: {
+        fontSize: 22, // Larger font for emphasis
+        fontWeight: 'bold',
+        color: '#202020', // Darker color for contrast
+    },
+    id: {
+        fontSize: 15,
+        color: '#555', // Muted color for secondary info
+    },
+    email: {
+        fontSize: 15,
+        color: '#555',
+    },
+    aadhar: {
+        fontSize: 15,
+        color: '#555',
+    },
+   
+    address: {
+        fontSize: 14,
+        color: '#4F4F4F',
     },
     heading: {
         fontSize: 18,
@@ -207,11 +228,10 @@ const styles = StyleSheet.create({
         alignItems: "center",
         padding: 10,
         borderWidth: 1,
-        width: "90%",
+        width: "100%",
         borderColor: "lightgrey",
         borderRadius: 10,
-        marginTop:5,
-        marginBottom:10,
+        marginVertical:5
     },
     Image2: {
         width: 30,
@@ -222,11 +242,17 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginRight: 10,
     },
+    rowSubText: {
+        fontSize: 14,
+        marginRight: 10,
+        color:"#777"
+    },
     imagecontent: {
         flex: 1,
         marginRight: 10,
-        
+
     },
+
 });
 
 export default Settings;

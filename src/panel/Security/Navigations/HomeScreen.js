@@ -12,7 +12,7 @@ import { FAB, RadioButton } from 'react-native-paper';
 const { width, height } = Dimensions.get("window");
 const dialPadContent = [1, 2, 3, 4, 5, 6, 7, 8, 9, "Y", 0, "X"];
 const dialPadSize = width * 0.2;
-const dialPadTextSize = dialPadSize * 0.38;
+const dialPadTextSize = dialPadSize * 0.28;
 const pinLength = 6;
 const pinContainerSize = width / 1.5;
 const pinSize = pinContainerSize / pinLength;
@@ -23,13 +23,12 @@ const HomeScreen = ({ }) => {
     const [code, setCode] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
     const [pinEnabled, setPinEnabled] = useState(true);
-    const [selectedOption, setSelectedOption] = useState(null);
+    const [selectedOption, setSelectedOption] = useState('Guest');
     const [societyId, setSocietyId] = useState(null);
     const successMessage = useSelector(state => state.homeScreen.successMessage);
     const error = useSelector(state => state.homeScreen.error);
     const [showDialog, setShowDialog] = useState(false);
     const [openFab, setOpenFab] = useState(false);
-    console.log(selectedOption)
     useEffect(() => {
         if (selectedOption !== null) {
             AsyncStorage.setItem('selectedVisitorOption', selectedOption)
@@ -75,21 +74,23 @@ const HomeScreen = ({ }) => {
                 visitorType: selectedOption
             };
             dispatch(fetchVisitorVerify(payload)).then((response) => {
+                console.log(response)
+
                 if (response.meta.requestStatus === 'fulfilled') {
-                    setModalVisible(true);
                     setPinEnabled(false);
+                    setModalVisible(true);
                     setSelectedOption(null);
                     setShowDialog(true);
                     setTimeout(() => {
                         dispatch(resetState());
                         setShowDialog(false);
-                    }, 2000);
+                    }, 1000);
                 } else {
                     setShowDialog(true);
                     setTimeout(() => {
                         dispatch(resetState());
                         setShowDialog(false);
-                    }, 2000);
+                    }, 1000);
                 }
             }).catch((error) => {
                 console.error('Error:', error);
@@ -106,9 +107,9 @@ const HomeScreen = ({ }) => {
                 <View style={styles.radioContainer}>
                     <View style={{ flexDirection: 'row', justifyContent: "center", alignItems: 'center' }}>
                         <RadioButton
-                            value="guests"
-                            status={selectedOption === 'guests' ? 'checked' : 'unchecked'}  // Compare with "guests"
-                            onPress={() => handleOptionSelect('guests')}  // Pass "guests"
+                            value="Guest"
+                            status={selectedOption === 'Guest' ? 'checked' : 'unchecked'}  // Compare with "guests"
+                            onPress={() => handleOptionSelect('Guest')}  // Pass "guests"
                             color="#7d0431"
                         />
                         <Text style={styles.radioText}>Guests</Text>
@@ -116,9 +117,9 @@ const HomeScreen = ({ }) => {
 
                     <View style={{ flexDirection: 'row', alignItems: 'center', paddingLeft: 20 }}>
                         <RadioButton
-                            value="service"
-                            status={selectedOption === 'service' ? 'checked' : 'unchecked'}  // Compare with "service"
-                            onPress={() => handleOptionSelect('service')}  // Pass "service"
+                            value="Staff"
+                            status={selectedOption === 'Staff' ? 'checked' : 'unchecked'}  // Compare with "service"
+                            onPress={() => handleOptionSelect('Staff')}  // Pass "service"
                             color="#7d0431"
                         />
                         <Text style={styles.radioText}>Service</Text>

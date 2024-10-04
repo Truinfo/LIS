@@ -1,6 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import serviceReducer from "./Slice/ServiceSlice/ServiceSlice";
-import noticeReducer from "./Slice/Security_Panel/NoticeSlice";
+import noticeReducer from "./Slice/CommunitySlice/NoticeSlice";
 import userLoginReducer from "./Slice/AuthSlice/Login/LoginSlice";
 import profileReducer from "./Slice/ProfileSlice/ProfileSlice";
 import profileEditReducer from "./Slice/ProfileSlice/EditProfileSlice";
@@ -17,7 +17,6 @@ import userResetPasswordReducer from "./Slice/ProfileSlice/resetSlice";
 import visitorReducer from "./Slice/Security_Panel/VisitorsSlice";
 import visitorsReducer from "./Slice/Security_Panel/InandOutSlice";
 import frequentVisitorsReducer from "./Slice/Security_Panel/FrequentVisitorsSlice";
-
 import houseHoldsReducer from "./Slice/ProfileSlice/Household/AddMemberSlice";
 import vehicleReducer from "./Slice/ProfileSlice/Household/VehicleSlice";
 import petReducer from "./Slice/ProfileSlice/Household/PetSlice";
@@ -36,7 +35,6 @@ import HomeScreen from "./Slice/Security_Panel/HomeScreenSlice";
 import DenyEntry from "./Slice/Security_Panel/DenySlice";
 import checkOut from "./Slice/Security_Panel/CheckOutSlice";
 import Settings from "./Slice/Security_Panel/SettingsSlice";
-import quickContacts from "./Slice/Security_Panel/QuickContactsSlice";
 import staffVisitors from "./Slice/Security_Panel/StaffInandOutSlice";
 import billsReducer from "./Slice//ProfileSlice/myBillsSlice";
 import societyLicence from "./Slice/AuthSlice/Signup/licenceSlice";
@@ -118,7 +116,6 @@ const store = configureStore({
     dening: DenyEntry,
     checkOuting: checkOut,
     setting: Settings,
-    quickContact: quickContacts,
     staffVisitor: staffVisitors,
     societyLis: societyLicence,
     AdminResidents: residentsReducer,

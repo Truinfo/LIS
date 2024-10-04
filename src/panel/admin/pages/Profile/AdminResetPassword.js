@@ -10,6 +10,8 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons'; // Ensure to install react-native-vector-icons
 import { useDispatch } from 'react-redux'; // Import useDispatch from react-redux
 import { resetPassword } from './resetPasswordSlice';
+import { useNavigation } from '@react-navigation/native';
+import { Snackbar } from 'react-native-paper';
 const ResetPassword = () => {
     const [showPassword, setShowPassword] = useState({
         currentPassword: false,
@@ -17,6 +19,9 @@ const ResetPassword = () => {
         confirmPassword: false,
     });
     const [formErrors, setFormErrors] = useState({});
+
+    const [snackbarVisible, setSnackbarVisible] = useState(false); // Snackbar visibility state
+    const [snackbarMessage, setSnackbarMessage] = useState('');
     const [formValues, setFormValues] = useState({
         currentPassword: '',
         newPassword: '',
@@ -30,7 +35,7 @@ const ResetPassword = () => {
             [field]: !prevState[field],
         }));
     };
-
+    const navigation = useNavigation();
     const handleInputChange = (name, value) => {
         setFormValues(prevState => ({
             ...prevState,
@@ -50,31 +55,34 @@ const ResetPassword = () => {
         try {
             if (!errors.passwordMismatch) {
                 if (isValid) {
-                    // Optional: If you want to close an expanded view
-                    // setExpanded(false);
-                }
-                const result = await dispatch(resetPassword({
-                    currentPassword: formValues.currentPassword,
-                    password: formValues.newPassword,
-                }));
-                console.log(formValues.currentPassword, formValues.newPassword,result)
+                    const result = await dispatch(resetPassword({
+                        currentPassword: formValues.currentPassword,
+                        password: formValues.newPassword,
+                    }));
+                    if (result.type === "resetPassword/reset/fulfilled") {
+                        setFormValues({
+                            currentPassword: "",
+                            newPassword: "",
+                            confirmPassword: "",
+                        });
+                        setSnackbarMessage(`${result.payload.message}`);
+                        setSnackbarVisible(true);
 
-                if (result.type === "resetPassword/reset/fulfilled") {
-                    setFormValues({
-                        currentPassword: "",
-                        newPassword: "",
-                        confirmPassword: "",
-                    });
-                    // Optional: Show success message
-                    Alert.alert("Success", "Password changed successfully!");
-                } else {
-                    // Optional: Show error message
-                    Alert.alert("Error", "Failed to change password.");
+                        setTimeout(() => {
+                            setSnackbarVisible(false); // Optionally hide the Snackbar before navigating
+                            navigation.goBack();
+                        }, 3000); // 3 seconds delay
+                    } else {
+                        setSnackbarMessage(`${result.payload}`);
+                        setSnackbarVisible(true);
+                    }
+
                 }
             }
         } catch (error) {
-            console.error(error);
-            Alert.alert("Error", "An unexpected error occurred.");
+            setSnackbarMessage(`${error}`);
+            setSnackbarMessage('An unexpected error occurred.');
+            setSnackbarVisible(true);
         }
     };
 
@@ -93,11 +101,11 @@ const ResetPassword = () => {
                         size={24}
                     />
                 </TouchableOpacity>
-                {formErrors.currentPassword && (
-                    <Text style={styles.errorText}>Current password is required</Text>
-                )}
-            </View>
 
+            </View>
+            {formErrors.currentPassword && (
+                <Text style={styles.errorText}>Current password is required</Text>
+            )}
             <View style={styles.inputContainer}>
                 <TextInput
                     style={styles.input}
@@ -111,11 +119,11 @@ const ResetPassword = () => {
                         size={24}
                     />
                 </TouchableOpacity>
-                {formErrors.newPassword && (
-                    <Text style={styles.errorText}>New password is required</Text>
-                )}
-            </View>
 
+            </View>
+            {formErrors.newPassword && (
+                <Text style={styles.errorText}>New password is required</Text>
+            )}
             <View style={styles.inputContainer}>
                 <TextInput
                     style={styles.input}
@@ -129,17 +137,24 @@ const ResetPassword = () => {
                         size={24}
                     />
                 </TouchableOpacity>
-                {formErrors.confirmPassword && (
-                    <Text style={styles.errorText}>Confirming your new password is required</Text>
-                )}
-                {formErrors.passwordMismatch && (
-                    <Text style={styles.errorText}>Passwords do not match</Text>
-                )}
-            </View>
 
+            </View>
+            {formErrors.confirmPassword && (
+                <Text style={styles.errorText}>Confirming your new password is required</Text>
+            )}
+            {formErrors.passwordMismatch && (
+                <Text style={styles.errorText}>Passwords do not match</Text>
+            )}
             <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
                 <Text style={styles.submitButtonText}>Save Changes</Text>
             </TouchableOpacity>
+            <Snackbar
+                visible={snackbarVisible}
+                onDismiss={() => setSnackbarVisible(false)}
+                duration={3000}
+            >
+                {snackbarMessage}
+            </Snackbar>
         </View>
     );
 };
@@ -165,11 +180,11 @@ const styles = StyleSheet.create({
     },
     errorText: {
         color: 'red',
-        marginTop: 4,
+        marginBottom: 4,
         marginLeft: 10,
     },
     submitButton: {
-        backgroundColor: '#007BFF',
+        backgroundColor: '#7d0431',
         padding: 12,
         borderRadius: 5,
         alignItems: 'center',

@@ -51,6 +51,7 @@ const Guard = () => {
                 <Avatar.Image
                     source={{ uri: `${ImagebaseURL}${Guard.pictures}` } || require("../../../../assets/Security/images/policeman.png")}
                     style={styles.image}
+                    size={100}
                 />
             </View>
             <View style={styles.detailsWrapper}>
@@ -107,8 +108,6 @@ const styles = StyleSheet.create({
         marginBottom: 15,
     },
     image: {
-        width: 100,
-        height: 100,
         borderRadius: 50,
     },
     textContainer: {

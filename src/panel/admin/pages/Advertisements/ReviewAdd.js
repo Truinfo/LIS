@@ -2,8 +2,8 @@ import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Alert, Image, Button, Linking } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRoute, } from '@react-navigation/native';
-import { getAdvertisementsById } from './AdvertisementSlice'; // Ensure this is a named or default export as needed
-import Carousel from 'react-native-reanimated-carousel'; // Check if this needs to be named or default
+import { getAdvertisementsById } from './AdvertisementSlice';
+import Carousel from 'react-native-reanimated-carousel';
 import { ImagebaseURL } from '../../../Security/helpers/axios';
 import { fetchCitiesById } from '../../../User/Redux/Slice/AuthSlice/Signup/citySlice';
 
@@ -15,7 +15,7 @@ const ReviewAdd = () => {
     const status = useSelector((state) => state.advertisements.status);
     const error = useSelector((state) => state.advertisements.error);
     const cities = useSelector((state) => state.citiesState.currentCity);
-    console.log(cities)
+
     useEffect(() => {
         dispatch(getAdvertisementsById(id));
         if (advertisement) {
@@ -79,7 +79,7 @@ const ReviewAdd = () => {
 
                                     <Text style={styles.detailLabel}>Address</Text>
                                     <Text style={styles.detailValue}>
-                                        : {`${advertisement.societyId?.societyAdress.addressLine1 || ''}, ${advertisement.societyId?.societyAdress.addressLine2 || ''}, ${cities || ''}, ${advertisement.societyId?.societyAdress.state || ''}, ${advertisement.societyId?.societyAdress.postalCode || ''}`}
+                                        : {`${advertisement.societyId?.societyAdress.addressLine1 || ''}, ${advertisement.societyId?.societyAdress.addressLine2 || ''}, ${cities.name || ''}, ${advertisement.societyId?.societyAdress.state || ''}, ${advertisement.societyId?.societyAdress.postalCode || ''}`}
                                     </Text>
                                 </View>
                             )}
@@ -201,7 +201,6 @@ const styles = StyleSheet.create({
     TitleLabel: {
         fontWeight: '700',
         fontSize: 20,
-        paddingBottom: 20,
         color: "#222222"
     },
     detailValue: {

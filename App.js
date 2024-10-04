@@ -317,10 +317,8 @@ export default function App() {
             <Stack.Screen name="Add Events" component={AddEvents} />
             <Stack.Screen name="Edit Event" component={EditEvent} />
 
-
             <Stack.Screen name='View Details' component={ReviewAdd} />
             <Stack.Screen name='Add Post' component={AddAdvertisements} />
-
             <Stack.Screen name='Edit Post' component={EditAdd} />
             <Stack.Screen name='Add Complaints' component={AdminRiseComplaints} />
             <Stack.Screen name='Add Notice' component={AddNotice} />

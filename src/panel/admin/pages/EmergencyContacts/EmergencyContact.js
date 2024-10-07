@@ -125,8 +125,8 @@ const EmergencyContactsTab = () => {
     const renderContactItem = ({ item }) => (
         <View style={styles.contactCard}>
             <View style={styles.column}>
-                <Text style={styles.contactName}>{item.name}</Text>
-                <Text>{item.profession}</Text>
+                <Text style={{ fontSize: 16, fontWeight: 600 }}>{item.name}</Text>
+                <Text style={{ fontSize: 14, fontWeight: 400, color: "gray" }}>{item.profession}</Text>
                 <Text>{item.phoneNumber}</Text>
             </View>
             <IconButton
@@ -262,31 +262,6 @@ const EmergencyContactsTab = () => {
                     </View>
                 </View>
             </Modal>
-
-
-
-
-            {/* <Modal
-                animationType="slide"
-                transparent
-                visible={modalVisible}
-                onRequestClose={() => setModalVisible(false)}
-            >
-                <View style={styles.modalContainer}>
-                    <View style={styles.modalContent}>
-                        <Text style={styles.modalTitle}>Add Emergency Contact</Text>
-                        <TextInput
-                            placeholder="Name"
-                            value={newContact.name}
-                            onChangeText={(text) => setNewContact({ ...newContact, name: text })}
-                            style={styles.inputField}
-                        />
-                       
-                        <Button title="Close" onPress={() => setModalVisible(false)} />
-
-                    </View>
-                </View>
-            </Modal> */}
         </>
     );
 };

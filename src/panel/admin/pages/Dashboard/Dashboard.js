@@ -254,52 +254,51 @@ const Dashboard = () => {
                 )}
             </View>
             <View>
-
+                <Text style={styles.monthHeader}>Maintenance Bill: {monthAndYear}</Text>
                 {paidPayments?.length > 0 ? (
                     <View>
-                    <Text style={styles.monthHeader}>Maintenance Bill: {monthAndYear}</Text>
-                    <View>
-                        {paidPayments.map(payment => (
-                            <>
-                                <Card key={payment._id} style={styles.paymentCard}>
-                                    <Card.Content style={styles.cardContent}>
-                                        <View style={styles.detailsContainer}>
-                                            <Text style={styles.attendanceName}>Name: {payment.name}</Text>
-                                            <Text style={styles.paymentDetails}>Flat Details: {payment.blockno}/ {payment.flatno}</Text>
-                                            <Text style={styles.paymentDetails}>Paid On: {new Date(payment.payedOn).toLocaleDateString()}</Text>
-                                        </View>
-                                        <View style={styles.iconContainer}>
-                                            <MaterialCommunityIcons
-                                                name="arrow-bottom-left"
-                                                size={30}
-                                                color="#4CAF50"
-                                            />
-                                        </View>
-                                    </Card.Content>
-                                </Card>
-                                <TouchableOpacity onPress={(() => navigation.navigate("Maintenance Bills"))}>
-                                    <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", }}>
-                                        <Text style={styles.viewMoreText}>View More</Text>
+                        {/* Display only the first two payments */}
+                        {paidPayments.slice(0, 2).map(payment => (
+                            <Card key={payment._id} style={styles.paymentCard}>
+                                <Card.Content style={styles.cardContent}>
+                                    <View style={styles.detailsContainer}>
+                                        <Text style={styles.attendanceName}>Name: {payment.name}</Text>
+                                        <Text style={styles.paymentDetails}>Flat Details: {payment.blockno}/ {payment.flatno}</Text>
+                                        <Text style={styles.paymentDetails}>Paid On: {new Date(payment.payedOn).toLocaleDateString()}</Text>
+                                    </View>
+                                    <View style={styles.iconContainer}>
                                         <MaterialCommunityIcons
-                                            name="arrow-right-circle-outline"
-                                            size={22}
-                                            color="#7d0431"
-                                            style={{
-                                                marginTop: 20,
-                                                marginLeft: 10
-                                            }}
+                                            name="arrow-bottom-left"
+                                            size={30}
+                                            color="#4CAF50"
                                         />
                                     </View>
-                                </TouchableOpacity>
-                            </>
-
+                                </Card.Content>
+                            </Card>
                         ))}
+                        {/* Show View More only if there are more than 2 payments */}
+                        {paidPayments.length > 2 && (
+                            <TouchableOpacity onPress={() => navigation.navigate("Maintenance Bills")}>
+                                <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", }}>
+                                    <Text style={styles.viewMoreText}>View More</Text>
+                                    <MaterialCommunityIcons
+                                        name="arrow-right-circle-outline"
+                                        size={22}
+                                        color="#7d0431"
+                                        style={{
+                                            marginTop: 20,
+                                            marginLeft: 10
+                                        }}
+                                    />
+                                </View>
+                            </TouchableOpacity>
+                        )}
                     </View>
-                </View>
                 ) : (
                     <Text style={styles.noPayments}>No payments have been made for this month.</Text>
                 )}
             </View>
+
             <Snackbar
                 visible={snackbarVisible}
                 onDismiss={() => setSnackbarVisible(false)}
@@ -508,7 +507,7 @@ const styles = StyleSheet.create({
     },
     viewMoreText: {
         fontSize: 18,
-        fontWeight: "700",
+        fontWeight: "500",
         color: "#525050",
         paddingTop: 15,
         paddingLeft: 10,

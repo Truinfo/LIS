@@ -110,47 +110,47 @@ const AmenityBookingsList = () => {
   const BookingData = [...booking].reverse();
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollViewContainer}>
-        <View style={styles.amenityCard}>
-          <Image
-            source={{ uri: `${ImagebaseURL}${Allbooking?.image}` || "" }}
-            style={styles.amenityImage}
-          />
-          <Text style={styles.amenityName}>{Allbooking?.amenityName}</Text>
-          <Text style={styles.capacityText}>
-            <Text style={styles.boldText}>Capacity:</Text> {Allbooking?.capacity}
-          </Text>
-          <Text style={styles.chargeText}>
-            <Text style={styles.boldText}>Total Charge:</Text> {Allbooking?.cost}
-          </Text>
-        </View>
-        <FlatList
-          data={BookingData}
-          renderItem={({ item }) => renderBookingCard(item)}
-          keyExtractor={item => item._id}
-          ListEmptyComponent={<Text>No bookings found</Text>}
-        />
-        <Modal
-          transparent={true}
-          animationType="slide"
-          visible={deleteDialogVisible}
-          onRequestClose={() => setDeleteDialogVisible(false)}
-        >
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalText}>Are you sure you want to delete this booking?</Text>
-              <View style={styles.modalButtons}>
-                <TouchableOpacity onPress={() => setDeleteDialogVisible(false)} style={styles.cancelButton}>
-                  <Text style={styles.buttonText}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={confirmDelete} style={styles.confirmButton}>
-                  <Text style={styles.buttonText}>Confirm</Text>
-                </TouchableOpacity>
-              </View>
+      <FlatList
+        ListHeaderComponent={() => (
+          <View style={styles.amenityCard}>
+            <Image
+              source={{ uri: `${ImagebaseURL}${Allbooking?.image}` || "" }}
+              style={styles.amenityImage}
+            />
+            <Text style={styles.amenityName}>{Allbooking?.amenityName}</Text>
+            <Text style={styles.capacityText}>
+              <Text style={styles.boldText}>Capacity:</Text> {Allbooking?.capacity}
+            </Text>
+            <Text style={styles.chargeText}>
+              <Text style={styles.boldText}>Total Charge:</Text> {Allbooking?.cost}
+            </Text>
+          </View>
+        )}
+        data={BookingData}
+        renderItem={({ item }) => renderBookingCard(item)}
+        keyExtractor={item => item._id}
+        ListEmptyComponent={<Text>No bookings found</Text>}
+      />
+      <Modal
+        transparent={true}
+        animationType="slide"
+        visible={deleteDialogVisible}
+        onRequestClose={() => setDeleteDialogVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalText}>Are you sure you want to delete this booking?</Text>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity onPress={() => setDeleteDialogVisible(false)} style={styles.cancelButton}>
+                <Text style={styles.buttonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={confirmDelete} style={styles.confirmButton}>
+                <Text style={styles.buttonText}>Confirm</Text>
+              </TouchableOpacity>
             </View>
           </View>
-        </Modal>
-      </ScrollView>
+        </View>
+      </Modal>
     </View>
   );
 };

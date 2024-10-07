@@ -15,7 +15,6 @@ import { fetchVisitors, deleteVisitor, deleteEntry } from './EntrySlice'; // Ass
 import { ImagebaseURL } from '../../../Security/helpers/axios';
 import dummyAvatar from '../../../../assets/Admin/Imgaes/dummyProfile.png'; // Import your dummy avatar image
 import { Dialog, Paragraph, Button, Snackbar, ActivityIndicator } from 'react-native-paper';
-
 const VisitorManagement = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const dispatch = useDispatch();
@@ -146,9 +145,10 @@ const VisitorManagement = () => {
                     onRequestClose={() => setModalVisible(!modalVisible)}
                 >
                     <View style={styles.modalView}>
+                        {console.log(selectedVisitor)}
                         {/* Centered Image */}
                         <Image
-                            source={selectedVisitor.picture ? { uri: selectedVisitor.picture } : dummyAvatar}
+                            source={selectedVisitor?.pictures ? { uri: ` ${ImagebaseURL}${selectedVisitor.pictures}` } : dummyAvatar}
                             style={styles.modalImage}
                         />
                         {/* Centered Title */}

@@ -41,7 +41,7 @@ const EditAmenity = () => {
     status: "",
   });
 
-  const [previewImages, setPreviewImages] = useState([]);
+  const [previewImages, setPreviewImages] = useState("");
   const [newFilesSelected, setNewFilesSelected] = useState(false);
   const [snackVisible, setSnackVisible] = useState(false); // Snackbar visibility state
   const [snackMessage, setSnackMessage] = useState(""); // Snackbar message
@@ -73,30 +73,25 @@ const EditAmenity = () => {
       });
 
       const imagePreviews = amenity.image
-        ? [`${ImagebaseURL}${amenity.image}`]
-        : [];
+        ? `${ImagebaseURL}${amenity.image}`:null
       setPreviewImages(imagePreviews);
     }
   }, [amenity]);
 
-  // Function to handle image picking
   const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
+    let result = await  ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
     });
 
     if (!result.canceled) {
-      setPreviewImages([result.uri]);
-      setFormData((prevData) => ({
-        ...prevData,
-        image: result.uri, // Store the image URI in formData
-      }));
-      setNewFilesSelected(true); // Set this flag to true to handle new image upload
+      setPreviewImages(result.assets[0].uri); // Store the URI for use in the image upload
+      setNewFilesSelected(result.assets[0]); // Store the asset for form submission
     }
-  };
+};
+
 
   const handleChange = (name, value) => {
     setFormData((prevData) => ({
@@ -140,18 +135,24 @@ const EditAmenity = () => {
       });
   };
   const onDismissSnackBar = () => setSnackVisible(false); // Dismiss the Snackbar
+  console.log("amenity",amenity)
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
         {/* Image Preview */}
         <View style={styles.imagePreviewContainer}>
-          {previewImages.map((image, index) => (
+          {/* {previewImages.map((image, index) => (
             <Image
               key={index}
               source={{ uri: image }}
               style={styles.imagePreview}
             />
-          ))}
+          ))} */}
+          {console.log("previewImages",previewImages)}
+          <Image
+                source={{ uri: newFilesSelected ? newFilesSelected : previewImages }}
+              style={styles.imagePreview}
+            />
         </View>
         <TouchableOpacity
           style={styles.uploadButton}

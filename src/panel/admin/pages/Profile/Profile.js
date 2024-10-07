@@ -7,13 +7,14 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { ImagebaseURL } from '../../../Security/helpers/axios';
 import { fetchCitiesById } from '../../../User/Redux/Slice/AuthSlice/Signup/citySlice';
 import { fetchCommityMembers } from './committeeSlice';
+import { ActivityIndicator } from 'react-native-paper';
 const Profile = () => {
     const dispatch = useDispatch();
     const navigation = useNavigation();
-    const resident = useSelector(state => state.profile.profile); // Adjusted to get the profile directly
-    const status = useSelector(state => state.profile.status); // Adjusted to get the profile directly
+    const resident = useSelector(state => state.profile.profile); 
+    const status = useSelector(state => state.profile.status); 
+    const loading = useSelector(state => state.profile.loading); 
     const city = useSelector(state => state.citiesState.currentCity || null);
-
 
     const [selectedBlock, setSelectedBlock] = useState('');
     const [blocks, setBlocks] = useState([]);

@@ -116,6 +116,8 @@ import EditAdminMaintaince from './src/panel/admin/pages/Maintenance/EditBill';
 import AdminResetPassword from './src/panel/admin/pages/Profile/AdminResetPassword';
 import AddMaintenanceBill from './src/panel/admin/pages/Maintenance/AddMaintenanceBill';
 import ResindetialRequests from './src/panel/admin/pages/Dashboard/ResindetialRequests';
+import AddMember from './src/panel/admin/pages/EmergencyContacts/AddMember';
+import EditMember from './src/panel/admin/pages/EmergencyContacts/EditMember';
 
 const Stack = createNativeStackNavigator();
 
@@ -333,6 +335,8 @@ export default function App() {
             <Stack.Screen name='Edit Maintenance' component={EditAdminMaintaince} />
             <Stack.Screen name='Add Maintenance Bill' component={AddMaintenanceBill} />
             <Stack.Screen name='Residential Approvals' component={ResindetialRequests} />
+            <Stack.Screen name='Add Committee Member' component={AddMember} />
+            <Stack.Screen name='Edit Committee Member' component={EditMember} />
           </Stack.Navigator>
         </SafeAreaView>
       </NavigationContainer>

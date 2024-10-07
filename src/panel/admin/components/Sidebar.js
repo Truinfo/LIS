@@ -113,7 +113,7 @@ export default function Sidebar() {
         <Drawer.Screen name="Inventory" component={Inventory} />
         <Drawer.Screen name="Society Bills" component={SocietyBills} />
         <Drawer.Screen name="Maintenance Bills" component={Maintenance} />
-        <Drawer.Screen name="Emergency Contacts" component={EmergencyContact} />
+        <Drawer.Screen name="Quick Contacts" component={EmergencyContact} />
       </Drawer.Navigator>
     </View>
   );

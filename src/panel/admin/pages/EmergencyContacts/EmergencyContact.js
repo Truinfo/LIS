@@ -1,23 +1,30 @@
 // EmergencyContact.js
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Modal, Button } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Modal, Button, ScrollView, Alert, TextInput } from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchEmergencyContacts } from '../../../User/Redux/Slice/CommunitySlice/EmergencyContactSlice';
-import { fetchCommityMembers } from '../Profile/committeeSlice';
-import { FAB, IconButton } from 'react-native-paper';
+import { createEmergencyContact, deleteEmergencyContact, fetchEmergencyContacts, updateEmergencyContact } from '../../../User/Redux/Slice/CommunitySlice/EmergencyContactSlice';
+import { deletecommityMembers, fetchCommityMembers } from '../Profile/committeeSlice';
+import { Avatar, Chip, FAB, IconButton, Snackbar } from 'react-native-paper';
+import { TouchableOpacity } from 'react-native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { ImagebaseURL } from '../../../Security/helpers/axios';
 
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 const Tab = createMaterialTopTabNavigator();
+const societyId = "6683b57b073739a31e8350d0";
 
-const ContactsTab = ({ fetchContacts, contacts, renderItem }) => {
+const ContactsTab = ({ fetchContacts, contacts, renderItem, snackbarVisible, setSnackbarVisible, snackbarMessage }) => {
     const dispatch = useDispatch();
-    const societyId = "6683b57b073739a31e8350d0";
+    const navigation = useNavigation();
 
-    useEffect(() => {
-        if (societyId) {
-            dispatch(fetchContacts(societyId));
-        }
-    }, [dispatch, fetchContacts, societyId]);
+    useFocusEffect(
+        React.useCallback(() => {
+            if (societyId) {
+                dispatch(fetchContacts(societyId));
+            }
+        }, [dispatch, fetchContacts, societyId])
+    );
 
     return (
         <View style={styles.container}>
@@ -26,91 +33,240 @@ const ContactsTab = ({ fetchContacts, contacts, renderItem }) => {
                 keyExtractor={item => item.id?.toString() || item._id?.toString()}
                 renderItem={renderItem}
             />
+            <FAB
+                style={styles.fab}
+                icon="plus"
+                onPress={() => navigation.navigate("Add Committee Member")}
+                color='white'
+            />
+            <Snackbar
+                visible={snackbarVisible}
+                onDismiss={() => setSnackbarVisible(false)}
+                duration={3000}
+            >
+                {snackbarMessage}
+            </Snackbar>
         </View>
     );
 };
 
 const EmergencyContactsTab = () => {
+    const [modalVisible, setModalVisible] = useState(false);
+    const [modalVisible1, setModalVisible1] = useState(false);
+    const [anchor, setAnchor] = useState(null);
+    const dispatch = useDispatch();
     const contacts = useSelector(state => state.emergencyContacts.contacts);
+    const [editContact, setEditContact] = useState({ name: '', profession: '', phoneNumber: '', serviceType: "" });
+    const [newContact, setNewContact] = useState({ name: '', profession: '', phoneNumber: '', serviceType: "" });
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarVisible, setSnackbarVisible] = useState(false);
+    const handleMenuPress = (resident) => {
+        setAnchor(anchor ? null : resident._id);
+    };
+    const handleCreateContact = async () => {
+        const contactToCreate = { ...newContact, societyId };
+
+        const result = await dispatch(createEmergencyContact(contactToCreate));
+
+        if (result.type === "emergencyContacts/createContact/fulfilled") {
+            console.log(result)
+            setSnackbarMessage(`${result.payload.message}`);
+            setSnackbarVisible(true);
+            setNewContact({ name: '', profession: '', phoneNumber: '', serviceType: '' });
+            setModalVisible(false);
+            dispatch(fetchEmergencyContacts(societyId));
+        } else {
+            setSnackbarMessage(`${result.payload.message}`);
+            setSnackbarVisible(true);
+        }
+    };
+    const handleDelete = (id) => {
+        Alert.alert(
+            "Delete Member",
+            "Are you sure you want to delete this member?",
+            [
+                { text: "Cancel", style: "cancel" },
+                {
+                    text: "Delete",
+                    onPress: async () => {
+                        const result = await dispatch(deleteEmergencyContact(id));
+                        if (result.type === "emergencyContacts/deleteContact/fulfilled") {
+                            setSnackbarMessage(`${result.payload.message}`);
+                            setSnackbarVisible(true);
+                            dispatch(fetchEmergencyContacts(societyId));
+                        } else {
+                            setSnackbarMessage('Failed to delete member.');
+                            setSnackbarVisible(true);
+                        }
+                    }
+                }
+            ]
+        );
+    };
+    const handleEditSubmit = async () => {
+        const result = await dispatch(updateEmergencyContact({ 
+            id: editContact._id,
+            name: editContact.name,
+            phoneNumber: editContact.phoneNumber,
+            profession: editContact.profession,
+            serviceType:editContact.serviceType,
+            societyId 
+        }));
+        if (result.type === "emergencyContacts/updateContact/fulfilled") {
+            setSnackbarMessage(`${result.payload.message}`);
+            setSnackbarVisible(true);
+            setModalVisible1(false);
+            dispatch(fetchEmergencyContacts(societyId));
+        } else {
+            setSnackbarMessage('Failed to update contact.');
+            setSnackbarVisible(true);
+        }
+    };
     const renderContactItem = ({ item }) => (
         <View style={styles.contactCard}>
-            <View style={styles.contactInfo}>
+            <View style={styles.column}>
                 <Text style={styles.contactName}>{item.name}</Text>
                 <Text>{item.profession}</Text>
                 <Text>{item.phoneNumber}</Text>
             </View>
             <IconButton
                 icon="dots-vertical"
-                onPress={() => console.log('More options')}
+                onPress={() => handleMenuPress(item)}
                 size={20}
                 style={styles.iconButton}
             />
+            {anchor === item._id && (
+                <ScrollView style={[styles.menuList, { top: 0 }]}>
+                    <TouchableOpacity style={styles.menuItem} onPress={() => {
+                        setAnchor(null);
+                        setEditContact(item);
+                        setModalVisible1(true)
+                    }}>
+                        <Text>Edit</Text>
+                    </TouchableOpacity>
+                    <View style={styles.divider} />
+                    <TouchableOpacity style={styles.menuItem} onPress={() => {
+                        setAnchor(null);
+
+                        handleDelete(item._id)
+                    }}>
+                        <Text>Delete</Text>
+                    </TouchableOpacity>
+                </ScrollView>
+            )}
         </View>
     );
-
-    return <ContactsTab fetchContacts={fetchEmergencyContacts} contacts={contacts} renderItem={renderContactItem} />;
-};
-
-const CommitteeMembersTab = () => {
-    const members = useSelector(state => state.commityMembers.commityMember || []);
-    const renderContactItem = ({ item }) => (
-        <View style={styles.contactCard}>
-            <View style={styles.contactInfo}>
-                <Text style={styles.contactName}>{item.name}</Text>
-                <Text>{item.designation}</Text>
-                <Text>{item.phoneNumber}</Text>
-            </View>
-            <IconButton
-                icon="dots-vertical"
-                onPress={() => console.log('More options')}
-                size={20}
-                style={styles.iconButton}
-            />
-        </View>
-    );
-
-    return <ContactsTab fetchContacts={fetchCommityMembers} contacts={members} renderItem={renderContactItem} />;
-};
-
-const EmergencyContact = () => {
-    const [modalVisible, setModalVisible] = useState(false);
-    const [activeTab, setActiveTab] = useState('Emergency Contacts');
-
-    const handleFABPress = () => setModalVisible(true);
-
-    const modalContent = activeTab === 'Emergency Contacts'
-        ? 'Add Emergency Contact'
-        : 'Add Committee Member';
 
     return (
         <>
-            <Tab.Navigator
-                screenOptions={{
-                    tabBarActiveTintColor: '#7d0431',
-                    tabBarLabelStyle: { fontSize: 14 },
-                    tabBarStyle: { backgroundColor: '#ffffff' },
-                }}
-            >
-                {['Emergency Contacts', 'Committee Members'].map(tab => (
-                    <Tab.Screen
-                        key={tab}
-                        name={tab}
-                        component={tab === 'Emergency Contacts' ? EmergencyContactsTab : CommitteeMembersTab}
-                        listeners={{
-                            tabPress: () => setActiveTab(tab),
-                        }}
-                    />
-                ))}
-            </Tab.Navigator>
-
+            <ContactsTab fetchContacts={fetchEmergencyContacts} contacts={contacts} renderItem={renderContactItem} snackbarVisible={snackbarVisible}
+                setSnackbarVisible={setSnackbarVisible}
+                snackbarMessage={snackbarMessage} />
             <FAB
                 style={styles.fab}
                 icon="plus"
-                onPress={handleFABPress}
+                onPress={() => setModalVisible(true)}
                 color='white'
             />
-
             <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => setModalVisible(false)}
+            >
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        <View style={styles.modalHeader}>
+                            <Text style={styles.modalTitle}>Add Emergency Contact</Text>
+                            <TouchableOpacity onPress={() => setModalVisible(false)}>
+                                <MaterialCommunityIcons name="close" size={24} color="#630000" />
+                            </TouchableOpacity>
+                        </View>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Name"
+                            value={newContact.name}
+                            onChangeText={(text) => setNewContact({ ...newContact, name: text })}
+                        />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Profession"
+                            value={newContact.profession}
+                            onChangeText={(text) => setNewContact({ ...newContact, profession: text })}
+                        />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Service Type"
+                            value={newContact.serviceType}
+                            onChangeText={(text) => setNewContact({ ...newContact, serviceType: text })}
+                        />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Phone Number"
+                            value={newContact.phoneNumber}
+                            keyboardType='numeric'
+                            onChangeText={(text) => setNewContact({ ...newContact, phoneNumber: text })}
+                        />
+                        <TouchableOpacity style={styles.submitButton}
+                            onPress={handleCreateContact}
+                        >
+                            <Text style={styles.submitButtonText}>Add</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible1}
+                onRequestClose={() => setModalVisible1(false)}
+            >
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        <View style={styles.modalHeader}>
+                            <Text style={styles.modalTitle}>Edit Emergency Contact</Text>
+                            <TouchableOpacity onPress={() => setModalVisible1(false)}>
+                                <MaterialCommunityIcons name="close" size={24} color="#630000" />
+                            </TouchableOpacity>
+                        </View>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Name"
+                            value={editContact.name}
+                            onChangeText={(text) => setEditContact({ ...editContact, name: text })}
+                        />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Profession"
+                            value={editContact.profession}
+                            onChangeText={(text) => setEditContact({ ...editContact, profession: text })}
+                        />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Service Type"
+                            value={editContact.serviceType}
+                            onChangeText={(text) => setEditContact({ ...editContact, serviceType: text })}
+                        />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Phone Number"
+                            value={editContact.phoneNumber}
+                            keyboardType='numeric'
+                            onChangeText={(text) => setEditContact({ ...editContact, phoneNumber: text })}
+                        />
+                        <TouchableOpacity style={styles.submitButton}
+                            onPress={handleEditSubmit}
+                        >
+                            <Text style={styles.submitButtonText}>Update</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+
+
+
+
+            {/* <Modal
                 animationType="slide"
                 transparent
                 visible={modalVisible}
@@ -118,13 +274,149 @@ const EmergencyContact = () => {
             >
                 <View style={styles.modalContainer}>
                     <View style={styles.modalContent}>
-                        <Text style={styles.modalTitle}>{modalContent}</Text>
-                        {/* Your form or additional content goes here */}
+                        <Text style={styles.modalTitle}>Add Emergency Contact</Text>
+                        <TextInput
+                            placeholder="Name"
+                            value={newContact.name}
+                            onChangeText={(text) => setNewContact({ ...newContact, name: text })}
+                            style={styles.inputField}
+                        />
+                       
                         <Button title="Close" onPress={() => setModalVisible(false)} />
+
                     </View>
                 </View>
-            </Modal>
+            </Modal> */}
         </>
+    );
+};
+
+const CommitteeMembersTab = () => {
+    const [anchor1, setAnchor1] = useState(null);
+    const members = useSelector(state => state.commityMembers.commityMember || []);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarVisible, setSnackbarVisible] = useState(false);
+    const navigation = useNavigation();
+    const dispatch = useDispatch();
+
+    const handleMenuPress1 = (resident) => {
+        setAnchor1(anchor1 ? null : resident._id);
+    };
+
+    const handleDelete = (id) => {
+        Alert.alert(
+            "Delete Member",
+            "Are you sure you want to delete this member?",
+            [
+                { text: "Cancel", style: "cancel" },
+                {
+                    text: "Delete",
+                    onPress: async () => {
+                        const result = await dispatch(deletecommityMembers({ id }));
+                        if (result.type === "deletecommityMembers/fulfilled") {
+                            setSnackbarMessage(`${result.payload.message}`);
+                            setSnackbarVisible(true);
+                            dispatch(fetchCommityMembers(societyId));
+                        } else {
+                            setSnackbarMessage('Failed to delete member.');
+                            setSnackbarVisible(true);
+                        }
+                    }
+                }
+            ]
+        );
+    };
+
+    const renderContactItem = ({ item }) => (
+        <View style={styles.contactCard}>
+            <View style={styles.contactInfo}>
+                <Avatar.Image
+                    size={80}
+                    source={
+                        item.pictures
+                            ? { uri: `${ImagebaseURL}${item.pictures}` }
+                            : { uri: "https://thumbs.dreamstime.com/b/default-avatar-profile-trendy-style-social-media-user-icon-187599373.jpg" } // Fallback to a local image
+                    }
+                    style={styles.avatar}
+                />
+                <View style={styles.column}>
+                    <Text style={{ fontSize: 16, fontWeight: 600 }}>{item.name}</Text>
+                    <Text style={{ fontSize: 14, fontWeight: 400, color: "gray" }}>{item.designation}</Text>
+                    <View style={styles.chipContainer}>
+                        <View style={styles.chip}>
+                            <Text style={styles.chipText}>{item.flatNumber}</Text>
+                        </View>
+                        <View style={styles.chip}>
+                            <Text style={styles.chipText}>{item.blockNumber}</Text>
+                        </View>
+                    </View>
+                    <Text>{item.phoneNumber}</Text>
+                </View>
+
+            </View>
+            <IconButton
+                icon="dots-vertical"
+                onPress={() => handleMenuPress1(item)}
+                size={20}
+                style={styles.iconButton}
+            />
+            {anchor1 === item._id && (
+                <ScrollView style={[styles.menuList, { top: 5 }]}>
+                    <TouchableOpacity style={styles.menuItem} onPress={() => {
+                        setAnchor1(null);
+                        navigation.navigate("Edit Committee Member", { member: item });
+                    }}>
+                        <Text>Edit</Text>
+                    </TouchableOpacity>
+                    <View style={styles.divider} />
+                    <TouchableOpacity
+                        style={styles.menuItem}
+                        onPress={() => {
+                            setAnchor1(null);
+                            handleDelete(item._id)
+                        }}
+                    >
+                        <Text>Delete</Text>
+                    </TouchableOpacity>
+                </ScrollView>
+            )}
+        </View>
+    );
+
+    return (
+        <ContactsTab
+            fetchContacts={fetchCommityMembers}
+            contacts={members}
+            renderItem={renderContactItem}
+            snackbarVisible={snackbarVisible}
+            setSnackbarVisible={setSnackbarVisible}
+            snackbarMessage={snackbarMessage}
+        />
+    );
+};
+
+const EmergencyContact = () => {
+    return (
+        <Tab.Navigator
+            screenOptions={{
+                tabBarActiveTintColor: '#7d0431',
+                tabBarLabelStyle: { fontSize: 14, fontWeight: 500 },
+                tabBarStyle: { backgroundColor: '#ffffff' },
+                tabBarIndicatorStyle: {
+                    backgroundColor: '#7d0431',
+                    height: 2,
+                },
+            }}
+        >
+            <Tab.Screen
+                name="Contacts"
+                component={EmergencyContactsTab}
+            />
+            <Tab.Screen
+                name="Committee Members"
+                component={CommitteeMembersTab}
+            />
+        </Tab.Navigator>
     );
 };
 
@@ -136,20 +428,38 @@ const styles = StyleSheet.create({
     contactCard: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center', // Center align the items
+        alignItems: 'center',
         padding: 10,
         borderBottomWidth: 1,
         borderBottomColor: '#ccc',
     },
     contactInfo: {
-        flex: 1, 
+        flexDirection: "row",
+        gap: 10, alignItems: 'center'
+    },
+    column: {
+        flexDirection: "column",
     },
     iconButton: {
-        marginLeft: 10, 
+        marginLeft: 10,
     },
-
-
-
+    menuList: {
+        position: 'absolute',
+        right: 40,
+        backgroundColor: '#fff',
+        borderRadius: 5,
+        elevation: 3,
+        padding: 5,
+        zIndex: 10,
+        overflow: "visible",
+    },
+    divider: {
+        borderBottomWidth: 1,
+        borderBottomColor: '#e0e0e0',
+    },
+    menuItem: {
+        padding: 10,
+    },
     fab: {
         position: 'absolute',
         margin: 16,
@@ -158,24 +468,89 @@ const styles = StyleSheet.create({
         backgroundColor: "#7d0431",
         borderRadius: 50,
     },
+    // modalContainer: {
+    //     flex: 1,
+    //     justifyContent: 'center',
+    //     alignItems: 'center',
+    //     backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    // },
+    // modalContent: {
+    //     width: 300,
+    //     padding: 20,
+    //     backgroundColor: 'white',
+    //     borderRadius: 10,
+    //     alignItems: 'center',
+    // },
+    // modalTitle: {
+    //     fontSize: 18,
+    //     fontWeight: 'bold',
+    //     marginBottom: 20,
+    // },
+    chipContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 10
+    },
+    chip: {
+        backgroundColor: '#e0e0e0',
+        borderRadius: 16,
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+    },
+    chipText: {
+        color: '#333',
+        fontSize: 10,
+        fontWeight: '500',
+    },
+
     modalContainer: {
         flex: 1,
-        justifyContent: 'center',
+        justifyContent: 'flex-end',
         alignItems: 'center',
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
-    modalContent: {
-        width: 300,
-        padding: 20,
-        backgroundColor: 'white',
-        borderRadius: 10,
+    modalHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         alignItems: 'center',
+        width: '100%',
+        marginBottom: 20,
     },
     modalTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        marginBottom: 20,
+        color: '#630000',
     },
+    modalContent: {
+        width: '100%',
+        backgroundColor: 'white',
+        borderTopLeftRadius: 10,
+        borderTopRightRadius: 10,
+        padding: 20,
+        alignItems: 'center',
+    },
+    input: {
+        height: 50,
+        borderColor: '#630000',
+        borderWidth: 1,
+        borderRadius: 5,
+        paddingHorizontal: 10,
+        marginBottom: 20,
+        width: '100%',
+    },
+    submitButton: {
+        backgroundColor: '#630000',
+        padding: 15,
+        borderRadius: 5,
+        alignItems: 'center',
+        marginBottom: 10,
+        width: '100%',
+    },
+    submitButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+    },
+
 });
 
 export default EmergencyContact;

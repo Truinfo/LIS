@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../../Security/helpers/axios';
+import axios from 'axios';
 
 
 
@@ -7,7 +8,8 @@ import axiosInstance from '../../../Security/helpers/axios';
 export const createCommityMembers = createAsyncThunk(
   'createCommityMembers',
   async (formData) => {
-    const response = await axiosInstance.post('/createCommityMembers', formData, {
+    console.log(formData)
+    const response = await axiosInstance.post('createCommityMembers', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }

@@ -63,10 +63,8 @@ const SocietyBills = () => {
 
     const closeMenu = () => {
         setVisibleMenu(false);
-        // Do not clear selectedBill here to avoid losing the selection when viewing
     };
 
-    // Updated handleView to accept the bill as a parameter
     const handleView = (bill) => {
         setSelectedBill(bill);
         setDialogVisible(true);
@@ -101,8 +99,6 @@ const SocietyBills = () => {
 
     const cancelDelete = () => {
         setDeleteDialogVisible(false);
-        // Optionally, you can clear selectedBill here if needed
-        // setSelectedBill(null);
     };
 
     const onChangeSearch = (query) => setSearchQuery(query.toLowerCase());

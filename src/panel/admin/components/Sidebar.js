@@ -11,7 +11,6 @@ import VisitorManagement from '../pages/VisistorManagement/VisistorManagement';
 import Amenities from '../pages/Amenities/Amenities';
 import Inventory from '../pages/Inventory/Inventory';
 import Complaints from '../pages/Complaints/Complaints';
-import Documents from '../pages/Documents/Documents';
 import SocietyBills from '../pages/SocietyBills/SocietyBills';
 import Security from '../pages/Security/Security';
 import Services from '../pages/Services/Services';

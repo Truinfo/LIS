@@ -21,12 +21,13 @@ const NoticeBoard = () => {
     const [anchorPosition, setAnchorPosition] = useState({ x: 0, y: 0 });
     const [snackbarVisible, setSnackbarVisible] = useState(false); // State for Snackbar visibility
     const [snackbarMessage, setSnackbarMessage] = useState('');
-  
+
     useFocusEffect(
         React.useCallback(() => {
             dispatch(fetchnotices());
+            setDialogVisible(false)
         }, [dispatch])
-      );
+    );
     const handleSearch = (query) => {
         setSearchQuery(query);
     };
@@ -151,11 +152,12 @@ const NoticeBoard = () => {
                     visible={menuVisible}
                     onDismiss={() => setMenuVisible(false)}
                     anchor={{ x: anchorPosition.x, y: anchorPosition.y }}
+                    contentStyle={{ backgroundColor: '#fff' }}
                 >
                     <Menu.Item onPress={() => handleEditNotice(selectedNotice)} title="Edit" />
                     <Menu.Item onPress={() => showDeleteDialog(selectedNotice)} title="Delete" />
                 </Menu>
-                <Dialog visible={dialogVisible} onDismiss={() => setDialogVisible(false)} >
+                <Dialog visible={dialogVisible} onDismiss={() => setDialogVisible(false)} style={{ backgroundColor: "#fff" }} >
                     <Dialog.Title>Notice Details</Dialog.Title>
                     <Dialog.Content>
                         {selectedNotice && (
@@ -235,7 +237,7 @@ const styles = StyleSheet.create({
         margin: 5,
         borderRadius: 8,
         elevation: 5,
-        backgroundColor:"#fff"
+        backgroundColor: "#fff"
     },
     cardHeader: {
         flexDirection: 'row',

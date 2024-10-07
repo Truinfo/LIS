@@ -29,7 +29,6 @@ const EditEvent = () => {
 
   const events = useSelector(state => state.societyEvents.event);
   const event = events.find((event) => event._id === eventId);
-  console.log(event)
   const successMessage = useSelector((state) => state.societyEvents.successMessage);
   const status = useSelector((state) => state.societyEvents.status);
   const error = useSelector((state) => state.societyEvents.error);

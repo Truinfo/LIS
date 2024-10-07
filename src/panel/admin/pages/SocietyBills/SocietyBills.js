@@ -133,13 +133,32 @@ const SocietyBills = () => {
     const colors = {
         iconButtonColor: '#7D0431',
     };
+    if (status === "loading") {
+        return (
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#7D0431" />
+            </View>
+        );
+    }
 
+    if (!bills || !bills.length === 0) { // Show spinner while loading
+        return (
+            <View style={styles.noDataContainer}>
+                <Image
+                    source={require('../../../../assets/Admin/Imgaes/nodatadound.png')}
+                    style={styles.noDataImage}
+                    resizeMode="contain"
+                />
+                <Text style={styles.noDataText}>No Amenities Found</Text>
+            </View>
+        );
+    }
     const renderItem = ({ item }) => (
         <Card style={styles.card} onPress={() => handleView(item)}>
             <View style={styles.titleContainer}>
                 <Text style={styles.cardTitle}>{item.name}</Text>
                 <Menu
-                
+
                     visible={visibleMenu && selectedBill?._id === item._id}
                     onDismiss={closeMenu}
                     anchor={

@@ -62,6 +62,8 @@ import { AdminBookingReducer } from "../../admin/pages/Amenities/BookingSlice";
 import { AdminprofileReducer } from "../../admin/pages/Profile/profileSlice";
 import { CommityMembersReducer } from "../../admin/pages/Profile/committeeSlice";
 import { AdminMaintainanceReducer } from "../../admin/pages/Maintenance/SocietyMaintainanceSlice";
+import { DashboardReducer } from "../../admin/pages/Dashboard/DashboardSlice";
+import { societyBillsReducer } from "../../admin/pages/SocietyBills/SocietyBillsSlice";
 
 const store = configureStore({
   reducer: {
@@ -137,6 +139,8 @@ const store = configureStore({
     adminAmenities: AdminAmenitiesReducer,
     adminBooking: AdminBookingReducer,
     adminMaintainance: AdminMaintainanceReducer,
+    DashBoard:DashboardReducer,
+    adminSocietyBills:societyBillsReducer
   },
 });
 export default store;

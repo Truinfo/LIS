@@ -139,55 +139,6 @@ const EditSecurity = () => {
     }
   };
 
-  const deletePhoto = () => {
-    setPreviewImage(null);
-  };
-  //   const handleSubmit = async () => {
-  //     const data = new FormData();
-
-  //     // Append individual fields to FormData
-  //     data.append('name', formData.name);
-  //     data.append('email', formData.email);
-  //     data.append('mobileNumber', formData.phoneNumber);
-  //     data.append('role', formData.role);
-  //     data.append('aadharNumber', formData.aadharNumber);
-  // console.log("formData.aadharNumber",formData.aadharNumber)
-  //     // Handle nested address object
-  //     if (formData.address) {
-  //       data.append('address[addressLine1]', formData.address.addressLine1);
-  //       data.append('address[addressLine2]', formData.address.addressLine2);
-  //       data.append('address[state]', formData.address.state);
-  //       data.append('address[postalCode]', formData.address.postalCode);
-  //     }
-
-  //     // Only append the image if it exists
-  //     if (imageUri) {
-  //       data.append('pictures', {
-  //           uri: imageUri,
-  //           name: `security-${Date.now()}.jpeg`,
-  //           type: 'image/jpeg',
-  //       });
-  //   }
-
-  //     console.log( imageUri);
-  //     console.log("Submitting with sequrityId:", sequrityId);
-
-  //     try {
-  //       // Dispatch the update and wait for the response
-  //       const response = await dispatch(updateSequrity({ sequrityId, formData: data }));
-
-  //       // Log the response
-  //       console.log(response);
-  //     } catch (err) {
-  //       console.log("Error during update:", err);
-  //       Toast.show({
-  //         text1: 'Error',
-  //         text2: err.message || 'Failed to update security. Please try again.',
-  //         type: 'error',
-  //       });
-  //     }
-  //   };
-
 
   const handleSubmit = async () => {
     const data = new FormData();

@@ -34,10 +34,10 @@ const Inventory = () => {
 
     const handleMenuPress = (item) => {
         setAnchor(anchor === item._id ? null : item._id);
-        
+
     };
 
-    
+
 
     const confirmDelete = (id) => {
         setAnchor(false)
@@ -70,7 +70,7 @@ const Inventory = () => {
             { cancelable: true }
         );
     };
-    
+
     const handleEditClick = (item) => {
         setEditInventoryData({
             id: item._id,
@@ -90,9 +90,9 @@ const Inventory = () => {
                     quantity: editInventoryData.quantity
                 }
             }));
-            
+
             console.log(editInventoryData);
-            
+
             if (response.type === 'inventory/EditInventoryData/fulfilled') {
                 setModalVisible1(false);
                 setSnackbarMessage(`${response.payload.message}`);
@@ -105,7 +105,7 @@ const Inventory = () => {
             console.error("Error:", error);
         }
     };
-    
+
 
     const handleChange = (name, value) => {
         setInventoryData(prevState => ({
@@ -121,22 +121,22 @@ const Inventory = () => {
             setSnackbarVisible(true);
             return;
         }
-    
+
         try {
             const response = await dispatch(fetchaddInventory(inventoryData));
             console.log(response)
             if (response.meta.requestStatus === 'fulfilled') {
                 setSnackbarMessage(`${response.payload.message}`);
                 setSnackbarVisible(true);
-                dispatch(fetchInventory()); 
-                setModalVisible(false); 
-                   
-            // Clear the fields by resetting inventoryData to its initial state
-            setInventoryData({
-                name: "",
-                quantity: "",
-                societyId: "" // default societyId
-            });
+                dispatch(fetchInventory());
+                setModalVisible(false);
+
+                // Clear the fields by resetting inventoryData to its initial state
+                setInventoryData({
+                    name: "",
+                    quantity: "",
+                    societyId: "" // default societyId
+                });
             } else if (response.error) {
                 setSnackbarMessage(`Failed to add inventory: ${response.error.message}`);
                 setSnackbarVisible(true);
@@ -147,15 +147,24 @@ const Inventory = () => {
             setSnackbarVisible(true);
         }
     };
-    if (status === 'loading') {
+    if (status === "loading") { // Show spinner while loading
         return (
-            <View style={[styles.container, { justifyContent: "center", alignItems: "center" }]}>
-                <ActivityIndicator size={30} color="#630000" />
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#7d0431" />
             </View>
         );
     }
-    if (status === 'failed') {
-        return <Text style={styles.errorText}>Error: {error}</Text>;
+    if (!inventoryItems || !inventoryItems.length === 0 || status === "error") { // Show spinner while loading
+        return (
+            <View style={styles.noDataContainer}>
+                <Image
+                    source={require('../../../../assets/Admin/Imgaes/nodatadound.png')}
+                    style={styles.noDataImage}
+                    resizeMode="contain"
+                />
+                <Text style={styles.noDataText}>No Amenities Found</Text>
+            </View>
+        );
     }
     const capitalizeFirstLetter = (string) => {
         return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
@@ -399,7 +408,21 @@ const styles = StyleSheet.create({
         color: 'white',
         fontWeight: 'bold',
     },
-
+    noDataContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    noDataImage: {
+        width: 150,
+        height: 150,
+        marginBottom: 16,
+    },
+    noDataText: {
+        fontSize: 18,
+        color: '#7d0431',
+        textAlign: 'center',
+    },
 
 });
 

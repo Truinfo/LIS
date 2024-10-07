@@ -57,8 +57,17 @@ const Events = () => {
         return <ActivityIndicator size="large" color="#630000" style={styles.loader} />;
     }
 
-    if (status === 'failed') {
-        return <Text style={styles.errorText}>Error: {error}</Text>;
+    if (!event || !event.length === 0) { // Show spinner while loading
+        return (
+            <View style={styles.noDataContainer}>
+                <Image
+                    source={require('../../../../assets/Admin/Imgaes/nodatadound.png')}
+                    style={styles.noDataImage}
+                    resizeMode="contain"
+                />
+                <Text style={styles.noDataText}>No Amenities Found</Text>
+            </View>
+        );
     }
 
     const renderItem = ({ item }) => (
@@ -244,6 +253,21 @@ const styles = StyleSheet.create({
     },
     modalButtonText: {
         color: 'white',
+    },
+    noDataContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    noDataImage: {
+        width: 150,
+        height: 150,
+        marginBottom: 16,
+    },
+    noDataText: {
+        fontSize: 18,
+        color: '#7d0431',
+        textAlign: 'center',
     },
 });
 

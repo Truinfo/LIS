@@ -20,6 +20,7 @@ const AmenityBookingsList = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const status = useSelector((state) => state.adminBooking.status);
+  const error = useSelector((state) => state.adminBooking.error);
   const Allbooking = useSelector((state) => state.adminBooking.booking);
   const booking = Allbooking && Allbooking.list ? Allbooking.list : [];
   const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
@@ -59,7 +60,6 @@ const AmenityBookingsList = () => {
     ;
     setAnchor(anchor ? null : item._id);
   };
-  // const societyId = fetchSocietyId()
   const renderBookingCard = (item) => (
     <View style={styles.bookingCard}>
       <Text style={styles.bookingId}>{item._id}</Text>
@@ -94,7 +94,7 @@ const AmenityBookingsList = () => {
       </View>
     );
   }
-  if (status === "failed") { // Show spinner while loading
+  if (!booking || !Allbooking && Allbooking.list.length === 0) { // Show spinner while loading
     return (
       <View style={styles.noDataContainer}>
         <Image

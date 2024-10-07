@@ -8,8 +8,15 @@ import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from "expo-image-picker";
 const AddAdvertisements = ({ navigation }) => {
   const dispatch = useDispatch();
+  const [societyId, setSocietyID] = useState([]);
+  const fetchSocietyId = async () => {
+    const storedAdmin = await AsyncStorage.getItem("societyAdmin");
+    const societyAdmin = JSON.parse(storedAdmin) || {};
+    return societyAdmin._id || "6683b57b073739a31e8350d0";
+  };
+
   const [formData, setFormData] = useState({
-    societyId: '6683b57b073739a31e8350d0',
+    societyId: societyId,
     adv: "",
     phoneNumber: "",
     userName: "",
@@ -31,6 +38,7 @@ const AddAdvertisements = ({ navigation }) => {
   const profileData = useSelector(state => state.adminProfile.profile);
   const [blockOptions, setBlockOptions] = useState([]);
   const [flatOptions, setFlatOptions] = useState([]);
+
   const [errors, setErrors] = useState({});
   const [showDialog, setShowDialog] = useState(false);
   const [dialogMessage, setDialogMessage] = useState('');
@@ -39,8 +47,9 @@ const AddAdvertisements = ({ navigation }) => {
   const statusOptions = ['Occupied', 'Unoccupied'];
   const roomOptions = ['1BHK', '2BHK', '3BHK', '4BHK', '5BHK'];
 
-  useEffect(() => {
+  useEffect(async () => {
     dispatch(fetchResidentProfile());
+    setSocietyID(await fetchSocietyId())
   }, [dispatch]);
 
   useEffect(() => {
@@ -89,7 +98,7 @@ const AddAdvertisements = ({ navigation }) => {
     }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const newErrors = {};
 
     // Validate form data
@@ -130,51 +139,51 @@ const AddAdvertisements = ({ navigation }) => {
     });
     // Dispatch or make an API call
     dispatch(createAdvertisements(submissionData))
-    .then((response) => {
-      if (response.meta.requestStatus === 'fulfilled') {
-        // Handle success (reset form, show message, etc.)
-        setDialogMessage('Advertisement added successfully!');
+      .then((response) => {
+        if (response.meta.requestStatus === 'fulfilled') {
+          // Handle success (reset form, show message, etc.)
+          setDialogMessage('Advertisement added successfully!');
+          setShowDialog(true);
+          // Reset form
+          setFormData({
+            societyId: '',
+            adv: "",
+            phoneNumber: "",
+            userName: "",
+            status: "",
+            details: {
+              block: '',
+              flat_No: '',
+              flat_Area: '',
+              rooms: '',
+              washrooms: '',
+              price: '',
+              maintainancePrice: '',
+              parkingSpace: '',
+            },
+            pictures: [],
+            picturePreviews: [],
+          });
+          setTimeout(() => {
+            setShowDialog(false);
+            navigation.navigate("Advertisements");
+          }, 2000);
+        } else {
+          // Handle failure
+          setDialogMessage('Failed to add advertisement. Please try again.');
+          setShowDialog(true);
+          setTimeout(() => {
+            setShowDialog(false);
+          }, 2000);
+        }
+      }).catch(() => {
+        // Handle errors
+        setDialogMessage('Error occurred while submitting. Please try again.');
         setShowDialog(true);
-        // Reset form
-        setFormData({
-          societyId: '6683b57b073739a31e8350d0',
-          adv: "",
-          phoneNumber: "",
-          userName: "",
-          status: "",
-          details: {
-            block: '',
-            flat_No: '',
-            flat_Area: '',
-            rooms: '',
-            washrooms: '',
-            price: '',
-            maintainancePrice: '',
-            parkingSpace: '',
-          },
-          pictures: [],
-          picturePreviews: [],
-        });
         setTimeout(() => {
           setShowDialog(false);
-          navigation.navigate("Advertisements");
         }, 2000);
-      } else {
-        // Handle failure
-        setDialogMessage('Failed to add advertisement. Please try again.');
-        setShowDialog(true);
-        setTimeout(() => {
-          setShowDialog(false);
-        }, 2000);
-      }
-    }).catch(() => {
-      // Handle errors
-      setDialogMessage('Error occurred while submitting. Please try again.');
-      setShowDialog(true);
-      setTimeout(() => {
-        setShowDialog(false);
-      }, 2000);
-    });
+      });
   };
 
   const handleImagePick = async () => {

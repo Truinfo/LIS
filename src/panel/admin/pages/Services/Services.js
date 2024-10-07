@@ -37,7 +37,7 @@ const Services = () => {
             const updatedPeople = people.map(person => {
                 const matchingService = data[person.named];
                 const serviceCount = matchingService ? matchingService.length : 0;
-              
+
                 return {
                     ...person,
                     count: serviceCount
@@ -79,10 +79,15 @@ const Services = () => {
         );
     }
 
-    if (error) {
+    if (!data || !data.length === 0) { // Show spinner while loading
         return (
-            <View style={styles.loadingContainer}>
-                <Text style={styles.errorText}>Failed to load services. Please try again later.</Text>
+            <View style={styles.noDataContainer}>
+                <Image
+                    source={require('../../../../assets/Admin/Imgaes/nodatadound.png')}
+                    style={styles.noDataImage}
+                    resizeMode="contain"
+                />
+                <Text style={styles.noDataText}>No Amenities Found</Text>
             </View>
         );
     }

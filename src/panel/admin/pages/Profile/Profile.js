@@ -11,6 +11,7 @@ const Profile = () => {
     const dispatch = useDispatch();
     const navigation = useNavigation();
     const resident = useSelector(state => state.profile.profile); // Adjusted to get the profile directly
+    const status = useSelector(state => state.profile.status); // Adjusted to get the profile directly
     const city = useSelector(state => state.citiesState.currentCity || null);
 
 
@@ -19,7 +20,7 @@ const Profile = () => {
     const [gates, setGates] = useState([]);
     const [documents, setDocuments] = useState([]);
     const commityMember = useSelector(state => state.commityMembers.commityMember || []);
-    const [cityName, setCityName] = useState(''); 
+    const [cityName, setCityName] = useState('');
     const societyId = "6683b57b073739a31e8350d0";
     useEffect(() => {
         if (societyId) {
@@ -55,6 +56,24 @@ const Profile = () => {
     });
 
     const totalGates = gates?.length;
+
+
+    if (loading === true) {
+        return <ActivityIndicator size="large" color="#630000" style={styles.loader} />;
+    }
+
+    if (!resident || !resident.length === 0) { // Show spinner while loading
+        return (
+            <View style={styles.noDataContainer}>
+                <Image
+                    source={require('../../../../assets/Admin/Imgaes/nodatadound.png')}
+                    style={styles.noDataImage}
+                    resizeMode="contain"
+                />
+                <Text style={styles.noDataText}>No Amenities Found</Text>
+            </View>
+        );
+    }
     return (
         <ScrollView style={styles.container}>
 
@@ -146,7 +165,7 @@ const Profile = () => {
                                         <Icon name="phone" size={20} color="green" style={styles.icon} />
                                     </TouchableOpacity>
 
-                                  
+
                                 </View>
                             </View>
                         </View>
@@ -201,14 +220,14 @@ const styles = StyleSheet.create({
         padding: 10,
         backgroundColor: '#fff',
     }, button: {
-        backgroundColor: '#7d0431', // Change to your desired button color
+        backgroundColor: '#7d0431',
         padding: 10,
         borderRadius: 5,
         alignItems: 'center',
         marginTop: 20,
     },
     buttonText: {
-        color: '#FFFFFF', // Change to your desired text color
+        color: '#FFFFFF',
         fontSize: 16,
         fontWeight: 'bold',
     }, sectionTitle: {
@@ -244,12 +263,26 @@ const styles = StyleSheet.create({
         fontSize: 14,
     },
     card: {
-        backgroundColor: '#fff', 
-        borderRadius: 8, // Rounded corners
-        padding: 10, // Padding inside the card
-        elevation: 3, // Shadow for Android
+        backgroundColor: '#fff',
+        borderRadius: 8,
+        padding: 10,
+        elevation: 3,
     },
-
+    noDataContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    noDataImage: {
+        width: 150,
+        height: 150,
+        marginBottom: 16,
+    },
+    noDataText: {
+        fontSize: 18,
+        color: '#7d0431',
+        textAlign: 'center',
+    },
 
 });
 

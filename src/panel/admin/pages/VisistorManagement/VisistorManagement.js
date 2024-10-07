@@ -24,7 +24,6 @@ const VisitorManagement = () => {
     const error = useSelector(state => state.adiminEntries.error);
     const [selectedVisitor, setSelectedVisitor] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);// State for delete confirmation
-    const [visitorToDelete, setVisitorToDelete] = useState(null); // State to track the visitor being deleted
     const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
     const [selectedEntry, setSelectedEntry] = useState("")
     const [snackbarVisible, setSnackbarVisible] = useState(false);
@@ -33,24 +32,7 @@ const VisitorManagement = () => {
         dispatch(fetchVisitors());
     }, [dispatch]);
 
-    if (status === "loading") {
-        return (
-            <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#7d0431" />
-            </View>
-        );
-    }
 
-    if (status === "failed") {
-        return (<View style={styles.noDataContainer}>
-            <Image
-                source={require('../../../../assets/Admin/Imgaes/nodatadound.png')}
-                style={styles.noDataImage}
-                resizeMode="contain"
-            />
-            <Text style={styles.noDataText}>No Bills Found</Text>
-        </View>);
-    }
 
 
     const filteredVisitors = Array.isArray(visitors)
@@ -94,6 +76,24 @@ const VisitorManagement = () => {
 
         }
     };
+    if (status === "loading") {
+        return (
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#7d0431" />
+            </View>
+        );
+    }
+
+    if (!filteredVisitors || filteredVisitors.length === 0) {
+        return (<View style={styles.noDataContainer}>
+            <Image
+                source={require('../../../../assets/Admin/Imgaes/nodatadound.png')}
+                style={styles.noDataImage}
+                resizeMode="contain"
+            />
+            <Text style={styles.noDataText}>No Bills Found</Text>
+        </View>);
+    }
     const renderItem = ({ item }) => (
         <TouchableOpacity onPress={() => handleViewClick(item)}>
             <View style={styles.card}>
@@ -371,6 +371,21 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#7D0431',
         fontWeight: '700',
+    },
+    noDataContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    noDataImage: {
+        width: 150,
+        height: 150,
+        marginBottom: 16,
+    },
+    noDataText: {
+        fontSize: 18,
+        color: '#7d0431',
+        textAlign: 'center',
     },
 });
 

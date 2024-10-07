@@ -67,7 +67,7 @@ const Amenities = () => {
       </View>
     );
   }
-  if (error) { // Show spinner while loading
+  if (!amenities) { // Show spinner while loading
     return (
       <View style={styles.noDataContainer}>
         <Image

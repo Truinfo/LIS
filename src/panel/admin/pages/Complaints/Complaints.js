@@ -57,6 +57,7 @@ const ComplaintItem = ({ item, handleEdit, handleDelete }) => {
         ]);
     };
 
+
     return (
         <View style={styles.cardContainer}>
             <View style={styles.header}>
@@ -190,15 +191,26 @@ const Complaints = () => {
         society: () => <SocietyComplaints complaints={societyComplaints} handleEdit={handleEdit} handleDelete={handleDelete} />,
     });
 
-    if (status === "loading") {
-        return <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#7d0431" />
-        </View>
-    }
-    if (status === "error") {
-        return <Text>Error fetching data...</Text>;
-    }
 
+    if (status === "loading") { // Show spinner while loading
+        return (
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#7d0431" />
+            </View>
+        );
+    }
+    if (!complaints || !complaints.length === 0 || status === "error") { // Show spinner while loading
+        return (
+            <View style={styles.noDataContainer}>
+                <Image
+                    source={require('../../../../assets/Admin/Imgaes/nodatadound.png')}
+                    style={styles.noDataImage}
+                    resizeMode="contain"
+                />
+                <Text style={styles.noDataText}>No Amenities Found</Text>
+            </View>
+        );
+    }
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="dark-content" />
@@ -219,15 +231,18 @@ const Complaints = () => {
             <TouchableOpacity style={styles.fab} onPress={() => navigate.navigate("Add Complaints")}>
                 <Icon name="add" size={24} color="#fff" />
             </TouchableOpacity>
-            <Modal visible={modalVisible} animationType="slide">
+            <Modal visible={modalVisible} animationType="slide" transparent={true} >
                 <View style={styles.modalView}>
                     <Text style={styles.modalTitle}>Update Status of Complaint</Text>
-                    <TouchableOpacity onPress={handleStatusChange} style={styles.closeButton}>
-                        <Text style={styles.buttonText}>Resolve</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeButton}>
-                        <Text style={styles.buttonText}>Close</Text>
-                    </TouchableOpacity>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", }}>
+                        <TouchableOpacity onPress={handleStatusChange} style={[styles.closeButton, { marginRight: 30 }]}>
+                            <Text style={styles.buttonText}>Resolve</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeButton}>
+                            <Text style={styles.buttonText}>Close</Text>
+                        </TouchableOpacity>
+                    </View>
+
                 </View>
             </Modal>
             <Snackbar
@@ -277,7 +292,7 @@ const styles = StyleSheet.create({
     },
     modalView: {
         margin: 20,
-        backgroundColor: "#f7f7f7",
+        backgroundColor: "#edebeb",
         borderRadius: 20,
         padding: 35,
         alignItems: "center",
@@ -291,7 +306,7 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         elevation: 5,
         position: "absolute",
-        top: 130,
+        top: 250,
 
     },
     modalTitle: {
@@ -394,7 +409,21 @@ const styles = StyleSheet.create({
         justifyContent: 'center', // Center vertically
         alignItems: 'center', // Center horizontally
     },
-
+    noDataContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    noDataImage: {
+        width: 150,
+        height: 150,
+        marginBottom: 16,
+    },
+    noDataText: {
+        fontSize: 18,
+        color: '#7d0431',
+        textAlign: 'center',
+    },
 });
 
 export default Complaints;

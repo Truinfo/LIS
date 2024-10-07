@@ -76,12 +76,13 @@ const List = () => {
 
   useEffect(() => {
     dispatch(fetchEvent())
+    setAnchorEl(null)
   }, [dispatch])
 
   const handleDeleteSelected = () => {
     setDeleteDialogOpen(true);
     handleMenuClose();
-};
+  };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage)
@@ -131,24 +132,24 @@ const List = () => {
 
   const confirmDelete = () => {
     dispatch(deleteEvent(selectedUser._id)).then(() => {
-        setDeleteDialogOpen(false);
-        setSelectedUser(null);
-        setShowDialog(true);
-        setTimeout(() => {
-            setShowDialog(false);
-        }, 2000);
-        dispatch(fetchEvent());
+      setDeleteDialogOpen(false);
+      setSelectedUser(null);
+      setShowDialog(true);
+      setTimeout(() => {
+        setShowDialog(false);
+      }, 2000);
+      dispatch(fetchEvent());
     }).catch((error) => {
-        setDeleteDialogOpen(false);
-        setSelectedUser(null);
-        console.error("Error:", error);
+      setDeleteDialogOpen(false);
+      setSelectedUser(null);
+      console.error("Error:", error);
     });
-};
+  };
 
-const cancelDelete = () => {
+  const cancelDelete = () => {
     setDeleteDialogOpen(false);
     setSelectedUser(null);
-};
+  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -344,7 +345,6 @@ const cancelDelete = () => {
                           >
                             <MoreVertIcon />
                           </GradientIconButton>
-
                           <Menu
                             id='long-menu'
                             anchorEl={anchorEl}
@@ -394,10 +394,10 @@ const cancelDelete = () => {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
         <MyDialog
-                message={successMessage}
-                showDialog={showDialog}
-                onClose={() => setShowDialog(false)}
-            />
+          message={successMessage}
+          showDialog={showDialog}
+          onClose={() => setShowDialog(false)}
+        />
       </Box>
     </ThemeProvider>
   )

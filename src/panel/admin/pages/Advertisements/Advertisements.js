@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, FlatList, Image, TouchableOpacity,  StyleSheet, Alert, ActivityIndicator, TouchableWithoutFeedback, } from 'react-native';
+import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet, Alert, ActivityIndicator, TouchableWithoutFeedback, } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAdvertisements, deleteAdvertisement } from './AdvertisementSlice';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -7,13 +7,14 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { ImagebaseURL } from '../../../Security/helpers/axios';
 
 const Advertisements = () => {
-  const [menuVisible, setMenuVisible] = useState(null); 
+  const [menuVisible, setMenuVisible] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigation();
 
   const adds = useSelector(state => state.advertisements.adds || []);
   const successMessage = useSelector(state => state.advertisements.successMessage);
   const status = useSelector(state => state.advertisements.status);
+  const error = useSelector(state => state.advertisements.error);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -54,7 +55,7 @@ const Advertisements = () => {
   };
 
   const toggleMenu = (itemId) => {
-    setMenuVisible(menuVisible === itemId ? null : itemId); 
+    setMenuVisible(menuVisible === itemId ? null : itemId);
   };
 
   const handleOutsidePress = () => {
@@ -93,6 +94,19 @@ const Advertisements = () => {
     </TouchableOpacity>
   );
 
+
+  if (error) { // Show spinner while loading
+    return (
+      <View style={styles.noDataContainer}>
+        <Image
+          source={require('../../../../assets/Admin/Imgaes/nodatadound.png')}
+          style={styles.noDataImage}
+          resizeMode="contain"
+        />
+        <Text style={styles.noDataText}>No Posts Found</Text>
+      </View>
+    );
+  }
   return (
     <TouchableWithoutFeedback onPress={handleOutsidePress}>
       <View style={styles.container}>
@@ -199,7 +213,22 @@ const styles = StyleSheet.create({
     flex: 1, // Use full height and width of the parent
     justifyContent: 'center', // Center vertically
     alignItems: 'center', // Center horizontally
-},
+  },
+  noDataContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noDataImage: {
+    width: 150,
+    height: 150,
+    marginBottom: 16,
+  },
+  noDataText: {
+    fontSize: 18,
+    color: '#7d0431',
+    textAlign: 'center',
+  },
 });
 
 export default Advertisements;

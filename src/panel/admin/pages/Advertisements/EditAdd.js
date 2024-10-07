@@ -122,7 +122,7 @@ const EditAdd = () => {
 
     const handleSubmit = () => {
         const data = new FormData();
-    
+
         // Append form fields to FormData
         Object.keys(formData).forEach((key) => {
             if (key === 'details') {
@@ -133,12 +133,12 @@ const EditAdd = () => {
                 data.append(key, formData[key]);
             }
         });
-    
+
         // Handle existing and new images separately
         formData.pictures.forEach((file, index) => {
             if (file.uri) {
                 const isExistingImage = !newFilesSelected; // Adjust condition if needed
-    
+
                 data.append('pictures', {
                     uri: file.uri,
                     type: 'image/jpeg', // Ensure 'type' exists or provide default
@@ -146,7 +146,7 @@ const EditAdd = () => {
                 });
             }
         });
-    
+
         // Dispatch formData to the API
         dispatch(editAdvertisement({ id, formData: data }))
             .then((response) => {
@@ -162,7 +162,7 @@ const EditAdd = () => {
                 console.error("Error:", error);
             });
     };
-    
+
     const handleImagePick = async () => {
         try {
             const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -263,7 +263,7 @@ const EditAdd = () => {
                                 source={{ uri: image.startsWith('/') ? `${ImagebaseURL}${image}` : image }}
                                 style={{ width: 80, height: 80, borderRadius: 10 }}
                             />
-                            
+
                             <TouchableOpacity
                                 onPress={() => handleRemoveImage(index)}
                                 style={styles.removeIcon}
@@ -274,9 +274,11 @@ const EditAdd = () => {
                     </View>
                 ))}
             </ScrollView>
-            <View style={{ paddingLeft: 10, paddingRight: 10 }}>
-                <Button title="Select Images" onPress={handleImagePick} />
+            <View style={{ paddingLeft: 10, paddingRight: 10, }}>
 
+                <TouchableOpacity onPress={handleImagePick} style={styles.submitButton}>
+                    <Text style={styles.submitButtonText}>Upload Images</Text>
+                </TouchableOpacity>
             </View>
             <View style={{ marginTop: 10, marginBottom: 40, padding: 10 }}>
                 <TouchableOpacity onPress={handleSubmit} style={styles.submitButton}>
@@ -297,13 +299,14 @@ const styles = {
         borderRadius: 5,
     },
     submitButton: {
-        backgroundColor: '#2196F3',
+        backgroundColor: '#7d0431',
         padding: 10,
         borderRadius: 5,
     },
     submitButtonText: {
         color: 'white',
         textAlign: 'center',
+        
     },
     removeIcon: {
         position: 'absolute',

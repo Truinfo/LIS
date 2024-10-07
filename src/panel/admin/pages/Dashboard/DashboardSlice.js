@@ -1,21 +1,37 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../../Security/helpers/axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import axios from 'axios';
 const fetchSocietyId = async () => {
     const storedAdmin = await AsyncStorage.getItem('societyAdmin');
     const societyAdmin = JSON.parse(storedAdmin) || {};
     return societyAdmin._id || "6683b57b073739a31e8350d0"; // Default ID
 };
-export const getAllMonthsBySocietyId = createAsyncThunk(
-    'dashboard/getAllMonthsBySocietyId',
-    async () => {
-        const response = await axiosInstance.get(`/getAllMonthsBySocietyId/${societyId}`);
-        return response.data.maintanance;
+export const updateRequestStatus = createAsyncThunk(
+    'dashboard/updateRequestStatus',
+    async (id) => {
+        console.log(id, "hai")
+        const response = await axiosInstance.put(`/user/updateVerificationBy/${id}`);
+        return response.data;
+    }
+);
+export const DeleteRequest = createAsyncThunk(
+    'dashboard/DeleteRequest',
+    async (id) => {
+        const socketID = await fetchSocietyId()
+        const response = await axiosInstance.delete(`/user/deleteREquest/${id}/${socketID}`);
+        return response.data;
     }
 );
 
-
+export const fetchGatekeepers = createAsyncThunk(
+    'sequrity/fetchGatekeepers',
+    async () => {
+        const societyId = await fetchSocietyId();
+        const response = await axiosInstance.get(`/sequrity/getSequrityBySocietyId/${societyId}`);
+        return response.data.sequrity;
+    }
+);
 const DashboardSlice = createSlice({
     name: 'dashboard',
     initialState: {
@@ -23,24 +39,38 @@ const DashboardSlice = createSlice({
         profile: [],
         status: 'idle',
         error: null,
+        sequrity: [],
         successMessage: null,
     },
     reducers: {
     },
     extraReducers: (builder) => {
         builder
-            .addCase(getAllMonthsBySocietyId.pending, (state) => {
+            .addCase(updateRequestStatus.pending, (state) => {
+                state.status = 'loading';
+                state.error = null
+            })
+            .addCase(updateRequestStatus.fulfilled, (state,) => {
+                state.status = 'succeeded';
+                state.error = null
+                console.log("succeeded")
+            })
+            .addCase(updateRequestStatus.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.error.message;
+                console.log("failed")
+            })
+            .addCase(fetchGatekeepers.pending, (state) => {
                 state.status = 'loading';
             })
-            .addCase(getAllMonthsBySocietyId.fulfilled, (state, action) => {
+            .addCase(fetchGatekeepers.fulfilled, (state, action) => {
                 state.status = 'succeeded';
-                state.dashboard = action.payload;
+                state.sequrity = action.payload;
             })
-            .addCase(getAllMonthsBySocietyId.rejected, (state, action) => {
+            .addCase(fetchGatekeepers.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.error.message;
             })
-          
     },
 });
 

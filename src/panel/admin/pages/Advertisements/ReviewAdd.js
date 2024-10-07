@@ -79,7 +79,7 @@ const ReviewAdd = () => {
 
                                     <Text style={styles.detailLabel}>Address</Text>
                                     <Text style={styles.detailValue}>
-                                        : {`${advertisement.societyId?.societyAdress.addressLine1 || ''}, ${advertisement.societyId?.societyAdress.addressLine2 || ''}, ${cities.name || ''}, ${advertisement.societyId?.societyAdress.state || ''}, ${advertisement.societyId?.societyAdress.postalCode || ''}`}
+                                        : {`${advertisement.societyId?.societyAdress.addressLine1 || ''}, ${advertisement.societyId?.societyAdress.addressLine2 || ''}, ${cities?.name || ''}, ${advertisement.societyId?.societyAdress.state || ''}, ${advertisement.societyId?.societyAdress.postalCode || ''}`}
                                     </Text>
                                 </View>
                             )}

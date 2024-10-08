@@ -50,7 +50,7 @@ const AddAmenity = () => {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const newErrors = {};
     Object.keys(formData).forEach(key => {
       if (!formData[key] && key !== 'image' && key !== 'picturePreview' && key !== 'cost' && key !== 'capacity') {
@@ -79,8 +79,10 @@ const AddAmenity = () => {
       });
     }
 
-    dispatch(createAmenity(submissionData)).then((response) => {
-      if (response.meta.requestStatus === 'fulfilled') {
+    const response = await dispatch(createAmenity(submissionData))
+    .then((response) => {
+      console.log(response)
+      if (response.type === 'amenities/createAmenity/fulfilled') {
         setFormData({
           societyId: '6683b57b073739a31e8350d0',
           amenityName: "",
@@ -92,7 +94,7 @@ const AddAmenity = () => {
           image: null,
           picturePreview: null,
         });
-        setSnackbarMessage(successMessage);
+        setSnackbarMessage(response.payload.message);
         setSnackbarVisible(true);
         // Show Snackbar on success
         setTimeout(() => {

@@ -13,13 +13,16 @@ import { useNavigation, useFocusEffect } from "@react-navigation/native"; // Imp
 import { deleteAmenity, getAllAmenityBySocietyId } from "./AmenitiesSlice"; // Keep this as it is for your API actions
 import { ImagebaseURL } from "../../../Security/helpers/axios";
 import { Ionicons } from "@expo/vector-icons"; // Add icons from Expo
-import { Dialog, Portal, Paragraph, Button, FAB, ActivityIndicator } from "react-native-paper"; // Import from react-native-paper
+import { Dialog, Portal, Paragraph, Button, FAB, ActivityIndicator, Snackbar } from "react-native-paper"; // Import from react-native-paper
 import { Provider as PaperProvider } from "react-native-paper";
 const Amenities = () => {
   const [selectedAmenity, setSelectedAmenity] = useState(null);
   const [deleteDialogVisible, setDeleteDialogVisible] = useState(false); // State for Dialog visibility
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [selectedMenuId, setSelectedMenuId] = useState(null); // Track which menu is open
+
+  const [snackVisible, setSnackVisible] = useState(false);
+  const [snackMessage, setSnackMessage] = useState('');
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const amenities = useSelector(
@@ -43,20 +46,19 @@ const Amenities = () => {
     }, [dispatch])
   );
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
     console.log(selectedAmenity);
-    dispatch(deleteAmenity({ id: selectedAmenity._id }))
-      .then(() => {
+    const response = await dispatch(deleteAmenity({ id: selectedAmenity._id }))
+      .then((response) => {
         setDeleteDialogVisible(false);
-        setShowSuccessDialog(true); // Show success message after deletion
-        setTimeout(() => {
-          setShowSuccessDialog(false);
-        }, 2000); // Automatically close success message after 2 seconds
+        setSnackMessage(response.payload.message);
+
+        setSnackVisible(true);
         dispatch(getAllAmenityBySocietyId());
       })
       .catch((error) => {
-        setDeleteDialogVisible(false);
-        console.error("Error:", error);
+        setSnackMessage(error.message);
+        setSnackVisible(true);
       });
   };
   const hideDeleteDialog = () => setDeleteDialogVisible(false); // Function to close the dialog
@@ -205,6 +207,13 @@ const Amenities = () => {
           onPress={() => navigation.navigate('Add Amenity')}
         />
       </View>
+      <Snackbar
+        visible={snackVisible}
+        onDismiss={() => setSnackVisible(false)}
+        duration={3000}
+      >
+        {snackMessage}
+      </Snackbar>
     </PaperProvider>
   );
 };

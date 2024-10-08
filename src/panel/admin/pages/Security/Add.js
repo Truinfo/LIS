@@ -166,7 +166,6 @@ const AddSecurity = () => {
           navigation.goBack();
         }, 2000);
 
-        // Reset form data and errors
         setFormData({
           societyId: '',
           name: '',
@@ -329,20 +328,6 @@ const AddSecurity = () => {
             />
             {errors.password && <Text style={styles.error}>{errors.password}</Text>}
           </View>
-          {/* Image Preview
-          {imageFile && (
-            <View style={styles.imagePreview}>
-              <Image source={{ uri: imageFile.uri }} style={styles.image} />
-              <TouchableOpacity onPress={deletePhoto} style={styles.removeImageButton}>
-                <Text style={styles.removeImageText}>Remove Image</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-
-          <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.uploadButton}>
-            <Text style={styles.uploadButtonText}>{imageFile ? 'Change Profile Photo' : 'Add Profile Photo'}</Text>
-          </TouchableOpacity>
-          */}
           <TouchableOpacity onPress={handleAdd} style={styles.submitButton}>
             <Text style={styles.submitButtonText}>Add Security</Text>
           </TouchableOpacity>
@@ -361,12 +346,12 @@ const AddSecurity = () => {
                 <Icon name="photo-camera" size={24} color="#7D0431" />
               </TouchableOpacity>
               <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.modalButton}>
-                <Text style={styles.modalButtonCancel} >Cancel</Text>
+                <Text style={styles.modalButtonCancel}>Cancel</Text>
               </TouchableOpacity>
             </View>
           </View>
         </Modal>
-        <Toast ref={(ref) => Toast.setRef(ref)} />
+        <Toast />
       </View>
     </ScrollView>
   );
@@ -420,6 +405,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: 'center',
     marginTop: 20,
+    marginBottom: 20,
   },
   submitButtonText: {
     color: '#fff',
@@ -465,7 +451,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     width: '100%',
     marginBottom: 10,
-    color: '#7d0431',
+    alignItems: 'center', // Ensure text and icon are vertically aligned
   },
 
   textInputFields: {
@@ -501,5 +487,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AddSecurity;
-
+export default AddSecurity; 

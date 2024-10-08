@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { checkAttendanceStatus, sequrityCheckIn, sequrityCheckOut } from './GateKeeperSlice';
+import { getSequrityPerson, sequrityCheckIn, sequrityCheckOut } from './GateKeeperSlice';
 import Toast from 'react-native-toast-message';
 import { useRoute } from '@react-navigation/native';
 
@@ -10,8 +10,8 @@ const AttendanceForm = () => {
   const route = useRoute();
   const { sequrityId } = route.params;
   const data = useSelector((state) => state.gateKeepers.sequrity);
-  const sequrity = data?.status || '';
-  const sequrityAttendance = data?.attendanceRecords || '';
+  const sequrityAttendance = data?.attendance?.slice(-1)[0] || '';
+
   const [attendance, setAttendance] = useState({
     date: new Date().toISOString().slice(0, 10),
     status: '',
@@ -19,13 +19,11 @@ const AttendanceForm = () => {
     checkOutDateTime: '',
   });
   const [showDropdown, setShowDropdown] = useState(false);
-  const [today] = useState(new Date().toISOString().slice(0, 10));
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    const formattedDate = new Date(attendance.date).toISOString();
-    dispatch(checkAttendanceStatus({ sequrityId, date: formattedDate }));
-  }, [dispatch, sequrityId, attendance.date]);
+    dispatch(getSequrityPerson(sequrityId));
+  }, [dispatch, sequrityId]);
 
   const handleAttendanceChange = (name, value) => {
     setAttendance((prevState) => ({
@@ -70,7 +68,7 @@ const AttendanceForm = () => {
           status: '',
         }));
 
-        await dispatch(checkAttendanceStatus({ sequrityId, date: new Date(attendance.date).toISOString() }));
+        await dispatch(getSequrityPerson(sequrityId));
       } else {
         Toast.show({
           text1: 'Check-in Failed',
@@ -93,13 +91,9 @@ const AttendanceForm = () => {
   };
 
   const handleCheckout = async () => {
-    const formData = {
-      checkOutDateTime: new Date().toISOString(),
-    };
     const attendanceId = sequrityAttendance._id;
-
     try {
-      await dispatch(sequrityCheckOut({ sequrityId, attendanceId, formData }));
+      await dispatch(sequrityCheckOut({ sequrityId, attendanceId }));
       Toast.show({
         text1: 'Check-out Successful',
         text2: 'You have checked out successfully.',
@@ -107,7 +101,7 @@ const AttendanceForm = () => {
         autoHide: true,
         visibilityTime: 1000,
       });
-      dispatch(checkAttendanceStatus({ sequrityId, date: new Date(attendance.date).toISOString() }));
+      dispatch(getSequrityPerson(sequrityId));
     } catch (error) {
       console.error('Error during check-out:', error);
       Toast.show({
@@ -131,6 +125,25 @@ const AttendanceForm = () => {
 
   return (
     <View style={styles.container}>
+
+      <View style={styles.record}>
+        <View style={styles.detailContainer}>
+          <Text style={styles.bold}>Sequrity Id:</Text>
+          <Text style={styles.profileDetail}>
+            {data.sequrityId}
+          </Text>
+        </View>
+
+        <View style={styles.detailContainer}>
+          <Text style={styles.bold}>Name:</Text>
+          <Text style={styles.profileDetail}>{data.name}</Text>
+        </View>
+        <View style={styles.detailContainer}>
+          <Text style={styles.bold}>Email:</Text>
+          <Text style={styles.profileDetail}>{data.email}</Text>
+        </View>
+      </View> 
+
       {sequrityAttendance ? (
         <View style={styles.record}>
           <Text style={styles.recordTitle}>Last Attendance Record</Text>
@@ -184,7 +197,7 @@ const AttendanceForm = () => {
         </View>
       )}
 
-      {sequrity !== 'Already checkin But no checkOut' && (
+      {sequrityAttendance.checkOutDateTime !== null && (
         <View style={styles.dropdown}>
           <TouchableOpacity onPress={() => setShowDropdown(!showDropdown)}>
             <Text style={styles.dropdownText}>{capitalizeFirstLetter(attendance.status) || 'Select Status'}</Text>
@@ -203,8 +216,7 @@ const AttendanceForm = () => {
         </View>
       )}
 
-      {(!sequrityAttendance.checkInDateTime ||
-        (sequrityAttendance.checkOutDateTime && !sequrityAttendance.checkOutDateTime === null)) && (
+{(!sequrityAttendance.checkInDateTime || sequrityAttendance.checkOutDateTime !== null ) && (
           <View style={styles.buttonContainer}>
             <TouchableOpacity style={styles.buttonCheck} onPress={handleCheckin}>
               <Text style={styles.addButtonText}>Check-in</Text>
@@ -221,7 +233,7 @@ const AttendanceForm = () => {
         </View>
       )}
 
-      {sequrity === 'Already Checkout' && (
+      {sequrityAttendance === 'Already Checkout' && (
         <View style={styles.buttonContainer}>
           <Text style={styles.buttonText}>Re-Entry</Text>
           <TouchableOpacity style={styles.buttonCheck} onPress={handleCheckin}>

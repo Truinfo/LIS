@@ -76,7 +76,7 @@ export const updateSequrity = createAsyncThunk(
       return rejectWithValue(error.response ? error.response.data : error.message)
     }
   }
-);
+); 
 
 export const checkAttendanceStatus = createAsyncThunk(
   'sequrity/checkAttendanceStatus',
@@ -87,27 +87,33 @@ export const checkAttendanceStatus = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.response ? error.response.data : error.message)
     }
-  }
+  } 
 );
 
 export const sequrityCheckIn = createAsyncThunk(
   'sequrity/sequrityCheckIn',
   async ({ sequrityId, formData }, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.put(`/sequrity/addCheckIn/${sequrityId}`, formData);
+      console.log(formData)
+      const response = await axiosInstance.put(`/sequrity/addCheckIn/${sequrityId}`, formData,{
+        headers: {
+          'Content-Type': 'application/json',
+      }      
+      });
       return response.data;
     } catch (error) {
+      console.log(error)
       return rejectWithValue(error.response ? error.response.data : error.message)
     }
   }
-);
+); 
 
 // router.put('/sequrity/addCheckOut/:sequrityId/:attendanceId', addCheckOut);
 export const sequrityCheckOut = createAsyncThunk(
   'sequrity/sequrityCheckOut',
-  async ({ sequrityId, attendanceId, formData }, { rejectWithValue }) => {
+  async ({ sequrityId, attendanceId }, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.put(`/sequrity/addCheckOut/${sequrityId}/${attendanceId}`, formData);
+      const response = await axiosInstance.put(`/sequrity/addCheckOut/${sequrityId}/${attendanceId}`);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response ? error.response.data : error.message)

@@ -94,12 +94,10 @@ const Security = () => {
     const renderItem = ({ item }) => (
         <TouchableOpacity onPress={() => handleView(item)}>
             <View style={styles.row}>
-
                 <Image
                     source={{ uri: `${ImagebaseURL}${item.pictures}` }}
                     style={styles.image}
                 />
-
                 <View style={styles.details}>
                     <Text style={styles.detailLabel}>Security ID</Text>
                     <Text style={styles.detailValue}>{item.sequrityId}</Text>
@@ -235,9 +233,9 @@ const styles = StyleSheet.create({
         marginBottom: 5,
     },
     image: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
+        width: 90,
+        height: 90,
+        borderRadius: 50,
         marginBottom: 10,
     },
     dotsButton: {
@@ -314,7 +312,7 @@ const styles = StyleSheet.create({
         bottom: 20,
         right: 20,
         backgroundColor: '#7D0431',
-        width: 56,
+        width: 56, 
         height: 56,
         borderRadius: 28,
         justifyContent: 'center',

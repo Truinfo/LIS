@@ -13,7 +13,6 @@ const Profile = () => {
     const navigation = useNavigation();
     const resident = useSelector(state => state.profile.profile); 
     const status = useSelector(state => state.profile.status); 
-    const loading = useSelector(state => state.profile.loading); 
     const city = useSelector(state => state.citiesState.currentCity || null);
 
     const [selectedBlock, setSelectedBlock] = useState('');

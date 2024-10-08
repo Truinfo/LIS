@@ -18,12 +18,12 @@ import {
   updateAmenity,
 } from "./AmenitiesSlice";
 import { ImagebaseURL } from "../../../Security/helpers/axios";
-import { Snackbar } from "react-native-paper"; // Import Snackbar
+import { Snackbar } from "react-native-paper";
 
 const EditAmenity = () => {
   const dispatch = useDispatch();
   const route = useRoute();
-  const { id } = route.params; // Get id from route params
+  const { id } = route.params;
   const navigation = useNavigation();
   const amenity = useSelector((state) => state.adminAmenities.amenities);
   const successMessage = useSelector(
@@ -73,24 +73,24 @@ const EditAmenity = () => {
       });
 
       const imagePreviews = amenity.image
-        ? `${ImagebaseURL}${amenity.image}`:null
+        ? `${ImagebaseURL}${amenity.image}` : null
       setPreviewImages(imagePreviews);
     }
   }, [amenity]);
 
   const pickImage = async () => {
-    let result = await  ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
     });
 
     if (!result.canceled) {
-      setPreviewImages(result.assets[0].uri); // Store the URI for use in the image upload
-      setNewFilesSelected(result.assets[0]); // Store the asset for form submission
+      setPreviewImages(result.assets[0].uri);
+      setNewFilesSelected(result.assets[0]);
     }
-};
+  };
 
 
   const handleChange = (name, value) => {
@@ -100,42 +100,79 @@ const EditAmenity = () => {
     }));
   };
 
-  const handleSubmit = () => {
-    const data = new FormData();
-    Object.keys(formData).forEach((key) => {
-      if (key !== "image") {
-        data.append(key, formData[key]);
-      } else if (newFilesSelected && formData[key]) {
-        if (formData[key].startsWith("http")) {
-          // Check if it is a valid URI
-          data.append("image", {
-            uri: formData[key],
-            name: `image_${id}.jpg`,
-            type: "image/jpeg",
-          });
-        } else {
-          console.error("Invalid image URI:", formData[key]);
-        }
-      }
-    });
+  const handleSubmit = async () => {
+    const formDataToSend = new FormData();
 
-    dispatch(updateAmenity({ id, formData: data }))
-      .then((response) => {
-        if (response.type === "amenities/updateAmenity/fulfilled") {
-          setSnackMessage(successMessage || "Updated successfully");
-          setSnackVisible(true); // Show the Snackbar
-          dispatch(getAmenityById(id));
-          navigation.goBack(); // Navigate back after successful update
-        }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-        setSnackMessage("Update failed. Please try again."); // Set error message
-        setSnackVisible(true); // Show Snackbar on error
+    // Correctly reference the state values
+    formDataToSend.append('societyId', formData.societyId);
+    formDataToSend.append('amenityName', formData.amenityName);
+    formDataToSend.append('capacity', formData.capacity);
+    formDataToSend.append('timings', formData.timings);
+    formDataToSend.append('location', formData.location);
+    formDataToSend.append('cost', formData.cost);
+    formDataToSend.append('status', formData.status);
+  
+    // Only append the image if it was changed
+    if (newFilesSelected) {
+      formDataToSend.append('image', {
+        uri: previewImages,
+        name: `image_${id}.jpg`,
+        type: 'image/jpeg',
       });
+    }
+
+    try {
+      const response = await dispatch(updateAmenity({ id, formData: formDataToSend }));
+      console.log(response)
+      if (response.type === "amenities/updateAmenity/fulfilled") {
+        setSnackMessage(successMessage || "Updated successfully");
+        setSnackVisible(true); // Show the Snackbar
+        dispatch(getAmenityById(id));
+        navigation.goBack(); // Navigate back after successful update
+      }
+    } catch (error) {
+      console.error("Error:", error.message);
+      setSnackMessage("Update failed. Please try again."); // Set error message
+      setSnackVisible(true); // Show Snackbar on error
+    }
   };
+
+  // const handleSubmit = () => {
+  //   const data = new FormData();
+  //   Object.keys(formData).forEach((key) => {
+  //     if (key !== "image") {
+  //       data.append(key, formData[key]);
+  //     } else if (newFilesSelected && formData[key]) {
+  //       if (formData[key].startsWith("http")) {
+  //         // Check if it is a valid URI
+  //         data.append("image", {
+  //           uri: formData[key],
+  //           name: `image_${id}.jpg`,
+  //           type: "image/jpeg",
+  //         });
+  //       } else {
+  //         console.error("Invalid image URI:", formData[key]);
+  //       }
+  //     }
+  //   });
+
+  //   dispatch(updateAmenity({ id, formData: data }))
+  //     .then((response) => {
+  //       if (response.type === "amenities/updateAmenity/fulfilled") {
+  //         setSnackMessage(successMessage || "Updated successfully");
+  //         setSnackVisible(true); // Show the Snackbar
+  //         dispatch(getAmenityById(id));
+  //         navigation.goBack(); // Navigate back after successful update
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error:", error);
+  //       setSnackMessage("Update failed. Please try again."); // Set error message
+  //       setSnackVisible(true); // Show Snackbar on error
+  //     });
+  // };
   const onDismissSnackBar = () => setSnackVisible(false); // Dismiss the Snackbar
-  console.log("amenity",amenity)
+
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
@@ -148,11 +185,10 @@ const EditAmenity = () => {
               style={styles.imagePreview}
             />
           ))} */}
-          {console.log("previewImages",previewImages)}
           <Image
-                source={{ uri: newFilesSelected ? newFilesSelected : previewImages }}
-              style={styles.imagePreview}
-            />
+            source={{ uri: newFilesSelected ? newFilesSelected : previewImages }}
+            style={styles.imagePreview}
+          />
         </View>
         <TouchableOpacity
           style={styles.uploadButton}

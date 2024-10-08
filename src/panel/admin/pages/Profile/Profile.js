@@ -11,9 +11,14 @@ import { ActivityIndicator } from 'react-native-paper';
 const Profile = () => {
     const dispatch = useDispatch();
     const navigation = useNavigation();
+<<<<<<< HEAD
     const resident = useSelector(state => state.profile.profile);
     const status = useSelector(state => state.profile.status);
     const loading = useSelector(state => state.profile.loading);
+=======
+    const resident = useSelector(state => state.profile.profile); 
+    const status = useSelector(state => state.profile.status); 
+>>>>>>> 1e2b802f81d7a8bbab4a10d9459950d05a6c52d6
     const city = useSelector(state => state.citiesState.currentCity || null);
 
     const [selectedBlock, setSelectedBlock] = useState('');

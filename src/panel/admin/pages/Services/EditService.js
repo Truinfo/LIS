@@ -48,7 +48,7 @@ const EditService = () => {
 
     useEffect(() => {
         if (profile) {
-            console.log('Fetched Profile:', profile); // Log the profile to check its structure
+            console.log('Fetched Profile:', profile);
             setUpdatedData({
                 name: profile.name || '',
                 phoneNumber: profile.phoneNumber || '',
@@ -104,14 +104,16 @@ const EditService = () => {
                 formData.append('pictures', fileToUpload);
             }
 
-            setLoading(true); // Start loading
+            setLoading(true);
             dispatch(updateServicePerson(formData))
                 .then((response) => {
                     if (response.type === 'staff/updateServicePerson/fulfilled') {
                         setSnackbarMessage(`${response.payload.message}`);
                         setSnackbarVisible(true);
-                        dispatch(fetchServicePersonById({ serviceType, userid }));
-                        navigation.navigate("Services")
+                        setTimeout(() => {
+                            dispatch(fetchServicePersonById({ serviceType, userid }));
+                            navigation.navigate("Services");
+                        }, 2000);
                     }
                 })
                 .catch((error) => {
@@ -119,7 +121,7 @@ const EditService = () => {
                     setSnackbarVisible(true);
                 })
                 .finally(() => {
-                    setLoading(false); // Stop loading
+                    setLoading(false);
                 });
         }
     };
@@ -151,31 +153,18 @@ const EditService = () => {
     const pickImage = async (launchFunction) => {
         let result = await launchFunction({
             mediaTypes: ImagePicker.MediaTypeOptions.All,
-            allowsEditing: true,
+            allowsEditing: false,
             aspect: [4, 3],
             quality: 1,
         });
 
         if (!result.canceled) {
-            setNewPicturesFile(result.assets[0].uri); // Store the URI for use in the image upload
-            setNewPicturesFile(result.assets[0]); // Store the asset for form submission
+            setNewPicturesFile(result.assets[0].uri);
+            setNewPicturesFile(result.assets[0]);
         }
     };
 
-    const handleDeleteListItem = (itemIndex) => {
-        if (serviceType && userid) {
-            const userIdToDelete = updatedData.list[itemIndex].userId;
-            dispatch(deleteUserService({ societyId, userid, userIdToDelete, serviceType }))
-                .then(() => {
-                    Alert.alert("Deleted", "Item deleted successfully");
-                    dispatch(fetchServicePersonById({ serviceType, userid }));
-                })
-                .catch((error) => {
-                    console.error('Deletion failed:', error);
-                });
-        }
-    };
-    console.log(userid)
+
     return (
         <ScrollView style={{ flex: 1, padding: 20, position: "relative" }}>
             <View>
@@ -192,11 +181,7 @@ const EditService = () => {
                                 <Ionicons name="camera" size={20} color="white" />
                             </TouchableOpacity>
                         </View>
-                        {/* <Avatar.Image
-                            source={{ uri: newPicturesFile ? URL.createObjectURL(newPicturesFile) : `${ImagebaseURL}${updatedData.pictures}` }}
-                            size={100}
-                            style={{ borderRadius: 50, marginBottom: 20, alignSelf: "center" }}
-                        /> */}
+
                         <TextInput
                             label="Service Type"
                             mode="outlined"
@@ -287,9 +272,7 @@ const EditService = () => {
                         <Button mode="contained" onPress={handleUpdate} theme={{ colors: { primary: "#7d0431" } }} style={{ marginTop: 100 }}>
                             Update
                         </Button>
-                        {loading && ( // Show activity indicator while loading
-                            <ActivityIndicator size="large" color="#7d0431" style={styles.loadingIndicator} />
-                        )}
+
                     </View>
                 )}
             </View>
@@ -384,10 +367,12 @@ const styles = StyleSheet.create({
     avatarContainer: {
         alignSelf: 'center',
         marginBottom: 20,
-        position: 'relative', // Needed for positioning camera button
+        position: 'relative',
+
     },
     avatar: {
         alignSelf: 'center',
+        backgroundColor: "#ccc"
     },
     cameraButton: {
         position: 'absolute',

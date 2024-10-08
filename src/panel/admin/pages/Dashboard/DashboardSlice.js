@@ -32,11 +32,21 @@ export const fetchGatekeepers = createAsyncThunk(
         return response.data.sequrity;
     }
 );
+export const fetchNotifications = createAsyncThunk(
+    'admin/fetchNotification',
+    async () => {
+        const societyId = await fetchSocietyId();
+        const response = await axiosInstance.get(`/getNotificationsBySocietyId/${societyId}`);
+        console.log(response.data, "hello")
+        return response.data.notifyData;
+    }
+);
 const DashboardSlice = createSlice({
     name: 'dashboard',
     initialState: {
         dashboard: [],
         profile: [],
+        Notification: [],
         status: 'idle',
         error: null,
         sequrity: [],
@@ -68,6 +78,17 @@ const DashboardSlice = createSlice({
                 state.sequrity = action.payload;
             })
             .addCase(fetchGatekeepers.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.error.message;
+            })
+            .addCase(fetchNotifications.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(fetchNotifications.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                state.Notification = action.payload;
+            })
+            .addCase(fetchNotifications.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.error.message;
             })

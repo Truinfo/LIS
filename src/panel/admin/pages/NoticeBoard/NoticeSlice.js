@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../../Security/helpers/axios';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from 'axios';
 export const fetchnotices = createAsyncThunk(
     'notice/fetchnotice',
     async () => {
@@ -34,7 +35,9 @@ export const getNoticeById = createAsyncThunk(
 export const createNotice = createAsyncThunk(
     'notice/createNotice',
     async (formData) => {
-        const response = await axiosInstance.post('/createNotice', formData);
+        const response = await axiosInstance.post('/createNotice', formData, {
+            headers: { 'Content-Type': 'application/json' }
+        });
         return response.data;
     }
 );
@@ -42,7 +45,10 @@ export const createNotice = createAsyncThunk(
 export const editNotice = createAsyncThunk(
     'notice/editNotice',
     async ({ noticeId, formData }) => {
-        const response = await axiosInstance.put(`/editNotice/${noticeId}`, formData);
+        const response = await axiosInstance.put(`/editNotice/${noticeId}`, formData, {
+            headers: { 'Content-Type': 'application/json' }
+        }
+        );
         return response.data;
     }
 );

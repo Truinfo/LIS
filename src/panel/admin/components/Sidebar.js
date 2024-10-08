@@ -1,7 +1,7 @@
-import  React, { useState } from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import Icon from 'react-native-vector-icons/FontAwesome'; 
+import Icon from 'react-native-vector-icons/FontAwesome';
 import Dashboard from '../pages/Dashboard/Dashboard';
 import Advertisements from '../pages/Advertisements/Advertisements';
 import ResidentialUnit from '../pages/ResidentialUnit/ResidentialUnit';
@@ -66,12 +66,13 @@ export default function Sidebar() {
         screenOptions={{
           headerRight: () => (
             <View style={{ flexDirection: 'row', alignItems: "center", gap: 15, marginRight: 10 }}>
-              <View>
+              <TouchableOpacity onPress={(() => navigation.navigate("Admin Notifications"))}>
+
                 <Icon name="bell-o" size={25} color="#7d0431" />
                 <View style={styles.badge}>
                   <Text style={styles.badgeText}>3</Text>
                 </View>
-              </View>
+              </TouchableOpacity>
               <TouchableOpacity onPress={toggleDropdown}>
                 <Icon name="user-circle-o" size={25} color="#7d0431" />
               </TouchableOpacity>
@@ -80,11 +81,11 @@ export default function Sidebar() {
                   <TouchableOpacity onPress={handleProfile} style={styles.menuItem}>
                     <Text style={styles.menuText}>Profile</Text>
                   </TouchableOpacity>
-                  <View style={{borderBottomWidth:1,borderColor:"#ccc"}}/>
+                  <View style={{ borderBottomWidth: 1, borderColor: "#ccc" }} />
                   <TouchableOpacity onPress={handlePassword} style={styles.menuItem}>
                     <Text style={styles.menuText}>Reset Password</Text>
                   </TouchableOpacity>
-                  <View style={{borderBottomWidth:1,borderColor:"#ccc"}}/>
+                  <View style={{ borderBottomWidth: 1, borderColor: "#ccc" }} />
 
                   <TouchableOpacity onPress={handleLogout} style={styles.menuItem}>
                     <Text style={styles.menuText}>Logout</Text>
@@ -93,10 +94,10 @@ export default function Sidebar() {
               )}
             </View>
           ),
-          drawerActiveTintColor: '#7d0431',  
+          drawerActiveTintColor: '#7d0431',
           drawerInactiveTintColor: 'gray',
         }}
-        
+
       >
         <Drawer.Screen name="Dashboard" component={Dashboard} />
         <Drawer.Screen name="Advertisements" component={Advertisements} />

@@ -62,7 +62,8 @@ const EditNotice = () => {
             const { ...formData } = formState;
             dispatch(editNotice({ noticeId, formData }))
                 .then((response) => {
-                    if (response.meta.requestStatus === 'fulfilled') {
+                    console.log(response)
+                    if (response.type === 'notice/editNotice/fulfilled') {
                         setFormState({
                             sender: '',
                             subject: '',

@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, {  useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Alert } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -15,7 +15,6 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 const Dashboard = () => {
     const dispatch = useDispatch();
     const navigation = useNavigation();
-    // Complaints
     const fetchedComplaints = useSelector(state => state.adminComplaints.complaints || []);
     const Security = useSelector(state => state.DashBoard.sequrity || []);
     const complaintsCount = fetchedComplaints.length;
@@ -92,10 +91,9 @@ const Dashboard = () => {
     };
     const unverifiedResidents = users?.filter((eachRes) => eachRes.isVerified === false);
     const activeSecurityPersonnel = Security && Security?.filter((security) => {
-        // Get today's date to compare with attendance
         const today = new Date();
-        const startOfDay = new Date(today.setHours(0, 0, 0, 0)); // Start of the day
-        const endOfDay = new Date(today.setHours(23, 59, 59, 999)); // End of the day
+        const startOfDay = new Date(today.setHours(0, 0, 0, 0));
+        const endOfDay = new Date(today.setHours(23, 59, 59, 999));
         return security.attendance.some(attendance => {
             // Check if the attendance date is today
             const attendanceDate = new Date(attendance.date);
@@ -107,7 +105,6 @@ const Dashboard = () => {
             );
         });
     });
-    // Map to extract names, mobile numbers, and check-in times
     const activeGatekeepers = activeSecurityPersonnel.map(security => {
         const activeAttendance = security?.attendance.find(attendance => {
             const attendanceDate = new Date(attendance.date);
@@ -118,17 +115,13 @@ const Dashboard = () => {
         });
         return {
             name: security.name,
-            mobileNumber: security.phoneNumber, // Assuming phoneNumber is the mobile number
-            checkInTime: activeAttendance ? activeAttendance.checkInDateTime : null // Get check-in time
+            mobileNumber: security.phoneNumber,
+            checkInTime: activeAttendance ? activeAttendance.checkInDateTime : null
         };
     });
     const { monthAndYear, paymentDetails } = maintainances;
-    // Filter payment details where status is 'Paid'
     const paidPayments = paymentDetails?.filter(payment => payment.status === 'Paid');
 
-    // if (daysRemaining !== null && daysRemaining <= 0) {
-    //     navigation.navigate("Renewal Plan")
-    // }
     if (status === "loading") {
         return (
             <View style={styles.loadingContainer}>
@@ -136,7 +129,7 @@ const Dashboard = () => {
             </View>
         );
     }
- 
+
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
@@ -417,7 +410,7 @@ const styles = StyleSheet.create({
         padding: 16,
         backgroundColor: '#fff',
         borderRadius: 8,
-        elevation: 4, // Shadow for Android
+        elevation: 4,
     },
     reminderText: {
         fontSize: 16,
@@ -443,7 +436,7 @@ const styles = StyleSheet.create({
         width: 150,
     },
     fullWidthCard: {
-        width: '100%', // Full width for the card
+        width: '100%',
     },
     attendanceName: {
         fontSize: 16,
@@ -467,12 +460,12 @@ const styles = StyleSheet.create({
         elevation: 1,
     },
     cardContent: {
-        flexDirection: 'row', // Row direction to align text and icon horizontally
+        flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
     },
     detailsContainer: {
-        flex: 1, // This will take up most of the space on the left
+        flex: 1,
     },
     attendanceName: {
         fontSize: 16,
@@ -483,8 +476,8 @@ const styles = StyleSheet.create({
         color: '#555',
     },
     iconContainer: {
-        width: 30, // Fixed width for the icon container
-        height: 30, // Fixed height for the icon container
+        width: 30,
+        height: 30,
         justifyContent: 'center',
         alignItems: 'center',
     },

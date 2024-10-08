@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import renewal from "../../../../assets/Admin/Imgaes/renewal1.png"; 
+import renewal from "../../../../assets/Admin/Imgaes/renewal2.png"; 
 const PlanRenewalScreen = () => {
     return (
         <View style={styles.container}>

@@ -129,6 +129,7 @@ const styles = StyleSheet.create({
     height: 250,
     borderRadius: 10,
     alignSelf: 'center',
+    marginBottom: 30,
   },
   profileName: {
     fontSize: 23,
@@ -138,6 +139,7 @@ const styles = StyleSheet.create({
   },
   attendanceContainer: {
     marginTop: 20,
+    marginBottom: 30,
   },
   attendanceTitle: {
     fontSize: 20,
@@ -160,7 +162,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     padding: 10,
     textAlign: 'center',
-    fontWeight: 'bold',
+    fontWeight: '600',
   },
   tableRow: {
     flexDirection: 'row',

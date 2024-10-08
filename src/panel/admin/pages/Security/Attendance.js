@@ -142,7 +142,7 @@ const AttendanceForm = () => {
           <Text style={styles.bold}>Email:</Text>
           <Text style={styles.profileDetail}>{data.email}</Text>
         </View>
-      </View>
+      </View> 
 
       {sequrityAttendance ? (
         <View style={styles.record}>

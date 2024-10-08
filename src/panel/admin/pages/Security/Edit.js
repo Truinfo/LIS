@@ -227,7 +227,7 @@ const handleSubmit = async () => {
             onChangeText={(value) => handleChange('email', value)}
             theme={{ colors: { primary: "#7d0431" } }}
             style={styles.textInput}
-          />
+          /> 
           <TextInput
             mode="outlined"
             label='Mobile Number'

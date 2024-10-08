@@ -160,10 +160,10 @@ const styles = StyleSheet.create({
   tableHeaderText: {
     flex: 1,
     color: '#fff',
-    padding: 10,
+    padding: 10, 
     textAlign: 'center',
     fontWeight: '600',
-  },
+  }, 
   tableRow: {
     flexDirection: 'row',
     borderBottomWidth: 1,

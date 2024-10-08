@@ -76,7 +76,7 @@ export const updateSequrity = createAsyncThunk(
       return rejectWithValue(error.response ? error.response.data : error.message)
     }
   }
-);
+); 
 
 export const checkAttendanceStatus = createAsyncThunk(
   'sequrity/checkAttendanceStatus',
@@ -87,7 +87,7 @@ export const checkAttendanceStatus = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.response ? error.response.data : error.message)
     }
-  }
+  } 
 );
 
 export const sequrityCheckIn = createAsyncThunk(
@@ -106,7 +106,7 @@ export const sequrityCheckIn = createAsyncThunk(
       return rejectWithValue(error.response ? error.response.data : error.message)
     }
   }
-);
+); 
 
 // router.put('/sequrity/addCheckOut/:sequrityId/:attendanceId', addCheckOut);
 export const sequrityCheckOut = createAsyncThunk(

@@ -36,11 +36,11 @@ export const fetchNotifications = createAsyncThunk(
     'admin/fetchNotification',
     async () => {
         const societyId = await fetchSocietyId();
-        const response = await axiosInstance.get(`/getNotificationsBySocietyId/${societyId}`);
-        console.log(response.data, "hello")
-        return response.data.notifyData;
+        const response = await axios.get(`http://192.168.29.151:2000/api/adminNotificationsBy/${societyId}`);
+        return response.data.notifications;
     }
 );
+
 const DashboardSlice = createSlice({
     name: 'dashboard',
     initialState: {

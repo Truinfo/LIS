@@ -5,7 +5,9 @@ export const sendVerificationEmail = createAsyncThunk(
   'emailVerification/sendVerificationEmail',
   async (email, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.post(`/user/sendVerificationEmail`, { email });
+      const response = await axiosInstance.post(`/user/sendVerificationEmail`, { email },{
+        headers: { 'Content-Type': 'application/json'}
+      });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);

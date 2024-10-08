@@ -7,39 +7,43 @@ import {
     ScrollView,
     Dimensions,
 } from 'react-native';
-import {
-    ActivityIndicator,
-    Avatar,
-    Chip,
-    Divider,
-} from 'react-native-paper';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { ActivityIndicator, Divider } from 'react-native-paper';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
-import { fetchNotifications } from './DashboardSlice';
+import { fetchNotifications, markAllAsRead } from './DashboardSlice'; // Import the markAllAsRead action
 import { useDispatch, useSelector } from 'react-redux';
 
-const NotificationComponent = () => {
+const AdminNotifications = () => {
     const dispatch = useDispatch();
+
+    // Fetch notifications when component is focused
     useFocusEffect(
         React.useCallback(() => {
-            dispatch(fetchNotifications())
-        }, [])
+            dispatch(fetchNotifications());
+        }, [dispatch])
     );
 
     const notifications = useSelector(state => state.DashBoard.Notification || []);
     const status = useSelector(state => state.DashBoard.status || "");
 
+    // Keep track of all read state
     const [isAllRead, setIsAllRead] = useState(false);
 
-    // Count of unread notifications
     const unreadCount = notifications?.filter(
         (notif) => !notif.isRead && notif.isVisible
     ).length;
 
-    // Handle individual notification dismissal
+    // Handle individual notification dismissal (for future enhancement)
     const dismissNotification = (id) => {
-        // Add logic to mark notification as dismissed if needed
+        // Add logic to mark individual notification as read
     };
+
+    // Handle mark all notifications as read
+    const handleMarkAllAsRead = () => {
+        setIsAllRead(true);
+        dispatch(markAllAsRead()); // Dispatch mark all as read action
+    };
+
     if (status === "loading") {
         return (
             <View style={styles.loadingContainer}>
@@ -47,85 +51,50 @@ const NotificationComponent = () => {
             </View>
         );
     }
+    const data = [...notifications].reverse()
     return (
         <View style={styles.container}>
             {/* Notifications List */}
             <ScrollView style={styles.notificationsList}>
-                {notifications.map(
-                    (notif) => (
-                        <View key={notif.id} style={styles.notificationCard}>
-                            <View style={styles.notificationItem}>
-                                <View style={styles.notificationText}>
-                                    <Text style={styles.notificationName}>
-                                        {notif.Category}
-                                    </Text>
-                                    <Text style={styles.notificationMessage}>
-                                        {notif.message}
-                                    </Text>
-                                    <Text style={styles.notificationTime}>
-                                        {new Date(notif.createdAt).toLocaleDateString()}
-                                        {new Date(notif.createdAt).toLocaleTimeString()}
-                                    </Text>
-                                </View>
-                                <TouchableOpacity
-                                    onPress={() => dismissNotification(notif.id)}
-                                    style={styles.closeButton}
-                                >
-                                    <MaterialCommunityIcons
-                                        name="close"
-                                        size={20}
-                                        color="#000"
-                                    />
-                                </TouchableOpacity>
-                                {!notif.isRead && (
-                                    <MaterialCommunityIcons
-                                        name="circle"
-                                        size={10}
-                                        color="#16a34a"
-                                        style={styles.unreadDot}
-                                    />
-                                )}
+                {data.map((notif) => (
+                    <View key={notif._id} style={styles.notificationCard}>
+                        <View style={styles.notificationItem}>
+                            <View style={styles.notificationText}>
+                                <Text style={styles.notificationName}>
+                                    {notif.title}
+                                </Text>
+                                <Text style={styles.notificationMessage}>
+                                    {notif.message}
+                                </Text>
+                                <Text style={styles.notificationTime}>
+                                    {new Date(notif.createdAt).toLocaleDateString()} {new Date(notif.createdAt).toLocaleTimeString()}
+                                </Text>
                             </View>
-                            <Divider />
-                        </View>
-                    )
-                )}
-            </ScrollView>
+                            <TouchableOpacity
+                                onPress={() => dismissNotification(notif.id)}
+                                style={styles.closeButton}
+                            >
+                                <MaterialCommunityIcons
+                                    name="close"
+                                    size={20}
+                                    color="#000"
+                                />
+                            </TouchableOpacity>
 
-            {/* Mark All as Read */}
-            <TouchableOpacity
-                style={styles.markAllButton}
-                onPress={() => {
-                    setIsAllRead(!isAllRead);
-                    // Mark all notifications as read logic
-                }}
-            >
-                <Text style={styles.markAllText}>
-                    {isAllRead ? 'Mark All as Unread' : 'Mark All as Read'}
-                </Text>
-            </TouchableOpacity>
+                        </View>
+                        <Divider />
+                    </View>
+                ))}
+            </ScrollView>
         </View>
     );
 };
 
-export default NotificationComponent;
+export default AdminNotifications;
 
 const styles = StyleSheet.create({
     container: {
         padding: 10,
-    },
-    iconButton: {
-        padding: 10,
-        position: 'relative',
-    },
-    badge: {
-        backgroundColor: '#16a34a',
-        width: 10,
-        height: 10,
-        borderRadius: 5,
-        position: 'absolute',
-        top: 5,
-        right: 5,
     },
     notificationsList: {
         marginTop: 10,
@@ -177,6 +146,7 @@ const styles = StyleSheet.create({
     markAllButton: {
         padding: 10,
         alignItems: 'center',
+        marginTop: 10,
     },
     markAllText: {
         fontSize: 16,

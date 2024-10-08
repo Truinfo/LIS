@@ -341,7 +341,9 @@ export default function App() {
             <Stack.Screen name='Residential Approvals' component={ResindetialRequests} />
             <Stack.Screen name='Add Committee Member' component={AddMember} />
             <Stack.Screen name='Edit Committee Member' component={EditMember} />
-            <Stack.Screen name='Renewal Plan' component={PlanRenewalScreen} />
+            <Stack.Screen name='Renewal Plan' component={PlanRenewalScreen} options={{
+              headerShown: false,
+            }}/>
             <Stack.Screen name='Admin Notifications' component={AdminNotifications} />
           </Stack.Navigator>
         </SafeAreaView>

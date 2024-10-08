@@ -153,7 +153,7 @@ const CreateUser = () => {
         const societyName = society?.societyName;
 
         try {
-            const resultAction = await dispatch(sendVerificationEmail(email)).unwrap();
+            const resultAction = await dispatch(sendVerificationEmail(email.toLowerCase())).unwrap();
             console.log(resultAction)
             navigation.navigate("Verification", {
                 name,
@@ -350,7 +350,7 @@ const CreateUser = () => {
                                     label="Email"
                                     value={email}
                                     onChangeText={(text) => {
-                                        setEmail(text.toLowerCase());
+                                        setEmail(text);
                                         setEmailError("");
                                     }}
                                     error={!!emailError}

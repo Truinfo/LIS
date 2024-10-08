@@ -52,7 +52,7 @@ const Verification = ({ route }) => {
   const handleContinue = async () => {
     try {
       // Dispatch OTP verification
-      const resultAction = await dispatch(verifyOTP({ email, otp: verificationCode.join('') })).unwrap();
+      const resultAction = await dispatch(verifyOTP({ email: email.toLowerCase(), otp: verificationCode.join('') })).unwrap();
 
       if (resultAction.success) {
         // Reset verification and fetch user profile
@@ -60,7 +60,7 @@ const Verification = ({ route }) => {
 
         const userProfileId = resultAction.userProfile?._id;
         if (userProfileId) {
-          const userData = { name, email, mobileNumber, password, society, societyId, block, flat, userType };
+          const userData = { name, email: email.toLowerCase(), mobileNumber, password, society, societyId, block, flat, userType };
           await dispatch(fetchUserProfile({ id: userProfileId, data: userData })).unwrap();
           Toast.show({
             type: 'success',

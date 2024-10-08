@@ -29,7 +29,6 @@ const Profile = () => {
         if (societyId) {
             dispatch(fetchResidentProfile(societyId));
             dispatch(fetchCommityMembers(societyId));
-
         }
     }, [dispatch, societyId]);
     useEffect(() => {

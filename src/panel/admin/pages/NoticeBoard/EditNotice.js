@@ -91,12 +91,10 @@ const EditNotice = () => {
             setShowDatePicker(false);
             return;
         }
-
-        // Ensure selectedDate is valid
         if (selectedDate) {
             const currentDate = selectedDate || formState.date;
             setShowDatePicker(false);
-            setFormState({ ...formState, date: currentDate }); // Update the selected date in the form state
+            setFormState({ ...formState, date: currentDate }); 
         }
     };
 
@@ -161,7 +159,7 @@ const EditNotice = () => {
                     errorMessage={errors.description}
                     multiline
                 />
-                <Button title="Update" onPress={handleSubmit} color="#630000" />
+                <Button title="Update" onPress={handleSubmit} color="#7d0431" />
             </View>
             {/* Success Dialog */}
             <Modal
@@ -198,10 +196,10 @@ const styles = StyleSheet.create({
         flexGrow: 1,
     },
     input: {
-        borderBottomWidth: 1,
-        borderBottomColor: '#630000',
+        borderWidth: 1,
+        borderColor: '#7d0431',
         paddingVertical: 10,
-        marginBottom: 20,
+        marginBottom: 20,padding:10
     },
     dialogContainer: {
         flex: 1,

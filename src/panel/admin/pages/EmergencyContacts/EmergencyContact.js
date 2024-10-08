@@ -312,7 +312,7 @@ const CommitteeMembersTab = () => {
                             ? { uri: `${ImagebaseURL}${item.pictures}` }
                             : { uri: "https://thumbs.dreamstime.com/b/default-avatar-profile-trendy-style-social-media-user-icon-187599373.jpg" } // Fallback to a local image
                     }
-                    style={styles.avatar}
+                    style={{backgroundColor:"#ddd"}}
                 />
                 <View style={styles.column}>
                     <Text style={{ fontSize: 16, fontWeight: 600 }}>{item.name}</Text>

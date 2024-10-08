@@ -118,6 +118,8 @@ import AddMaintenanceBill from './src/panel/admin/pages/Maintenance/AddMaintenan
 import ResindetialRequests from './src/panel/admin/pages/Dashboard/ResindetialRequests';
 import AddMember from './src/panel/admin/pages/EmergencyContacts/AddMember';
 import EditMember from './src/panel/admin/pages/EmergencyContacts/EditMember';
+import PlanRenewalScreen from './src/panel/admin/pages/Dashboard/RenewalPlan';
+import AdminNotifications from './src/panel/admin/pages/Dashboard/Notification';
 
 const Stack = createNativeStackNavigator();
 
@@ -170,6 +172,8 @@ export default function App() {
   if (isLoading) {
     return null;
   }
+
+  
   return (
     <Provider store={store}>
       <NavigationContainer>
@@ -337,6 +341,8 @@ export default function App() {
             <Stack.Screen name='Residential Approvals' component={ResindetialRequests} />
             <Stack.Screen name='Add Committee Member' component={AddMember} />
             <Stack.Screen name='Edit Committee Member' component={EditMember} />
+            <Stack.Screen name='Renewal Plan' component={PlanRenewalScreen} />
+            <Stack.Screen name='Admin Notifications' component={AdminNotifications} />
           </Stack.Navigator>
         </SafeAreaView>
       </NavigationContainer>

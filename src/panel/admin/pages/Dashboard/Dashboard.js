@@ -27,6 +27,9 @@ const Dashboard = () => {
     const flatsCount = fetchedProfile?.blocks?.reduce((total, block) => total + block.flats.length, 0);
     const [snackbarVisible, setSnackbarVisible] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState("");
+    const expiryDate = fetchedProfile?.expiryDate ? new Date(fetchedProfile?.expiryDate) : null;
+    const currentDate = new Date();
+    const daysRemaining = expiryDate ? Math.ceil((expiryDate - currentDate) / (1000 * 60 * 60 * 24)) : null;
     useFocusEffect(
         React.useCallback(() => {
             const date = new Date()
@@ -39,12 +42,11 @@ const Dashboard = () => {
             dispatch(getByMonthAndYear(`${year}-${month}`));
         }, [dispatch])
     );
+
     const handleNavigation = (route) => {
         navigation.navigate(route);
     };
-    const expiryDate = fetchedProfile?.expiryDate ? new Date(fetchedProfile?.expiryDate) : null;
-    const currentDate = new Date();
-    const daysRemaining = expiryDate ? Math.ceil((expiryDate - currentDate) / (1000 * 60 * 60 * 24)) : null;
+
     const maintainances = useSelector((state) => state.adminMaintainance.maintainances) || [];
     const handleApprove = (id) => {
         if (id) {
@@ -124,7 +126,9 @@ const Dashboard = () => {
     // Filter payment details where status is 'Paid'
     const paidPayments = paymentDetails?.filter(payment => payment.status === 'Paid');
 
-
+    // if (daysRemaining !== null && daysRemaining <= 0) {
+    //     navigation.navigate("Renewal Plan")
+    // }
     if (status === "loading") {
         return (
             <View style={styles.loadingContainer}>
@@ -132,7 +136,7 @@ const Dashboard = () => {
             </View>
         );
     }
-
+ 
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
@@ -142,22 +146,6 @@ const Dashboard = () => {
                 <DashboardCard title="Complaints" count={complaintsCount} onPress={() => handleNavigation('Complaints')} />
             </View>
             <View>
-                {daysRemaining !== null && daysRemaining <= 0 && (
-                    <Card style={styles.reminderCard}>
-                        <Card.Content>
-                            <Text style={styles.reminderText}>
-                                Your plan has expired. Please renewal your plan to avoid interruption.
-                            </Text>
-                            <Button
-                                mode="contained"
-                                onPress={() => handleNavigation('RenewalPage')}
-                                style={styles.renewButton}
-                            >
-                                Renew Now
-                            </Button>
-                        </Card.Content>
-                    </Card>
-                )}
                 {daysRemaining !== null && daysRemaining > 0 && daysRemaining <= 10 && (
                     <Card style={styles.reminderCard}>
                         <Card.Content>

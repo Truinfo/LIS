@@ -32,7 +32,9 @@ export const createComplaint = createAsyncThunk(
   'complaints/createComplaint',
   async (complaintData, thunkAPI) => {
     try {
-      const response = await axiosInstance.post('/createComplaint', complaintData);
+      const response = await axiosInstance.post('/createComplaint', complaintData,{
+        headers: { 'Content-Type': 'application/json'}
+      });
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);

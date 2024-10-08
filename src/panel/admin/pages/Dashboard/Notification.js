@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
     View,
     Text,
@@ -10,13 +10,14 @@ import {
 import { ActivityIndicator, Divider } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
-import { fetchNotifications, markAllAsRead } from './DashboardSlice'; // Import the markAllAsRead action
+import { DeleteNotifications, fetchNotifications } from './DashboardSlice'; // Import actions
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigation } from '@react-navigation/native'; // Import useNavigation
 
 const AdminNotifications = () => {
     const dispatch = useDispatch();
+    const navigation = useNavigation(); // Initialize useNavigation hook
 
-    // Fetch notifications when component is focused
     useFocusEffect(
         React.useCallback(() => {
             dispatch(fetchNotifications());
@@ -26,24 +27,6 @@ const AdminNotifications = () => {
     const notifications = useSelector(state => state.DashBoard.Notification || []);
     const status = useSelector(state => state.DashBoard.status || "");
 
-    // Keep track of all read state
-    const [isAllRead, setIsAllRead] = useState(false);
-
-    const unreadCount = notifications?.filter(
-        (notif) => !notif.isRead && notif.isVisible
-    ).length;
-
-    // Handle individual notification dismissal (for future enhancement)
-    const dismissNotification = (id) => {
-        // Add logic to mark individual notification as read
-    };
-
-    // Handle mark all notifications as read
-    const handleMarkAllAsRead = () => {
-        setIsAllRead(true);
-        dispatch(markAllAsRead()); // Dispatch mark all as read action
-    };
-
     if (status === "loading") {
         return (
             <View style={styles.loadingContainer}>
@@ -51,37 +34,77 @@ const AdminNotifications = () => {
             </View>
         );
     }
-    const data = [...notifications].reverse()
+
+    const dismissNotification = (id) => {
+        console.log(id);
+        dispatch(DeleteNotifications(id)).then((response) => {
+            if (response.type === "admin/deleteNotification/fulfilled") {
+                dispatch(fetchNotifications());
+            } else {
+                dispatch(fetchNotifications());
+            }
+        });
+    };
+    const handleNotificationPress = (notif) => {
+        // Navigate based on notification category
+        switch (notif.category) {
+            case 'event_registration':
+                navigation.navigate('Events');
+                break;
+            case 'complaint':
+                navigation.navigate('Complaints');
+                break;
+            case 'resident_approval_request':
+                navigation.navigate('Residential Approvals');
+                break;
+            case 'Adds_notification':
+                navigation.navigate('Advertisements');
+                break;
+            case 'amenietyBooking':
+                navigation.navigate('Bookings');
+                break;
+            case 'maintenance_payment':
+                navigation.navigate('Maintenance Bills');
+                break;
+            // Add more cases as necessary
+            default:
+                console.warn('Unknown category:');
+        }
+    };
+
     return (
         <View style={styles.container}>
             {/* Notifications List */}
             <ScrollView style={styles.notificationsList}>
-                {data.map((notif) => (
+                {notifications.map((notif) => (
                     <View key={notif._id} style={styles.notificationCard}>
-                        <View style={styles.notificationItem}>
-                            <View style={styles.notificationText}>
-                                <Text style={styles.notificationName}>
-                                    {notif.title}
-                                </Text>
-                                <Text style={styles.notificationMessage}>
-                                    {notif.message}
-                                </Text>
-                                <Text style={styles.notificationTime}>
-                                    {new Date(notif.createdAt).toLocaleDateString()} {new Date(notif.createdAt).toLocaleTimeString()}
-                                </Text>
-                            </View>
-                            <TouchableOpacity
-                                onPress={() => dismissNotification(notif.id)}
-                                style={styles.closeButton}
-                            >
-                                <MaterialCommunityIcons
-                                    name="close"
-                                    size={20}
-                                    color="#000"
-                                />
-                            </TouchableOpacity>
+                        <TouchableOpacity onPress={() => handleNotificationPress(notif)}>
+                            <View style={styles.notificationItem}>
+                                <View style={styles.notificationText}>
+                                    <Text style={styles.notificationName}>
+                                        {notif.title}
+                                    </Text>
+                                    <Text style={styles.notificationMessage}>
+                                        {notif.message}
+                                    </Text>
+                                    <Text style={styles.notificationTime}>
+                                        {new Date(notif.createdAt).toLocaleDateString()} {new Date(notif.createdAt).toLocaleTimeString()}
+                                    </Text>
+                                </View>
 
-                        </View>
+                                {/* Close/Dismiss Button */}
+                                <TouchableOpacity
+                                    onPress={() => dismissNotification(notif._id)}
+                                    style={styles.closeButton}
+                                >
+                                    <MaterialCommunityIcons
+                                        name="close"
+                                        size={24}
+                                        color="#000"
+                                    />
+                                </TouchableOpacity>
+                            </View>
+                        </TouchableOpacity>
                         <Divider />
                     </View>
                 ))}
@@ -137,20 +160,6 @@ const styles = StyleSheet.create({
     },
     closeButton: {
         padding: 5,
-    },
-    unreadDot: {
-        position: 'absolute',
-        bottom: 10,
-        right: 10,
-    },
-    markAllButton: {
-        padding: 10,
-        alignItems: 'center',
-        marginTop: 10,
-    },
-    markAllText: {
-        fontSize: 16,
-        color: '#007AFF',
     },
     loadingContainer: {
         flex: 1,

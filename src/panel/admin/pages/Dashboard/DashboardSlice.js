@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../../Security/helpers/axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
 const fetchSocietyId = async () => {
     const storedAdmin = await AsyncStorage.getItem('societyAdmin');
     const societyAdmin = JSON.parse(storedAdmin) || {};
@@ -23,7 +22,6 @@ export const DeleteRequest = createAsyncThunk(
         return response.data;
     }
 );
-
 export const fetchGatekeepers = createAsyncThunk(
     'sequrity/fetchGatekeepers',
     async () => {
@@ -36,11 +34,18 @@ export const fetchNotifications = createAsyncThunk(
     'admin/fetchNotification',
     async () => {
         const societyId = await fetchSocietyId();
-        const response = await axios.get(`http://192.168.29.151:2000/api/adminNotificationsBy/${societyId}`);
+        const response = await axiosInstance.get(`/adminNotificationsBy/${societyId}`);
         return response.data.notifications;
     }
 );
-
+export const DeleteNotifications = createAsyncThunk(
+    'admin/deleteNotification',
+    async (id) => {
+        const response = await axiosInstance.delete(`/deleteNotifications/${id}`);
+        // Check the response to ensure it contains the necessary data
+        return response.data; // Assuming the server returns the deleted notification or success message
+    }
+);
 const DashboardSlice = createSlice({
     name: 'dashboard',
     initialState: {
@@ -92,6 +97,20 @@ const DashboardSlice = createSlice({
                 state.status = 'failed';
                 state.error = action.error.message;
             })
+            .addCase(DeleteNotifications.pending, (state) => {
+                state.status = 'loading';
+                state.error = null; // Clear any existing error
+            })
+            .addCase(DeleteNotifications.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                // Optionally handle success message or any state update
+                // For example, you can filter out the deleted notification from the state:
+                state.Notification = state.Notification.filter(notif => notif._id !== action.payload.id);
+            })
+            .addCase(DeleteNotifications.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.error.message; // Store error message
+            });
     },
 });
 

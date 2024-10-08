@@ -55,21 +55,25 @@ const Waiting = ({ data, setActiveTab }) => {
     }).catch((error) => {
       console.error('Error:', error);
       setShowDialog(true);
-      setTimeout(() => setShowDialog(false),1000);
+      setTimeout(() => setShowDialog(false), 1000);
     });
   };
 
-  const handleDeny = (itemId) => {
-    const payload = {
+  const handleDeny = async (itemId) => {
+
+
+    await dispatch(denyEntry({
       societyId,
       visitorId: itemId,
-    };
-    dispatch(denyEntry(payload)).then(() => {
-      setShowDialog(true);
-      setTimeout(() => {
-        dispatch(fetchVisitors(societyId));
-        setShowDialog(false);
-      }, 2000);
+    })).then((result) => {
+      console.log(result)
+      if (result.type === "deny/denyEntry/fulfilled") {
+        setShowDialog(true);
+        setTimeout(() => {
+          dispatch(fetchVisitors(societyId));
+          setShowDialog(false);
+        }, 2000);
+      }
     }).catch((error) => {
       console.error('Error:', error);
       setShowDialog(true);
@@ -82,11 +86,11 @@ const Waiting = ({ data, setActiveTab }) => {
       <View style={styles.itemContainer}>
         <View style={styles.imageContainer}>
           <Text style={styles.imageText}>{item.visitorId}</Text>
-    
+
           {item.pictures ? (
             <Avatar.Image
               source={{ uri: `${ImagebaseURL}${item.pictures}` }}
-               
+
               style={styles.avatar}
             />
           ) : (
@@ -184,7 +188,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   avatar: {
-    backgroundColor: "#ccc",marginTop:10
+    backgroundColor: "#ccc", marginTop: 10
 
   },
   noImageText: {

@@ -66,7 +66,11 @@ const ResidentialUnit = () => {
         const chipStyle = item.ownerType === 'Owner' ? styles.ownerChip : styles.tenantChip;
 
         return (
-            <TouchableOpacity style={styles.residentCard} onPress={() => navigation.navigate("Residents Details", { resident: item })}>
+            <TouchableOpacity style={styles.residentCard} onPress={() => {
+                setAnchor(false);
+                navigation.navigate("Residents Details", { resident: item })
+            }
+            }>
                 <Avatar.Image source={{ uri: `${ImagebaseURL}${item.profilePicture}` }} size={50} style={{ backgroundColor: "#ccc" }} />
                 <View style={styles.residentDetails}>
                     <Text style={styles.name}>{item.name}</Text>
@@ -79,18 +83,20 @@ const ResidentialUnit = () => {
                 <TouchableOpacity onPress={() => handleMenuPress(item)}>
                     <Icon name="more-vert" size={20} color="#424242" />
                 </TouchableOpacity>
-                {anchor === item._id && (
-                    <ScrollView style={[styles.menuList, { top: 0 }]}>
-                        <TouchableOpacity onPress={handleEdit} style={styles.menuItem}>
-                            <Text>Edit</Text>
-                        </TouchableOpacity>
-                        <View style={styles.divider} />
-                        <TouchableOpacity onPress={handleDelete} style={styles.menuItem}>
-                            <Text>Delete</Text>
-                        </TouchableOpacity>
-                    </ScrollView>
-                )}
-            </TouchableOpacity>
+                {
+                    anchor === item._id && (
+                        <ScrollView style={[styles.menuList, { top: 0 }]}>
+                            <TouchableOpacity onPress={handleEdit} style={styles.menuItem}>
+                                <Text>Edit</Text>
+                            </TouchableOpacity>
+                            <View style={styles.divider} />
+                            <TouchableOpacity onPress={handleDelete} style={styles.menuItem}>
+                                <Text>Delete</Text>
+                            </TouchableOpacity>
+                        </ScrollView>
+                    )
+                }
+            </TouchableOpacity >
         );
     };
 
@@ -199,11 +205,11 @@ const styles = StyleSheet.create({
         alignItems: "center"
     },
     ownerChip: {
-        backgroundColor: '#4caf50',
+        backgroundColor: '#7d0431',
         color: '#fff',
     },
     tenantChip: {
-        backgroundColor: '#2196f3',
+        backgroundColor: '#7d0431',
         color: '#fff',
     },
     chipLabel: {
@@ -227,7 +233,7 @@ const styles = StyleSheet.create({
         elevation: 3,
         padding: 5,
         zIndex: 10,
-        overflow:"visible"
+        overflow: "visible"
     },
     divider: {
         borderBottomWidth: 1,

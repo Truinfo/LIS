@@ -266,6 +266,7 @@ const styles = StyleSheet.create({
         height: 50,
         borderRadius: 25,
         marginRight: 10,
+        backgroundColor:"#f6f6f6"
     },
     details: {
         flex: 1,

@@ -12,9 +12,22 @@ const ResidentDetails = ({ route }) => {
     const { resident } = route.params;
     const { societyId, buildingName, flatNumber } = resident;
     const dispatch = useDispatch();
-    const { servicePerson, error, loading } = useSelector((state) => state.manageServices);
-    const { services } = servicePerson || {};
-    const { visitors, fetchStatus } = useSelector(state => state.frequentVisitor);
+    const { servicePerson } = useSelector((state) => state.manageServices);
+    const { visitors } = useSelector(state => state.frequentVisitor);
+    
+    const [expandedSection, setExpandedSection] = useState(null); // Single state to manage expanded section
+
+    const toggleSection = (section) => {
+        setExpandedSection(prev => (prev === section ? null : section)); // Toggle section
+    };
+
+    useEffect(() => {
+        if (societyId && buildingName && flatNumber) {
+            dispatch(fetchServicePerson({ societyId, block: buildingName, flatNumber }));
+            dispatch(fetchFrequentVisitors({ societyId, block: buildingName, flatNo: flatNumber }));
+        }
+    }, [dispatch, societyId, buildingName, flatNumber]);
+
     const serviceType = [
         { id: 'maid', type: 'Maid' },
         { id: 'milkMan', type: 'Milkman' },
@@ -32,34 +45,14 @@ const ResidentDetails = ({ route }) => {
         { id: 'pestClean', type: 'Pest Clean' }
     ];
 
-    // State to control the accordion
-    const [collapsedFamily, setCollapsedFamily] = useState(true);
-    const [collapsedPets, setCollapsedPets] = useState(true);
-    const [collapsedVehicles, setCollapsedVehicles] = useState(true);
-    const [collapsedDailyHelp, setCollapsedDailyHelp] = useState(true);
-    const [collapsedVisitors, setCollapsedVisitors] = useState(true);
-
-    // Toggle functions
-    const toggleFamily = () => setCollapsedFamily(!collapsedFamily);
-    const togglePets = () => setCollapsedPets(!collapsedPets);
-    const toggleVehicles = () => setCollapsedVehicles(!collapsedVehicles);
-    const toggleDailyHelp = () => setCollapsedDailyHelp(!collapsedDailyHelp);
-    const toggleVisitors = () => setCollapsedVisitors(!collapsedVisitors);
-
-    useEffect(() => {
-        if (societyId && buildingName && flatNumber) {
-            dispatch(fetchServicePerson({ societyId, block: buildingName, flatNumber }));
-            dispatch(fetchFrequentVisitors({ societyId, block: buildingName, flatNo: flatNumber }));
-        }
-    }, [dispatch, societyId, buildingName, flatNumber]);
-
     const renderServiceList = (serviceCategory, serviceName) => {
-        if (!services || !services[serviceCategory] || services[serviceCategory].length === 0) {
+        const services = servicePerson?.services[serviceCategory];
+        if (!services || services.length === 0) {
             return null;
         }
         return (
             <View key={serviceCategory}>
-                {services[serviceCategory].map((item) => (
+                {services.map((item) => (
                     <View key={item._id} style={styles.listItem}>
                         <Text style={styles.listTitle}>{item.name} ({serviceName})</Text>
                         <Text style={styles.subText}>Phone: {item.phoneNumber}</Text>
@@ -106,11 +99,11 @@ const ResidentDetails = ({ route }) => {
             </View>
 
             {/* Family Members Section */}
-            <TouchableOpacity onPress={toggleFamily} style={styles.sectionHeader}>
+            <TouchableOpacity onPress={() => toggleSection('family')} style={styles.sectionHeader}>
                 <Text style={styles.sectionTitle}>Family Members</Text>
-                <Icon name={collapsedFamily ? "keyboard-arrow-down" : "keyboard-arrow-up"} size={24} color="#424242" />
+                <Icon name={expandedSection === 'family' ? "keyboard-arrow-up" : "keyboard-arrow-down"} size={24} color="#424242" />
             </TouchableOpacity>
-            <Collapsible collapsed={collapsedFamily}>
+            <Collapsible collapsed={expandedSection !== 'family'}>
                 {resident.familyMembers.length > 0 ? (
                     resident.familyMembers.map((item) => (
                         <View key={item._id} style={styles.listItem}>
@@ -126,11 +119,11 @@ const ResidentDetails = ({ route }) => {
             </Collapsible>
 
             {/* Pets Section */}
-            <TouchableOpacity onPress={togglePets} style={styles.sectionHeader}>
+            <TouchableOpacity onPress={() => toggleSection('pets')} style={styles.sectionHeader}>
                 <Text style={styles.sectionTitle}>Pets</Text>
-                <Icon name={collapsedPets ? "keyboard-arrow-down" : "keyboard-arrow-up"} size={24} color="#424242" />
+                <Icon name={expandedSection === 'pets' ? "keyboard-arrow-up" : "keyboard-arrow-down"} size={24} color="#424242" />
             </TouchableOpacity>
-            <Collapsible collapsed={collapsedPets}>
+            <Collapsible collapsed={expandedSection !== 'pets'}>
                 {resident.pets.length > 0 ? (
                     resident.pets.map((item) => (
                         <View key={item._id} style={styles.listItem}>
@@ -146,11 +139,11 @@ const ResidentDetails = ({ route }) => {
             </Collapsible>
 
             {/* Vehicles Section */}
-            <TouchableOpacity onPress={toggleVehicles} style={styles.sectionHeader}>
+            <TouchableOpacity onPress={() => toggleSection('vehicles')} style={styles.sectionHeader}>
                 <Text style={styles.sectionTitle}>Vehicles</Text>
-                <Icon name={collapsedVehicles ? "keyboard-arrow-down" : "keyboard-arrow-up"} size={24} color="#424242" />
+                <Icon name={expandedSection === 'vehicles' ? "keyboard-arrow-up" : "keyboard-arrow-down"} size={24} color="#424242" />
             </TouchableOpacity>
-            <Collapsible collapsed={collapsedVehicles}>
+            <Collapsible collapsed={expandedSection !== 'vehicles'}>
                 {resident.Vehicle.length > 0 ? (
                     resident.Vehicle.map((item) => (
                         <View key={item._id} style={styles.listItem}>
@@ -167,20 +160,20 @@ const ResidentDetails = ({ route }) => {
             </Collapsible>
 
             {/* Daily Help Section */}
-            <TouchableOpacity onPress={toggleDailyHelp} style={styles.sectionHeader}>
+            <TouchableOpacity onPress={() => toggleSection('dailyHelp')} style={styles.sectionHeader}>
                 <Text style={styles.sectionTitle}>Daily Help</Text>
-                <Icon name={collapsedDailyHelp ? "keyboard-arrow-down" : "keyboard-arrow-up"} size={24} color="#424242" />
+                <Icon name={expandedSection === 'dailyHelp' ? "keyboard-arrow-up" : "keyboard-arrow-down"} size={24} color="#424242" />
             </TouchableOpacity>
-            <Collapsible collapsed={collapsedDailyHelp}>
+            <Collapsible collapsed={expandedSection !== 'dailyHelp'}>
                 {serviceType.map((service) => renderServiceList(service.id, service.type))}
             </Collapsible>
 
             {/* Frequent Visitors Section */}
-            <TouchableOpacity onPress={toggleVisitors} style={styles.sectionHeader}>
+            <TouchableOpacity onPress={() => toggleSection('visitors')} style={[styles.sectionHeader,{marginBottom:30}]}>
                 <Text style={styles.sectionTitle}>Frequent Visitors</Text>
-                <Icon name={collapsedVisitors ? "keyboard-arrow-down" : "keyboard-arrow-up"} size={24} color="#424242" />
+                <Icon name={expandedSection === 'visitors' ? "keyboard-arrow-up" : "keyboard-arrow-down"} size={24} color="#424242" />
             </TouchableOpacity>
-            <Collapsible collapsed={collapsedVisitors}>
+            <Collapsible collapsed={expandedSection !== 'visitors'}>
                 {visitors.length > 0 ? (
                     visitors.map((visitor) => (
                         <View key={visitor._id} style={styles.listItem}>
@@ -207,7 +200,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         marginBottom: 20,
         alignItems: 'center',
-        gap: 15, paddingHorizontal: 10
+        gap: 15, 
+        paddingHorizontal: 10,
     },
     profileDetails: {
         marginLeft: 10,
@@ -223,7 +217,7 @@ const styles = StyleSheet.create({
     },
     details: {
         marginLeft: 5,
-        color: '#777',
+        color: '#555',
     },
     sectionHeader: {
         flexDirection: 'row',
@@ -254,6 +248,7 @@ const styles = StyleSheet.create({
     noData: {
         padding: 10,
         color: '#888',
+        textAlign:"center",
         fontStyle: 'italic',
     },
 });

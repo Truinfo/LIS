@@ -3,16 +3,15 @@ import {
   View,
   Text,
   TextInput,
-  Button,
   StyleSheet,
   Image,
   TouchableOpacity,
-  Alert,
   ScrollView,
+  ActivityIndicator, // Import ActivityIndicator
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import * as ImagePicker from "expo-image-picker"; // Import image picker
+import * as ImagePicker from "expo-image-picker"; 
 import {
   getAmenityById,
   updateAmenity,
@@ -26,6 +25,7 @@ const EditAmenity = () => {
   const { id } = route.params;
   const navigation = useNavigation();
   const amenity = useSelector((state) => state.adminAmenities.amenities);
+  const loading = useSelector((state) => state.adminAmenities.loading);
   const successMessage = useSelector(
     (state) => state.adminAmenities.successMessage
   );
@@ -43,10 +43,8 @@ const EditAmenity = () => {
 
   const [previewImages, setPreviewImages] = useState("");
   const [newFilesSelected, setNewFilesSelected] = useState(false);
-  const [snackVisible, setSnackVisible] = useState(false); // Snackbar visibility state
-  const [snackMessage, setSnackMessage] = useState(""); // Snackbar message
-
-  // Request permission to access media library
+  const [snackVisible, setSnackVisible] = useState(false); 
+  const [snackMessage, setSnackMessage] = useState(""); 
   const requestPermission = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
@@ -73,7 +71,7 @@ const EditAmenity = () => {
       });
 
       const imagePreviews = amenity.image
-        ? `${ImagebaseURL}${amenity.image}` : null
+        ? `${ImagebaseURL}${amenity.image}` : null;
       setPreviewImages(imagePreviews);
     }
   }, [amenity]);
@@ -92,7 +90,6 @@ const EditAmenity = () => {
     }
   };
 
-
   const handleChange = (name, value) => {
     setFormData((prevData) => ({
       ...prevData,
@@ -102,8 +99,6 @@ const EditAmenity = () => {
 
   const handleSubmit = async () => {
     const formDataToSend = new FormData();
-
-    // Correctly reference the state values
     formDataToSend.append('societyId', formData.societyId);
     formDataToSend.append('amenityName', formData.amenityName);
     formDataToSend.append('capacity', formData.capacity);
@@ -111,8 +106,7 @@ const EditAmenity = () => {
     formDataToSend.append('location', formData.location);
     formDataToSend.append('cost', formData.cost);
     formDataToSend.append('status', formData.status);
-  
-    // Only append the image if it was changed
+
     if (newFilesSelected) {
       formDataToSend.append('image', {
         uri: previewImages,
@@ -121,83 +115,53 @@ const EditAmenity = () => {
       });
     }
 
+    setLoading(true); // Set loading to true when submission starts
+
     try {
       const response = await dispatch(updateAmenity({ id, formData: formDataToSend }));
-      console.log(response)
+      console.log(response);
       if (response.type === "amenities/updateAmenity/fulfilled") {
         setSnackMessage(successMessage || "Updated successfully");
-        setSnackVisible(true); // Show the Snackbar
+        setSnackVisible(true); 
         dispatch(getAmenityById(id));
-        navigation.goBack(); // Navigate back after successful update
+        navigation.goBack();
       }
     } catch (error) {
       console.error("Error:", error.message);
-      setSnackMessage("Update failed. Please try again."); // Set error message
-      setSnackVisible(true); // Show Snackbar on error
+      setSnackMessage("Update failed. Please try again."); 
+      setSnackVisible(true); 
+    } finally {
+      setLoading(false); // Set loading to false when done
     }
   };
 
-  // const handleSubmit = () => {
-  //   const data = new FormData();
-  //   Object.keys(formData).forEach((key) => {
-  //     if (key !== "image") {
-  //       data.append(key, formData[key]);
-  //     } else if (newFilesSelected && formData[key]) {
-  //       if (formData[key].startsWith("http")) {
-  //         // Check if it is a valid URI
-  //         data.append("image", {
-  //           uri: formData[key],
-  //           name: `image_${id}.jpg`,
-  //           type: "image/jpeg",
-  //         });
-  //       } else {
-  //         console.error("Invalid image URI:", formData[key]);
-  //       }
-  //     }
-  //   });
-
-  //   dispatch(updateAmenity({ id, formData: data }))
-  //     .then((response) => {
-  //       if (response.type === "amenities/updateAmenity/fulfilled") {
-  //         setSnackMessage(successMessage || "Updated successfully");
-  //         setSnackVisible(true); // Show the Snackbar
-  //         dispatch(getAmenityById(id));
-  //         navigation.goBack(); // Navigate back after successful update
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error:", error);
-  //       setSnackMessage("Update failed. Please try again."); // Set error message
-  //       setSnackVisible(true); // Show Snackbar on error
-  //     });
-  // };
-  const onDismissSnackBar = () => setSnackVisible(false); // Dismiss the Snackbar
+  const onDismissSnackBar = () => setSnackVisible(false);
 
   return (
     <View style={styles.container}>
+      {loading && ( // Full-screen loading overlay
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" color="#630000" />
+        </View>
+      )}
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
-        {/* Image Preview */}
         <View style={styles.imagePreviewContainer}>
-          {/* {previewImages.map((image, index) => (
+          {previewImages ? (
             <Image
-              key={index}
-              source={{ uri: image }}
+              source={{ uri: previewImages }}
               style={styles.imagePreview}
             />
-          ))} */}
-          <Image
-            source={{ uri: newFilesSelected ? newFilesSelected : previewImages }}
-            style={styles.imagePreview}
-          />
+          ) : (
+            <Text>No image selected</Text>
+          )}
         </View>
         <TouchableOpacity
           style={styles.uploadButton}
-          onPress={pickImage} // Call the image picker function
+          onPress={pickImage}
         >
           <Text style={styles.uploadButtonText}>Upload Image</Text>
         </TouchableOpacity>
 
-        {/* Form Fields */}
         <View style={styles.formContainer}>
           <TextInput
             style={styles.input}
@@ -265,6 +229,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+  },
+  loadingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(255, 255, 255, 0.8)", // Semi-transparent background
+    zIndex: 1000, // Ensure it appears above other components
   },
   scrollViewContainer: {
     paddingBottom: 40,

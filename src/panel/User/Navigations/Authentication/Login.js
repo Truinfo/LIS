@@ -42,13 +42,12 @@ const Login = () => {
 
     if (isValid) {
       try {
-        const resultAction = await dispatch(userLogin({ email, password }));
+        const resultAction = await dispatch(userLogin({  email: email.toLowerCase(), password }));
         if (resultAction.type === "auth/userLogin/fulfilled") {
           await AsyncStorage.setItem('userToken', resultAction.payload.token);
           const userRole = resultAction.payload.profile.role;
           setEmail("");
           setPassword("");
-          // Reset the navigation stack based on user role
           if (userRole === 'User') {
             navigation.reset({
               index: 0,
@@ -84,60 +83,6 @@ const Login = () => {
       }
     }
   };
-  // const handleLogin = async () => {
-  //   let isValid = true;
-
-  //   // Validate Email Format
-  //   if (!email) {
-  //     setEmailError("Please enter your email.");
-  //     isValid = false;
-  //   } else if (!emailRegex.test(email)) {
-  //     setEmailError("Please enter a valid email address.");
-  //     isValid = false;
-  //   } else {
-  //     setEmailError("");
-  //   }
-
-  //   if (!password) {
-  //     setPasswordError("Please enter your password.");
-  //     isValid = false;
-  //   } else {
-  //     setPasswordError("");
-  //   }
-
-  //   if (isValid) {
-  //     try {
-  //       const resultAction = await dispatch(userLogin({ email, password }));
-  //       if (resultAction.type === "auth/userLogin/fulfilled") {
-  //         await AsyncStorage.setItem('userToken', resultAction.payload.token);
-  //         const userRole = resultAction.payload.profile.role;
-  //         if (userRole === 'User') {
-  //           navigation.navigate("Tabs");
-  //         } else if (userRole === 'Sequrity') {
-  //           navigation.navigate("Header");
-  //         }
-  //          else if (userRole === 'SocietyAdmin') {
-  //           navigation.navigate("Sidebar");
-  //         }
-  //       } else {
-  //         Toast.show({
-  //           type: 'error',
-  //           text1: 'Login Failed',
-  //           text2: resultAction.payload.message || 'An error occurred during login.',
-  //           position: 'top',
-  //           topOffset: 60,
-  //         });
-  //       }
-  //     } catch (error) {
-  //       Toast.show({
-  //         type: 'error',
-  //         text1: 'Login Error',
-  //         text2: 'An error occurred. Please try again later.',
-  //         position: 'top',
-  //       });
-  //     }
-  //   }
-  // };
 
   const handleSignuppress = () => {
     navigation.navigate("Create User");
@@ -170,7 +115,7 @@ const Login = () => {
           label="Email"
           value={email}
           onChangeText={(text) => {
-            setEmail(text.toLowerCase());
+            setEmail(text);
             setEmailError("");
           }}
           keyboardType="email-address"

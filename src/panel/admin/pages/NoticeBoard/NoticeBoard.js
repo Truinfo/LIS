@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, FlatList, TouchableOpacity, ActivityIndicator, Text, Image } from 'react-native';
+import { View, FlatList, TouchableOpacity, ActivityIndicator, Text, Image, Alert, TextInput } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteNotice, fetchnotices } from './NoticeSlice'; // Assuming you have a slice set up
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -49,43 +49,13 @@ const NoticeBoard = () => {
         setMenuVisible(false);
     };
 
-    const handleDeleteNotice = () => {
-        setDeleteDialogVisible(false);
-        if (selectedNotice) {
-            dispatch(deleteNotice(selectedNotice._id))
-                .then((result) => {
-                    if (result.meta.requestStatus === "fulfilled") {
-                        setSnackbarMessage("Notice deleted successfully.");
-                        setSnackbarVisible(true);
-                        dispatch(fetchnotices());
-                    } else {
-                        setSnackbarMessage("Failed to delete the No. Please try again.");
-                        setSnackbarVisible(true);
-                    }
-                })
-                .catch(() => {
-                    setSnackbarMessage("An error occurred. Please check your network and try again.");
-                    setSnackbarVisible(true);
-                });
-        }
-    };
-
-    const showDeleteDialog = (notice) => {
-        setSelectedNotice(notice);
-        setDeleteDialogVisible(true);
-        setMenuVisible(false);
-    };
-
-    const hideDeleteDialog = () => {
-        setDeleteDialogVisible(false);
-    };
     const renderNotice = ({ item }) => (
         <TouchableOpacity
             onPress={() => handleViewNotice(item)}
             onLongPress={(e) => {
                 setAnchorPosition({
                     x: e.nativeEvent.pageX,
-                    y: e.nativeEvent.pageY - 50 // Decrease the top margin by 50 pixels
+                    y: e.nativeEvent.pageY - 50 
                 });
                 setMenuVisible(true);
                 setSelectedNotice(item);
@@ -99,7 +69,7 @@ const NoticeBoard = () => {
                             onPress={(e) => {
                                 setAnchorPosition({
                                     x: e.nativeEvent.pageX,
-                                    y: e.nativeEvent.pageY - 50 // Decrease the top margin by 50 pixels
+                                    y: e.nativeEvent.pageY - 50 
                                 });
                                 setMenuVisible(true);
                                 setSelectedNotice(item);
@@ -126,17 +96,53 @@ const NoticeBoard = () => {
         return (
             <View style={styles.errorContainer}>
                 <Image
-                    source={require('../../../../assets/Admin/Imgaes/nodatadound.png')} // Update this path
+                    source={require('../../../../assets/Admin/Imgaes/nodatadound.png')} 
                     style={styles.errorImage}
                     alt="No Data Found"
                 />
             </View>
         );
     }
+    const handleDeleteNotice = () => {
+        if (selectedNotice) {
+            Alert.alert(
+                "Confirm Delete",
+                "Are you sure you want to delete this notice?",
+                [
+                    {
+                        text: "Cancel",
+                        onPress: () => setMenuVisible(false),
+                        style: "cancel"
+                    },
+                    {
+                        text: "Delete",
+                        onPress: () => {
+                            dispatch(deleteNotice(selectedNotice._id))
+                                .then((result) => {
+                                    if (result.type === "notice/createNotice/fulfilled") {
+                                        setSnackbarMessage(`${result.payload.message}`);
+                                        setSnackbarVisible(true);
+                                        dispatch(fetchnotices());
+                                    } else {
+                                        setSnackbarMessage("Failed to delete the notice. Please try again.");
+                                        setSnackbarVisible(true);
+                                    }
+                                })
+                                .catch(() => {
+                                    setSnackbarMessage("An error occurred. Please check your network and try again.");
+                                    setSnackbarVisible(true);
+                                });
+                        }
+                    }
+                ],
+                { cancelable: false }
+            );
+        }
+    };
     return (
         <Provider>
             <View style={styles.container}>
-                <Searchbar
+                <TextInput
                     placeholder="Search"
                     value={searchQuery}
                     onChangeText={handleSearch}
@@ -155,7 +161,7 @@ const NoticeBoard = () => {
                     contentStyle={{ backgroundColor: '#fff' }}
                 >
                     <Menu.Item onPress={() => handleEditNotice(selectedNotice)} title="Edit" />
-                    <Menu.Item onPress={() => showDeleteDialog(selectedNotice)} title="Delete" />
+                    <Menu.Item onPress={handleDeleteNotice} title="Delete" />
                 </Menu>
                 <Dialog visible={dialogVisible} onDismiss={() => setDialogVisible(false)} style={{ backgroundColor: "#fff" }} >
                     <Dialog.Title>Notice Details</Dialog.Title>
@@ -187,19 +193,10 @@ const NoticeBoard = () => {
                         )}
                     </Dialog.Content>
                     <Dialog.Actions>
-                        <Button onPress={() => setDialogVisible(false)}>Close</Button>
+                        <Button theme={{colors:{primary:"#7d0431"}}} onPress={() => setDialogVisible(false)}>Close</Button>
                     </Dialog.Actions>
                 </Dialog>
-                <Dialog visible={deleteDialogVisible} onDismiss={hideDeleteDialog}>
-                    <Dialog.Title>Confirm Delete</Dialog.Title>
-                    <Dialog.Content>
-                        <Paragraph>Are you sure you want to delete this notice?</Paragraph>
-                    </Dialog.Content>
-                    <Dialog.Actions>
-                        <Button onPress={hideDeleteDialog}>Cancel</Button>
-                        <Button onPress={handleDeleteNotice}>Delete</Button>
-                    </Dialog.Actions>
-                </Dialog>
+
                 <FAB
                     style={styles.fab}
                     icon="plus"
@@ -222,7 +219,8 @@ const NoticeBoard = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 10,
+        paddingTop:10,
+        paddingHorizontal:12,
     },
     menuIcon: {
         position: 'absolute',
@@ -231,7 +229,14 @@ const styles = StyleSheet.create({
         zIndex: 10,
     },
     searchbar: {
+        height: 50,
+        borderColor: '#7d0431',
+        borderWidth: 1,
+        borderRadius: 5,
+        paddingHorizontal: 10,
         marginBottom: 10,
+        width: '100%',
+        backgroundColor:"#fff"
     },
     card: {
         margin: 5,
@@ -264,7 +269,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 30,
         right: 30,
-        backgroundColor: '#630000',
+        backgroundColor: '#7d0431',
         width: 60,
         height: 60,
         borderRadius: 30,

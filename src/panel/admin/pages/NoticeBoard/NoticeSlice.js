@@ -5,9 +5,9 @@ import axios from 'axios';
 export const fetchnotices = createAsyncThunk(
     'notice/fetchnotice',
     async () => {
-        const storedAdmin = await AsyncStorage.getItem('societyAdmin');
+        const storedAdmin = await AsyncStorage.getItem('user');
         const societyAdmin = JSON.parse(storedAdmin) || {};
-        const societyId = societyAdmin._id || "6683b57b073739a31e8350d0"; // Default ID
+        const societyId = societyAdmin._id ; 
         const response = await axiosInstance.get(`/getNotice/${societyId}`);
         return response.data.notices;
     }
@@ -16,9 +16,9 @@ export const fetchnotices = createAsyncThunk(
 export const fetchnoticeById = createAsyncThunk(
     'notice/fetchnoticeById',
     async () => {
-        const storedAdmin = await AsyncStorage.getItem('societyAdmin');
+        const storedAdmin = await AsyncStorage.getItem('user');
         const societyAdmin = JSON.parse(storedAdmin) || {};
-        const societyId = societyAdmin._id || "6683b57b073739a31e8350d0"; // Default ID
+        const societyId = societyAdmin._id ; 
         const response = await axiosInstance.get(`/getAllNotice/${societyId}`);
         return response.data.notices;
     }

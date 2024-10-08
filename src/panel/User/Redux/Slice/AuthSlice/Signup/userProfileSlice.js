@@ -10,7 +10,9 @@ export const fetchUserProfile = createAsyncThunk(
   async ({ id, data }, { rejectWithValue }) => {
     console.log("data", data,id)
     try {
-      const response = await axiosInstance.put(`/user/createUserProfile/${id}`, data)
+      const response = await axiosInstance.put(`/user/createUserProfile/${id}`, data,{
+        headers: { 'Content-Type': 'application/json'}
+      })
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data.message || error.message);

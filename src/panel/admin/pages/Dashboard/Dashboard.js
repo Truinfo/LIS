@@ -1,5 +1,5 @@
 
-import React, {  useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Alert } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -122,6 +122,9 @@ const Dashboard = () => {
     const { monthAndYear, paymentDetails } = maintainances;
     const paidPayments = paymentDetails?.filter(payment => payment.status === 'Paid');
 
+    // if (daysRemaining !== null && daysRemaining <= 0) {
+    //     navigation.navigate("Renewal Plan")
+    // }
     if (status === "loading") {
         return (
             <View style={styles.loadingContainer}>
@@ -235,9 +238,9 @@ const Dashboard = () => {
                 )}
             </View>
             <View>
-                <Text style={styles.monthHeader}>Maintenance Bill: {monthAndYear}</Text>
                 {paidPayments?.length > 0 ? (
                     <View>
+                        <Text style={styles.monthHeader}>Maintenance Bill: {monthAndYear}</Text>
                         {/* Display only the first two payments */}
                         {paidPayments.slice(0, 2).map(payment => (
                             <Card key={payment._id} style={styles.paymentCard}>
@@ -256,6 +259,7 @@ const Dashboard = () => {
                                     </View>
                                 </Card.Content>
                             </Card>
+
                         ))}
                         {/* Show View More only if there are more than 2 payments */}
                         {paidPayments.length > 2 && (
@@ -276,10 +280,9 @@ const Dashboard = () => {
                         )}
                     </View>
                 ) : (
-                    <Text style={styles.noPayments}>No payments have been made for this month.</Text>
+                    null
                 )}
             </View>
-
             <Snackbar
                 visible={snackbarVisible}
                 onDismiss={() => setSnackbarVisible(false)}

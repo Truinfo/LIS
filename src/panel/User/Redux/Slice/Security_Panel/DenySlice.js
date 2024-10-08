@@ -1,12 +1,13 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from '../../../../Security/helpers/axios';
+import axios from "axios";
 
 export const denyEntry = createAsyncThunk(
     "deny/denyEntry",
-    async (payload, { rejectWithValue }) => {
+    async ({societyId, visitorId}, { rejectWithValue }) => {
         try {
-            const { societyId, visitorId } = payload;
-            response = await axiosInstance.put(`/denyVisitor`, {
+            console.log ( societyId, visitorId ) ;
+            response = await axios.put(`http://192.168.29.226:2000/api/denyVisitor`, {
                 societyId,
                 visitorId,
             }

@@ -149,7 +149,7 @@ const Inventory = () => {
     };
     if (status === "loading") { // Show spinner while loading
         return (
-            <View style={styles.loadingContainer}>
+            <View style={{justifyContent:"center",alignItems:"center"}}>
                 <ActivityIndicator size="large" color="#7d0431" />
             </View>
         );

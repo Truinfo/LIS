@@ -91,13 +91,6 @@ const AddNotice = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <MaterialIcons name="arrow-back" size={24} color="#fff" />
-                </TouchableOpacity>
-                <Text style={styles.title}>Add Notice</Text>
-            </View>
-
             <View style={styles.formContainer}>
                 <TextInput
                     style={styles.input}
@@ -175,7 +168,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 24,
         fontWeight: '700',
-        color: '#630000',
+        color: '#7d0431',
         marginLeft: 10,
     },
     formContainer: {

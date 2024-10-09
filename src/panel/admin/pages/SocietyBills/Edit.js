@@ -1,259 +1,398 @@
 import React, { useState, useEffect } from "react";
-import { TextField, Button, Grid, Box, Typography, IconButton, MenuItem, Select, InputLabel, FormControl } from "@mui/material";
-import { useParams, useNavigate } from "react-router-dom";
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+  Modal,
+  Text,
+  Image,
+} from "react-native";
+import { useRoute, useNavigation } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
-
-import { IoArrowBackSharp } from "react-icons/io5";
-import { createTheme, styled, ThemeProvider } from "@mui/material/styles";
-import Dialog from '../../DialogBox/DialogBox';
 import { editBill, getBillById } from "./SocietyBillsSlice";
-
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#630000',
-    },
-  },
-});
-
-const GradientIconButton = styled(IconButton)(({ theme }) => ({
-  background: "linear-gradient(to right,#fb0707, #630000)",
-  color: "#fff",
-  border: "1px solid #fff",
-  marginLeft: "10px",
-  marginRight: "10px",
-  "&:hover": {
-    background: "#FFF",
-    border: "1px solid #630000",
-    "& svg": {
-      color: "#630000",
-    },
-  },
-  "& svg": {
-    fontSize: "20px",
-  },
-}));
+import * as ImagePicker from "expo-image-picker";
+import { Avatar } from "react-native-paper";
+import { TextInput } from 'react-native-paper';
+import { Picker } from '@react-native-picker/picker';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { ImagebaseURL } from "../../../Security/helpers/axios";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import Toast from 'react-native-toast-message';
 
 const Edit = () => {
-  const { id } = useParams();
+  const route = useRoute();
+  const navigation = useNavigation();
+  const { id } = route.params;
   const dispatch = useDispatch();
-  const bills = useSelector((state) => state.societyBills.bills);
-  const successMessage = useSelector((state) => state.societyBills.successMessage);
+  const bills = useSelector((state) => state.adminSocietyBills.bills);
   const [errors, setErrors] = useState({});
-  const navigate = useNavigate();
-  const [showDialog, setShowDialog] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
   const [fileName, setFileName] = useState("");
-
   const [formState, setFormState] = useState({
-    name: '',
-    amount: '',
-    status: '',
-    date: '',
+    name: "",
+    amount: "",
+    status: "",
+    monthAndYear: "",
     pictures: null,
+    selectedMonth: new Date().getMonth() + 1,
+    selectedYear: new Date().getFullYear(),
   });
+  console.log(bills)
+  const statusOptions = [
+    { label: "Paid", value: "Paid" },
+    { label: "Unpaid", value: "Unpaid" },
+  ];
 
   useEffect(() => {
     dispatch(getBillById({ id }));
   }, [dispatch, id]);
 
-  const statusOptions = ['Paid', 'Unpaid'];
-
   useEffect(() => {
-    if (bills) {
-      setFormState({
-        name: bills.name || '',
-        amount: bills.amount || '',
-        status: bills.status || '',
-        date: bills.date || '',
-        pictures: null,
-      });
-      setFileName(bills.pictures ? bills.pictures.split('/').pop() : "");
+    if (bills && bills.length > 0) {
+      const bill = bills[0];
+      setFormState((prev) => ({
+        ...prev,
+        name: bill.name || "",
+        amount: bill.amount || "",
+        status: bill.status || "",
+        selectedMonth: bill.monthAndYear ? new Date(bill.monthAndYear).getMonth() + 1 : new Date().getMonth() + 1,
+        selectedYear: bill.monthAndYear ? new Date(bill.monthAndYear).getFullYear() : new Date().getFullYear(),
+      }));
+      setFileName(bill.pictures ? bill.pictures.split("/").pop() : "");
     }
   }, [bills]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
+  useEffect(() => {
+    (async () => {
+      const { status: cameraStatus } = await ImagePicker.requestCameraPermissionsAsync();
+      const { status: mediaStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (cameraStatus !== 'granted' || mediaStatus !== 'granted') {
+        Alert.alert("Permissions Required", "Sorry, we need camera and media library permissions to make this work!");
+      }
+    })();
+  }, []);
+
+  const handleInputChange = (name, value) => {
     setFormState({ ...formState, [name]: value });
   };
 
-  const handleFileChange = (e) => {
-    setFormState({ ...formState, pictures: e.target.files[0] });
-    setFileName(e.target.files[0] ? e.target.files[0].name : bills.pictures.split('/').pop());
+  const handleImagePick = () => {
+    setModalVisible(true);
+  };
+
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setFormState({ ...formState, pictures: result.assets[0] });
+      setFileName(result.assets[0].uri.split("/").pop());
+    }
+    setModalVisible(false);
+  };
+
+  const takePhoto = async () => {
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setFormState({ ...formState, pictures: result.assets[0] });
+      setFileName(result.assets[0].uri.split("/").pop());
+    }
+    setModalVisible(false);
   };
 
   const validateForm = () => {
-    let tempErrors = {};
-    tempErrors.name = formState.name ? "" : "Name is required.";
-    tempErrors.amount = formState.amount ? "" : "Amount is required.";
-    tempErrors.status = formState.status ? "" : "Status is required.";
-    tempErrors.date = formState.date ? "" : "Date is required.";
-    setErrors(tempErrors);
-    return Object.values(tempErrors).every((x) => x === "");
+    // Implement validation logic
+    return true;
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
+    const { selectedMonth, selectedYear, ...rest } = formState;
+
+    // Create the monthAndYear string
+    const monthAndYear = `${selectedYear}-${String(selectedMonth).padStart(2, '0')}`;
+
     if (validateForm()) {
-      const { pictures, ...formData } = formState;
       const updateData = new FormData();
-      for (const key in formData) {
-        updateData.append(key, formData[key]);
-      }
-      if (pictures) {
-        updateData.append('pictures', pictures);
+      for (const key in rest) {
+        updateData.append(key, key === "monthAndYear" ? monthAndYear : rest[key]);
       }
 
-      dispatch(editBill({ id, formData: updateData })).then(() => {
-        setShowDialog(true);
-        setTimeout(() => {
-          setShowDialog(false);
-        }, 2000);
-        dispatch(getBillById({ id }));
-      }).catch((error) => {
-        console.error("Error:", error);
-      });
+      try {
+        // Dispatch the editBill action and wait for it to resolve
+        const response = await dispatch(editBill({ id, formData: updateData }));
+
+        if (response.meta.requestStatus === 'fulfilled') {
+          // Reset form state if successful
+          setFormState({
+            name: '',
+            status: 'Unpaid',
+            amount: '',
+            monthAndYear: '',
+            pictures: null,
+          });
+          setFileName('');
+          Toast.show({
+            type: 'success',
+            text1: 'Success',
+            text2: "Successfully Bill Created",
+          });
+
+          setTimeout(() => {
+            navigation.goBack();
+          }, 2000);
+        }
+      } catch (error) {
+        // Handle any errors that occur during the dispatch
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: error.message || "An error occurred while updating the bill.",
+        });
+      }
     }
   };
 
+
   return (
-    <ThemeProvider theme={theme}>
-      <Box >
-        <Box sx={{
-          width: "100%", padding: "10px", borderRadius: "8px", display: "flex",
-          justifyContent: "space-between", alignItems: "center", position: 'relative'
-        }}>
-          <Box sx={{ display: "flex", position: 'relative', alignItems: 'center' }}>
-            <GradientIconButton onClick={() => navigate(-1)}>
-              <IoArrowBackSharp />
-            </GradientIconButton>
-            <Typography variant="body1" sx={{ fontFamily: 'Red Hat Display, sans-serif', fontSize: "23px", fontWeight: '700', color: '#630000' }}>
-              Edit Bill
-            </Typography>
-          </Box>
-        </Box>
-        <form style={{ padding: "20px" }} onSubmit={handleSubmit} encType="multipart/form-data">
-          <Grid container spacing={2}>
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                label="Bill"
-                name="name"
-                variant="outlined"
-                value={formState.name}
-                onChange={handleInputChange}
-                error={!!errors.name}
-                helperText={errors.name}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                label="Amount"
-                variant="outlined"
-                name="amount"
-                value={formState.amount}
-                onChange={handleInputChange}
-                error={!!errors.amount}
-                helperText={errors.amount}
-              />
-            </Grid>
-
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                label='Month And Year'
-                name='date'
-                value={formState.date}
-                onChange={handleInputChange}
-                variant='outlined'
-                required
-                error={!!errors.date}
-                helperText={errors.date}
-                type='month'
-                InputLabelProps={{ shrink: true }}
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth variant="outlined" required error={!!errors.status}>
-                <InputLabel>Status</InputLabel>
-                <Select
-                  label="Status"
-                  name="status"
-                  value={formState.status}
-                  onChange={handleInputChange}
-                >
-                  {statusOptions.map((status) => (
-                    <MenuItem key={status} value={status}>
-                      {status}
-                    </MenuItem>
-                  ))}
-                </Select>
-                {errors.status && <Typography color="error">{errors.status}</Typography>}
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <input
-                accept="*"
-                style={{ display: 'none' }}
-                id="file-input"
-                type="file"
-                onChange={handleFileChange}
-              />
-              <label htmlFor="file-input">
-                <Button
-                  variant="contained"
-                  component="span"
-                  sx={{
-                    color: '#630000',
-                    backgroundColor: '#fff',
-                    border: '1px solid #630000',
-                    fontWeight: '600',
-                    fontSize: 15,
-                    fontFamily: 'Red Hat Display, sans-serif',
-                    '&:hover': {
-                      backgroundColor: '#630000',
-                      color: '#fff',
-                    },
-                  }}
-                >
-                  Upload
-                </Button>
-              </label>
-              {fileName && (
-                <Typography variant="body2" sx={{ marginTop: 1 }}>
-                  Current File: {fileName}
-                </Typography>
-              )}
-            </Grid>
-            <Grid item xs={12} sx={{ marginTop: 5, display: "flex", justifyContent: "center" }}>
-              <Button
-                fullWidth
-                variant="contained"
-                color="primary"
-                sx={{
-                  fontFamily: 'Red Hat Display, sans-serif',
-                  backgroundColor: "#630000",
-                  width: "11%",
-                  '&:hover': {
-                    backgroundColor: "#630000",
-                  },
-                }}
-                type="Update"
-              >
-                Update
-              </Button>
-            </Grid>
-          </Grid>
-        </form>
-        <Dialog
-          message={successMessage}
-          showDialog={showDialog}
-          onClose={() => setShowDialog(false)}
+    <ScrollView contentContainerStyle={styles.container}>
+      <View style={styles.form}>
+        <TextInput
+          mode="outlined"
+          label="Bill Name"
+          style={styles.input}
+          value={formState.name}
+          onChangeText={(text) => handleInputChange("name", text)}
+          theme={{ colors: { primary: "#7d0431" } }}
         />
-      </Box>
-    </ThemeProvider>
+
+        <TextInput
+          mode="outlined"
+          label="Amount"
+          style={styles.input}
+          value={formState.amount}
+          onChangeText={(text) => handleInputChange("amount", text)}
+          theme={{ colors: { primary: "#7d0431" } }}
+        />
+
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={formState.selectedYear}
+            onValueChange={(itemValue) => handleInputChange("selectedYear", itemValue)}
+          >
+            {Array.from({ length: 15 }, (_, i) => {
+              const year = new Date().getFullYear() - i;
+              return <Picker.Item key={year} label={`${year}`} value={year} />;
+            })}
+          </Picker>
+        </View>
+
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={formState.selectedMonth}
+            onValueChange={(itemValue) => handleInputChange("selectedMonth", itemValue)}
+          >
+            {Array.from({ length: 12 }, (_, i) => (
+              <Picker.Item key={i + 1} label={`Month ${i + 1}`} value={i + 1} />
+            ))}
+          </Picker>
+        </View>
+
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={formState.status}
+            onValueChange={(itemValue) => handleInputChange("status", itemValue)}
+          >
+            {statusOptions.map((option) => (
+              <Picker.Item key={option.value} label={option.label} value={option.value} />
+            ))}
+          </Picker>
+        </View>
+
+
+        <Text style={styles.label}>Upload File</Text>
+        {fileName && bills && bills.length > 0 && bills[0].pictures && (
+          <View style={styles.existingImageContainer}>
+            <Image
+              source={{ uri: `${ImagebaseURL}${bills[0].pictures}` }}
+              style={styles.existingImage}
+              resizeMode="cover"
+            />
+            <Text style={styles.fileName}>Existing File: {fileName}</Text>
+          </View>
+        )}
+        <TouchableOpacity style={styles.uploadButton} onPress={handleImagePick}>
+          <View style={styles.uploadButtonContent}>
+            <Ionicons name="cloud-upload-outline" size={20} color="#FFF" />
+            <Text style={styles.uploadButtonText}>Upload</Text>
+          </View>
+        </TouchableOpacity>
+
+
+        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+          <Text style={styles.submitButtonText}>Update Bill</Text>
+        </TouchableOpacity>
+
+
+
+        <Modal visible={modalVisible} transparent={true} animationType="slide">
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Select Image Source</Text>
+              <TouchableOpacity onPress={pickImage} style={styles.modalButtonIcon}>
+                <Text>Pick from Gallery  </Text>
+                <Icon name="photo-library" size={24} color="#7D0431" />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={takePhoto} style={styles.modalButtonIcon}>
+                <Text>Take a Photo  </Text>
+                <Icon name="photo-camera" size={24} color="#7D0431" />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.modalButton}>
+                <Text style={styles.modalButtonCancel}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
+        <Toast />
+      </View>
+    </ScrollView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flexGrow: 1,
+    padding: 15,
+    backgroundColor: "#fff",
+  },
+  header: {
+    width: "100%",
+    padding: 10,
+    borderRadius: 8,
+    backgroundColor: "#630000",
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  form: {
+    flex: 1,
+  },
+  label: {
+    marginTop: 15,
+    marginBottom: 5,
+    fontSize: 16,
+    color: "#630000",
+    fontWeight: "600",
+  },
+  input: {
+    marginBottom: 8,
+  },
+  existingImageContainer: {
+    flexDirection: "column",
+    alignItems: "flex-start",
+    marginBottom: 10,
+  },
+  existingImage: {
+    width: "100%",
+    height: 200,
+    borderRadius: 5,
+    marginBottom: 5,
+  },
+  submitButton: {
+    backgroundColor: "#630000",
+    paddingVertical: 15,
+    borderRadius: 5,
+    alignItems: "center",
+    marginTop: 20,
+  },
+  submitButtonText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "600",
+  },
+  modalText: {
+    fontSize: 18,
+    color: "#630000",
+    textAlign: "center",
+  },
+  pickerContainer: {
+    borderColor: '#7d0431',
+    borderWidth: 1,
+    borderRadius: 5,
+    marginBottom: 8,
+    overflow: 'hidden',
+  },
+
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: 300,
+    padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 15,
+    color: "#7D0431"
+  },
+  modalButton: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: '#7d0431',
+    borderRadius: 5,
+    width: '100%',
+    alignItems: 'center',
+  },
+  modalButtonCancel: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  modalButtonIcon: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    padding: 10,
+    backgroundColor: '#f2f2f2',
+    borderRadius: 5,
+    width: '100%',
+    marginBottom: 10,
+    alignItems: 'center',
+  },
+  uploadButton: {
+    height: 45,
+    backgroundColor: "#4CAF50",
+    borderWidth: 1,
+    borderRadius: 5,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  uploadButtonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  uploadButtonText: {
+    color: "#FFF",
+    marginLeft: 5,
+    fontSize: 16,
+  },
+});
 
 export default Edit;

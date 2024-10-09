@@ -13,39 +13,40 @@ import {
     Card,
     Dialog,
     Portal,
-    Menu,
     Paragraph,
     Provider as PaperProvider,
     Text,
-    Searchbar,
 } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { deleteBill, fetchBillsBySocietyId } from './SocietyBillsSlice';
 import { ImagebaseURL } from '../../../Security/helpers/axios';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import Modal from 'react-native-modal';
+import Toast from 'react-native-toast-message';
 
 const SocietyBills = () => {
     const dispatch = useDispatch();
     const navigation = useNavigation();
     const { status, error, successMessage } = useSelector((state) => state.adminSocietyBills);
     const bills = useSelector((state) => Array.isArray(state.adminSocietyBills.bills) ? state.adminSocietyBills.bills : []);
-
     const [searchQuery, setSearchQuery] = useState('');
-    const [visibleMenu, setVisibleMenu] = useState(false);
-    const [selectedBill, setSelectedBill] = useState(null);
     const [dialogVisible, setDialogVisible] = useState(false);
-    const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
     const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+    const [selectedBill, setSelectedBill] = useState(null);
+    const [actionMenuVisible, setActionMenuVisible] = useState(null);
+    const [isModalVisible, setModalVisible] = useState(false);
 
-    // Debugging: Log selectedBill whenever it changes
-    useEffect(() => {
-        console.log("selectedBill", selectedBill);
-    }, [selectedBill]);
-
-    useEffect(() => {
-        dispatch(fetchBillsBySocietyId());
-    }, [dispatch]);
+    useFocusEffect(
+        React.useCallback(() => {
+            dispatch(fetchBillsBySocietyId());
+        }, [dispatch])
+    );
+    useFocusEffect(
+        React.useCallback(() => {
+            setActionMenuVisible(null);
+        }, [])
+    );
 
     useEffect(() => {
         if (successMessage) {
@@ -56,63 +57,61 @@ const SocietyBills = () => {
         }
     }, [successMessage]);
 
-    const openMenu = (bill) => {
-        setSelectedBill(bill);
-        setVisibleMenu(true);
-    };
-
-    const closeMenu = () => {
-        setVisibleMenu(false);
-    };
-
     const handleView = (bill) => {
         setSelectedBill(bill);
         setDialogVisible(true);
-        closeMenu();
     };
 
-    const handleEdit = () => {
-        if (selectedBill) {
-            closeMenu();
-            navigation.navigate('EditSocietyBill', { id: selectedBill._id });
+    const handleEdit = (bill) => {
+        if (bill) {
+            setActionMenuVisible(null);
+            navigation.navigate('Edit Society Bills', { id: bill._id });
         }
     };
 
-    const handleDelete = () => {
-        setDeleteDialogVisible(true);
-        closeMenu();
+    const handleDelete = (bill) => {
+        setSelectedBill(bill);
+        setActionMenuVisible(null);
+        setModalVisible(true);
     };
 
     const confirmDelete = () => {
         if (selectedBill) {
             dispatch(deleteBill({ id: selectedBill._id }))
                 .then(() => {
-                    setDeleteDialogVisible(false);
-                    setSelectedBill(null);
+                    Toast.show({
+                        text1: 'Deleted',
+                        text2: 'Bill deleted successfully!',
+                        type: 'success',
+                    });
+                    setTimeout(() => {
+                        dispatch(fetchBillsBySocietyId());
+                    }, 1500);
                 })
-                .catch((err) => {
-                    setDeleteDialogVisible(false);
-                    Alert.alert('Error', 'Failed to delete the bill.');
+                .catch((error) => {
+                    console.error('Error:', error);
+                    Toast.show({
+                        text1: 'Error',
+                        text2: 'Failed to delete the bill.',
+                        type: 'error',
+                    });
                 });
+            setSelectedBill(null);
+            setModalVisible(false);
         }
     };
-
-    const cancelDelete = () => {
-        setDeleteDialogVisible(false);
-    };
-
-    const onChangeSearch = (query) => setSearchQuery(query.toLowerCase());
 
     const filteredBills = bills.filter((bill) => {
         const { sender = '', Subject = '', Description = '', Date = '', Status = '' } = bill;
         return (
-            sender.toLowerCase().includes(searchQuery) ||
-            Subject.toString().toLowerCase().includes(searchQuery) ||
-            Description.toString().toLowerCase().includes(searchQuery) ||
-            Date.toLowerCase().includes(searchQuery) ||
-            (Status && Status.toLowerCase().includes(searchQuery))
+            sender.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            Subject.toString().toLowerCase().includes(searchQuery.toLowerCase()) ||
+            Description.toString().toLowerCase().includes(searchQuery.toLowerCase()) ||
+            Date.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (Status && Status.toLowerCase().includes(searchQuery.toLowerCase()))
         );
     });
+
     const formatDate = (dateString) => {
         const date = new Date(dateString);
         return date.toLocaleString('en-US', {
@@ -126,50 +125,28 @@ const SocietyBills = () => {
         }).replace(',', '');
     };
 
-    const colors = {
-        iconButtonColor: '#7D0431',
-    };
-    if (status === "loading") {
-        return (
-            <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#7D0431" />
-            </View>
-        );
-    }
-
-    if (!bills || !bills.length === 0) { // Show spinner while loading
-        return (
-            <View style={styles.noDataContainer}>
-                <Image
-                    source={require('../../../../assets/Admin/Imgaes/nodatadound.png')}
-                    style={styles.noDataImage}
-                    resizeMode="contain"
-                />
-                <Text style={styles.noDataText}>No Amenities Found</Text>
-            </View>
-        );
-    }
     const renderItem = ({ item }) => (
         <Card style={styles.card} onPress={() => handleView(item)}>
             <View style={styles.titleContainer}>
                 <Text style={styles.cardTitle}>{item.name}</Text>
-                <Menu
-
-                    visible={visibleMenu && selectedBill?._id === item._id}
-                    onDismiss={closeMenu}
-                    anchor={
-                        <Icon
-                            name="more-vert"
-                            size={24}
-                            color="#7D0431"
-                            onPress={() => openMenu(item)}
-                        />
-                    }
+                
+                <TouchableOpacity
+                    onPress={() => setActionMenuVisible(actionMenuVisible === item._id ? null : item._id)}
+                    style={styles.dotsButton}
                 >
-                    <Menu.Item onPress={handleEdit} title="Edit" />
-                    <Menu.Item onPress={handleDelete} title="Delete" style={{ color: 'red' }} />
-                </Menu>
+                    <Icon name="more-vert" size={24} color="#7D0431" />
+                </TouchableOpacity>
 
+                {actionMenuVisible === item._id && (
+                    <View style={styles.actionMenu}>
+                        <TouchableOpacity onPress={() => handleEdit(item)} style={styles.menuButton}>
+                            <Text style={styles.buttonText}>Edit</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => handleDelete(item)} style={styles.menuButton}>
+                            <Text style={[styles.buttonText, { color: "#7D0431" }]}>Delete</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
             </View>
 
             <Card.Content>
@@ -221,8 +198,7 @@ const SocietyBills = () => {
     }
 
     return (
-        <PaperProvider>
-
+        <View style={styles.container}>
             <FlatList
                 data={filteredBills}
                 keyExtractor={(item) => item._id}
@@ -235,8 +211,8 @@ const SocietyBills = () => {
                 }
             />
 
-            {/* View Details Dialog */}
-            <Portal>
+            {/* Details Dialog */}
+            
                 <Dialog
                     visible={dialogVisible}
                     onDismiss={() => setDialogVisible(false)}
@@ -274,48 +250,37 @@ const SocietyBills = () => {
                             <Text style={styles.dialogButtonText}>Close</Text>
                         </TouchableOpacity>
                     </Dialog.Actions>
-
                 </Dialog>
-            </Portal>
+         
 
+            {/* Floating Action Button */}
             <TouchableOpacity
                 style={styles.floatingButton}
                 onPress={() => {
-                    navigation.navigate('Add Security');
+                    navigation.navigate('Add Society Bills');
                 }}
             >
                 <Icon name="add" size={24} color="#fff" />
             </TouchableOpacity>
 
-            {/* Delete Confirmation Dialog */}
-            <Portal>
-                <Dialog
-                    visible={deleteDialogVisible}
-                    onDismiss={cancelDelete}
-                >
-                    <Dialog.Title>Confirm Delete</Dialog.Title>
-                    <Dialog.Content>
-                        <Paragraph>Are you sure you want to delete this bill?</Paragraph>
-                    </Dialog.Content>
-                    <Dialog.Actions>
-                        <Button onPress={cancelDelete}>Cancel</Button>
-                        <Button onPress={confirmDelete}>Confirm</Button>
-                    </Dialog.Actions>
-                </Dialog>
-            </Portal>
+            {/* Delete Confirmation Modal */}
+            <Modal isVisible={isModalVisible}>
+                <View style={styles.modalContent}>
+                    <Text style={styles.modalMainText}>Delete Confirmation</Text>
+                    <Text style={styles.modalText}>Are you sure you want to delete {selectedBill?.name}?</Text>
+                    <View style={styles.modalButtons}>
+                        <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.modalButton}>
+                            <Text style={styles.modelbuttonText}>Cancel</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={confirmDelete} style={styles.modalButton}>
+                            <Text style={styles.modelbuttonText}>Yes</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
 
-            {/* Success Message Dialog */}
-            <Portal>
-                <Dialog
-                    visible={showSuccessDialog}
-                    onDismiss={() => setShowSuccessDialog(false)}
-                >
-                    <Dialog.Content>
-                        <Paragraph>{successMessage}</Paragraph>
-                    </Dialog.Content>
-                </Dialog>
-            </Portal>
-        </PaperProvider>
+            <Toast />
+        </View>
     );
 };
 
@@ -363,6 +328,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#7D0431',
         borderRadius: 5,
         alignItems: 'center',
+        marginHorizontal: 10,
     },
     dialogButtonText: {
         color: '#FFFFFF',
@@ -370,13 +336,13 @@ const styles = StyleSheet.create({
         fontSize: 12,
     },
     downloadButton: {
-        flex: 1.5,
         flexDirection: 'row',
         alignItems: 'center',
         padding: 10,
-        alignSelf: 'flex-end',
+        alignSelf: 'center',
         backgroundColor: '#E0E0E0',
         borderRadius: 5,
+        marginTop: 10,
     },
     downloadText: {
         color: '#7D0431',
@@ -393,8 +359,8 @@ const styles = StyleSheet.create({
         borderRadius: 28,
         justifyContent: 'center',
         alignItems: 'center',
-        elevation: 6, // Add shadow on Android
-        shadowColor: '#000', // Add shadow on iOS
+        elevation: 6,
+        shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.3,
         shadowRadius: 4,
@@ -424,7 +390,6 @@ const styles = StyleSheet.create({
         fontWeight: "700",
         flex: 1,
         fontSize: 15,
-
     },
     selectDetailValue: {
         flex: 3,
@@ -433,14 +398,63 @@ const styles = StyleSheet.create({
     },
     actionMenu: {
         position: 'absolute',
-        top: 50,
-        right: 10,
+        top: 40, // Adjusted to position below the icon
+        right: 0,
         backgroundColor: '#fff',
         padding: 10,
         borderRadius: 8,
         elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        zIndex: 1, // Ensure the menu appears above other elements
+    },
+    menuButton: {
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+    },
+    buttonText: {
+        fontSize: 16,
+    },
+    dotsButton: {
+        padding: 5,
+    },
+    modalContent: {
+        backgroundColor: '#fff',
+        padding: 20,
+        borderRadius: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    modalMainText: {
+        fontSize: 20,
+        marginBottom: 20,
+        textAlign: 'center',
+        color: '#7D0431'
+    },
+    modalText: {
+        fontSize: 16,
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+    modalButtons: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+    },
+    modalButton: {
+        backgroundColor: '#7D0431',
+        padding: 10,
+        borderRadius: 5,
+        width: '45%',
+        alignItems: 'center',
+        color: 'White',
+    },
+    modelbuttonText: {
+        fontSize: 16,
+        color: "white"
     },
 });
-
 
 export default SocietyBills;

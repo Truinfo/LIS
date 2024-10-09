@@ -54,7 +54,7 @@ const AddSocietyBills = () => {
       setFormState({ ...formState, pictures: asset.uri });
       setFileName(asset.fileName || asset.uri.split('/').pop());
     }
-    setModalVisible(false); // Close modal after picking
+    setModalVisible(false);
   };
 
   const takePhoto = async () => {
@@ -69,19 +69,17 @@ const AddSocietyBills = () => {
       setFormState({ ...formState, pictures: asset.uri });
       setFileName(asset.fileName || asset.uri.split('/').pop());
     }
-    setModalVisible(false); // Close modal after taking photo
+    setModalVisible(false); 
   };
 
   const handleAdd = async () => {
     const newErrors = {};
     const { name, status, amount } = formState;
 
-    // Validate required fields
     if (!name.trim()) newErrors.name = 'Bill name is required';
     if (!amount.trim()) newErrors.amount = 'Amount is required';
     if (!status.trim()) newErrors.status = 'Status is required';
 
-    // Set errors if any
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       Toast.show({
@@ -92,12 +90,10 @@ const AddSocietyBills = () => {
       return;
     }
 
-    // Prepare month and year
     const month = selectedMonth.toString().padStart(2, '0');
     const year = selectedYear.toString();
     const monthAndYear = `${year}-${month}`;
 
-    // Prepare form data
     const formDataToAdd = new FormData();
     formDataToAdd.append('societyId', formState.societyId);
     formDataToAdd.append('name', formState.name);
@@ -113,11 +109,9 @@ const AddSocietyBills = () => {
       });
     }
 
-    // Dispatch action
-    const response = await dispatch(createBill(formDataToAdd));
 
+    const response = await dispatch(createBill(formDataToAdd));
     if (response.meta.requestStatus === 'fulfilled') {
-      // Reset form state if successful
       setFormState({
         societyId,
         name: '',
@@ -150,7 +144,6 @@ const AddSocietyBills = () => {
     <ScrollView>
       <View style={styles.container}>
 
-        {/* Bill Name Input */}
         <TextInput
           mode="outlined"
           label="Bill Name"
@@ -161,7 +154,6 @@ const AddSocietyBills = () => {
         />
         {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
 
-        {/* Amount Input */}
         <TextInput
           mode="outlined"
           label="Amount"
@@ -173,7 +165,6 @@ const AddSocietyBills = () => {
         />
         {errors.amount && <Text style={styles.errorText}>{errors.amount}</Text>}
 
-        {/* Year Picker */}
         <View style={styles.pickerContainer}>
           <Picker
             selectedValue={selectedYear}
@@ -187,7 +178,6 @@ const AddSocietyBills = () => {
           </Picker>
         </View>
 
-        {/* Month Picker */}
         <View style={styles.pickerContainer}>
           <Picker
             selectedValue={selectedMonth}
@@ -200,7 +190,6 @@ const AddSocietyBills = () => {
           </Picker>
         </View>
 
-        {/* Status Picker */}
         <View style={styles.pickerContainer}>
           <Picker
             selectedValue={formState.status}
@@ -213,7 +202,6 @@ const AddSocietyBills = () => {
         </View>
         {errors.status && <Text style={styles.errorText}>{errors.status}</Text>}
 
-        {/* Image Preview */}
         {formState.pictures ? (
           <View style={styles.imagePreviewContainer}>
             <Text style={styles.fileTitle}>Image</Text>
@@ -222,17 +210,14 @@ const AddSocietyBills = () => {
         ) : null}
         {fileName ? <Text style={styles.fileName}>{fileName}</Text> : null}
 
-        {/* Image Upload Button */}
         <TouchableOpacity style={styles.uploadButton} onPress={() => setModalVisible(true)}>
           <Text style={styles.uploadButtonText}>Upload Image</Text>
         </TouchableOpacity>
 
-        {/* Add Button */}
         <TouchableOpacity style={styles.submitButton} onPress={handleAdd}>
           <Text style={styles.submitButtonText}>Add</Text>
         </TouchableOpacity>
 
-        {/* Modal for Image Source Selection */}
         <Modal visible={modalVisible} transparent={true} animationType="slide">
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
@@ -252,7 +237,6 @@ const AddSocietyBills = () => {
           </View>
         </Modal>
 
-        {/* Toast Component */}
         <Toast />
 
       </View>
@@ -364,7 +348,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     width: '100%',
     marginBottom: 10,
-    alignItems: 'center', // Ensure text and icon are vertically aligned
+    alignItems: 'center',
   },
   errorText: {
     color: 'red',
@@ -372,4 +356,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AddSocietyBills;
+export default AddSocietyBills; 

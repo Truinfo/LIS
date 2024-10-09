@@ -1,9 +1,7 @@
-// SocietyBillsSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from "../../../Security/helpers/axios";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Utility function to fetch societyId
 const getSocietyId = async () => {
     try {
         const societyAdminString = await AsyncStorage.getItem("societyAdmin");
@@ -68,7 +66,6 @@ export const editBill = createAsyncThunk(
 );
 
 
-// Thunk to delete a bill
 export const deleteBill = createAsyncThunk(
     "bills/deleteBill",
     async ({ id }) => {
@@ -88,12 +85,10 @@ const SocietyBillsSlice = createSlice({
     },
 
     reducers: {
-        // Define any synchronous reducers if needed
     },
 
     extraReducers: (builder) => {
         builder
-            // fetchBillsBySocietyId Thunk
             .addCase(fetchBillsBySocietyId.pending, (state) => {
                 state.status = 'loading';
             })
@@ -106,15 +101,11 @@ const SocietyBillsSlice = createSlice({
                 state.error = action.error.message;
             })
 
-            // getBillById Thunk
             .addCase(getBillById.pending, (state) => {
                 state.status = 'loading';
             })
             .addCase(getBillById.fulfilled, (state, action) => {
                 state.status = 'succeeded';
-                // Assuming getBillById returns a single bill, consider storing it separately
-                // For example, state.selectedBill = action.payload;
-                // But here, we'll push it to bills for consistency
                 state.bills = [action.payload];
             })
             .addCase(getBillById.rejected, (state, action) => {
@@ -122,7 +113,6 @@ const SocietyBillsSlice = createSlice({
                 state.error = action.error.message;
             })
 
-            // createBill Thunk
             .addCase(createBill.pending, (state) => {
                 state.status = 'loading';
             })
@@ -136,13 +126,11 @@ const SocietyBillsSlice = createSlice({
                 state.error = action.error.message;
             })
 
-            // editBill Thunk
             .addCase(editBill.pending, (state) => {
                 state.status = 'loading';
             })
             .addCase(editBill.fulfilled, (state, action) => {
                 state.status = 'succeeded';
-                // Assuming editBill returns the updated list of bills
                 state.bills = action.payload;
                 state.successMessage = action.payload.message;
             })
@@ -151,14 +139,12 @@ const SocietyBillsSlice = createSlice({
                 state.error = action.error.message;
             })
 
-            // deleteBill Thunk
             .addCase(deleteBill.pending, (state) => {
                 state.status = 'loading';
                 state.error = null;
             })
             .addCase(deleteBill.fulfilled, (state, action) => {
                 state.status = 'succeeded';
-                // Assuming deleteBill returns the updated list of bills
                 state.bills = action.payload;
                 state.successMessage = action.payload.message;
                 state.error = null;

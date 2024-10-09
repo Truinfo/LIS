@@ -34,15 +34,13 @@ const Edit = () => {
     amount: "",
     status: "",
     monthAndYear: "",
-    pictures: null, // New Image
+    pictures: null,
     selectedMonth: new Date().getMonth() + 1,
     selectedYear: new Date().getFullYear(),
   });
 
-  // This will hold the existing image's file name
   const [existingFileName, setExistingFileName] = useState("");
 
-  // console.log(bills)
   const statusOptions = [
     { label: "Paid", value: "Paid" },
     { label: "Unpaid", value: "Unpaid" },
@@ -88,7 +86,7 @@ const Edit = () => {
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: false, // Disable editing
+      allowsEditing: false, 
       quality: 1,
     });
 
@@ -103,7 +101,7 @@ const Edit = () => {
   const takePhoto = async () => {
     const result = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: false, // Disable editing
+      allowsEditing: false,
       quality: 1,
     });
 
@@ -117,8 +115,6 @@ const Edit = () => {
 
 
   const validateForm = () => {
-    // Implement validation logic
-    // Example:
     const newErrors = {};
     if (!formState.name.trim()) newErrors.name = "Name is required.";
     if (!formState.amount.trim()) newErrors.amount = "Amount is required.";
@@ -132,13 +128,11 @@ const Edit = () => {
   const handleSubmit = async () => {
     const { selectedMonth, selectedYear, pictures, ...rest } = formState;
 
-    // Create the monthAndYear string
     const monthAndYear = `${selectedYear}-${String(selectedMonth).padStart(2, '0')}`;
 
     if (validateForm()) {
       const updateData = new FormData();
 
-      // Append mandatory fields
       updateData.append("name", rest.name);
       updateData.append("amount", rest.amount);
       updateData.append("status", rest.status);
@@ -179,7 +173,6 @@ const Edit = () => {
           }, 2000);
         }
       } catch (error) {
-        // Handle any errors that occur during the dispatch
         Toast.show({
           type: 'error',
           text1: 'Error',
@@ -205,7 +198,6 @@ const Edit = () => {
         />
         {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
 
-        {/* Amount Input */}
         <TextInput
           mode="outlined"
           label="Amount"
@@ -218,7 +210,7 @@ const Edit = () => {
         />
         {errors.amount && <Text style={styles.errorText}>{errors.amount}</Text>}
 
-        {/* Year Picker */}
+
         <View style={styles.pickerContainer}>
           <Picker
             selectedValue={formState.selectedYear}
@@ -232,7 +224,6 @@ const Edit = () => {
         </View>
         {errors.monthAndYear && <Text style={styles.errorText}>{errors.monthAndYear}</Text>}
 
-        {/* Month Picker */}
         <View style={styles.pickerContainer}>
           <Picker
             selectedValue={formState.selectedMonth}
@@ -244,7 +235,6 @@ const Edit = () => {
           </Picker>
         </View>
 
-        {/* Status Picker */}
         <View style={styles.pickerContainer}>
           <Picker
             selectedValue={formState.status}
@@ -263,7 +253,6 @@ const Edit = () => {
           <View style={styles.existingImageContainer}>
             <Image
               source={{ uri: `${ImagebaseURL}${bills[0].pictures}` }}
-              // source={{ uri: `http://192.168.29.25:2000${bills[0].pictures}` }}
               style={styles.existingImage}
               resizeMode="cover"
             />
@@ -271,7 +260,6 @@ const Edit = () => {
           </View>
         )}
 
-        {/* Newly Selected Image */}
         {formState.pictures && (
           <View style={styles.newImageContainer}>
             <Image
@@ -286,7 +274,6 @@ const Edit = () => {
           </View>
         )}
 
-        {/* Upload Button */}
         <TouchableOpacity style={styles.uploadButton} onPress={handleImagePick}>
           <View style={styles.uploadButtonContent}>
             <Ionicons name="cloud-upload-outline" size={20} color="#FFF" />
@@ -294,12 +281,10 @@ const Edit = () => {
           </View>
         </TouchableOpacity>
 
-        {/* Submit Button */}
         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
           <Text style={styles.submitButtonText}>Update Bill</Text>
         </TouchableOpacity>
 
-        {/* Image Source Modal */}
         <Modal visible={modalVisible} transparent={true} animationType="slide">
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
@@ -319,7 +304,6 @@ const Edit = () => {
           </View>
         </Modal>
 
-        {/* Toast Notifications */}
         <Toast />
       </View>
     </ScrollView>
@@ -465,6 +449,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
+
   uploadButtonText: {
     color: "#FFF",
     marginLeft: 5,

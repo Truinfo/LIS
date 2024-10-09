@@ -208,8 +208,6 @@ const SocietyBills = () => {
                 }
             />
 
-            {/* Details Dialog */}
-            
                 <Dialog
                     visible={dialogVisible}
                     onDismiss={() => setDialogVisible(false)}
@@ -249,8 +247,6 @@ const SocietyBills = () => {
                     </Dialog.Actions>
                 </Dialog>
          
-
-            {/* Floating Action Button */}
             <TouchableOpacity
                 style={styles.floatingButton}
                 onPress={() => {
@@ -260,7 +256,6 @@ const SocietyBills = () => {
                 <Icon name="add" size={24} color="#fff" />
             </TouchableOpacity>
 
-            {/* Delete Confirmation Modal */}
             <Modal isVisible={isModalVisible}>
                 <View style={styles.modalContent}>
                     <Text style={styles.modalMainText}>Delete Confirmation</Text>
@@ -395,7 +390,7 @@ const styles = StyleSheet.create({
     },
     actionMenu: {
         position: 'absolute',
-        top: 40, // Adjusted to position below the icon
+        top: 40, 
         right: 0,
         backgroundColor: '#fff',
         padding: 10,
@@ -405,7 +400,7 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
-        zIndex: 1, // Ensure the menu appears above other elements
+        zIndex: 1,
     },
     menuButton: {
         paddingVertical: 8,
@@ -450,7 +445,7 @@ const styles = StyleSheet.create({
     },
     modelbuttonText: {
         fontSize: 16,
-        color: "white"
+        color: "white",
     },
 });
 

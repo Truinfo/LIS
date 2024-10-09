@@ -120,8 +120,12 @@ import AddMember from './src/panel/admin/pages/EmergencyContacts/AddMember';
 import EditMember from './src/panel/admin/pages/EmergencyContacts/EditMember';
 import PlanRenewalScreen from './src/panel/admin/pages/Dashboard/RenewalPlan';
 import AdminNotifications from './src/panel/admin/pages/Dashboard/Notification';
+
+import UpiPayment from './src/panel/admin/pages/Dashboard/Payment';
+
 import AdminAddSocietyBills from './src/panel/admin/pages/SocietyBills/Add';
 import AdminEditSocietyBills from './src/panel/admin/pages/SocietyBills/Edit';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -347,6 +351,9 @@ export default function App() {
               headerShown: false,
             }}/>
             <Stack.Screen name='Admin Notifications' component={AdminNotifications} />
+
+            <Stack.Screen name='UpiPayment' component={UpiPayment} />
+
             <Stack.Screen name='Add Society Bills' component={AdminAddSocietyBills} />
             <Stack.Screen name='Edit Society Bills' component={AdminEditSocietyBills} />
           </Stack.Navigator>

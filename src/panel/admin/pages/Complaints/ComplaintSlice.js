@@ -4,9 +4,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Function to fetch society ID from AsyncStorage
 const fetchSocietyId = async () => {
-  const storedAdmin = await AsyncStorage.getItem('societyAdmin');
-  const societyAdmin = JSON.parse(storedAdmin) || {};
-  return societyAdmin._id || "6683b57b073739a31e8350d0"; // Default ID
+  const storedAdmin = await AsyncStorage.getItem('user');
+  const societyAdmin = JSON.parse(storedAdmin) ;
+  return societyAdmin._id ; // Default ID
 };
 
 export const fetchComplaints = createAsyncThunk(
@@ -46,9 +46,9 @@ export const updateComplaintStatusResolution = createAsyncThunk(
   'complaints/updateComplaintResolution',
   async ({ complaintId, resolution }, thunkAPI) => {
     try {
-      const storedAdmin = await AsyncStorage.getItem('societyAdmin');
-      const societyAdmin = JSON.parse(storedAdmin) || {};
-      const societyId = societyAdmin._id || "6683b57b073739a31e8350d0"; // Default ID
+      const storedAdmin = await AsyncStorage.getItem('user');
+      const societyAdmin = JSON.parse(storedAdmin) ;
+      const societyId = societyAdmin._id ; // Default ID
       const response = await axiosInstance.put(`/updateComplaintStatus/${societyId}/${complaintId}`, { resolution });
       return response.data;
     } catch (error) {
@@ -106,7 +106,7 @@ const ComplaintSlice = createSlice({
       })
       .addCase(createComplaint.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message; // Update to use action.error.message
+        state.error = action.error.message; 
         state.status = "Failed";
       })
       .addCase(updateComplaintStatusResolution.pending, (state) => {

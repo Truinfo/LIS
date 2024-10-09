@@ -13,7 +13,6 @@ import { useRoute, useNavigation } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
 import { editBill, getBillById } from "./SocietyBillsSlice";
 import * as ImagePicker from "expo-image-picker";
-import { Avatar } from "react-native-paper";
 import { TextInput } from 'react-native-paper';
 import { Picker } from '@react-native-picker/picker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -35,11 +34,15 @@ const Edit = () => {
     amount: "",
     status: "",
     monthAndYear: "",
-    pictures: null,
+    pictures: null, // New Image
     selectedMonth: new Date().getMonth() + 1,
     selectedYear: new Date().getFullYear(),
   });
-  console.log(bills)
+
+  // This will hold the existing image's file name
+  const [existingFileName, setExistingFileName] = useState("");
+
+  // console.log(bills)
   const statusOptions = [
     { label: "Paid", value: "Paid" },
     { label: "Unpaid", value: "Unpaid" },
@@ -60,7 +63,7 @@ const Edit = () => {
         selectedMonth: bill.monthAndYear ? new Date(bill.monthAndYear).getMonth() + 1 : new Date().getMonth() + 1,
         selectedYear: bill.monthAndYear ? new Date(bill.monthAndYear).getFullYear() : new Date().getFullYear(),
       }));
-      setFileName(bill.pictures ? bill.pictures.split("/").pop() : "");
+      setExistingFileName(bill.pictures ? bill.pictures.split("/").pop() : "");
     }
   }, [bills]);
 
@@ -84,68 +87,91 @@ const Edit = () => {
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: false, // Disable editing
       quality: 1,
     });
 
-    if (!result.canceled) {
-      setFormState({ ...formState, pictures: result.assets[0] });
-      setFileName(result.assets[0].uri.split("/").pop());
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      const asset = result.assets[0];
+      setFormState({ ...formState, pictures: asset.uri });
+      setFileName(asset.fileName || asset.uri.split('/').pop());
     }
     setModalVisible(false);
   };
 
   const takePhoto = async () => {
     const result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true,
-      aspect: [4, 3],
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: false, // Disable editing
       quality: 1,
     });
 
-    if (!result.canceled) {
-      setFormState({ ...formState, pictures: result.assets[0] });
-      setFileName(result.assets[0].uri.split("/").pop());
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      const asset = result.assets[0];
+      setFormState({ ...formState, pictures: asset.uri });
+      setFileName(asset.fileName || asset.uri.split('/').pop());
     }
     setModalVisible(false);
   };
 
+
   const validateForm = () => {
     // Implement validation logic
-    return true;
+    // Example:
+    const newErrors = {};
+    if (!formState.name.trim()) newErrors.name = "Name is required.";
+    if (!formState.amount.trim()) newErrors.amount = "Amount is required.";
+    if (!formState.status) newErrors.status = "Status is required.";
+    if (!formState.selectedMonth || !formState.selectedYear) newErrors.monthAndYear = "Month and Year are required.";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async () => {
-    const { selectedMonth, selectedYear, ...rest } = formState;
+    const { selectedMonth, selectedYear, pictures, ...rest } = formState;
 
     // Create the monthAndYear string
     const monthAndYear = `${selectedYear}-${String(selectedMonth).padStart(2, '0')}`;
 
     if (validateForm()) {
       const updateData = new FormData();
-      for (const key in rest) {
-        updateData.append(key, key === "monthAndYear" ? monthAndYear : rest[key]);
+
+      // Append mandatory fields
+      updateData.append("name", rest.name);
+      updateData.append("amount", rest.amount);
+      updateData.append("status", rest.status);
+      updateData.append("monthAndYear", monthAndYear);
+
+
+      if (formState.pictures) {
+        updateData.append('pictures', {
+          uri: formState.pictures,
+          name: fileName,
+          type: 'image/jpeg',
+        });
       }
 
       try {
-        // Dispatch the editBill action and wait for it to resolve
         const response = await dispatch(editBill({ id, formData: updateData }));
 
         if (response.meta.requestStatus === 'fulfilled') {
-          // Reset form state if successful
           setFormState({
             name: '',
             status: 'Unpaid',
             amount: '',
             monthAndYear: '',
             pictures: null,
+            selectedMonth: new Date().getMonth() + 1,
+            selectedYear: new Date().getFullYear(),
           });
           setFileName('');
+          setExistingFileName('');
           Toast.show({
             type: 'success',
             text1: 'Success',
-            text2: "Successfully Bill Created",
+            text2: "Successfully Bill Updated",
           });
 
           setTimeout(() => {
@@ -164,6 +190,7 @@ const Edit = () => {
   };
 
 
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.form}>
@@ -174,8 +201,11 @@ const Edit = () => {
           value={formState.name}
           onChangeText={(text) => handleInputChange("name", text)}
           theme={{ colors: { primary: "#7d0431" } }}
+          error={!!errors.name}
         />
+        {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
 
+        {/* Amount Input */}
         <TextInput
           mode="outlined"
           label="Amount"
@@ -183,8 +213,12 @@ const Edit = () => {
           value={formState.amount}
           onChangeText={(text) => handleInputChange("amount", text)}
           theme={{ colors: { primary: "#7d0431" } }}
+          keyboardType="numeric"
+          error={!!errors.amount}
         />
+        {errors.amount && <Text style={styles.errorText}>{errors.amount}</Text>}
 
+        {/* Year Picker */}
         <View style={styles.pickerContainer}>
           <Picker
             selectedValue={formState.selectedYear}
@@ -196,7 +230,9 @@ const Edit = () => {
             })}
           </Picker>
         </View>
+        {errors.monthAndYear && <Text style={styles.errorText}>{errors.monthAndYear}</Text>}
 
+        {/* Month Picker */}
         <View style={styles.pickerContainer}>
           <Picker
             selectedValue={formState.selectedMonth}
@@ -208,6 +244,7 @@ const Edit = () => {
           </Picker>
         </View>
 
+        {/* Status Picker */}
         <View style={styles.pickerContainer}>
           <Picker
             selectedValue={formState.status}
@@ -218,19 +255,38 @@ const Edit = () => {
             ))}
           </Picker>
         </View>
-
+        {errors.status && <Text style={styles.errorText}>{errors.status}</Text>}
 
         <Text style={styles.label}>Upload File</Text>
-        {fileName && bills && bills.length > 0 && bills[0].pictures && (
+
+        {!formState.pictures && existingFileName && bills && bills.length > 0 && bills[0].pictures && (
           <View style={styles.existingImageContainer}>
             <Image
               source={{ uri: `${ImagebaseURL}${bills[0].pictures}` }}
+              // source={{ uri: `http://192.168.29.25:2000${bills[0].pictures}` }}
               style={styles.existingImage}
               resizeMode="cover"
             />
-            <Text style={styles.fileName}>Existing File: {fileName}</Text>
+            <Text style={styles.fileName}>Existing File: {existingFileName}</Text>
           </View>
         )}
+
+        {/* Newly Selected Image */}
+        {formState.pictures && (
+          <View style={styles.newImageContainer}>
+            <Image
+              source={{ uri: formState.pictures }}
+              style={styles.newImage}
+              resizeMode="cover"
+            />
+            <Text style={styles.fileName}>New File: {fileName}</Text>
+            <TouchableOpacity onPress={() => setFormState({ ...formState, pictures: null })}>
+              <Text style={styles.removeText}>Remove Image</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* Upload Button */}
         <TouchableOpacity style={styles.uploadButton} onPress={handleImagePick}>
           <View style={styles.uploadButtonContent}>
             <Ionicons name="cloud-upload-outline" size={20} color="#FFF" />
@@ -238,13 +294,12 @@ const Edit = () => {
           </View>
         </TouchableOpacity>
 
-
+        {/* Submit Button */}
         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
           <Text style={styles.submitButtonText}>Update Bill</Text>
         </TouchableOpacity>
 
-
-
+        {/* Image Source Modal */}
         <Modal visible={modalVisible} transparent={true} animationType="slide">
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
@@ -264,6 +319,7 @@ const Edit = () => {
           </View>
         </Modal>
 
+        {/* Toast Notifications */}
         <Toast />
       </View>
     </ScrollView>
@@ -309,6 +365,28 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 5,
   },
+  newImageContainer: {
+    flexDirection: "column",
+    alignItems: "flex-start",
+    marginBottom: 10,
+  },
+  newImage: {
+    width: "100%",
+    height: 200,
+    borderRadius: 5,
+    marginBottom: 5,
+    borderWidth: 2,
+    borderColor: "#4CAF50",
+  },
+  fileName: {
+    fontSize: 14,
+    color: "#555",
+  },
+  removeText: {
+    color: "#FF0000",
+    marginTop: 5,
+    textDecorationLine: "underline",
+  },
   submitButton: {
     backgroundColor: "#630000",
     paddingVertical: 15,
@@ -333,7 +411,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     overflow: 'hidden',
   },
-
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -392,6 +469,11 @@ const styles = StyleSheet.create({
     color: "#FFF",
     marginLeft: 5,
     fontSize: 16,
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 8,
+    marginLeft: 4,
   },
 });
 

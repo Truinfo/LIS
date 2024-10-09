@@ -4,15 +4,12 @@ import {
     StyleSheet,
     FlatList,
     Linking,
-    Alert,
     ActivityIndicator,
     TouchableOpacity,
 } from 'react-native';
 import {
-    Button,
     Card,
     Dialog,
-    Portal,
     Paragraph,
     Provider as PaperProvider,
     Text,

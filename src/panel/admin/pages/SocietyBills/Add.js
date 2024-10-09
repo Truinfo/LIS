@@ -148,8 +148,8 @@ const AddSocietyBills = () => {
 
   return (
     <ScrollView>
-    <View style={styles.container}>
-      
+      <View style={styles.container}>
+
         {/* Bill Name Input */}
         <TextInput
           mode="outlined"
@@ -254,8 +254,8 @@ const AddSocietyBills = () => {
 
         {/* Toast Component */}
         <Toast />
-      
-    </View>
+
+      </View>
     </ScrollView>
   );
 };

@@ -11,22 +11,19 @@ const getSocietyId = async () => {
         return data._id || "6683b57b073739a31e8350d0";
     } catch (error) {
         console.error("Error fetching societyId:", error);
-        return "6683b57b073739a31e8350d0"; // Fallback ID
+        return "6683b57b073739a31e8350d0"; 
     }
 };
 
-// Thunk to fetch bills by society ID
 export const fetchBillsBySocietyId = createAsyncThunk(
     'bills/fetchBillsBySocietyId',
     async () => {
         const societyId = await getSocietyId();
         const response = await axiosInstance.get(`/getBillsBySocietyId/${societyId}`);
-        console.log(response.data.society.bills);
         return response.data.society.bills;
     }
 );
 
-// Thunk to get a specific bill by ID
 export const getBillById = createAsyncThunk(
     'bills/getBillById',
     async ({ id }) => {
@@ -36,11 +33,10 @@ export const getBillById = createAsyncThunk(
     }
 );
 
-// Thunk to create a new bill
 export const createBill = createAsyncThunk(
     'bills/createBill',
     async (formData) => {
-        const societyId = await getSocietyId();
+        console.log("CreateformData", formData)
         const response = await axiosInstance.post('/createBill', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
@@ -50,19 +46,27 @@ export const createBill = createAsyncThunk(
     }
 );
 
-// Thunk to edit an existing bill
 export const editBill = createAsyncThunk(
     'bills/editBill',
-    async ({ id, formData }) => {
-        const societyId = await getSocietyId();
-        const response = await axiosInstance.put(`/editBill/${societyId}/${id}`, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
-        });
-        return response.data;
+    async ({ id, formData }, { rejectWithValue }) => {
+        try {
+            const societyId = await getSocietyId();
+            const response = await axiosInstance.put(
+                `/editBill/${societyId}/${id}`,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                }
+            );
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response ? error.response.data : error.message);
+        }
     }
 );
+
 
 // Thunk to delete a bill
 export const deleteBill = createAsyncThunk(

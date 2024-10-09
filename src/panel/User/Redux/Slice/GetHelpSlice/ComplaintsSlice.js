@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../../../Security/helpers/axios';
+import axios from 'axios';
 
 // Async thunk for fetching complaints
 export const fetchComplaints = createAsyncThunk(
@@ -18,9 +19,10 @@ export const fetchComplaints = createAsyncThunk(
 export const createComplaint = createAsyncThunk(
     'complaints/createComplaint',
     async (complaintData, thunkAPI) => {
-       
         try {
-            const response = await axiosInstance.post('/createComplaint', complaintData);
+            const response = await axiosInstance.post('/createComplaint', complaintData, {
+                headers: { 'Content-Type': 'application/json' }
+            });
             return response.data;
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response.data);
@@ -30,8 +32,9 @@ export const createComplaint = createAsyncThunk(
 export const updateComplaintResolution = createAsyncThunk(
     'complaints/updateComplaintResolution',
     async ({ societyId, complaintId, resolution }, thunkAPI) => {
+
         try {
-            const response = await axiosInstance.put(`/updateComplaint/${societyId}/${complaintId}`, { resolution });
+            const response = await axiosInstance.put(`/updateComplaintStatus/${societyId}/${complaintId}`, resolution);
             return response.data;
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response.data);
@@ -68,10 +71,12 @@ const complaintsSlice = createSlice({
             .addCase(createComplaint.fulfilled, (state, action) => {
                 state.status = 'succeeded';
                 state.complaints = action.payload; // Assuming action.payload is the created complaint
+                console.log("success")
             })
             .addCase(createComplaint.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.payload;
+                console.log("failed")
             })
             .addCase(updateComplaintResolution.pending, (state) => {
                 state.status = 'loading';
@@ -79,11 +84,12 @@ const complaintsSlice = createSlice({
             .addCase(updateComplaintResolution.fulfilled, (state, action) => {
                 state.status = 'succeeded';
                 state.complaints = action.payload;
-
+                console.log("success")
             })
             .addCase(updateComplaintResolution.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.payload;
+                console.log("failed", action.payload)
             });
     },
 });

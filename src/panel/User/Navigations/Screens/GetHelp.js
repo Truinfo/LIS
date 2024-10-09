@@ -299,7 +299,7 @@ const GetHelp = () => {
             {item.resolution === "Pending" && (
               <TouchableOpacity
                 style={styles.resolveButton}
-                onPress={() => markAsResolved(item.complaintId)}
+                onPress={() => markAsResolved(item._id)}
               >
                 <Text style={styles.resolveButtonText}>Resolved</Text>
               </TouchableOpacity>

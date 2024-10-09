@@ -117,11 +117,12 @@ export default AdminNotifications;
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
         padding: 10,
     },
     notificationsList: {
         marginTop: 10,
-        maxHeight: Dimensions.get('window').height * 0.6,
+        maxHeight: Dimensions.get('window').height * 1,
     },
     notificationCard: {
         borderRadius: 10,

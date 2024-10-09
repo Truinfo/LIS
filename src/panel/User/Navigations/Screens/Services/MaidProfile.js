@@ -95,12 +95,13 @@ const MaidProfile = ({ navigation, route }) => {
       </View>
     );
   }
+  const filterData = [...filteredMaid?.timings].reverse();
   return (
     <ScrollView contentContainerStyle={styles.scrollViewContainer}>
       <View key={filteredMaid.userid} style={styles.container}>
         <View style={styles.card}>
           <Avatar.Image source={{ uri: `https://livinsync.onrender.com${filteredMaid.pictures}` }} size={100} style={styles.avatarContainer} />
-         
+
           <View style={styles.content}>
             <Text style={styles.cardTitle}>{filteredMaid.name}</Text>
             <View style={styles.locationContainer}>
@@ -181,15 +182,13 @@ const MaidProfile = ({ navigation, route }) => {
             <Text style={styles.newCardSubText}>Behaviors</Text>
           </View>
         </View>
-        <Text style={{ fontWeight: "600", fontSize: 18, margin: 10, padding: 10 }}>
+        <Text style={{ fontWeight: "600", fontSize: 18, padding: 15 }}>
           Available Time Slots
         </Text>
         <View style={styles.morningSectionCard}>
           <View style={styles.timeSlotsContainer}>
-            {filteredMaid.timings.map((time, index) => (
-
+            {filterData.map((time, index) => (
               <TouchableOpacity
-
                 key={index}
                 style={[
                   styles.timeSlot,
@@ -214,44 +213,46 @@ const MaidProfile = ({ navigation, route }) => {
           Reviews
         </Text>
         {filteredMaid.list.some(item => item.rating != null || item.reviews != null || item.rating != "" || item.reviews != "") ? (
-            <ScrollView
-              horizontal
-              contentContainerStyle={styles.horizontalScrollView}
-            >
-              {filteredMaid.list.map((item, index) => (
-                <View key={index}>
-                  <View style={styles.reviewCard}>
-                    <View style={styles.reviewSection}>
-                      <View style={styles.reviewContainer}>
-                        {item.rating != null ? (
-                          <Rating
-                            type="star"
-                            imageSize={16}
-                            readonly
-                            startingValue={item.rating}
-                            style={styles.rating}
-                          />
-                        ) : (
-                          <Text style={{ fontWeight: "500", color: "#797979" }}>
-                            No reviews available.
-                          </Text>
-                        )}
-                      </View>
-                    </View>
-                    <View style={{ marginTop: 10 }}>
-                      <Text style={{ fontWeight: "500", color: "#797979" }}>
-                        {item.reviews != null ? item.reviews : "No reviews available."}
-                      </Text>
+          <ScrollView
+            horizontal
+            contentContainerStyle={styles.horizontalScrollView}
+          >
+            {filteredMaid.list.map((item, index) => (
+              
+              <View key={index}>
+                {console.log(item)}
+                <View style={styles.reviewCard}>
+                  <View style={styles.reviewSection}>
+                    <View style={styles.reviewContainer}>
+                      {item.rating != null ? (
+                        <Rating
+                          type="star"
+                          imageSize={16}
+                          readonly
+                          startingValue={item.rating}
+                          style={styles.rating}
+                        />
+                      ) : (
+                        <Text style={{ fontWeight: "500", color: "#797979" }}>
+                          No reviews available.
+                        </Text>
+                      )}
                     </View>
                   </View>
+                  <View style={{ marginTop: 10 }}>
+                    <Text style={{ fontWeight: "500", color: "#797979" }}>
+                      {item.reviews != null ? item.reviews : "No reviews available."}
+                    </Text>
+                  </View>
                 </View>
-              ))}
-            </ScrollView>
-          ) : (
-            <Text style={{ fontWeight: "500", color: "#797979" }}>
-              No reviews available.
-            </Text>
-          )}
+              </View>
+            ))}
+          </ScrollView>
+        ) : (
+          <Text style={{ fontWeight: "500", color: "#797979" }}>
+            No reviews available.
+          </Text>
+        )}
       </View >
       <Modal
         animationType="slide"
@@ -420,7 +421,7 @@ const styles = StyleSheet.create({
 
   timeSlotsContainer: {
     flexDirection: "row",
-    justifyContent: "space-around",
+    justifyContent: "space-even",
   },
   timeSlot: {
     backgroundColor: "#D8D9E0",
@@ -429,10 +430,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     alignItems: "center",
     marginRight: 10,
+    width: 105
   },
   timeSlotText: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: 10,
+    fontWeight: "500",
   },
   horizontalScrollView: {
     paddingHorizontal: 16,

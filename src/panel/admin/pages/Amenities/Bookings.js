@@ -33,8 +33,8 @@ const AmenityBookingsList = () => {
       setAnchor(false)
     }, [dispatch])
   );
-  const confirmDelete = () => {
-    const userId = selectDeletedItem.userId
+  const confirmDelete = (item) => {
+    const userId = item?.userId
     dispatch(deleteAmenityBooking(userId))
       .then((response) => {
         console.log(response.type, "respo")
@@ -51,10 +51,7 @@ const AmenityBookingsList = () => {
       });
   };
 
-  const handleDelete = (item) => {
-    setSelectDeletedItem(item)
-    confirmDelete();
-  };
+ 
 
   const handleMenuPress = (item) => {
     ;
@@ -79,7 +76,7 @@ const AmenityBookingsList = () => {
           <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate("Edit Booking", ({ id: item._id, userId: item.userId }))}>
             <Text>Edit</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleDelete(item)} style={styles.menuItem}>
+          <TouchableOpacity onPress={() => confirmDelete(item)} style={styles.menuItem}>
             <Text>Delete</Text>
           </TouchableOpacity>
         </ScrollView>
@@ -94,7 +91,7 @@ const AmenityBookingsList = () => {
       </View>
     );
   }
-  if (!booking || !Allbooking && Allbooking.list.length === 0) { // Show spinner while loading
+  if (!booking || !Allbooking && Allbooking?.list.length === 0) { // Show spinner while loading
     return (
       <View style={styles.noDataContainer}>
         <Image

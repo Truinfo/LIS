@@ -33,8 +33,8 @@ const EditBooking = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (booking && booking.list) {
-      const matchedBookings = booking.list.filter((booking) => booking._id === id);
+    if (booking && booking?.list) {
+      const matchedBookings = booking.list?.filter((booking) => booking._id === id);
       if (matchedBookings.length > 0) {
         setFormState({
           payed: matchedBookings[0].payed || '',
@@ -62,10 +62,10 @@ const EditBooking = () => {
   };
 
   const handleSubmit = async () => {
-    if (validateForm()) {
-      const societyId = await fetchSocietyId();  // Assuming you have this function elsewhere
+    if (validateForm()) { // Assuming you have this function elsewhere
       const { ...formData } = formState;
-      dispatch(updateAmenityBooking({ societyId, userId, formData }))
+      console.log(formData)
+      dispatch(updateAmenityBooking({ userId, formData }))
         .then((response) => {
           if (response.type === "booking/updateAmenityBooking/fulfilled") {
             setSnackVisible(true); // Show Snackbar on successful update
@@ -140,7 +140,7 @@ const EditBooking = () => {
 
         {errors.status && <Text style={styles.errorText}>{errors.status}</Text>}
 
-        <Button title="Update" onPress={handleSubmit} color="#630000" />
+        <Button title="Update" onPress={handleSubmit} color="#7d0431" />
       </View>
 
       <Snackbar
@@ -160,7 +160,7 @@ const EditBooking = () => {
         <View style={styles.modalContainer}>
           <View style={styles.dialog}>
             <Text style={styles.dialogText}>{successMessage || "Booking updated successfully!"}</Text>
-            <Button title="OK" onPress={() => setShowDialog(false)} color="#630000" />
+            <Button title="OK" onPress={() => setShowDialog(false)} color="#7d0431" />
           </View>
         </View>
       </Modal>

@@ -2,8 +2,6 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../../Security/helpers/axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
-// Helper function to get the societyId
 const getSocietyId = async () => {
     const societyAdmin = await AsyncStorage.getItem('societyAdmin');
     return JSON.parse(societyAdmin)?._id || "6683b57b073739a31e8350d0";
@@ -21,29 +19,41 @@ export const fetchEvent = createAsyncThunk(
 
 export const fetchEventById = createAsyncThunk(
     'event/fetchEventById',
-    async (id) => {
+    async (eventId) => {
         const societyId = await getSocietyId();
-        const response = await axiosInstance.get(`/events/getEventById/${id}/${societyId}`);
+        const response = await axiosInstance.get(`/events/getEventById/${eventId}/${societyId}`);
         return response.data.event;
     }
 );
 
 export const createEvent = createAsyncThunk(
     'event/AddEvent',
-    async (formData) => {
-        const response = await axiosInstance.post('/events/createEvent', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
+    async (formData, { rejectWithValue }) => {
+        try {
+            console.log(formData);
+            const response = await axiosInstance.post('/events/createEvent', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            console.log(response.data);
+            return response.data;
+        } catch (error) {
+            console.error('Error creating event:', error);
+            if (error.response) {
+                return rejectWithValue(error.response.data);
+            } else {
+                return rejectWithValue('An error occurred while creating the event');
             }
-        });
-        return response.data;
+        }
     }
 );
 
 
 export const updateEvent = createAsyncThunk(
     'event/updateEvent',
-    async ({ id, formData }) => {
+    async ({ id, formData }, { rejectWithValue }) => {  
+        try {
         const societyId = await getSocietyId();
         const response = await axiosInstance.put(`/events/updateEvent/${societyId}/${id}`, formData, {
             headers: {
@@ -51,7 +61,15 @@ export const updateEvent = createAsyncThunk(
             }
         });
         return response.data;
+    } catch (error) {
+        console.error('updateEvent', error);
+        if (error.response) {
+            return rejectWithValue(error.response.data);
+        } else {
+            return rejectWithValue('An error occurred while creating the event');
+        }
     }
+}
 );
 
 export const deleteEvent = createAsyncThunk(
@@ -122,7 +140,7 @@ const EventSlice = createSlice({
             })
             .addCase(updateEvent.rejected, (state, action) => {
                 state.status = 'failed';
-                state.error = action.error.message;
+                state.error = action.payload?.message || 'Failed to update the event.';
             })
             .addCase(deleteEvent.pending, (state) => {
                 state.status = 'loading';

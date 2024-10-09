@@ -7,22 +7,21 @@ import {
   ScrollView,
   Image,
   Alert,
-  Platform,
+  Modal,
   ActivityIndicator,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { createEvent } from './EventSlice';
 import { useNavigation } from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import { launchImageLibrary } from 'react-native-image-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { TextInput } from 'react-native-paper';
+import * as ImagePicker from 'expo-image-picker';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import Toast from 'react-native-toast-message';
 
 const AddEvent = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
-  const { successMessage, error } = useSelector(state => state.societyEvents);
-
   const [name, setName] = useState('');
   const [startDateTime, setStartDateTime] = useState(new Date());
   const [endDateTime, setEndDateTime] = useState(new Date());
@@ -30,19 +29,17 @@ const AddEvent = () => {
   const [pictures, setPictures] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
-  // Date and Time Picker Handlers...
-  // (Keep the existing onChangeDate, onChangeTime, and setFieldDate methods)
+  // Date and Time Picker Handlers
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [currentPickerField, setCurrentPickerField] = useState(null); // 'startDate', 'endDate', 'activity_start', 'activity_end'
   const [currentActivityIndex, setCurrentActivityIndex] = useState(null);
   const [tempDate, setTempDate] = useState(new Date());
-  const [errors, setErrors] = useState({});
-
-  
 
   const handleSubmit = async () => {
+    // Validation for required fields
     if (!name || !startDateTime || !endDateTime) {
       Alert.alert('Validation Error', 'Please fill in all fields.');
       return;
@@ -54,6 +51,7 @@ const AddEvent = () => {
     newEvent.append('startDate', startDateTime.toISOString());
     newEvent.append('endDate', endDateTime.toISOString());
 
+    // Append pictures to FormData
     pictures.forEach(picture => {
       newEvent.append('pictures', {
         uri: picture.uri,
@@ -68,8 +66,12 @@ const AddEvent = () => {
     try {
       const response = await dispatch(createEvent(newEvent));
       if (response.type === 'event/AddEvent/fulfilled') {
-        Alert.alert('Success', 'Event created successfully!');
-        // Clear the form after successful submission
+        Toast.show({
+          type: 'success',
+          text1: 'Success',
+          text2: "Event Created Successfully!",
+        });
+
         setName('');
         setStartDateTime(new Date());
         setEndDateTime(new Date());
@@ -78,15 +80,26 @@ const AddEvent = () => {
         setImagePreviews([]);
         navigation.navigate('EventList');
       } else {
-        Alert.alert('Error', 'Failed to create event.');
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: "Failed to create event !",
+        });
       }
     } catch (err) {
       console.error('Error:', err);
-      Alert.alert('Error', 'An unexpected error occurred.');
+      Toast.show({
+        type: 'error',
+        text1: 'Failed',
+        text2: "An unexpected error occurred.",
+      });
+      
+
     } finally {
       setIsLoading(false);
     }
   };
+
 
   const handleActivityChange = (index, field, value) => {
     const newActivities = [...activities];
@@ -95,21 +108,11 @@ const AddEvent = () => {
   };
 
   const addActivity = () => {
-    if (
-      activities.some(
-        activity => !activity.type || !activity.startDate || !activity.endDate
-      )
-    ) {
-      Alert.alert(
-        'Validation Error',
-        'Please fill in all fields before adding a new activity.'
-      );
+    if (activities.some(activity => !activity.type || !activity.startDate || !activity.endDate)) {
+      Alert.alert('Validation Error', 'Please fill in all fields before adding a new activity.');
       return;
     }
-    setActivities([
-      ...activities,
-      { type: '', startDate: new Date(), endDate: new Date() },
-    ]);
+    setActivities([...activities, { type: '', startDate: new Date(), endDate: new Date() }]);
   };
 
   const removeActivity = index => {
@@ -117,88 +120,85 @@ const AddEvent = () => {
     setActivities(newActivities);
   };
 
-  const handleImagePicker = () => {
-    const options = {
-      mediaType: 'photo',
-      selectionLimit: 0,
-    };
-    launchImageLibrary(options, response => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.errorCode) {
-        console.log('ImagePicker Error: ', response.errorMessage);
-      } else {
-        const selectedImages = response.assets.map(asset => ({
-          uri: asset.uri,
-          type: asset.type,
-          fileName: asset.fileName,
-        }));
-        setPictures(selectedImages);
-        setImagePreviews(selectedImages.map(img => img.uri));
-      }
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: false,
+      quality: 1,
     });
+
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      const asset = result.assets[0];
+      setPictures(prev => [...prev, asset]);
+      setImagePreviews(prev => [...prev, asset.uri]);
+    }
+    setModalVisible(false);
+  };
+
+  const takePhoto = async () => {
+    let result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: false,
+      quality: 1,
+    });
+
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      const asset = result.assets[0];
+      setPictures(prev => [...prev, asset]);
+      setImagePreviews(prev => [...prev, asset.uri]);
+    }
+    setModalVisible(false);
   };
 
   const onChangeDate = (event, selectedDate) => {
     if (event.type === 'dismissed') {
       setShowDatePicker(false);
-      return; // Early return if dismissed
+      return;
     }
-  
+
     const currentDate = selectedDate || tempDate;
     setTempDate(currentDate);
     setShowDatePicker(false);
-    // Show time picker after selecting the date
-    setShowTimePicker(true);
+    setShowTimePicker(true); // Automatically show time picker after date selection
   };
-  
+
   const onChangeTime = (event, selectedTime) => {
     if (event.type === 'dismissed') {
       setShowTimePicker(false);
-      return; // Early return if dismissed
+      return;
     }
-  
+
     const currentTime = selectedTime || tempDate;
     const combinedDate = new Date(tempDate);
     combinedDate.setHours(currentTime.getHours());
     combinedDate.setMinutes(currentTime.getMinutes());
-    
-    setFieldDate(combinedDate); // Use this to set the date in your state
+
+    setFieldDate(combinedDate);
     setShowTimePicker(false);
   };
-  
 
   const setFieldDate = (date) => {
-    const { field, activityIndex } = { field: currentPickerField, activityIndex: currentActivityIndex };
-    if (field === 'startDate') {
-      setFormData(prevData => ({
-        ...prevData,
-        startDate: date,
-      }));
-    } else if (field === 'endDate') {
-      setFormData(prevData => ({
-        ...prevData,
-        endDate: date,
-      }));
-    } else if (field === 'activity_start') {
-      const updatedActivities = [...formData.activities];
-      updatedActivities[activityIndex].startDate = date;
-      setFormData({ ...formData, activities: updatedActivities });
-    } else if (field === 'activity_end') {
-      const updatedActivities = [...formData.activities];
-      updatedActivities[activityIndex].endDate = date;
-      setFormData({ ...formData, activities: updatedActivities });
+    if (currentPickerField === 'startDate') {
+      setStartDateTime(date);
+    } else if (currentPickerField === 'endDate') {
+      setEndDateTime(date);
+    } else if (currentPickerField === 'activity_start' && currentActivityIndex !== null) {
+      const updatedActivities = [...activities];
+      updatedActivities[currentActivityIndex].startDate = date;
+      setActivities(updatedActivities);
+    } else if (currentPickerField === 'activity_end' && currentActivityIndex !== null) {
+      const updatedActivities = [...activities];
+      updatedActivities[currentActivityIndex].endDate = date;
+      setActivities(updatedActivities);
     }
   };
 
-  // Function to open the picker
   const openPicker = (field, activityIndex = null) => {
     setCurrentPickerField(field);
     setCurrentActivityIndex(activityIndex);
-    setShowTimePicker(false); // Ensure time picker is closed when opening date picker
+    setShowTimePicker(false);
     setShowDatePicker(true);
   };
-
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -211,91 +211,106 @@ const AddEvent = () => {
           onChangeText={setName}
           theme={{ colors: { primary: "#7d0431" } }}
         />
-        
+
         {/* Date Pickers */}
-        {/* Start and End Date Picker Buttons */}
         <TouchableOpacity onPress={() => openPicker('startDate')} style={styles.datePickerButton}>
           <Text style={styles.datePickerText}>Start Date: {startDateTime.toLocaleString()}</Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity onPress={() => openPicker('endDate')} style={styles.datePickerButton}>
           <Text style={styles.datePickerText}>End Date: {endDateTime.toLocaleString()}</Text>
         </TouchableOpacity>
 
         {/* DateTimePicker */}
-        {showDatePicker && <DateTimePicker value={tempDate} mode="datetime" display="default" onChange={onChangeDate} />}
-        {showTimePicker && <DateTimePicker value={tempDate} mode="time" display="default" onChange={onChangeTime} />}
+        {showDatePicker && (
+          <DateTimePicker
+            value={tempDate}
+            mode="date"
+            display="default"
+            onChange={onChangeDate}
+          />
+        )}
+        {showTimePicker && (
+          <DateTimePicker
+            value={tempDate}
+            mode="time"
+            display="default"
+            onChange={onChangeTime}
+          />
+        )}
 
         {/* Image Upload */}
-        <TouchableOpacity onPress={handleImagePicker} style={styles.uploadButton}>
-          <Text style={styles.uploadButtonText}>Upload Images</Text>
+        <TouchableOpacity style={styles.uploadButton} onPress={() => setModalVisible(true)}>
+          <Text style={styles.uploadButtonText}>Upload Pictures</Text>
         </TouchableOpacity>
 
         {/* Image Previews */}
         <View style={styles.imagePreviewContainer}>
-          {imagePreviews.map((imageUri, index) => (
-            <Image key={index} source={{ uri: imageUri }} style={styles.imagePreview} />
+          {imagePreviews.map((uri, index) => (
+            <Image key={index} source={{ uri }} style={styles.imagePreview} />
           ))}
         </View>
 
-        {/* Activities Section */}
-        <Text style={styles.activitiesHeader}>Activities</Text>
+        {/* Activities */}
         {activities.map((activity, index) => (
           <View key={index} style={styles.activityContainer}>
             <TextInput
               mode="outlined"
               label="Activity Type"
-              value={activity.type}
-              onChangeText={text => handleActivityChange(index, 'type', text)}
-              theme={{ colors: { primary: "#7d0431" } }}
               style={styles.input}
+              value={activity.type}
+              onChangeText={value => handleActivityChange(index, 'type', value)}
+              theme={{ colors: { primary: "#7d0431" } }}
             />
             <TouchableOpacity onPress={() => openPicker('activity_start', index)} style={styles.datePickerButton}>
-              <Text style={styles.datePickerText}>Activity Start Date: {activity.startDate.toLocaleString()}</Text>
+              <Text style={styles.datePickerText}>Activity Start: {activity.startDate.toLocaleString()}</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => openPicker('activity_end', index)} style={styles.datePickerButton}>
-              <Text style={styles.datePickerText}>Activity End Date: {activity.endDate.toLocaleString()}</Text>
+              <Text style={styles.datePickerText}>Activity End: {activity.endDate.toLocaleString()}</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => removeActivity(index)} style={styles.removeButton}>
-              <Text style={styles.removeButtonText}>Remove Activity</Text>
+            <TouchableOpacity onPress={() => removeActivity(index)} style={styles.removeActivityButton}>
+              <Icon name="remove-circle" size={25} color="red" />
             </TouchableOpacity>
           </View>
         ))}
-        
-        <TouchableOpacity onPress={addActivity} style={styles.addActivityButton}>
+
+        <TouchableOpacity style={styles.addActivityButton} onPress={addActivity}>
           <Text style={styles.addActivityButtonText}>Add Activity</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={handleSubmit} style={styles.submitButton} disabled={isLoading}>
-          {isLoading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.submitButtonText}>Submit</Text>
-          )}
+        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+          <Text style={styles.submitButtonText}>Submit Event</Text>
         </TouchableOpacity>
 
-        {showDatePicker && (
-        <DateTimePicker
-          value={tempDate}
-          mode="datetime"
-          display="default"
-          onChange={onChangeDate}
-        />
-      )}
-      {showTimePicker && (
-        <DateTimePicker
-          value={tempDate}
-          mode="time"
-          display="default"
-          onChange={onChangeTime}
-        />
-      )}
+        {isLoading && <ActivityIndicator size="large" color="#7d0431" />}
 
+        {/* Modal for Image Picker */}
+        <Modal visible={modalVisible} transparent={true} animationType="slide">
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Select Image Source</Text>
+              <TouchableOpacity onPress={pickImage} style={styles.modalButtonIcon}>
+                <Text>Pick from Gallery  </Text>
+                <Icon name="photo-library" size={24} color="#7D0431" />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={takePhoto} style={styles.modalButtonIcon}>
+                <Text>Take a Photo  </Text>
+                <Icon name="photo-camera" size={24} color="#7D0431" />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.modalButton}>
+                <Text style={styles.modalButtonCancel}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
 
+        <Toast />
       </View>
     </ScrollView>
   );
 };
+
+
 
 const styles = StyleSheet.create({
   container: {
@@ -387,6 +402,47 @@ const styles = StyleSheet.create({
   submitButtonText: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: 300,
+    padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 15,
+    color: "#7D0431"
+  },
+  modalButton: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: '#7d0431',
+    borderRadius: 5,
+    width: '100%',
+    alignItems: 'center',
+  },
+  modalButtonCancel: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  modalButtonIcon: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    padding: 10,
+    backgroundColor: '#f2f2f2',
+    borderRadius: 5,
+    width: '100%',
+    marginBottom: 10,
+    alignItems: 'center',
   },
 });
 

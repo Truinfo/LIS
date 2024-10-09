@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchEvent, deleteEvent } from './EventSlice';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ImagebaseURL } from '../../../Security/helpers/axios';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Modal from 'react-native-modal';
@@ -15,9 +15,12 @@ const Events = () => {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const navigation = useNavigation();
 
-    useEffect(() => {
-        dispatch(fetchEvent());
-    }, [dispatch]);
+    useFocusEffect(
+        React.useCallback(() => {
+            dispatch(fetchEvent());
+        }, [dispatch])
+    );
+
 
     const handleView = (event) => {
         navigation.navigate('View Events', { eventId: event._id });

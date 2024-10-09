@@ -180,12 +180,12 @@ const styles = StyleSheet.create({
   },
   backButtonText: {
     fontSize: 24,
-    color: '#630000',
+    color: '#7d0431',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#630000',
+    color: '#7d0431',
   },
   formContainer: {
     paddingVertical: 20,
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   submitButton: {
-    backgroundColor: '#630000',
+    backgroundColor: '#7d0431',
     borderRadius: 8,
     padding: 15,
     alignItems: 'center',
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   snackbar: {
-    backgroundColor: '#630000', // Snackbar color
+    backgroundColor: '#7d0431', // Snackbar color
   },
 });
 

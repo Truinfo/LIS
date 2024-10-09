@@ -141,7 +141,7 @@ const EditAmenity = () => {
     <View style={styles.container}>
       {loading && ( // Full-screen loading overlay
         <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="large" color="#630000" />
+          <ActivityIndicator size="large" color="#7d0431" />
         </View>
       )}
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   uploadButtonText: {
-    color: "#630000",
+    color: "#7d0431",
     fontSize: 16,
     fontWeight: "600",
   },
@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   submitButton: {
-    backgroundColor: "#630000",
+    backgroundColor: "#7d0431",
     padding: 15,
     borderRadius: 8,
     alignItems: "center",

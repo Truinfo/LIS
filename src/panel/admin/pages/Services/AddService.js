@@ -171,7 +171,7 @@ const AddService = () => {
     const pickImage = async (launchFunction) => {
         let result = await launchFunction({
             mediaTypes: ImagePicker.MediaTypeOptions.All,
-            allowsEditing: true,
+            allowsEditing: false,
             aspect: [4, 3],
             quality: 1,
         });

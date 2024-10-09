@@ -48,10 +48,9 @@ export const updateAmenityBooking = createAsyncThunk(
   "booking/updateAmenityBooking",
   async ({ userId, formData }) => {
     const societyId = await fetchSocietyId();
-    console.log(societyId, userId, formData)
-    const response = await axios.put(
+    const response = await axiosInstance.put(
       `/updateAmenityBooking/${societyId}/${userId}`,
-      formData
+      formData,
 
     );
     return response.data;

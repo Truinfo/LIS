@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -42,7 +42,7 @@ const ApplianceList = () => {
             <Text style={styles.phone}>{item.phoneNumber}</Text>
           </View>
         </View>
-       
+
       </View>
       <TouchableOpacity
         onPress={() => handleCall(item.phoneLeft, item.phoneRight)}
@@ -53,7 +53,9 @@ const ApplianceList = () => {
     </View>
   );
   if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
+    return (<View style={styles.loadingContainer}>
+      <ActivityIndicator size="large" color="#7d0431" />
+    </View>)
   }
 
   if (error) {
@@ -62,8 +64,8 @@ const ApplianceList = () => {
   return (
     <View style={styles.container}>
       <FlatList
-       data={data.appliance}
-       keyExtractor={(item) => item._id}
+        data={data.appliance}
+        keyExtractor={(item) => item._id}
         renderItem={renderItem}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
@@ -114,8 +116,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    paddingHorizontal:15,
-    paddingTop:10
+    paddingHorizontal: 15,
+    paddingTop: 10
   },
   itemContainer: {
     backgroundColor: "#fcf6f0",
@@ -123,8 +125,8 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 30,
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 0,
-    borderWidth:1,
-    borderColor:"#e6b08b",
+    borderWidth: 1,
+    borderColor: "#e6b08b",
     marginBottom: 10,
     padding: 15,
   },
@@ -181,6 +183,11 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 14,
     fontWeight: "600",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

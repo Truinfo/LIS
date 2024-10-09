@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   Modal,
   Alert,
-  Share,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -17,10 +16,10 @@ import { Avatar } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchServices } from "../../../Redux/Slice/ServiceSlice/ServiceSlice";
 import { addService } from "../../../Redux/Slice/ServiceSlice/AddServiceSlice";
-const MaidProfile = ({ navigation, route }) => {
+const MaidProfile = ({ route }) => {
   const dispatch = useDispatch();
   const { id, userid } = route.params;
-  const { data, loading, error } = useSelector((state) => state.services);
+  const { data, } = useSelector((state) => state.services);
   useEffect(() => {
     dispatch(fetchServices());
   }, [dispatch]);
@@ -77,7 +76,10 @@ const MaidProfile = ({ navigation, route }) => {
         ],
       };
       const result = await dispatch(addService(serviceData));
+      console.log(result)
       if (result.type === "services/addService/fulfilled") {
+
+        console.log("success")
         setModalVisible(false);
         Alert.alert(result.payload.message);
       }
@@ -86,12 +88,12 @@ const MaidProfile = ({ navigation, route }) => {
     }
   };
 
-  const filteredMaid = data.maid.find(maid => maid._id === id);
+  const filteredMaid = data?.maid.find(maid => maid._id === id);
 
   if (!filteredMaid) {
     return (
-      <View style={styles.container}>
-        <Text>Loading...</Text>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#7d0431" />
       </View>
     );
   }
@@ -209,50 +211,7 @@ const MaidProfile = ({ navigation, route }) => {
             ))}
           </View>
         </View>
-        <Text style={{ fontWeight: "700", fontSize: 20, margin: 20 }}>
-          Reviews
-        </Text>
-        {filteredMaid.list.some(item => item.rating != null || item.reviews != null || item.rating != "" || item.reviews != "") ? (
-          <ScrollView
-            horizontal
-            contentContainerStyle={styles.horizontalScrollView}
-          >
-            {filteredMaid.list.map((item, index) => (
-              
-              <View key={index}>
-                {console.log(item)}
-                <View style={styles.reviewCard}>
-                  <View style={styles.reviewSection}>
-                    <View style={styles.reviewContainer}>
-                      {item.rating != null ? (
-                        <Rating
-                          type="star"
-                          imageSize={16}
-                          readonly
-                          startingValue={item.rating}
-                          style={styles.rating}
-                        />
-                      ) : (
-                        <Text style={{ fontWeight: "500", color: "#797979" }}>
-                          No reviews available.
-                        </Text>
-                      )}
-                    </View>
-                  </View>
-                  <View style={{ marginTop: 10 }}>
-                    <Text style={{ fontWeight: "500", color: "#797979" }}>
-                      {item.reviews != null ? item.reviews : "No reviews available."}
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            ))}
-          </ScrollView>
-        ) : (
-          <Text style={{ fontWeight: "500", color: "#797979" }}>
-            No reviews available.
-          </Text>
-        )}
+
       </View >
       <Modal
         animationType="slide"
@@ -263,9 +222,7 @@ const MaidProfile = ({ navigation, route }) => {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <View style={styles.modalColumn}>
-
               <Text style={styles.modalText}>Review</Text>
-
             </View>
             <View style={styles.modalRow}>
               <Avatar.Image
@@ -279,13 +236,11 @@ const MaidProfile = ({ navigation, route }) => {
               </View>
             </View>
 
-            <View style={{ flexDirection: "column", marginTop: 10 }}>
+            <View style={{ flexDirection: "row", marginTop: 10, alignItems: "center" }}>
 
-              <Text style={[styles.Slot]}>Selected Timings</Text>
+              <Text style={[styles.Slot, { paddingRight: 20, textDecorationLine: "none" }]}>Selected Timings :</Text>
               <Text style={styles.modalSlot}>{selectedSlot}</Text>
             </View>
-
-
 
             <View style={styles.modalButtonContainer}>
               <TouchableOpacity
@@ -534,7 +489,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     alignSelf: "flex-start",
     marginTop: 5,
-    width: "100%",
+    width: 130,
     fontWeight: "500",
   },
   modalButtonContainer: {
@@ -629,6 +584,11 @@ const styles = StyleSheet.create({
   },
   selectedSlotText: {
     color: "white",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

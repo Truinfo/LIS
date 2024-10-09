@@ -27,12 +27,10 @@ const EditResidents = ({ route }) => {
     const [imageUri, setImageUri] = useState(null); // State to hold image URI
     const [snackbarVisible, setSnackbarVisible] = useState(false); // State for Snackbar visibility
 
-    // Fetch users on component mount
     useEffect(() => {
         dispatch(fetchUsers());
     }, [dispatch]);
 
-    // Find resident details based on ID
     useEffect(() => {
         const foundResident = users.find(user => user._id === resident._id);
         if (foundResident) {
@@ -71,50 +69,55 @@ const EditResidents = ({ route }) => {
     const pickImage = async (launchFunction) => {
         let result = await launchFunction({
             mediaTypes: ImagePicker.MediaTypeOptions.All,
-            allowsEditing: true,
+            allowsEditing: false,
             aspect: [4, 3],
             quality: 1,
         });
 
         if (!result.canceled) {
-            setImageUri(result.assets[0].uri); // Store the URI for use in the image upload
-            setPhoto(result.assets[0]); // Store the asset for form submission
+            setImageUri(result.assets[0].uri); 
+            setPhoto(result.assets[0]);
         }
     };
 
-    const handleSubmit = async () => {
-        const formData = new FormData();
-        formData.append('name', name);
-        formData.append('mobileNumber', phone);
-        formData.append('email', email);
-        formData.append('block', block);
-        formData.append('flat', flat);
-        formData.append('apartment', apartment);
+   const handleSubmit = async () => {
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('mobileNumber', phone);
+    formData.append('email', email);
+    formData.append('block', block);
+    formData.append('flat', flat);
+    formData.append('apartment', apartment);
 
-        // Only append the image if it was changed
-        if (imageUri) {
-            formData.append('profilePicture', {
-                uri: imageUri,
-                name: `profile-${Date.now()}.jpeg`, // Change the name to match your server's expectation
-                type: 'image/jpeg', // Set appropriate MIME type
-            });
-        }
-        const updatedResident = { formData, id: resident._id };
+    // Only append the image if it was changed
+    if (imageUri) {
+        formData.append('profilePicture', {
+            uri: imageUri,
+            name: `profile-${Date.now()}.jpeg`,
+            type: 'image/jpeg',
+        });
+    }
+    const updatedResident = { formData, id: resident._id };
 
-        try {
-            const result = await dispatch(EditUserProfile(updatedResident)).unwrap();
-            console.log(result);
-            setSnackbarMessage(`${result.message}`);
+    try {
+        const response = await dispatch(EditUserProfile(updatedResident));
+        console.log(response); // Log the response
+
+        if (response.type === "profiles/EditUserProfile/fulfilled") {
+            setSnackbarMessage(`${response.payload.message}`);
             setSnackbarVisible(true);
             dispatch(fetchUsers());
             setTimeout(() => {
                 navigation.navigate('Residential Management');
             }, 2000);
-        } catch (error) {
-            setSnackbarMessage(`${error.message}`);
-            setSnackbarVisible(true);
         }
-    };
+    } catch (error) {
+        console.error('Error during profile update:', error);
+        setSnackbarMessage(`Error: ${error.message}`);
+        setSnackbarVisible(true);
+    }
+};
+
 
     return (
         <KeyboardAvoidingView

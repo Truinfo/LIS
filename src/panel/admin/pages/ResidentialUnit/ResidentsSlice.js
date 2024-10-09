@@ -2,9 +2,10 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../../Security/helpers/axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 const fetchSocietyId = async () => {
-    const storedAdmin = await AsyncStorage.getItem('societyAdmin');
-    const societyAdmin = JSON.parse(storedAdmin) || {};
-    return societyAdmin._id || "6683b57b073739a31e8350d0"; // Default ID
+    const storedAdmin = await AsyncStorage.getItem('user');
+    const societyAdmin = JSON.parse(storedAdmin) ;
+    console.log("societyID Slice",societyAdmin._id)
+    return societyAdmin._id ; // Default ID
 };
 export const fetchUsers = createAsyncThunk(
     'user/fetchUsers',

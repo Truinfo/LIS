@@ -11,7 +11,7 @@ export const EditUserProfile = createAsyncThunk(
   'profiles/EditUserProfile',
   async ({ formData, id }, thunkAPI) => {
     try {
-
+      console.log(formData, id)
       const response = await axiosInstance.put(
         `/user/updateUserProfile/${id}`,
         formData,
@@ -23,7 +23,7 @@ export const EditUserProfile = createAsyncThunk(
       );
       return response.data;
     } catch (error) {
-      consoel.log(error)
+      console.log(error)
       return thunkAPI.rejectWithValue(error.response.data);
     }
   }

@@ -162,7 +162,7 @@ const AddResidents = () => {
             if (userProfileId) {
                 const userData = {
                     name,
-                    email,
+                    email:email,
                     mobileNumber: phoneNumber,
                     password,
                     society: societyLicence,

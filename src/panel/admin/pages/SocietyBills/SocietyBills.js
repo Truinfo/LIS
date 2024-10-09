@@ -11,7 +11,6 @@ import {
     Card,
     Dialog,
     Paragraph,
-    Provider as PaperProvider,
     Text,
 } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
@@ -126,7 +125,7 @@ const SocietyBills = () => {
         <Card style={styles.card} onPress={() => handleView(item)}>
             <View style={styles.titleContainer}>
                 <Text style={styles.cardTitle}>{item.name}</Text>
-                
+
                 <TouchableOpacity
                     onPress={() => setActionMenuVisible(actionMenuVisible === item._id ? null : item._id)}
                     style={styles.dotsButton}
@@ -208,45 +207,45 @@ const SocietyBills = () => {
                 }
             />
 
-                <Dialog
-                    visible={dialogVisible}
-                    onDismiss={() => setDialogVisible(false)}
-                >
-                    <Dialog.Title style={styles.dialogTitle}>Details</Dialog.Title>
-                    <Dialog.Content>
-                        {selectedBill ? (
-                            <>
-                                <View style={styles.selectDetails}>
-                                    <Text style={styles.selectDetailLabel}>ID</Text>
-                                    <Text style={styles.selectDetailValue}>{selectedBill._id}</Text>
-                                </View>
-                                <View style={styles.selectDetails}>
-                                    <Text style={styles.selectDetailLabel}>Bill</Text>
-                                    <Text style={styles.selectDetailValue}>{selectedBill.name}</Text>
-                                </View>
-                                <View style={styles.selectDetails}>
-                                    <Text style={styles.selectDetailLabel}>Amount</Text>
-                                    <Text style={styles.selectDetailValue}>{selectedBill.amount}</Text>
-                                </View>
-                                <View style={styles.selectDetails}>
-                                    <Text style={styles.selectDetailLabel}>Date</Text>
-                                    <Text style={styles.selectDetailValue}>{formatDate(selectedBill.date)}</Text>
-                                </View>
-                            </>
-                        ) : (
-                            <Paragraph>No details available.</Paragraph>
-                        )}
-                    </Dialog.Content>
-                    <Dialog.Actions>
-                        <TouchableOpacity
-                            style={styles.dialogButton}
-                            onPress={() => setDialogVisible(false)}
-                        >
-                            <Text style={styles.dialogButtonText}>Close</Text>
-                        </TouchableOpacity>
-                    </Dialog.Actions>
-                </Dialog>
-         
+            <Dialog
+                visible={dialogVisible}
+                onDismiss={() => setDialogVisible(false)}
+            >
+                <Dialog.Title style={styles.dialogTitle}>Details</Dialog.Title>
+                <Dialog.Content>
+                    {selectedBill ? (
+                        <>
+                            <View style={styles.selectDetails}>
+                                <Text style={styles.selectDetailLabel}>ID</Text>
+                                <Text style={styles.selectDetailValue}>{selectedBill._id}</Text>
+                            </View>
+                            <View style={styles.selectDetails}>
+                                <Text style={styles.selectDetailLabel}>Bill</Text>
+                                <Text style={styles.selectDetailValue}>{selectedBill.name}</Text>
+                            </View>
+                            <View style={styles.selectDetails}>
+                                <Text style={styles.selectDetailLabel}>Amount</Text>
+                                <Text style={styles.selectDetailValue}>{selectedBill.amount}</Text>
+                            </View>
+                            <View style={styles.selectDetails}>
+                                <Text style={styles.selectDetailLabel}>Date</Text>
+                                <Text style={styles.selectDetailValue}>{formatDate(selectedBill.date)}</Text>
+                            </View>
+                        </>
+                    ) : (
+                        <Paragraph>No details available.</Paragraph>
+                    )}
+                </Dialog.Content>
+                <Dialog.Actions>
+                    <TouchableOpacity
+                        style={styles.dialogButton}
+                        onPress={() => setDialogVisible(false)}
+                    >
+                        <Text style={styles.dialogButtonText}>Close</Text>
+                    </TouchableOpacity>
+                </Dialog.Actions>
+            </Dialog>
+
             <TouchableOpacity
                 style={styles.floatingButton}
                 onPress={() => {
@@ -277,17 +276,16 @@ const SocietyBills = () => {
 };
 
 const styles = StyleSheet.create({
-    appbarTitle: {
-        alignItems: 'center',
-    },
-    searchbar: {
-        margin: 10,
+    container: {
+        flexGrow: 1,
+        padding: 15,
+        backgroundColor: "#fff",
     },
     list: {
         paddingHorizontal: 10,
     },
     card: {
-        marginVertical: 10,
+        marginVertical: 5,
     },
     titleContainer: {
         flexDirection: 'row',
@@ -390,7 +388,7 @@ const styles = StyleSheet.create({
     },
     actionMenu: {
         position: 'absolute',
-        top: 40, 
+        top: 40,
         right: 0,
         backgroundColor: '#fff',
         padding: 10,

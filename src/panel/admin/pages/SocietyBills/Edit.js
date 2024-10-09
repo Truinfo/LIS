@@ -86,7 +86,7 @@ const Edit = () => {
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: false, 
+      allowsEditing: false,
       quality: 1,
     });
 
@@ -256,19 +256,27 @@ const Edit = () => {
               style={styles.existingImage}
               resizeMode="cover"
             />
-            <Text style={styles.fileName}>Existing File: {existingFileName}</Text>
+            <Text style={styles.fileName}>
+              <Text style={{fontWeight: '700'}}>Existing File:</Text>
+              {existingFileName}
+              </Text>
           </View>
         )}
 
         {formState.pictures && (
           <View style={styles.newImageContainer}>
+
             <Image
               source={{ uri: formState.pictures }}
               style={styles.newImage}
               resizeMode="cover"
             />
-            <Text style={styles.fileName}>New File: {fileName}</Text>
-            <TouchableOpacity onPress={() => setFormState({ ...formState, pictures: null })}>
+            <Text style={styles.fileName}>
+            <Text style={{fontWeight: '700'}}>New File:</Text> 
+            {fileName}
+            </Text>
+            <TouchableOpacity style={styles.DeleteIconCont} onPress={() => setFormState({ ...formState, pictures: null })}>
+              <Icon name="delete" size={24} color="red" />
               <Text style={styles.removeText}>Remove Image</Text>
             </TouchableOpacity>
           </View>
@@ -332,7 +340,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
     marginBottom: 5,
     fontSize: 16,
-    color: "#630000",
+    color: "#7D0431",
     fontWeight: "600",
   },
   input: {
@@ -341,24 +349,24 @@ const styles = StyleSheet.create({
   existingImageContainer: {
     flexDirection: "column",
     alignItems: "flex-start",
-    marginBottom: 10,
+    marginBottom: 20,
   },
   existingImage: {
     width: "100%",
     height: 200,
     borderRadius: 5,
-    marginBottom: 5,
+    marginBottom: 15,
   },
   newImageContainer: {
     flexDirection: "column",
     alignItems: "flex-start",
-    marginBottom: 10,
+    marginBottom: 15,
   },
   newImage: {
     width: "100%",
     height: 200,
     borderRadius: 5,
-    marginBottom: 5,
+    marginBottom: 15,
     borderWidth: 2,
     borderColor: "#4CAF50",
   },
@@ -369,7 +377,6 @@ const styles = StyleSheet.create({
   removeText: {
     color: "#FF0000",
     marginTop: 5,
-    textDecorationLine: "underline",
   },
   submitButton: {
     backgroundColor: "#630000",
@@ -456,6 +463,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   errorText: {
+    color: 'red',
+    marginBottom: 8,
+    marginLeft: 4,
+  },
+  DeleteIconCont: {
+    flexDirection: 'row',
+    alignContent: 'center',
+    alignSelf: 'flex-end',
     color: 'red',
     marginBottom: 8,
     marginLeft: 4,

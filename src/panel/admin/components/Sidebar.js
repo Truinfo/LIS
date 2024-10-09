@@ -62,7 +62,7 @@ export default function Sidebar() {
   return (
     <View style={{ flex: 1 }}>
       <Drawer.Navigator
-        initialRouteName="Dashboard"
+        initialRouteName="Events"
         screenOptions={{
           headerRight: () => (
             <View style={{ flexDirection: 'row', alignItems: "center", gap: 15, marginRight: 10 }}>

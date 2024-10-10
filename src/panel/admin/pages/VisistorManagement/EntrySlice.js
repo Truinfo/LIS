@@ -1,15 +1,16 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../../../Security/helpers/axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 
 export const fetchVisitors = createAsyncThunk(
   "visitors/fetchVisitors",
   async () => {
-    const societyAdminString = await AsyncStorage.getItem("societyAdmin");
+    const societyAdminString = await AsyncStorage.getItem("user");
     const data = societyAdminString ? JSON.parse(societyAdminString) : {};
-    const societyId = data._id || "6683b57b073739a31e8350d0"; // Default ID
-    const response = await axiosInstance(
-      `/getAllVisitorsBySocietyId/${societyId}`
+    const societyId = data._id; // Default ID
+    const response = await axios.get(
+      `http://192.168.29.35:2000/api/getAllVisitorsBySocietyId/${societyId}`
     );
     return response.data.visitors;
   }
@@ -17,12 +18,14 @@ export const fetchVisitors = createAsyncThunk(
 
 export const deleteEntry = createAsyncThunk(
   "visitors/Delete",
-  async (selectedEntry) => {
-    const societyAdminString = await AsyncStorage.getItem("societyAdmin");
+  async ({block,flatNo,visitorId}) => {
+    const societyAdminString = await AsyncStorage.getItem("user");
     const data = societyAdminString ? JSON.parse(societyAdminString) : {};
-    const societyId = data._id || "6683b57b073739a31e8350d0"; // Default ID
-    const response = await axiosInstance(`/deleteEntryVisitor/${societyId}/${selectedEntry.block}/${selectedEntry.flatNo}/${selectedEntry.visitorId}`);
-    return response.data.visitor;
+    const societyId = data._id; 
+    const response = await axiosInstance.delete(
+      `/deleteEntryVisitor/${societyId}/${block}/${flatNo}/${visitorId}`
+    );
+    return response.data;
   }
 );
 
@@ -57,6 +60,7 @@ const visitorsSlice = createSlice({
       })
       .addCase(deleteEntry.rejected, (state, action) => {
         state.status = "failed";
+
         state.error = action.error.message;
       });
   },

@@ -1,16 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../../Security/helpers/axios';
 
-const fetchSocietyId = async () => {
-  const storedAdmin = await AsyncStorage.getItem('societyAdmin');
-  const societyAdmin = JSON.parse(storedAdmin) || {};
-  return societyAdmin._id || "6683b57b073739a31e8350d0"; // Default ID
-};
 export const fetchResidentProfile = createAsyncThunk(
   'profile/fetchResidentProfile',
-  async () => {
-    const societyId = await fetchSocietyId()
-    console.log(societyId, "id")
+  async (societyId) => {
     const response = await axiosInstance.get(`/society/profile/${societyId}`);
     return response.data.admins;
   }

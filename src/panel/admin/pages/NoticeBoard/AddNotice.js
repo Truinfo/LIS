@@ -54,9 +54,7 @@ const AddNotice = ({ navigation }) => {
             setErrors(newErrors);
             return;
         }
-        console.log(formData)
         dispatch(createNotice(formData)).then((response) => {
-            console.log(response)
             if (response.meta.requestStatus === 'fulfilled') {
                 setFormData({
                     societyId: formData.societyId, // Keep the societyId the same

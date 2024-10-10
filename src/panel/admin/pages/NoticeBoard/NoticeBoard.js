@@ -119,7 +119,7 @@ const NoticeBoard = () => {
                         onPress: () => {
                             dispatch(deleteNotice(selectedNotice._id))
                                 .then((result) => {
-                                    if (result.type === "notice/createNotice/fulfilled") {
+                                    if (result.type === "notice/deleteNotice/fulfilled") {
                                         setSnackbarMessage(`${result.payload.message}`);
                                         setSnackbarVisible(true);
                                         dispatch(fetchnotices());

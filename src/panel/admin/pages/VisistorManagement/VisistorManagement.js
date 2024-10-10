@@ -55,7 +55,8 @@ const VisitorManagement = () => {
     const handleDeleteNotice = () => {
         setDeleteDialogVisible(false);
         if (selectedEntry) {
-            dispatch(deleteEntry(selectedEntry))
+
+            dispatch(deleteEntry({block:selectedEntry.block,flatNo:selectedEntry.flatNo,visitorId:selectedEntry._id}))
                 .then((result) => {
                     if (result.meta.requestStatus === "fulfilled") {
                         setSnackbarMessage("Notice deleted successfully.");

@@ -125,6 +125,10 @@ import UpiPayment from './src/panel/admin/pages/Dashboard/Payment';
 
 import AdminAddSocietyBills from './src/panel/admin/pages/SocietyBills/Add';
 import AdminEditSocietyBills from './src/panel/admin/pages/SocietyBills/Edit';
+import AddProductScreen from './src/panel/User/Navigations/Screens/MarketPlace/AddProductScreen';
+import ListPage from './src/panel/User/Navigations/Screens/MarketPlace/ListPage';
+import PropertyDetails from './src/panel/User/Navigations/Screens/MarketPlace/PropertyDetails';
+import MyAdds from './src/panel/User/Navigations/Screens/MarketPlace/MyAdds';
 
 
 const Stack = createNativeStackNavigator();
@@ -179,7 +183,7 @@ export default function App() {
     return null;
   }
 
-  
+
   return (
     <Provider store={store}>
       <NavigationContainer>
@@ -187,6 +191,7 @@ export default function App() {
           <StatusBar barStyle="light-content" backgroundColor="#000" />
           <Stack.Navigator
             initialRouteName={initialRoute}
+            // initialRouteName="Property List"
             screenOptions={{
               headerStyle: {
                 backgroundColor: '#7D0431',
@@ -308,27 +313,21 @@ export default function App() {
             <Stack.Screen name="Sidebar" component={Sidebar} options={{
               headerShown: false,
             }} />
-
             <Stack.Screen name="AdminProfile" component={Profile} />
             <Stack.Screen name="Resetpassword" component={AdminResetPassword} />
-
-
             <Stack.Screen name="Add Residents" component={AddResidents} />
             <Stack.Screen name="Residents Details" component={ResidentDetails} />
             <Stack.Screen name="Edit Resident" component={EditResidents} />
             <Stack.Screen name="Add Staff" component={AdminAddService} />
             <Stack.Screen name="Staff List" component={ServicesList} />
             <Stack.Screen name="Edit Service" component={EditService} />
-
             <Stack.Screen name="Add Security" component={AddSecurity} />
             <Stack.Screen name="Edit Security" component={EditSecurity} />
             <Stack.Screen name="View Security" component={ViewSequrity} />
             <Stack.Screen name="Attendance" component={AttendanceForm} />
-
             <Stack.Screen name="View Events" component={ViewEvents} />
             <Stack.Screen name="Add Events" component={AddEvents} />
             <Stack.Screen name="Edit Event" component={EditEvent} />
-
             <Stack.Screen name='View Details' component={ReviewAdd} />
             <Stack.Screen name='Add Post' component={AddAdvertisements} />
             <Stack.Screen name='Edit Post' component={EditAdd} />
@@ -349,13 +348,15 @@ export default function App() {
             <Stack.Screen name='Edit Committee Member' component={EditMember} />
             <Stack.Screen name='Renewal Plan' component={PlanRenewalScreen} options={{
               headerShown: false,
-            }}/>
+            }} />
             <Stack.Screen name='Admin Notifications' component={AdminNotifications} />
-
             <Stack.Screen name='UpiPayment' component={UpiPayment} />
-
             <Stack.Screen name='Add Society Bills' component={AdminAddSocietyBills} />
             <Stack.Screen name='Edit Society Bills' component={AdminEditSocietyBills} />
+            <Stack.Screen name='Add Property' component={AddProductScreen} />
+            <Stack.Screen name='Property List' component={ListPage} />
+            <Stack.Screen name='Property Details' component={PropertyDetails} />
+            <Stack.Screen name='My Adds' component={MyAdds} />
           </Stack.Navigator>
         </SafeAreaView>
       </NavigationContainer>

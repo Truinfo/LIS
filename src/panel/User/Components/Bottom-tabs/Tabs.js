@@ -6,10 +6,12 @@ import QuickActions from '../../Navigations/Screens/QuickActions';
 import Services from '../../Navigations/Screens/Services';
 import Community from '../../Navigations/Screens/Community';
 import RentalProperties from '../../Navigations/Screens/Community/RentalProperties';
-
+import Icon from 'react-native-vector-icons/Ionicons';
+import { useNavigation } from '@react-navigation/native';
 const Tab = createBottomTabNavigator();
 
 function Tabs() {
+    const navigation = useNavigation()
     return (
         <Tab.Navigator
             initialRouteName="Home"
@@ -78,10 +80,23 @@ function Tabs() {
                 headerTintColor: '#fff',
             }} />
 
-            <Tab.Screen name="Social" component={RentalProperties} options={{
-                headerStyle: { backgroundColor: '#7D0431' },
-                headerTintColor: '#fff',
-            }} />
+            <Tab.Screen
+                name="Social"
+                component={RentalProperties}
+                options={{
+                    headerStyle: { backgroundColor: '#7D0431' },
+                    headerTintColor: '#fff',
+                    headerRight: () => (
+                        <Icon
+                            name="storefront-sharp" // Change this to your desired icon
+                            size={28}
+                            color="#fff"
+                            style={{ marginRight: 15 }} // Add some margin to align properly
+                            onPress={() => navigation.navigate("Property List")} // Handle icon press here
+                        />
+                    ),
+                }}
+            />
         </Tab.Navigator>
     );
 }

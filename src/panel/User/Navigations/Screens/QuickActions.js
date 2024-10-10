@@ -11,7 +11,7 @@ import {
   Share,
   Alert,
 } from "react-native";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
 import { ActivityIndicator, Avatar, Checkbox } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -59,14 +59,14 @@ const QuickActions = ({ navigation }) => {
     if (type === "camera") {
       result = await ImagePicker.launchCameraAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
+        allowsEditing: false,
         aspect: [4, 3],
         quality: 1,
       });
     } else {
       result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
+        allowsEditing: false,
         aspect: [4, 3],
         quality: 1,
       });
@@ -509,7 +509,7 @@ const QuickActions = ({ navigation }) => {
           onPress={() => navigation.navigate("Pre Approval Visitors")}
         >
           <Image
-            source={require("../../../../assets/User/images/phone1.png")}
+            source={require("../../../../assets/User/images/id.png")}
             style={styles.icon}
           />
           <Text style={styles.iconLabel}>Pre Approval Visitors</Text>
@@ -729,17 +729,26 @@ const QuickActions = ({ navigation }) => {
             >
               <MaterialCommunityIcons name="close" style={styles.closeIcon} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={chooseImageSource}>
-              <Avatar.Image
-                size={120}
-                source={
-                  image
-                    ? { uri: image }
-                    : require("../../../../assets/User/images/cake.png")
-                }
-                style={styles.modalImage}
-              />
-            </TouchableOpacity>
+            <View style={styles.profilecontainer}>
+              <TouchableOpacity onPress={chooseImageSource}>
+                <Avatar.Image
+                  size={120}
+                  source={
+                    image
+                      ? { uri: image }
+                      : require("../../../../assets/User/images/cake.png")
+                  }
+                  style={styles.modalImage}
+                />
+                <TouchableOpacity
+                  onPress={chooseImageSource}
+                  style={styles.cameraIcon}
+                >
+                  <Entypo name="camera" size={20} color="#7d0431" />
+                </TouchableOpacity>
+              </TouchableOpacity>
+            </View>
+
             <TextInput
               style={styles.input}
               placeholder="Name"
@@ -774,8 +783,9 @@ const QuickActions = ({ navigation }) => {
               <Checkbox
                 status={isCheckboxChecked ? "checked" : "unchecked"}
                 onPress={() => setIsCheckboxChecked(!isCheckboxChecked)}
+                theme={{ colors: { primary: "#7d0431" } }}
               />
-              <Text style={styles.checkboxLabel}>Add to frequent Visitor</Text>
+              <Text style={{marginTop:7}}>Add to frequent Visitor</Text>
             </View>
 
             <TouchableOpacity
@@ -1152,6 +1162,18 @@ const styles = StyleSheet.create({
     padding: 20,
     width: "90%",
     alignItems: "center",
+  },
+  profilecontainer: {
+    alignItems: "center",
+    position: "relative", // Set relative positioning for the container
+  },
+  cameraIcon: {
+    position: "absolute", // Positioning it absolutely within the container
+    bottom: 10, // Align to the bottom of the Avatar
+    right: 5, // Align to the right of the Avatar
+    borderRadius: 50,
+    backgroundColor: " rgba(0,0,0,0.2)", // Make the background transparent
+    padding: 10, // Add some padding for touchable area
   },
 });
 

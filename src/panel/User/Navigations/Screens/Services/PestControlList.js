@@ -59,7 +59,7 @@ const PestControlList = () => {
     <View style={styles.container}>
       <FlatList
         data={data.pestClean}
-        keyExtractor={(item) => item}
+        keyExtractor={(item) => item._id}
         renderItem={renderItem}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
       />

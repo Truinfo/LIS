@@ -68,7 +68,7 @@ const MoversList = () => {
     <View style={styles.container}>
       <FlatList
         data={data.moving}
-        keyExtractor={(item) => item}
+        keyExtractor={(item) => item._id}
         renderItem={renderItem}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
       />

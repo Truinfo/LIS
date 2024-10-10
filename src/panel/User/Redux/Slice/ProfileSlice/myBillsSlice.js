@@ -1,4 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
+import { Api } from '../../../../Security/helpers/axios';
 // Define the initial state
 const initialState = {
     bills: [],
@@ -10,7 +12,9 @@ const initialState = {
 export const fetchBills = createAsyncThunk(
     'bills/fetchBills',
     async ({ societyId, blockno, flatno }) => {
-        const response = await axiosInstance.get(`/getPaymentsOfEach/${societyId}/${blockno}/${flatno}`); // Replace with your API endpoint
+
+        const response = await Api.get(`/getPaymentsOfEach/${societyId}/${blockno}/${flatno}`); 
+
         return response.data;
     }
 );

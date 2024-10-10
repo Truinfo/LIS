@@ -66,7 +66,7 @@ const CarpentersList = () => {
     <View style={styles.container}>
       <FlatList
         data={data.carpenter}
-        keyExtractor={(item) => item}
+        keyExtractor={(item) => item._id}
         renderItem={renderItem}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
       />

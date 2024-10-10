@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -10,16 +9,19 @@ import {
   Image,
   Dimensions,
   Share,
-  Alert
+  Alert,
 } from "react-native";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
 import { ActivityIndicator, Avatar, Checkbox } from "react-native-paper";
-import { useDispatch, useSelector } from 'react-redux';
-import { createVisitor, resetState } from '../../Redux/Slice/Security_Panel/VisitorsSlice';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useDispatch, useSelector } from "react-redux";
+import {
+  createVisitor,
+  resetState,
+} from "../../Redux/Slice/Security_Panel/VisitorsSlice";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { fetchUserProfiles } from "../../Redux/Slice/ProfileSlice/ProfileSlice";
-import * as ImagePicker from 'expo-image-picker';
-import { Calendar } from 'react-native-calendars';
+import * as ImagePicker from "expo-image-picker";
+import { Calendar } from "react-native-calendars";
 import { ImagebaseURL } from "../../../Security/helpers/axios";
 const { width, height } = Dimensions.get("window");
 
@@ -35,36 +37,36 @@ const QuickActions = ({ navigation }) => {
   const [isAlertModalVisible, setAlertModalVisible] = useState(false);
   const [calendarModalVisible, setCalendarModalVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [societyId, setSocietyId] = useState('');
-  const [userId, setUserId] = useState('');
-  const [buildingName, setBuildingName] = useState('');
-  const [flatNumber, setFlatNumber] = useState('');
-  const [role, setRole] = useState('');
+  const [societyId, setSocietyId] = useState("");
+  const [userId, setUserId] = useState("");
+  const [buildingName, setBuildingName] = useState("");
+  const [flatNumber, setFlatNumber] = useState("");
+  const [role, setRole] = useState("");
   const [qrImageUrl, setQrImageUrl] = useState(null);
   const [visitorId, setVisitorId] = useState(null);
   const [showQrModal, setShowQrModal] = useState(false);
   // Cab entry state
-  const [name, setName] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [vehicleNumber, setVehicleNumber] = useState('');
-  const [company, setCompany] = useState('');
+  const [name, setName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [vehicleNumber, setVehicleNumber] = useState("");
+  const [company, setCompany] = useState("");
 
   //Delivery
-  const [details, setDetails] = useState("")
+  const [details, setDetails] = useState("");
   const [image, setImage] = useState(null);
   const handleImagePicker = async (type) => {
     let result;
-    if (type === 'camera') {
+    if (type === "camera") {
       result = await ImagePicker.launchCameraAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
+        allowsEditing: false,
         aspect: [4, 3],
         quality: 1,
       });
     } else {
       result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
+        allowsEditing: false,
         aspect: [4, 3],
         quality: 1,
       });
@@ -76,38 +78,33 @@ const QuickActions = ({ navigation }) => {
   };
 
   const chooseImageSource = () => {
-    Alert.alert(
-      'Select Image Source',
-      'Choose an option to pick an image',
-      [
-        {
-          text: 'Camera',
-          onPress: () => handleImagePicker('camera'),
-        },
-        {
-          text: 'Gallery',
-          onPress: () => handleImagePicker('gallery'),
-        },
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-      ]
-    );
+    Alert.alert("Select Image Source", "Choose an option to pick an image", [
+      {
+        text: "Camera",
+        onPress: () => handleImagePicker("camera"),
+      },
+      {
+        text: "Gallery",
+        onPress: () => handleImagePicker("gallery"),
+      },
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+    ]);
   };
-
 
   const { profiles, status, error } = useSelector((state) => state.profiles);
   const dispatch = useDispatch();
   const resetFields = () => {
-    setImage('');
-    setName('');
-    setPhoneNumber('');
-    setVehicleNumber('');
-    setCompany('');
-    setDetails('');
+    setImage("");
+    setName("");
+    setPhoneNumber("");
+    setVehicleNumber("");
+    setCompany("");
+    setDetails("");
     setIsCheckboxChecked(false);
-    setSelectedDate("")
+    setSelectedDate("");
   };
 
   useEffect(() => {
@@ -139,8 +136,6 @@ const QuickActions = ({ navigation }) => {
     }
   }, [profiles]);
 
-
-
   const handleSubmitCabEntry = () => {
     const visitorData = {
       userId,
@@ -152,34 +147,39 @@ const QuickActions = ({ navigation }) => {
       societyId,
       block: buildingName,
       flatNo: flatNumber,
-      role
+      role,
     };
 
     // Validation: Ensure all fields are filled
-    if (name === "" || phoneNumber === "" || vehicleNumber === "" || company === "" || selectedDate === "") {
+    if (
+      name === "" ||
+      phoneNumber === "" ||
+      vehicleNumber === "" ||
+      company === "" ||
+      selectedDate === ""
+    ) {
       // Show error toast if any field is empty
-      Alert.alert("Please fill out all fields before submitting.")
+      Alert.alert("Please fill out all fields before submitting.");
     } else {
       // Proceed with submission if all fields are filled
-      dispatch(createVisitor(visitorData))
-        .then((result) => {
-          if (createVisitor.fulfilled.match(result)) {
-            Alert.alert('Success', 'Cab entry created successfully');
-            const { visitors } = result.payload.data.savedVisitor.society;
-            
-            const qrImage = result.payload.data.qrCodeUrl;
-            const newVisitor = visitors[visitors.length - 1];
-            const { visitorId } = newVisitor;
-            setVisitorId(visitorId);
-            setQrImageUrl(qrImage);
-            setShowQrModal(true);
-            resetFields();
-            setCabModalVisible(false);
-            setInviteModalVisible(true);
-          } else {
-            Alert.alert('Error', result.payload || 'Failed to create cab entry');
-          }
-        });
+      dispatch(createVisitor(visitorData)).then((result) => {
+        if (createVisitor.fulfilled.match(result)) {
+          Alert.alert("Success", "Cab entry created successfully");
+          const { visitors } = result.payload.data.savedVisitor.society;
+
+          const qrImage = result.payload.data.qrCodeUrl;
+          const newVisitor = visitors[visitors.length - 1];
+          const { visitorId } = newVisitor;
+          setVisitorId(visitorId);
+          setQrImageUrl(qrImage);
+          setShowQrModal(true);
+          resetFields();
+          setCabModalVisible(false);
+          setInviteModalVisible(true);
+        } else {
+          Alert.alert("Error", result.payload || "Failed to create cab entry");
+        }
+      });
     }
   };
   const handleSubmitDeliveryEntry = () => {
@@ -193,18 +193,24 @@ const QuickActions = ({ navigation }) => {
       societyId,
       block: buildingName,
       flatNo: flatNumber,
-      role
+      role,
     };
-    if (name === "" || phoneNumber === "" || details === "" || company === "" || selectedDate === "") {
+    if (
+      name === "" ||
+      phoneNumber === "" ||
+      details === "" ||
+      company === "" ||
+      selectedDate === ""
+    ) {
       // Show error toast if any field is empty
-      Alert.alert("Please fill out all fields before submitting.")
+      Alert.alert("Please fill out all fields before submitting.");
     } else {
       dispatch(createVisitor(visitorData))
         .then((result) => {
           if (createVisitor.fulfilled.match(result)) {
-            Alert.alert('Success', 'Delivery entry created successfully');
-            const { visitors } = result.payload.data.savedVisitor.society
-            const qrImage = result.payload.data.qrCodeUrl
+            Alert.alert("Success", "Delivery entry created successfully");
+            const { visitors } = result.payload.data.savedVisitor.society;
+            const qrImage = result.payload.data.qrCodeUrl;
             const newVisitor = visitors[visitors.length - 1];
             const { visitorId } = newVisitor;
             setVisitorId(visitorId);
@@ -214,11 +220,13 @@ const QuickActions = ({ navigation }) => {
             setDeliveryModalVisible(false);
             setInviteModalVisible(true);
           } else {
-            Alert.alert('Error', result.payload || 'Failed to create cab entry');
+            Alert.alert(
+              "Error",
+              result.payload || "Failed to create cab entry"
+            );
           }
         })
         .finally(() => {
-
           dispatch(resetState());
         });
     }
@@ -228,61 +236,60 @@ const QuickActions = ({ navigation }) => {
     const formData = new FormData();
 
     // Append fields to formData
-    formData.append('userId', userId);
-    formData.append('name', name);
-    formData.append('phoneNumber', phoneNumber);
-    formData.append('vehicleNumber', vehicleNumber);
-    formData.append('date', selectedDate);
-    formData.append('societyId', societyId);
-    formData.append('block', buildingName);
-    formData.append('flatNo', flatNumber);
-    formData.append('role', role);
-    formData.append('isFrequent', isCheckboxChecked);
+    formData.append("userId", userId);
+    formData.append("name", name);
+    formData.append("phoneNumber", phoneNumber);
+    formData.append("vehicleNumber", vehicleNumber);
+    formData.append("date", selectedDate);
+    formData.append("societyId", societyId);
+    formData.append("block", buildingName);
+    formData.append("flatNo", flatNumber);
+    formData.append("role", role);
+    formData.append("isFrequent", isCheckboxChecked);
 
     // Append image if it exists
     if (image) {
-      const fileExtension = image.split('.').pop(); // e.g., 'jpeg'
-      const mimeType = `image/${fileExtension}`;    // e.g., 'image/jpeg'
-      const fileName = `photo.${fileExtension}`;    // e.g., 'photo.jpeg'
+      const fileExtension = image.split(".").pop(); // e.g., 'jpeg'
+      const mimeType = `image/${fileExtension}`; // e.g., 'image/jpeg'
+      const fileName = `photo.${fileExtension}`; // e.g., 'photo.jpeg'
 
       const file = {
         uri: image,
         type: mimeType,
         name: fileName,
       };
-      formData.append('pictures', file);
+      formData.append("pictures", file);
     }
 
     // Validation for required fields
     if (!name) {
-      Alert.alert('Error', 'Name is required');
+      Alert.alert("Error", "Name is required");
       return;
     }
     if (!phoneNumber) {
-      Alert.alert('Error', 'Phone Number is required');
+      Alert.alert("Error", "Phone Number is required");
       return;
     }
     if (!vehicleNumber) {
-      Alert.alert('Error', 'Vehicle Number is required');
+      Alert.alert("Error", "Vehicle Number is required");
       return;
     }
     if (!selectedDate) {
-      Alert.alert('Error', 'Date is required');
+      Alert.alert("Error", "Date is required");
       return;
     }
     if (!image) {
-      Alert.alert('Error', 'Image is required');
+      Alert.alert("Error", "Image is required");
       return;
     }
 
     // All fields are valid, proceed to dispatch the createVisitor action
     dispatch(createVisitor(formData))
       .then((result) => {
-        console.log(result)
+        console.log(result);
 
         if (createVisitor.fulfilled.match(result)) {
-
-          Alert.alert('Success', 'Visitor entry created successfully');
+          Alert.alert("Success", "Visitor entry created successfully");
           const { visitors } = result.payload.data.savedVisitor.society;
           const qrImage = result.payload.data.qrCodeUrl;
           const newVisitor = visitors[visitors.length - 1];
@@ -294,7 +301,10 @@ const QuickActions = ({ navigation }) => {
           setGuestModalVisible(false);
           setInviteModalVisible(true);
         } else {
-          Alert.alert('Error', result.payload || 'Failed to create visitor entry');
+          Alert.alert(
+            "Error",
+            result.payload || "Failed to create visitor entry"
+          );
         }
       })
       .finally(() => {
@@ -317,33 +327,32 @@ const QuickActions = ({ navigation }) => {
       role,
     };
     if (!name) {
-      Alert.alert('Error', 'Name is required');
+      Alert.alert("Error", "Name is required");
       return;
     }
     if (!phoneNumber) {
-      Alert.alert('Error', 'Phone Number is required');
+      Alert.alert("Error", "Phone Number is required");
       return;
     }
     if (!vehicleNumber) {
-      Alert.alert('Error', 'Vehicle Number is required');
+      Alert.alert("Error", "Vehicle Number is required");
       return;
     }
     if (!selectedDate) {
-      Alert.alert('Error', 'Date is required');
+      Alert.alert("Error", "Date is required");
       return;
     }
     if (!company) {
-      Alert.alert('Error', 'Company is required');
+      Alert.alert("Error", "Company is required");
       return;
     }
 
     dispatch(createVisitor(visitorData))
       .then((result) => {
         if (createVisitor.fulfilled.match(result)) {
-
-          Alert.alert('Success', 'Service entry created successfully');
-          const { visitors } = result.payload.data.savedVisitor.society
-          const qrImage = result.payload.data.qrCodeUrl
+          Alert.alert("Success", "Service entry created successfully");
+          const { visitors } = result.payload.data.savedVisitor.society;
+          const qrImage = result.payload.data.qrCodeUrl;
           const newVisitor = visitors[visitors.length - 1];
           const { visitorId } = newVisitor;
           setVisitorId(visitorId);
@@ -353,7 +362,7 @@ const QuickActions = ({ navigation }) => {
           setDeliveryModalVisible(false);
           setInviteModalVisible(true);
         } else {
-          Alert.alert('Error', result.payload || 'Failed to create cab entry');
+          Alert.alert("Error", result.payload || "Failed to create cab entry");
         }
       })
       .finally(() => {
@@ -361,31 +370,27 @@ const QuickActions = ({ navigation }) => {
       });
   };
 
-
   const handleActionPress = (action) => {
     if (action === "Cab") {
-      setRole("Cab")
+      setRole("Cab");
       setCabModalVisible(true);
     } else if (action === "Delivery") {
-      setRole("Delivery")
+      setRole("Delivery");
       setDeliveryModalVisible(true);
-
     } else if (action === "Help") {
-      setRole("Service")
+      setRole("Service");
       setHelpModalVisible(true);
     } else if (action === "Guest") {
-      setRole("Guest")
+      setRole("Guest");
       setGuestModalVisible(true);
     }
   };
-
-
 
   const handleShare = async () => {
     try {
       const result = await Share.share({
         message: `Check out this entry code!${visitorId}`,
-        url: qrImageUrl
+        url: qrImageUrl,
       });
 
       if (result.action === Share.sharedAction) {
@@ -429,11 +434,8 @@ const QuickActions = ({ navigation }) => {
     </TouchableOpacity>
   );
 
-
-
   return (
     <View style={styles.container}>
-     
       <Text style={styles.heading}>Allow Future Entry</Text>
       <View style={styles.iconContainer}>
         <TouchableOpacity
@@ -491,7 +493,7 @@ const QuickActions = ({ navigation }) => {
           />
           <Text style={styles.iconLabel}>Security Alert</Text>
         </TouchableOpacity>
-     
+
         <TouchableOpacity
           style={styles.iconWrapper}
           onPress={() => navigation.navigate("Call to Security")}
@@ -501,6 +503,16 @@ const QuickActions = ({ navigation }) => {
             style={styles.icon}
           />
           <Text style={styles.iconLabel}>Call to Security</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.iconWrapper}
+          onPress={() => navigation.navigate("Pre Approval Visitors")}
+        >
+          <Image
+            source={require("../../../../assets/User/images/id.png")}
+            style={styles.icon}
+          />
+          <Text style={styles.iconLabel}>Pre Approval Visitors</Text>
         </TouchableOpacity>
       </View>
 
@@ -517,13 +529,11 @@ const QuickActions = ({ navigation }) => {
               style={styles.closeIconContainer}
               onPress={() => setCabModalVisible(false)}
             >
-              <MaterialCommunityIcons
-                name="close"
-                style={styles.closeIcon}
-              />
+              <MaterialCommunityIcons name="close" style={styles.closeIcon} />
             </TouchableOpacity>
-            <Avatar.Image size={120}
-              source={require('../../../../assets/User/images/taxi (2).png')}
+            <Avatar.Image
+              size={120}
+              source={require("../../../../assets/User/images/taxi (2).png")}
               style={styles.modalImage}
             />
             <TextInput
@@ -551,7 +561,10 @@ const QuickActions = ({ navigation }) => {
               value={company}
               onChangeText={setCompany}
             />
-            <TouchableOpacity style={styles.input} onPress={() => setCalendarModalVisible(true)}>
+            <TouchableOpacity
+              style={styles.input}
+              onPress={() => setCalendarModalVisible(true)}
+            >
               <TextInput
                 placeholder="Select Date"
                 value={selectedDate || "Select Date"}
@@ -582,12 +595,17 @@ const QuickActions = ({ navigation }) => {
             >
               <MaterialCommunityIcons name="close" style={styles.closeIcon} />
             </TouchableOpacity>
-            <Avatar.Image size={120}
+            <Avatar.Image
+              size={120}
               source={require("../../../../assets/User/images/fast-delivery (1).png")}
               style={styles.modalImage}
             />
-            <TextInput style={styles.input} placeholder="Name" value={name}
-              onChangeText={setName} />
+            <TextInput
+              style={styles.input}
+              placeholder="Name"
+              value={name}
+              onChangeText={setName}
+            />
             <TextInput
               style={styles.input}
               placeholder="Phone Number"
@@ -595,18 +613,32 @@ const QuickActions = ({ navigation }) => {
               value={phoneNumber}
               onChangeText={setPhoneNumber}
             />
-            <TextInput style={styles.input} placeholder="Company" value={company}
-              onChangeText={setCompany} />
-            <TextInput style={styles.input} placeholder="Order ID" value={details}
-              onChangeText={setDetails} />
-            <TouchableOpacity style={styles.input} onPress={() => setCalendarModalVisible(true)}>
+            <TextInput
+              style={styles.input}
+              placeholder="Company"
+              value={company}
+              onChangeText={setCompany}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Order ID"
+              value={details}
+              onChangeText={setDetails}
+            />
+            <TouchableOpacity
+              style={styles.input}
+              onPress={() => setCalendarModalVisible(true)}
+            >
               <TextInput
                 placeholder="Select Date"
                 value={selectedDate || "Select Date"}
                 editable={false}
               />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={handleSubmitDeliveryEntry}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleSubmitDeliveryEntry}
+            >
               <Text style={styles.buttonText}>Invite Delivery</Text>
             </TouchableOpacity>
           </View>
@@ -627,12 +659,17 @@ const QuickActions = ({ navigation }) => {
             >
               <MaterialCommunityIcons name="close" style={styles.closeIcon} />
             </TouchableOpacity>
-            <Avatar.Image size={120}
+            <Avatar.Image
+              size={120}
               source={require("../../../../assets/User/images/policemen.png")}
               style={styles.modalImage}
             />
-            <TextInput style={styles.input} placeholder="Name" value={name}
-              onChangeText={setName} />
+            <TextInput
+              style={styles.input}
+              placeholder="Name"
+              value={name}
+              onChangeText={setName}
+            />
             <TextInput
               style={styles.input}
               placeholder="Phone Number"
@@ -646,18 +683,32 @@ const QuickActions = ({ navigation }) => {
               value={vehicleNumber}
               onChangeText={setVehicleNumber}
             />
-            <TextInput style={styles.input} placeholder="Company" value={company}
-              onChangeText={setCompany} />
-            <TextInput style={styles.input} placeholder="Details" value={details}
-              onChangeText={setDetails} />
-            <TouchableOpacity style={styles.input} onPress={() => setCalendarModalVisible(true)}>
+            <TextInput
+              style={styles.input}
+              placeholder="Company"
+              value={company}
+              onChangeText={setCompany}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Details"
+              value={details}
+              onChangeText={setDetails}
+            />
+            <TouchableOpacity
+              style={styles.input}
+              onPress={() => setCalendarModalVisible(true)}
+            >
               <TextInput
                 placeholder="Select Date"
                 value={selectedDate || "Select Date"}
                 editable={false}
               />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={handleSubmitServiceEntry}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleSubmitServiceEntry}
+            >
               <Text style={styles.buttonText}>Invite Service</Text>
             </TouchableOpacity>
           </View>
@@ -678,13 +729,26 @@ const QuickActions = ({ navigation }) => {
             >
               <MaterialCommunityIcons name="close" style={styles.closeIcon} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={chooseImageSource}>
-              <Avatar.Image
-                size={120}
-                source={image ? { uri: image } : require("../../../../assets/User/images/cake.png")}
-                style={styles.modalImage}
-              />
-            </TouchableOpacity>
+            <View style={styles.profilecontainer}>
+              <TouchableOpacity onPress={chooseImageSource}>
+                <Avatar.Image
+                  size={120}
+                  source={
+                    image
+                      ? { uri: image }
+                      : require("../../../../assets/User/images/cake.png")
+                  }
+                  style={styles.modalImage}
+                />
+                <TouchableOpacity
+                  onPress={chooseImageSource}
+                  style={styles.cameraIcon}
+                >
+                  <Entypo name="camera" size={20} color="#7d0431" />
+                </TouchableOpacity>
+              </TouchableOpacity>
+            </View>
+
             <TextInput
               style={styles.input}
               placeholder="Name"
@@ -704,7 +768,10 @@ const QuickActions = ({ navigation }) => {
               value={vehicleNumber}
               onChangeText={setVehicleNumber}
             />
-            <TouchableOpacity style={styles.input} onPress={() => setCalendarModalVisible(true)}>
+            <TouchableOpacity
+              style={styles.input}
+              onPress={() => setCalendarModalVisible(true)}
+            >
               <TextInput
                 placeholder="Select Date"
                 value={selectedDate || "Select Date"}
@@ -716,13 +783,15 @@ const QuickActions = ({ navigation }) => {
               <Checkbox
                 status={isCheckboxChecked ? "checked" : "unchecked"}
                 onPress={() => setIsCheckboxChecked(!isCheckboxChecked)}
+                theme={{ colors: { primary: "#7d0431" } }}
               />
-              <Text style={styles.checkboxLabel}>
-                Add to frequent Visitor
-              </Text>
+              <Text style={{marginTop:7}}>Add to frequent Visitor</Text>
             </View>
 
-            <TouchableOpacity style={styles.button} onPress={handleSubmitGuestEntry}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleSubmitGuestEntry}
+            >
               <Text style={styles.buttonText}>Invite Guest</Text>
             </TouchableOpacity>
           </View>
@@ -748,11 +817,16 @@ const QuickActions = ({ navigation }) => {
                 setCalendarModalVisible(false);
               }}
               markedDates={{
-                [selectedDate]: { selected: true, disableTouchEvent: true, selectedColor: 'blue', selectedTextColor: '#fff' }
+                [selectedDate]: {
+                  selected: true,
+                  disableTouchEvent: true,
+                  selectedColor: "blue",
+                  selectedTextColor: "#fff",
+                },
               }}
               theme={{
-                arrowColor: 'blue',
-                monthTextColor: 'blue',
+                arrowColor: "blue",
+                monthTextColor: "blue",
               }}
             />
           </View>
@@ -780,9 +854,16 @@ const QuickActions = ({ navigation }) => {
                 />
 
                 <Text style={{ marginBottom: 5 }}>Visitor ID: {visitorId}</Text>
-                <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
+                <TouchableOpacity
+                  style={styles.shareButton}
+                  onPress={handleShare}
+                >
                   <View style={styles.shareButtonContent}>
-                    <MaterialCommunityIcons name="share" color="#fff" size={20} />
+                    <MaterialCommunityIcons
+                      name="share"
+                      color="#fff"
+                      size={20}
+                    />
                     <Text style={styles.shareButtonText}>Share</Text>
                   </View>
                 </TouchableOpacity>
@@ -871,7 +952,7 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     paddingHorizontal: width * 0.04,
     backgroundColor: "#fff",
-    paddingTop: height * 0.03
+    paddingTop: height * 0.03,
   },
   heading: {
     fontWeight: "bold",
@@ -879,7 +960,6 @@ const styles = StyleSheet.create({
     color: "#484848",
     marginBottom: height * 0.02,
     marginBottom: height * 0.02,
-
   },
   iconContainer: {
     flexDirection: "row",
@@ -902,7 +982,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     backgroundColor: "#f7f7f7",
     borderColor: "#f0f3f4",
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -912,7 +992,7 @@ const styles = StyleSheet.create({
     width: width * 0.11,
     height: height * 0.05,
     marginTop: height * 0.023,
-    marginTop: width * 0.03
+    marginTop: width * 0.03,
   },
   iconLabel: {
     marginTop: 5,
@@ -1077,11 +1157,23 @@ const styles = StyleSheet.create({
     backgroundColor: "#7D0431",
   },
   calendarModalContent: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 10,
     padding: 20,
-    width: '90%',
-    alignItems: 'center',
+    width: "90%",
+    alignItems: "center",
+  },
+  profilecontainer: {
+    alignItems: "center",
+    position: "relative", // Set relative positioning for the container
+  },
+  cameraIcon: {
+    position: "absolute", // Positioning it absolutely within the container
+    bottom: 10, // Align to the bottom of the Avatar
+    right: 5, // Align to the right of the Avatar
+    borderRadius: 50,
+    backgroundColor: " rgba(0,0,0,0.2)", // Make the background transparent
+    padding: 10, // Add some padding for touchable area
   },
 });
 

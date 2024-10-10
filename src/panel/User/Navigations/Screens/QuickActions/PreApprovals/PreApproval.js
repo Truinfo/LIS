@@ -1,28 +1,111 @@
-// PreApproval.js
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { View, Text, SafeAreaView, ScrollView, StyleSheet, TouchableOpacity, Share, Alert } from 'react-native';
-import { Avatar } from 'react-native-paper';
-import { Entypo } from '@expo/vector-icons';
-import { fetchPreApprovals } from '../../../../Redux/Slice/Home/PreapprovalSlice';
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  View,
+  Text,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  // Share,
+  Alert,
+} from "react-native";
+import * as Sharing from "expo-sharing";
+import * as FileSystem from "expo-file-system";
 
-const PreApproval = ({ route }) => {
+import { ActivityIndicator, Avatar } from "react-native-paper";
+import { Entypo } from "@expo/vector-icons";
+import { fetchPreApprovals } from "../../../../Redux/Slice/Home/PreapprovalSlice";
+import { fetchUserProfiles } from "../../../../Redux/Slice/ProfileSlice/ProfileSlice";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ImagebaseURL } from "../../../../../Security/helpers/axios";
 
+const PreApproval = () => {
+  const [userId, setUserId] = useState("");
+  const [societyId, setSocietyId] = useState("");
+  const [flatNumber, setFlatNumber] = useState("");
+  const [buildingName, setBuildingName] = useState("");
   const dispatch = useDispatch();
-  const { societyId, buildingName, flatNumber } = route.params;
 
-  const { preApprovals, status, error } = useSelector((state) => state.preApprovals);
+  const { profiles } = useSelector((state) => state.profiles);
   useEffect(() => {
-    if (status === 'idle') {
-      dispatch(fetchPreApprovals({ societyId, block: buildingName, flatNo: flatNumber }));
-    }
-  }, [status, dispatch]);
+    const getUserName = async () => {
+      try {
+        const userString = await AsyncStorage.getItem("user");
+        if (userString !== null) {
+          const user = JSON.parse(userString);
+          setSocietyId(user.societyId);
+          setUserId(user.userId);
+        }
+      } catch (error) {
+        console.error("Failed to fetch the user from async storage", error);
+      }
+    };
+    getUserName();
+  }, []);
 
-  if (status === 'loading') {
-    return <Text>Loading...</Text>;
+  useEffect(() => {
+    if (userId && societyId) {
+      dispatch(fetchUserProfiles({ userId, societyId }));
+    }
+  }, [dispatch, userId, societyId]);
+
+  useEffect(() => {
+    if (profiles.length > 0) {
+      const profile = profiles[0];
+      setBuildingName(profile.buildingName);
+      setFlatNumber(profile.flatNumber);
+    }
+  }, [profiles]);
+
+  const { preApprovals, status, error } = useSelector(
+    (state) => state.preApprovals
+  );
+
+  useEffect(() => {
+    if (societyId && buildingName && flatNumber) {
+      dispatch(
+        fetchPreApprovals({
+          societyId,
+          block: buildingName,
+          flatNo: flatNumber,
+        })
+      );
+    }
+  }, [societyId, buildingName, flatNumber, dispatch]);
+  const handleShare = async (visitorId, imageUrl) => {
+    try {
+      // Download the image to a local file
+      const localUri = FileSystem.documentDirectory + "image.jpg"; // Name your image file
+      const response = await FileSystem.downloadAsync(imageUrl, localUri);
+
+      // Create a message including the visitor ID
+      const message = `Check out this visitor's pin: ${visitorId}`;
+
+      // Create a temporary text file to hold the visitor ID
+      const messageUri = FileSystem.documentDirectory + "visitor_id.txt";
+      await FileSystem.writeAsStringAsync(messageUri, message);
+
+      // Share the image and the message URI
+      await Sharing.shareAsync(response.uri, {
+        dialogTitle: message,
+        UTI: "public.image",
+      });
+
+    } catch (error) {
+      Alert.alert("Error sharing", error.message);
+    }
+  };
+
+  if (status === "loading") {
+    return (
+      <View style={{ alignItems: "center", flex: 1, justifyContent: "center" }}>
+        <ActivityIndicator size="large" color="#7d0431" />
+      </View>
+    );
   }
 
-  if (status === 'failed') {
+  if (status === "failed") {
     return <Text>Error: {error}</Text>;
   }
 
@@ -30,42 +113,61 @@ const PreApproval = ({ route }) => {
     <SafeAreaView style={styles.container}>
       <ScrollView vertical={true}>
         <View style={styles.cards}>
-          {preApprovals.map((preApproval) => (
-            <View key={preApproval._id} style={styles.eachCard}>
-              <View style={styles.imageText}>
-                <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-                  <Avatar.Image resizeMode="cover" size={60} source={require('../../../../../../assets/User/images/man.png')} />
-                  <View style={{ marginLeft: 10 }}>
-                    <Text style={{ fontSize: 20, fontWeight: 'bold' }}>
-                      {preApproval.name}
-                    </Text>
-                    <Text style={{ fontSize: 16, color: 'grey' }}>
-                      {preApproval.phoneNumber}
-                    </Text>
+          {preApprovals
+            .slice()
+            .reverse()
+            .map((preApproval) => (
+              <View key={preApproval._id} style={styles.eachCard}>
+                <View style={styles.imageText}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "center",
+                      gap: 10,
+                    }}
+                  >
+                    <Avatar.Image
+                      resizeMode="cover"
+                      size={60}
+                      style={{
+                        justifyContent: "center",
+                        backgroundColor: "#ccc",
+                      }}
+                      source={{ uri: `${ImagebaseURL}${preApproval.pictures}` }}
+                    />
+                    <View>
+                      <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+                        {preApproval.name}
+                      </Text>
+                      <Text style={{ fontSize: 13, color: "grey" }}>
+                        {preApproval.phoneNumber}
+                      </Text>
+                      <Text
+                        style={{
+                          fontSize: 20,
+                          fontWeight: "bold",
+                          color: "#7d0431",
+                        }}
+                      >
+                        {preApproval.visitorId}
+                      </Text>
+                    </View>
                   </View>
-                </View>
-                <View style={styles.code}>
-                  <Text style={{ fontSize: 20, fontWeight: 'bold', textAlign: 'center', color: '#fff' }}>
-                    {preApproval.visitorId}
-                  </Text>
+                  <TouchableOpacity
+                    onPress={() =>
+                      handleShare(
+                        preApproval.visitorId,
+                        `${ImagebaseURL}${preApproval.qrImage}`
+                      )
+                    }
+                  >
+                    <View style={styles.share}>
+                      <Entypo name="share" size={22} color="#c59358" />
+                    </View>
+                  </TouchableOpacity>
                 </View>
               </View>
-              <View style={styles.entry}>
-                <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                  <Text style={{ fontSize: 14 }}>
-                    Entry Time: {preApproval.checkInDateTime}
-                  </Text>
-                </View>
-                <TouchableOpacity
-                >
-                  <View style={styles.share}>
-                    <Entypo name="share" size={22} color="#c59358" />
-                    <Text style={{ fontSize: 14, color: '#c59358' }}>Share</Text>
-                  </View>
-                </TouchableOpacity>
-              </View>
-            </View>
-          ))}
+            ))}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -75,51 +177,32 @@ const PreApproval = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#f6f6f6",
   },
   cards: {
     paddingHorizontal: 10,
   },
   eachCard: {
-    height: 120,
-    backgroundColor: '#f6f6f6',
+    backgroundColor: "#fff",
     borderRadius: 15,
-    borderWidth: 1,
-    borderColor: '#91A8BA',
+    elevation: 2,
     paddingHorizontal: 10,
     paddingVertical: 10,
     marginVertical: 10,
   },
   imageText: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  avatar: {
-    backgroundColor: '#192c4c',
-  },
-  code: {
-    backgroundColor: '#192c4c',
-    width: 100,
-    height: 50,
-    borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  entry: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   share: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    width: 100,
-    height: 37,
-    flexDirection: 'row',
-    borderColor: '#c59358',
+    backgroundColor: "#fff",
+    borderRadius: 50,
+    flexDirection: "row",
+    borderColor: "#c59358",
     borderWidth: 1,
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 15,
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 5,
   },
 });
 

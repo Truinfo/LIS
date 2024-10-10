@@ -55,6 +55,7 @@ const CookList = () => {
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
       />
+      
     </View>
   );
 };

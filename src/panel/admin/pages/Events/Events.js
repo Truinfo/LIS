@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet, ActivityIndicator } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchEvent, deleteEvent } from './EventSlice';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ImagebaseURL } from '../../../Security/helpers/axios';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Modal from 'react-native-modal';
+import Toast from 'react-native-toast-message';
 
 const Events = () => {
     const dispatch = useDispatch();
@@ -38,19 +39,38 @@ const Events = () => {
         setActionMenuVisible(null);
     };
 
-    const confirmDelete = () => {
-        dispatch(deleteEvent(selectedEvent._id))
-            .then(() => {
-                Alert.alert('Deleted', 'Event deleted successfully!');
-                dispatch(fetchEvent());
-                setDeleteDialogOpen(false);
-                setSelectedEvent(null);
-            })
-            .catch((error) => {
-                console.error("Error:", error);
-                setDeleteDialogOpen(false);
+    const confirmDelete = async () => {
+        setDeleteDialogOpen(false);
+        try {
+          const response = await dispatch(deleteEvent(selectedEvent._id));
+          setSelectedEvent(null);
+          if (response.meta.requestStatus === 'fulfilled') {
+            Toast.show({
+              type: 'success',
+              text1: 'Success',
+              text2: 'Event deleted successfully.',
             });
-    };
+            setTimeout(() => {
+                dispatch(fetchEvent());
+            }, 2000);
+          } else {
+            Toast.show({
+              type: 'error',
+              text1: 'Error',
+              text2: 'Failed to delete the event.',
+            });
+            console.error('Delete Event Error:', response.error);
+          }
+        } catch (error) {
+            setSelectedEvent(null);
+          Toast.show({
+            type: 'error',
+            text1: 'Error',
+            text2: 'An unexpected error occurred while deleting the event.',
+          });
+          console.error('Unexpected Error:', error);
+        } 
+      };
 
     const cancelDelete = () => {
         setDeleteDialogOpen(false);
@@ -149,6 +169,7 @@ const Events = () => {
                     </View>
                 </View>
             </Modal>
+            <Toast />
         </View>
     );
 };

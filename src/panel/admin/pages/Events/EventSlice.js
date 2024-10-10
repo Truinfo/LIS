@@ -55,6 +55,7 @@ export const updateEvent = createAsyncThunk(
     async ({ id, formData }, { rejectWithValue }) => {  
         try {
         const societyId = await getSocietyId();
+        console.log("EditformData", formData)
         const response = await axiosInstance.put(`/events/updateEvent/${societyId}/${id}`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'

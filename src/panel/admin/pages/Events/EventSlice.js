@@ -159,5 +159,4 @@ const EventSlice = createSlice({
     },
 });
 
-
 export const SocietyEventReducer = EventSlice.reducer;

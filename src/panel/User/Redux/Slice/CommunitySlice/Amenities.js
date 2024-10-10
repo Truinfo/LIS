@@ -19,7 +19,9 @@ export const bookAmenity = createAsyncThunk(
     async (BookingData, { rejectWithValue }) => {
         console.log("Booking data",BookingData)
         try {
-            const response = await axios.post(`http://192.168.29.226:2000/api/bookAmenity/${BookingData.amenityId}`, BookingData.data);
+            const response = await axiosInstance.post(`/bookAmenity/${BookingData.amenityId}`, BookingData.data,{
+                headers: { 'Content-Type': 'application/json'}
+            });
             return response.data; // Return the data directly
         } catch (error) {
             console.error("Error fetching amenities:", error);

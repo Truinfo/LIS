@@ -89,10 +89,10 @@ const PaperBoyProfile = ({ navigation, route }) => {
   const filteredpaperBoy = data.paperBoy.find(driver => driver._id === id);
 
   if (!filteredpaperBoy) {
-    return (
-      <View style={styles.container}>
-        <Text>Loading...</Text>
-      </View>
+    return (<View style={styles.loadingContainer}>
+      <ActivityIndicator size="large" color="#7d0431" />
+    </View>
+
     );
   }
   return (
@@ -100,10 +100,6 @@ const PaperBoyProfile = ({ navigation, route }) => {
       <ScrollView contentContainerStyle={styles.scrollViewContainer}>
         <View style={styles.container}>
           <View style={styles.card}>
-            {/* <Image
-              source={require("../../../../../assets/User/images/learner_5999070.png")}
-              style={styles.image}
-            /> */}
             <Avatar.Image source={{ uri: `https://livinsync.onrender.com${filteredpaperBoy.pictures}` }} size={100} style={styles.avatarContainer} />
             <View style={styles.content}>
               <Text style={styles.cardTitle}>Raju</Text>
@@ -215,7 +211,6 @@ const PaperBoyProfile = ({ navigation, route }) => {
             </RadioButton.Group>
           </View>
         </View>
-        {/* Bottom Modal */}
         <Modal
           animationType="slide"
           transparent={true}
@@ -241,9 +236,9 @@ const PaperBoyProfile = ({ navigation, route }) => {
                 </View>
               </View>
 
-              <View style={{ flexDirection: "column", marginTop: 10 }}>
+              <View style={{ flexDirection: "row", marginTop: 10, alignItems: "center" }}>
 
-                <Text style={[styles.Slot]}>Selected Timings</Text>
+                <Text style={[styles.Slot, { paddingRight: 20, textDecorationLine: "none" }]}>Selected Timings :</Text>
                 <Text style={styles.modalSlot}>{radioValue}</Text>
               </View>
 
@@ -408,7 +403,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginTop: 10,
-    justifyContent: "space-between",
   },
   modalImage: {
     width: 60,
@@ -553,6 +547,11 @@ const styles = StyleSheet.create({
   },
   radioButtonText: {
     marginLeft: 8,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

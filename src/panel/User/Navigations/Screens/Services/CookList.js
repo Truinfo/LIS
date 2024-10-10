@@ -39,7 +39,9 @@ const CookList = () => {
   );
   const ItemSeparator = () => <View style={styles.separator} />;
   if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
+    return (<View style={styles.loadingContainer}>
+      <ActivityIndicator size="large" color="#7d0431" />
+    </View>)
   }
 
   if (error) {
@@ -99,6 +101,11 @@ const styles = StyleSheet.create({
   },
   separator: {
     height: 10,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 export default CookList;

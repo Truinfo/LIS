@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#630000',
+    color: '#7d0431',
     marginBottom: 20,
   },
   input: {
@@ -231,12 +231,12 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   selectedOption: {
-    backgroundColor: '#630000',
+    backgroundColor: '#7d0431',
     color: '#fff',
     padding: 10
   },
   optionText: {
-    color: '#630000',
+    color: '#7d0431',
 
   },
   imagePreview: {

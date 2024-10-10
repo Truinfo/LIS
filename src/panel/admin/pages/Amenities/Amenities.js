@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 23,
     fontWeight: "700",
-    color: "#630000",
+    color: "#7d0431",
     marginBottom: 16,
   },
   addButton: {
@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 30,
     right: 30,
-    backgroundColor: '#630000',
+    backgroundColor: '#7d0431',
     width: 60,
     height: 60,
     borderRadius: 30,

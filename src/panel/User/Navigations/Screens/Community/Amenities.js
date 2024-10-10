@@ -319,7 +319,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
   },
   detailsContainer: {
-    marginBottom: 16,
+    flex:0.8,
+    marginBottom: 10,
   },
   detailBox: {
     marginBottom: 8,
@@ -362,7 +363,8 @@ const styles = StyleSheet.create({
     position: 'absolute', bottom: 1, width: "100%",
     justifyContent: "center",
     alignItems: "center",
-    textAlign: "center", margin: "auto"
+    textAlign: "center", 
+    margin: "auto",
   },
   buttonText: {
     color: "#fff",

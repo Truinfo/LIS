@@ -1,4 +1,4 @@
-import React, { useState ,useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -23,7 +23,7 @@ const PestControlList = () => {
     dispatch(fetchServices());
   }, [dispatch]);
   const renderItem = ({ item }) => (
-    <View style={styles.itemContainer}>
+    <View style={styles.itemContainer} >
       <View style={styles.rowContainer}>
         <View style={styles.column}>
           <View style={styles.iconAndText}>
@@ -35,7 +35,7 @@ const PestControlList = () => {
             <Text style={styles.phone}>{item.phoneNumber}</Text>
           </View>
         </View>
-        
+
       </View>
       <TouchableOpacity
         onPress={() => handleCall(item.phoneLeft, item.phoneRight)}
@@ -46,7 +46,9 @@ const PestControlList = () => {
     </View>
   );
   if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
+    return (<View style={styles.loadingContainer}>
+      <ActivityIndicator size="large" color="#7d0431" />
+    </View>)
   }
 
   if (error) {
@@ -56,12 +58,12 @@ const PestControlList = () => {
   return (
     <View style={styles.container}>
       <FlatList
-       data={data.pestClean}
-       keyExtractor={(item) => item}
+        data={data.pestClean}
+        keyExtractor={(item) => item}
         renderItem={renderItem}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
-     
+
     </View>
   );
 };
@@ -136,6 +138,11 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 14,
     fontWeight: "600",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

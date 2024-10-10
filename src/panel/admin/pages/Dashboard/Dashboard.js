@@ -122,9 +122,9 @@ const Dashboard = () => {
     const { monthAndYear, paymentDetails } = maintainances;
     const paidPayments = paymentDetails?.filter(payment => payment.status === 'Paid');
 
-    if (daysRemaining !== null && daysRemaining <= 0) {
-        navigation.navigate("UpiPayment")
-    }
+    // if (daysRemaining !== null && daysRemaining <= 0) {
+    //     navigation.navigate("UpiPayment")
+    // }
     if (status === "loading") {
         return (
             <View style={styles.loadingContainer}>
@@ -132,7 +132,6 @@ const Dashboard = () => {
             </View>
         );
     }
-
 
     return (
         <ScrollView contentContainerStyle={styles.container}>

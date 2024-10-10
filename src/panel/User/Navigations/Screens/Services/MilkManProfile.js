@@ -18,11 +18,11 @@ import { fetchServices } from "../../../Redux/Slice/ServiceSlice/ServiceSlice";
 import { Avatar } from "react-native-paper";
 import { addService } from "../../../Redux/Slice/ServiceSlice/AddServiceSlice";
 
-const MilkManProfile = ({  route }) => {
+const MilkManProfile = ({ route }) => {
   const dispatch = useDispatch();
 
   const { id, userid } = route.params;
-  const { data,} = useSelector((state) => state.services);
+  const { data, } = useSelector((state) => state.services);
   const [userId, setUserId] = useState(null);
   const [flatNumber, setFlatNumber] = useState(null);
   const [blockName, setblockName] = useState(null);
@@ -262,56 +262,9 @@ const MilkManProfile = ({  route }) => {
                 </TouchableOpacity>
 
               ))}
-
             </View>
-
           </View>
-
-          <Text style={{ fontWeight: "700", fontSize: 20, margin: 20 }}>
-            Reviews
-          </Text>
-          {filteredMilkMan.list.some(item => item.rating != null || item.reviews != null || item.rating != "" || item.reviews != "") ? (
-            <ScrollView
-              horizontal
-              contentContainerStyle={styles.horizontalScrollView}
-            >
-              {filteredMilkMan.list.map((item, index) => (
-                <View key={index}>
-                  <View style={styles.reviewCard}>
-                    <View style={styles.reviewSection}>
-                      <View style={styles.reviewContainer}>
-                        {item.rating != null ? (
-                          <Rating
-                            type="star"
-                            imageSize={16}
-                            readonly
-                            startingValue={item.rating}
-                            style={styles.rating}
-                          />
-                        ) : (
-                          <Text style={{ fontWeight: "500", color: "#797979" }}>
-                            No reviews available.
-                          </Text>
-                        )}
-                      </View>
-                    </View>
-                    <View style={{ marginTop: 10 }}>
-                      <Text style={{ fontWeight: "500", color: "#797979" }}>
-                        {item.reviews != null ? item.reviews : "No reviews available."}
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-              ))}
-            </ScrollView>
-          ) : (
-            <Text style={{ fontWeight: "500", color: "#797979" }}>
-              No reviews available.
-            </Text>
-          )}
-
         </View>
-
         <Modal
           animationType="slide"
           transparent={true}
@@ -321,9 +274,7 @@ const MilkManProfile = ({  route }) => {
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <View style={styles.modalColumn}>
-
                 <Text style={styles.modalText}>Review</Text>
-
               </View>
               <View style={styles.modalRow}>
                 <Avatar.Image
@@ -336,13 +287,10 @@ const MilkManProfile = ({  route }) => {
                   <Text style={styles.modalText3}>{filteredMilkMan.address}</Text>
                 </View>
               </View>
-
-              <View style={{ flexDirection: "column", marginTop: 10 }}>
-
-                <Text style={[styles.Slot]}>Selected Timings</Text>
+              <View style={{ flexDirection: "row", marginTop: 10, alignItems: "center" }}>
+                <Text style={[styles.Slot, { paddingRight: 20, textDecorationLine: "none" }]}>Selected Timings :</Text>
                 <Text style={styles.modalSlot}>{selectedSlot}</Text>
               </View>
-
               <View style={styles.modalButtonContainer}>
                 <TouchableOpacity
                   style={[styles.modalButton, styles.cancelButton]}
@@ -569,7 +517,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginTop: 10,
-    justifyContent: "space-between",
   },
   modalImage: {
     width: 60,

@@ -55,7 +55,7 @@ const NoticeBoard = () => {
             onLongPress={(e) => {
                 setAnchorPosition({
                     x: e.nativeEvent.pageX,
-                    y: e.nativeEvent.pageY - 50 
+                    y: e.nativeEvent.pageY - 50
                 });
                 setMenuVisible(true);
                 setSelectedNotice(item);
@@ -69,7 +69,7 @@ const NoticeBoard = () => {
                             onPress={(e) => {
                                 setAnchorPosition({
                                     x: e.nativeEvent.pageX,
-                                    y: e.nativeEvent.pageY - 50 
+                                    y: e.nativeEvent.pageY - 50
                                 });
                                 setMenuVisible(true);
                                 setSelectedNotice(item);
@@ -96,7 +96,7 @@ const NoticeBoard = () => {
         return (
             <View style={styles.errorContainer}>
                 <Image
-                    source={require('../../../../assets/Admin/Imgaes/nodatadound.png')} 
+                    source={require('../../../../assets/Admin/Imgaes/nodatadound.png')}
                     style={styles.errorImage}
                     alt="No Data Found"
                 />
@@ -193,7 +193,7 @@ const NoticeBoard = () => {
                         )}
                     </Dialog.Content>
                     <Dialog.Actions>
-                        <Button theme={{colors:{primary:"#7d0431"}}} onPress={() => setDialogVisible(false)}>Close</Button>
+                        <Button theme={{ colors: { primary: "#7d0431" } }} onPress={() => setDialogVisible(false)}>Close</Button>
                     </Dialog.Actions>
                 </Dialog>
 
@@ -219,8 +219,8 @@ const NoticeBoard = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingTop:10,
-        paddingHorizontal:12,
+        paddingTop: 10,
+        paddingHorizontal: 12,
     },
     menuIcon: {
         position: 'absolute',
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         marginBottom: 10,
         width: '100%',
-        backgroundColor:"#fff"
+        backgroundColor: "#fff"
     },
     card: {
         margin: 5,

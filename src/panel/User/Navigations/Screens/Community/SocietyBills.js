@@ -11,7 +11,7 @@ const SocietyBills = () => {
     const dispatch = useDispatch();
     const [societyId, setSocietyId] = useState('');
     const { society } = useSelector((state) => state.societyBills.societyBills);
-    const { loading} = useSelector((state) => state.societyBills);
+    const { loading,error} = useSelector((state) => state.societyBills);
     useEffect(() => {
         const getUserName = async () => {
             try {

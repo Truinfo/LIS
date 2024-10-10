@@ -249,9 +249,9 @@ const DriverProfile = ({ route }) => {
                 </View>
               </View>
 
-              <View style={{ flexDirection: "column", marginTop: 10 }}>
+              <View style={{ flexDirection: "row", marginTop: 10, alignItems: "center" }}>
 
-                <Text style={[styles.Slot]}>Selected Timings</Text>
+                <Text style={[styles.Slot, { paddingRight: 20, textDecorationLine: "none" }]}>Selected Timings :</Text>
                 <Text style={styles.modalSlot}>{selectedSlot}</Text>
               </View>
               <View style={styles.modalButtonContainer}>
@@ -403,7 +403,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginTop: 10,
-    justifyContent: "space-between",
   },
   modalImage: {
     width: 60,

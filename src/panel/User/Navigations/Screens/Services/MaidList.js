@@ -32,10 +32,14 @@ const MaidList = () => {
 
   const ItemSeparator = () => <View style={styles.separator} />;
 
-  if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
-  }
 
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#7d0431" />
+      </View>
+    );
+  }
   if (error) {
     return <Text>Error: {error}</Text>;
   }
@@ -87,6 +91,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     backgroundColor: "#dddee0",
     borderColor: "white",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

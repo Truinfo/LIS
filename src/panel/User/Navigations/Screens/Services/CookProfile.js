@@ -65,7 +65,6 @@ const CookProfile = ({ navigation, route }) => {
     setSelectedSlot(slot);
   };
 
-
   const handleContinuePress = async () => {
     try {
       const serviceData = {
@@ -94,10 +93,10 @@ const CookProfile = ({ navigation, route }) => {
   const filteredCook = data.cook.find(cook => cook._id === id);
 
   if (!filteredCook) {
-    return (
-      <View style={styles.container}>
-        <Text>Loading...</Text>
-      </View>
+    return (<View style={styles.loadingContainer}>
+      <ActivityIndicator size="large" color="#7d0431" />
+    </View>
+
     );
   }
   return (
@@ -195,12 +194,9 @@ const CookProfile = ({ navigation, route }) => {
           </Text>
           {/* Morning Section Card */}
           <View style={styles.morningSectionCard}>
-
             <View style={styles.timeSlotsContainer}>
               {filteredCook.timings.map((time, index) => (
-
                 <TouchableOpacity
-
                   key={index}
                   style={[
                     styles.timeSlot,
@@ -222,38 +218,6 @@ const CookProfile = ({ navigation, route }) => {
             </View>
 
           </View>
-
-          {/* Horizontal ScrollView for Cards */}
-          <Text style={{ fontWeight: "700", fontSize: 20, margin: 20 }}>
-            Reviews
-          </Text>
-          <ScrollView
-            horizontal
-            contentContainerStyle={styles.horizontalScrollView}
-          >
-            {filteredCook.list.map((cookreview, index) => (
-              <View key={index}>
-                <View style={styles.reviewCard}>
-                  <View style={styles.reviewSection}>
-                    <View style={styles.reviewContainer}>
-                      <Rating
-                        type='star'
-                        ratingCount={5}
-                        imageSize={20}
-                        startingValue={cookreview.rating}
-                        readonly
-                      />
-                    </View>
-                  </View>
-                  <View style={{ marginTop: 10 }}>
-                    <Text style={{ fontWeight: "500", color: "#797979" }}>
-                      {cookreview.reviews}
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            ))}
-          </ScrollView>
         </View>
         <Modal
           animationType="slide"
@@ -280,13 +244,11 @@ const CookProfile = ({ navigation, route }) => {
                 </View>
               </View>
 
-              <View style={{ flexDirection: "column", marginTop: 10 }}>
+              <View style={{ flexDirection: "row", marginTop: 10, alignItems: "center" }}>
 
-                <Text style={[styles.Slot]}>Selected Timings</Text>
+                <Text style={[styles.Slot, { paddingRight: 20, textDecorationLine: "none" }]}>Selected Timings :</Text>
                 <Text style={styles.modalSlot}>{selectedSlot}</Text>
               </View>
-
-
 
               <View style={styles.modalButtonContainer}>
                 <TouchableOpacity
@@ -423,18 +385,20 @@ const styles = StyleSheet.create({
 
   timeSlotsContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    flexWrap: "wrap",
+    justifyContent: "space-even",
   },
   timeSlot: {
     backgroundColor: "#D8D9E0",
     borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: 15,
+    margin: 5,
     alignItems: "center",
   },
   timeSlotText: {
-    fontSize: 14,
-    fontWeight: "700",
+    fontSize: 10,
+    fontWeight: "500",
   },
   horizontalScrollView: {
     paddingHorizontal: 16,
@@ -499,7 +463,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginTop: 10,
-    justifyContent: "space-between",
   },
   modalImage: {
     width: 60,
@@ -647,6 +610,11 @@ const styles = StyleSheet.create({
   },
   selectedSlotText: {
     color: "white",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

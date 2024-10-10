@@ -1,4 +1,4 @@
-import React, { useEffect,useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -43,7 +43,7 @@ const Electrician = () => {
             <Text style={styles.phone}>{item.phoneNumber}</Text>
           </View>
         </View>
-        
+
       </View>
       <TouchableOpacity
         onPress={() => handleCall(item.phoneLeft, item.phoneRight)}
@@ -55,7 +55,9 @@ const Electrician = () => {
   );
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
+    return (<View style={styles.loadingContainer}>
+      <ActivityIndicator size="large" color="#7d0431" />
+    </View>)
   }
 
   if (error) {
@@ -184,6 +186,11 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 14,
     fontWeight: "600",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

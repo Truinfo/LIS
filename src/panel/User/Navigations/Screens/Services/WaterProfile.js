@@ -23,7 +23,7 @@ const WaterProfile = ({ route }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const dispatch = useDispatch();
-  const { data,  } = useSelector((state) => state.services);
+  const { data, } = useSelector((state) => state.services);
   const [userId, setUserId] = useState(null);
   const [flatNumber, setFlatNumber] = useState(null);
   const [blockName, setblockName] = useState(null);
@@ -247,9 +247,8 @@ const WaterProfile = ({ route }) => {
                 </View>
               </View>
 
-              <View style={{ flexDirection: "column", marginTop: 10 }}>
-
-                <Text style={[styles.Slot]}>Selected Type</Text>
+              <View style={{ flexDirection: "row", marginTop: 10, alignItems: "center" }}>
+                <Text style={[styles.Slot, { paddingRight: 20, textDecorationLine: "none" }]}>Selected Timings :</Text>
                 <Text style={styles.modalSlot}>{selectedSlot}</Text>
               </View>
 
@@ -402,7 +401,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginTop: 10,
-    justifyContent: "space-between",
   },
   modalImage: {
     width: 60,

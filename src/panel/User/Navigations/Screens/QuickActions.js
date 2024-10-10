@@ -431,10 +431,9 @@ const QuickActions = ({ navigation }) => {
 
 
 
-
   return (
     <View style={styles.container}>
-      {status === 'loading' && <ActivityIndicator size="large" color="#0000ff" />}
+     
       <Text style={styles.heading}>Allow Future Entry</Text>
       <View style={styles.iconContainer}>
         <TouchableOpacity

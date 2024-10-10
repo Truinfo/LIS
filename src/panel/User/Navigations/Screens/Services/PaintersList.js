@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -6,7 +6,7 @@ import {
   Text,
   TouchableOpacity,
   Modal,
-  Linking,  ActivityIndicator,
+  Linking, ActivityIndicator,
 } from "react-native";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import Zocial from "@expo/vector-icons/Zocial";
@@ -40,7 +40,7 @@ const PaintersList = () => {
             <Text style={styles.phone}>{item.phoneNumber}</Text>
           </View>
         </View>
-        
+
       </View>
       <TouchableOpacity
         onPress={() => handleCall(item.phoneLeft, item.phoneRight)}
@@ -52,7 +52,9 @@ const PaintersList = () => {
   );
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
+    return (<View style={styles.loadingContainer}>
+      <ActivityIndicator size="large" color="#7d0431" />
+    </View>)
   }
 
   if (error) {
@@ -61,8 +63,8 @@ const PaintersList = () => {
   return (
     <View style={styles.container}>
       <FlatList
-       data={data.painter}
-       keyExtractor={(item) => item}
+        data={data.painter}
+        keyExtractor={(item) => item}
         renderItem={renderItem}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
@@ -180,6 +182,11 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 14,
     fontWeight: "600",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

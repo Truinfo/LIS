@@ -120,7 +120,7 @@ const ServiceItem = ({ name, icon }) => {
   };
   return (
     <TouchableOpacity onPress={handlePress}>
-      <View style={{ display: 'flex', justifyContent: "center", alignItems: "center" }}>
+      <View style={{ display: 'flex', justifyContent: "space-evenly", alignItems: "center", paddingRight: 4 }}>
         <View style={styles.serviceIconContainer}>
           <Image source={icon} style={styles.serviceIcon} />
         </View>
@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     width: width * 0.20,
-    height:75,
+    height: 75,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,

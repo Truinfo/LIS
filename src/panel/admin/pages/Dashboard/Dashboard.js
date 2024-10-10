@@ -133,7 +133,6 @@ const Dashboard = () => {
         );
     }
 
-
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <View style={styles.row}>

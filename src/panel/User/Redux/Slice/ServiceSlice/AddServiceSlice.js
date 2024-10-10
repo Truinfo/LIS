@@ -4,7 +4,9 @@ import axiosInstance from '../../../../Security/helpers/axios';
 
 export const addService = createAsyncThunk('services/addService', async (serviceData) => {
 
-  const response = await axiosInstance.put('/addList', serviceData);
+  const response = await axiosInstance.put('/addList', serviceData, {
+    headers: { 'Content-Type': 'application/json' }
+  });
   return response.data;
 });
 

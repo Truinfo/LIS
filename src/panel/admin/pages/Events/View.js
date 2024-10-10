@@ -16,14 +16,17 @@ const ViewEvents = () => {
         return <View style={styles.container}><Text>Event not found.</Text></View>;
     }
 
+    const picturesCount = event.pictures.length;
+    const isSinglePicture = picturesCount === 1;
+
     return (
         <ScrollView>
             <View style={styles.card}>
                 <Carousel
-                    loop
+                    loop={!isSinglePicture} 
                     width={300}
                     height={200}
-                    autoPlay
+                    autoPlay={!isSinglePicture} 
                     data={event.pictures}
                     renderItem={({ item }) => (
                         <Image
@@ -34,6 +37,7 @@ const ViewEvents = () => {
                         />
                     )}
                     style={styles.carousel}
+                    animationDuration={isSinglePicture ? 0 : 2000} // Set animation duration for multiple pictures
                 />
                 <Text style={styles.sectionTitle}>Society Profile Details:</Text>
                 <View style={styles.detailsContainer}>
@@ -66,7 +70,6 @@ const ViewEvents = () => {
                     </>
                 )}
 
-
                 {/* Registrations Section */}
                 {event.registrations && event.registrations.length > 0 && (
                     <>
@@ -95,13 +98,7 @@ const ViewEvents = () => {
     );
 };
 
-const DetailItem = ({ label, value }) => (
-    <View style={styles.detailItem}>
-        <Text style={styles.detailLabel}>{label}</Text>
-        <Text style={styles.detailValue}>{value}</Text>
-    </View>
-);
-
+// Styles for your component
 const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
@@ -182,7 +179,6 @@ const styles = StyleSheet.create({
         color: '#333',
         fontWeight: "600",
     },
-
 });
 
 export default ViewEvents;

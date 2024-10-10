@@ -42,8 +42,8 @@ const EditEvent = () => {
     activities: [],
   });
 
-  const [pictures, setPictures] = useState([]);
-  const [uploadedImages, setUploadedImages] = useState([]);
+  const [pictures, setPictures] = useState([]); // Existing pictures
+  const [uploadedImages, setUploadedImages] = useState([]); // Newly selected images
   const [previewImages, setPreviewImages] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -103,64 +103,59 @@ const EditEvent = () => {
     });
   };
 
-  const handleImagePicker = async (source) => {
-    const permissionResult =
-      source === 'camera'
-        ? await ImagePicker.requestCameraPermissionsAsync()
-        : await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-    if (!permissionResult.granted) {
-      Toast.show({
-        type: 'error',
-        text1: 'Permission Denied',
-        text2: 'You need to grant camera or gallery permissions.',
-      });
-      return;
-    }
-
-    const options = {
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsMultipleSelection: true,
+  // Corrected Image Picker Function: Adds to uploadedImages and updates previewImages
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: false,
       quality: 1,
-    };
+      allowsMultipleSelection: true,
+      selectionLimit: 5,
+    });
 
-    let result;
-    if (source === 'camera') {
-      result = await ImagePicker.launchCameraAsync(options);
-    } else {
-      result = await ImagePicker.launchImageLibraryAsync(options);
-    }
-
-    if (!result.canceled) {
-      const selectedImages = result.assets.map((asset) => ({
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      const asset = result.assets[0];
+      const newImage = {
         uri: asset.uri,
-        name: asset.uri.split('/').pop(),
+        name: asset.fileName || asset.uri.split('/').pop(),
         type: asset.type || 'image/jpeg',
-      }));
-
-      if (uploadedImages.length + selectedImages.length + pictures.length > 5) {
-        Toast.show({
-          type: 'error',
-          text1: 'Image Limit Exceeded',
-          text2: 'You can only upload up to 5 images.',
-        });
-        return;
-      }
-
-      setUploadedImages((prev) => [...prev, ...selectedImages]);
-      setPreviewImages((prev) => [
-        ...prev,
-        ...selectedImages.map((img) => img.uri),
-      ]);
+      };
+      setUploadedImages((prev) => [...prev, newImage]);
+      setPreviewImages((prev) => [...prev, asset.uri]);
     }
     setModalVisible(false);
   };
 
+  // Corrected Take Photo Function: Adds to uploadedImages and updates previewImages
+  const takePhoto = async () => {
+    let result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: false,
+      quality: 1,
+    });
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      const asset = result.assets[0];
+
+      const newImage = {
+        uri: asset.uri,
+        name: asset.fileName || asset.uri.split('/').pop(),
+        type: asset.type || 'image/jpeg', // Adjust type if necessary
+      };
+      setUploadedImages((prev) => [...prev, newImage]);
+      setPreviewImages((prev) => [...prev, asset.uri]);
+    }
+    setModalVisible(false); 
+  };
+  
+
+
+  // Delete Image Function: Removes from either existing pictures or uploadedImages
   const deleteImage = (index, isExisting = false) => {
     if (isExisting) {
       setPictures((prev) => {
         const updatedPictures = [...prev];
         updatedPictures.splice(index, 1);
+        // Update previewImages by removing the deleted image
         const updatedPreviews = updatedPictures.map((pic) => `${ImagebaseURL}${pic.img}`);
         setPreviewImages(updatedPreviews.concat(uploadedImages.map((img) => img.uri)));
         return updatedPictures;
@@ -169,6 +164,7 @@ const EditEvent = () => {
       setUploadedImages((prev) => {
         const updatedUploadedImages = [...prev];
         updatedUploadedImages.splice(index - pictures.length, 1);
+        // Update previewImages by removing the deleted uploaded image
         const updatedPreviews = updatedUploadedImages.map((img) => img.uri);
         setPreviewImages(pictures.map((pic) => `${ImagebaseURL}${pic.img}`).concat(updatedPreviews));
         return updatedUploadedImages;
@@ -220,12 +216,14 @@ const EditEvent = () => {
         )
       );
 
+      // Append only newly uploaded images
       uploadedImages.forEach((image, index) => {
         if (image.uri) {
           data.append('pictures', {
             uri: image.uri,
-            name: image.name || `image_${index}.jpg`,
-            type: image.type,
+            name: image.name,
+            type: 'image/jpeg',
+            
           });
         }
       });
@@ -260,60 +258,60 @@ const EditEvent = () => {
   };
 
 // Date Picker Handler
-const onChangeDate = (event, selectedDate) => {
-  if (event.type === 'dismissed') {
+  const onChangeDate = (event, selectedDate) => {
+    if (event.type === 'dismissed') {
+      setShowDatePicker(false);
+      return;
+    }
+
+    const currentDate = selectedDate || tempDate;
+    setTempDate(currentDate);
     setShowDatePicker(false);
-    return;
-  }
 
-  const currentDate = selectedDate || tempDate;
-  setTempDate(currentDate);
-  setShowDatePicker(false);
+    // Open time picker after a small delay to avoid flicker
+    setTimeout(() => setShowTimePicker(true), 100);
+  };
 
-  // Open time picker after a small delay to avoid flicker
-  setTimeout(() => setShowTimePicker(true), 100);
-};
+  // Time Picker Handler
+  const onChangeTime = (event, selectedTime) => {
+    if (event.type === 'dismissed') {
+      setShowTimePicker(false);
+      return;
+    }
 
-// Time Picker Handler
-const onChangeTime = (event, selectedTime) => {
-  if (event.type === 'dismissed') {
+    const currentTime = selectedTime || tempDate;
     setShowTimePicker(false);
-    return;
-  }
 
-  const currentTime = selectedTime || tempDate;
-  setShowTimePicker(false);
+    // Combine date and time
+    const combinedDate = new Date(tempDate);
+    combinedDate.setHours(currentTime.getHours());
+    combinedDate.setMinutes(currentTime.getMinutes());
 
-  // Combine date and time
-  const combinedDate = new Date(tempDate);
-  combinedDate.setHours(currentTime.getHours());
-  combinedDate.setMinutes(currentTime.getMinutes());
+    // Set the combined date to the correct field based on the current picker field
+    setFieldDate(combinedDate);
+  };
 
-  // Set the combined date to the correct field based on the current picker field
-  setFieldDate(combinedDate);
-};
-
-const setFieldDate = (date) => {
-  if (currentPickerField === 'startDate') {
-    setFormData(prevData => ({
-      ...prevData,
-      startDate: date,
-    }));
-  } else if (currentPickerField === 'endDate') {
-    setFormData(prevData => ({
-      ...prevData,
-      endDate: date,
-    }));
-  } else if (currentPickerField === 'activity_start') {
-    const updatedActivities = [...formData.activities];
-    updatedActivities[currentActivityIndex].startDate = date;
-    setFormData({ ...formData, activities: updatedActivities });
-  } else if (currentPickerField === 'activity_end') {
-    const updatedActivities = [...formData.activities];
-    updatedActivities[currentActivityIndex].endDate = date;
-    setFormData({ ...formData, activities: updatedActivities });
-  }
-};
+  const setFieldDate = (date) => {
+    if (currentPickerField === 'startDate') {
+      setFormData(prevData => ({
+        ...prevData,
+        startDate: date,
+      }));
+    } else if (currentPickerField === 'endDate') {
+      setFormData(prevData => ({
+        ...prevData,
+        endDate: date,
+      }));
+    } else if (currentPickerField === 'activity_start') {
+      const updatedActivities = [...formData.activities];
+      updatedActivities[currentActivityIndex].startDate = date;
+      setFormData({ ...formData, activities: updatedActivities });
+    } else if (currentPickerField === 'activity_end') {
+      const updatedActivities = [...formData.activities];
+      updatedActivities[currentActivityIndex].endDate = date;
+      setFormData({ ...formData, activities: updatedActivities });
+    }
+  };
 
 
   const openPicker = (field, activityIndex = null) => {
@@ -409,8 +407,10 @@ const setFieldDate = (date) => {
               <TouchableOpacity onPress={() => removeActivity(index)} style={styles.removeActivityButton}>
                 <Icon name="delete" size={24} color="red" />
               </TouchableOpacity>
+
             </View>
           ))}
+
           <TouchableOpacity onPress={addActivity} style={styles.addActivityButton}>
             <Text style={styles.addActivityText}>Add Activity</Text>
           </TouchableOpacity>
@@ -450,20 +450,21 @@ const setFieldDate = (date) => {
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>Select Image Source</Text>
-              <TouchableOpacity onPress={() => handleImagePicker('camera')} style={styles.modalButton}>
-                <Icon name="photo-camera" size={24} color="#7D0431" />
-                <Text style={styles.modalButtonText}>Take a Photo</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleImagePicker('gallery')} style={styles.modalButton}>
+              <TouchableOpacity onPress={pickImage} style={styles.modalButtonIcon}>
+                <Text>Pick from Gallery  </Text>
                 <Icon name="photo-library" size={24} color="#7D0431" />
-                <Text style={styles.modalButtonText}>Pick from Gallery</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.modalCloseButton}>
-                <Text style={styles.modalCancelText}>Cancel</Text>
+              <TouchableOpacity onPress={takePhoto} style={styles.modalButtonIcon}>
+                <Text>Take a Photo  </Text>
+                <Icon name="photo-camera" size={24} color="#7D0431" />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.modalButton}>
+                <Text style={styles.modalButtonCancel}>Cancel</Text>
               </TouchableOpacity>
             </View>
           </View>
         </Modal>
+
 
         {/* Date Picker */}
         {showDatePicker && (
@@ -560,11 +561,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: '#630000',
   },
-  removeActivityButton: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-  },
+
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
@@ -636,42 +633,44 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 22,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    width: '80%',
-    backgroundColor: 'white',
-    borderRadius: 8,
+    width: 300,
     padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 10,
     alignItems: 'center',
   },
   modalTitle: {
     fontSize: 18,
-    marginBottom: 20,
-    color: '#7D0431',
     fontWeight: '600',
+    marginBottom: 15,
+    color: "#7D0431"
   },
   modalButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    marginTop: 10,
     padding: 10,
+    backgroundColor: '#7d0431',
+    borderRadius: 5,
     width: '100%',
-    borderBottomWidth: 1,
-    borderColor: '#ddd',
+    alignItems: 'center',
   },
-  modalButtonText: {
-    marginLeft: 10,
-    fontSize: 16,
-    color: '#7D0431',
+  modalButtonCancel: {
+    color: 'white',
+    fontWeight: 'bold',
   },
-  modalCloseButton: {
-    marginTop: 20,
+  modalButtonIcon: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    padding: 10,
+    backgroundColor: '#f2f2f2',
+    borderRadius: 5,
+    width: '100%',
+    marginBottom: 10,
+    alignItems: 'center',
   },
-  modalCancelText: {
-    color: 'red',
-    fontSize: 16,
-  },
+
   addActivityButton: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -684,5 +683,8 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '700',
   },
+  removeActivityButton: {
+    alignSelf: 'flex-end'
+  }
 });
 export default EditEvent;

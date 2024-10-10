@@ -236,9 +236,7 @@ const AddSocietyBills = () => {
             </View>
           </View>
         </Modal>
-
         <Toast />
-
       </View>
     </ScrollView>
   );

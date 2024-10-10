@@ -26,9 +26,11 @@ const AddEvent = () => {
   const [startDateTime, setStartDateTime] = useState(new Date());
   const [endDateTime, setEndDateTime] = useState(new Date());
   const [activities, setActivities] = useState([{ type: '', startDate: new Date(), endDate: new Date() }]);
-  const [pictures, setPictures] = useState([]);
-  const [imagePreviews, setImagePreviews] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+
+  // Updated State Variables
+  const [uploadedImages, setUploadedImages] = useState([]);
+  const [previewImages, setPreviewImages] = useState([]);
+  const status = useSelector((state) => state.societyEvents.status);
   const [modalVisible, setModalVisible] = useState(false);
 
   // Date and Time Picker Handlers
@@ -39,7 +41,6 @@ const AddEvent = () => {
   const [tempDate, setTempDate] = useState(new Date());
 
   const handleSubmit = async () => {
-    // Validation for required fields
     if (!name || !startDateTime || !endDateTime) {
       Alert.alert('Validation Error', 'Please fill in all fields.');
       return;
@@ -51,18 +52,19 @@ const AddEvent = () => {
     newEvent.append('startDate', startDateTime.toISOString());
     newEvent.append('endDate', endDateTime.toISOString());
 
-    // Append pictures to FormData
-    pictures.forEach(picture => {
-      newEvent.append('pictures', {
-        uri: picture.uri,
-        type: picture.type,
-        name: picture.fileName,
-      });
+    uploadedImages.forEach((image, index) => {
+      if (image.uri) {
+        newEvent.append('pictures', {
+          uri: image.uri,
+          name: image.name,
+          type: 'image/jpeg',
+
+        });
+      }
     });
 
     newEvent.append('activities', JSON.stringify(activities));
 
-    setIsLoading(true);
     try {
       const response = await dispatch(createEvent(newEvent));
       if (response.type === 'event/AddEvent/fulfilled') {
@@ -76,14 +78,16 @@ const AddEvent = () => {
         setStartDateTime(new Date());
         setEndDateTime(new Date());
         setActivities([{ type: '', startDate: new Date(), endDate: new Date() }]);
-        setPictures([]);
-        setImagePreviews([]);
-        navigation.navigate('EventList');
+        setUploadedImages([]);
+        setPreviewImages([]);
+        setTimeout(() => {
+          navigation.goBack();
+        }, 2000);
       } else {
         Toast.show({
           type: 'error',
           text1: 'Error',
-          text2: "Failed to create event !",
+          text2: "Failed to create event!",
         });
       }
     } catch (err) {
@@ -93,13 +97,8 @@ const AddEvent = () => {
         text1: 'Failed',
         text2: "An unexpected error occurred.",
       });
-      
-
-    } finally {
-      setIsLoading(false);
     }
   };
-
 
   const handleActivityChange = (index, field, value) => {
     const newActivities = [...activities];
@@ -120,32 +119,46 @@ const AddEvent = () => {
     setActivities(newActivities);
   };
 
+  // Updated pickImage Function
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: false,
       quality: 1,
+      allowsMultipleSelection: true,
+      selectionLimit: 5,
     });
 
     if (!result.canceled && result.assets && result.assets.length > 0) {
       const asset = result.assets[0];
-      setPictures(prev => [...prev, asset]);
-      setImagePreviews(prev => [...prev, asset.uri]);
+      const newImage = {
+        uri: asset.uri,
+        name: asset.fileName || asset.uri.split('/').pop(),
+        type: asset.type || 'image/jpeg',
+      };
+      setUploadedImages(prev => [...prev, newImage]);
+      setPreviewImages(prev => [...prev, asset.uri]);
     }
     setModalVisible(false);
   };
 
+  // Updated takePhoto Function
   const takePhoto = async () => {
     let result = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: false,
       quality: 1,
     });
-
     if (!result.canceled && result.assets && result.assets.length > 0) {
       const asset = result.assets[0];
-      setPictures(prev => [...prev, asset]);
-      setImagePreviews(prev => [...prev, asset.uri]);
+
+      const newImage = {
+        uri: asset.uri,
+        name: asset.fileName || asset.uri.split('/').pop(),
+        type: asset.type || 'image/jpeg', // Adjust type if necessary
+      };
+      setUploadedImages(prev => [...prev, newImage]);
+      setPreviewImages(prev => [...prev, asset.uri]);
     }
     setModalVisible(false);
   };
@@ -200,9 +213,25 @@ const AddEvent = () => {
     setShowDatePicker(true);
   };
 
+  if (status === 'loading') {
+    return (
+      <View style={styles.loader}>
+        <ActivityIndicator size="large" color="#630000" />
+      </View>
+    );
+  }
+
+  if (status === 'failed') {
+    return (
+      <View style={styles.center}>
+        <Text>Error: {error}</Text>
+      </View>
+    );
+  }
+
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.form}>
+    <ScrollView >
+      <View style={styles.container}>
         <TextInput
           mode="outlined"
           label="Event Name"
@@ -239,17 +268,19 @@ const AddEvent = () => {
           />
         )}
 
+        {/* Image Previews */}
+        <View style={styles.imagePreviewContainer}>
+          {previewImages.map((uri, index) => (
+            <Image key={index} source={{ uri }} style={styles.imagePreview} />
+          ))}
+        </View>
+
         {/* Image Upload */}
         <TouchableOpacity style={styles.uploadButton} onPress={() => setModalVisible(true)}>
           <Text style={styles.uploadButtonText}>Upload Pictures</Text>
         </TouchableOpacity>
 
-        {/* Image Previews */}
-        <View style={styles.imagePreviewContainer}>
-          {imagePreviews.map((uri, index) => (
-            <Image key={index} source={{ uri }} style={styles.imagePreview} />
-          ))}
-        </View>
+
 
         {/* Activities */}
         {activities.map((activity, index) => (
@@ -269,7 +300,7 @@ const AddEvent = () => {
               <Text style={styles.datePickerText}>Activity End: {activity.endDate.toLocaleString()}</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => removeActivity(index)} style={styles.removeActivityButton}>
-              <Icon name="remove-circle" size={25} color="red" />
+              <Icon name="delete" size={25} color="red" />
             </TouchableOpacity>
           </View>
         ))}
@@ -282,7 +313,7 @@ const AddEvent = () => {
           <Text style={styles.submitButtonText}>Submit Event</Text>
         </TouchableOpacity>
 
-        {isLoading && <ActivityIndicator size="large" color="#7d0431" />}
+        {/* {isLoading && <ActivityIndicator size="large" color="#7d0431" />} */}
 
         {/* Modal for Image Picker */}
         <Modal visible={modalVisible} transparent={true} animationType="slide">
@@ -310,16 +341,19 @@ const AddEvent = () => {
   );
 };
 
-
-
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
-    padding: 16,
+    flex: 1,
+    padding: 20,
     backgroundColor: '#fff',
   },
-  form: {
-    marginBottom: 20,
+  loader: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  center: {
+    alignItems: 'center',
+    marginTop: 20,
   },
   input: {
     marginBottom: 16,
@@ -345,7 +379,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f0f0f0',
   },
   uploadButton: {
-    backgroundColor: '#7d0431',
+    backgroundColor: '#7D0431',
     padding: 12,
     borderRadius: 8,
     marginVertical: 16,
@@ -394,7 +428,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   submitButton: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#7D0431',
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
@@ -444,6 +478,9 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     alignItems: 'center',
   },
+  removeActivityButton: {
+    alignSelf: 'flex-end'
+  }
 });
 
 export default AddEvent;

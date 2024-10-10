@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity, ScrollView, Image, ActivityIndicator, } from 'react-native';
 import DialpadPin from "../Component/CustomKeypad/DailpadPin";
 import DialpadKeypad from "../Component/CustomKeypad/DialpadKeypad";
 import { useNavigation } from '@react-navigation/native';
@@ -26,6 +26,7 @@ const HomeScreen = ({ }) => {
     const [selectedOption, setSelectedOption] = useState('Guest');
     const [societyId, setSocietyId] = useState(null);
     const successMessage = useSelector(state => state.homeScreen.successMessage);
+    const status = useSelector(state => state.homeScreen.status);
     const error = useSelector(state => state.homeScreen.error);
     const [showDialog, setShowDialog] = useState(false);
     const [openFab, setOpenFab] = useState(false);
@@ -98,8 +99,16 @@ const HomeScreen = ({ }) => {
         };
     };
     const handleOptionSelect = (option) => {
-        setSelectedOption(option); // No need for additional logic here
+        setSelectedOption(option);
     };
+
+    if (status === 'loading') {
+        return (
+          <View style={styles.loader}>
+            <ActivityIndicator size="large" color="#630000" />
+          </View>
+        );
+      }
 
     return (
         <View style={styles.container}>
@@ -109,7 +118,7 @@ const HomeScreen = ({ }) => {
                         <RadioButton
                             value="Guest"
                             status={selectedOption === 'Guest' ? 'checked' : 'unchecked'}  // Compare with "guests"
-                            onPress={() => handleOptionSelect('Guest')}  // Pass "guests"
+                            onPress={() => handleOptionSelect('Guest')} 
                             color="#7d0431"
                         />
                         <Text style={styles.radioText}>Guests</Text>
@@ -119,7 +128,7 @@ const HomeScreen = ({ }) => {
                         <RadioButton
                             value="Staff"
                             status={selectedOption === 'Staff' ? 'checked' : 'unchecked'}  // Compare with "service"
-                            onPress={() => handleOptionSelect('Staff')}  // Pass "service"
+                            onPress={() => handleOptionSelect('Staff')}
                             color="#7d0431"
                         />
                         <Text style={styles.radioText}>Service</Text>
@@ -233,6 +242,12 @@ const styles = StyleSheet.create({
         width: 80,
         height: 80
     },
+    loader: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        
+      },
     radioContainer: {
         flexDirection: 'row',
         marginVertical: 20,
@@ -273,7 +288,6 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
         fontSize: 18,
         fontWeight: 'bold',
-        // marginBottom:50
     },
     scrollContainer: {
         width: '100%',
@@ -312,6 +326,6 @@ const styles = StyleSheet.create({
         margin: 16,
         right: 0,
         bottom: 0,
-        backgroundColor: '#7D0431', // Customize the color if needed
+        backgroundColor: '#7D0431',
     },
 });

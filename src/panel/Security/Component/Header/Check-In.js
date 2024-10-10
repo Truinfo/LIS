@@ -135,8 +135,8 @@ const styles = StyleSheet.create({
     borderBottomColor: '#eee',
   },
   avatar: {
-    backgroundColor:"#ccc",marginTop:10
-
+    backgroundColor:"#ccc",
+    marginTop:10
   },
   noImageText: {
     width: 80,
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   redButton: {
-    backgroundColor: 'red',
+    backgroundColor: '#7D0431',
     width: 70,
     height: 40,
   },

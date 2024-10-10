@@ -180,12 +180,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff"
   },
   itemContainer: {
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    padding: 5,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
   },
   avatar: {
     backgroundColor: "#ccc", marginTop: 10
@@ -198,6 +198,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   imageContainer: {
+    flex: 1,
     marginRight: 15,
     alignItems: 'center',
   },

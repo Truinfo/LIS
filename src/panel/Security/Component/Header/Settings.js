@@ -53,7 +53,8 @@ const Settings = () => {
         Linking.openURL(dialNumber);
     };
     return (
-        <ScrollView contentContainerStyle={styles.container}>
+        <ScrollView>
+            <View style={styles.container}>
             <View style={styles.card}>
                 <Avatar.Image
                     source={{ uri: `${ImagebaseURL}${Guard.pictures}` } || require("../../../../assets/Security/images/policeman.png")}
@@ -150,6 +151,7 @@ const Settings = () => {
                     </View>
                 </View>
             </TouchableOpacity> */}
+             </View>
         </ScrollView>
     );
 };

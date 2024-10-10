@@ -153,7 +153,7 @@ backgroundColor:"#fff"
     justifyContent: 'center',
   },
   redButton: {
-    backgroundColor: 'red',
+    backgroundColor: '#7D0431',
     width: 70,
     height: 40,
   },

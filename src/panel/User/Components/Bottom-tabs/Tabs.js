@@ -40,52 +40,52 @@ function Tabs() {
       // Listening for visitor notifications
       socketServices.on("Visitor_Notification", (data) => {
         console.log("Visitor Notification Data:", data);
-    
+
         if (data) {
-            const visitorName = data.visitorName || "Unknown Visitor";
-            const flatNumber = data.flatNumber || "Unknown Flat";
-            const buildingName = data.buildingName || "Unknown Building";
-    
-            // Show alert to the user
-            Alert.alert(
-                `Visitor Request`,
-                `Visitor ${visitorName} is requesting access to your flat ${flatNumber} in ${buildingName}. Do you want to approve?`,
-                [
-                    {
-                        text: "Decline",
-                        onPress: () => {
-                            // Emit decline response
-                            socketServices.emit("Visitor_Response", {
-                                visitorName,
-                                response: "declined",
-                                flatNumber,
-                                buildingName,
-                                residentName: "Your Name", // Replace with actual resident's name
-                                societyId, // Use the state value for societyId
-                            });
-                        },
-                    },
-                    {
-                        text: "Approve",
-                        onPress: () => {
-                            // Emit approve response
-                            socketServices.emit("Visitor_Response", {
-                                visitorName,
-                                response: "approved",
-                                flatNumber,
-                                buildingName,
-                                residentName: "Your Name", // Replace with actual resident's name
-                                societyId, // Use the state value for societyId
-                            });
-                        },
-                    },
-                ],
-                { cancelable: false } // Prevents closing the alert by tapping outside
-            );
+          const visitorName = data.visitorName || "Unknown Visitor";
+          const flatNumber = data.flatNumber || "Unknown Flat";
+          const buildingName = data.buildingName || "Unknown Building";
+
+          // Show alert to the user
+          Alert.alert(
+            `Visitor Request`,
+            `Visitor ${visitorName} is requesting access to your flat ${flatNumber} in ${buildingName}. Do you want to approve?`,
+            [
+              {
+                text: "Decline",
+                onPress: () => {
+                  // Emit decline response
+                  socketServices.emit("Visitor_Response", {
+                    visitorName,
+                    response: "declined",
+                    flatNumber,
+                    buildingName,
+                    residentName: "Your Name", // Replace with actual resident's name
+                    societyId, // Use the state value for societyId
+                  });
+                },
+              },
+              {
+                text: "Approve",
+                onPress: () => {
+                  // Emit approve response
+                  socketServices.emit("Visitor_Response", {
+                    visitorName,
+                    response: "approved",
+                    flatNumber,
+                    buildingName,
+                    residentName: "Your Name", // Replace with actual resident's name
+                    societyId, // Use the state value for societyId
+                  });
+                },
+              },
+            ],
+            { cancelable: false } // Prevents closing the alert by tapping outside
+          );
         } else {
-            console.error("Received data is undefined or null");
+          console.error("Received data is undefined or null");
         }
-    });
+      });
       return () => {
         socketServices.removeListener("Visitor_Notification");
       };
@@ -190,6 +190,15 @@ function Tabs() {
         options={{
           headerStyle: { backgroundColor: "#7D0431" },
           headerTintColor: "#fff",
+          headerRight: () => (
+            <Icon
+              name="storefront-sharp" // Change this to your desired icon
+              size={28}
+              color="#fff"
+              style={{ marginRight: 15 }} // Add some margin to align properly
+              onPress={() => navigation.navigate("Property List")} // Handle icon press here
+            />
+          ),
         }}
       />
     </Tab.Navigator>

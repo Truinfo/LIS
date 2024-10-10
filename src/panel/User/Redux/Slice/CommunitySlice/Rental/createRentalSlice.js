@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../../../../Security/helpers/axios';
-import axios from 'axios';
 
 const initialState = {
   loading: false,
@@ -12,8 +11,8 @@ export const createRental = createAsyncThunk(
   'createRental/createRental',
   async (formData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        'http://192.168.29.151:2000/api/createAdvertisements',
+      const response = await axiosInstance.post(
+        '/createAdvertisements',
         formData,
         {
           headers: {

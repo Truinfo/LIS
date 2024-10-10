@@ -109,6 +109,7 @@ const Amenities = () => {
           </TouchableOpacity>
         </View>
 
+
         {/* Menu Actions */}
         {isMenuOpen && (
           <View style={styles.menu}>

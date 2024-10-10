@@ -47,7 +47,6 @@ import GetDocumentSlice from "./Slice/ProfileSlice/GetDocumentSlice";
 import DocumentSlice from "./Slice/ProfileSlice/DocumentSlice";
 import { GateKeeperReducer } from "../../admin/pages/Security/GateKeeperSlice";
 import { residentsReducer } from "../../admin/pages/ResidentialUnit/ResidentsSlice";
-import { Reducer } from "../../admin/pages/ResidentialUnit/ResidentsSlice";
 import { AdvertisementReducer } from "../../admin/pages/Advertisements/AdvertisementSlice";
 import { AdminProfileReducer } from "../../admin/pages/Advertisements/profileSlice";
 import { AdminComplaintReducer } from "../../admin/pages/Complaints/ComplaintSlice";
@@ -64,6 +63,7 @@ import { CommityMembersReducer } from "../../admin/pages/Profile/committeeSlice"
 import { AdminMaintainanceReducer } from "../../admin/pages/Maintenance/SocietyMaintainanceSlice";
 import { DashboardReducer } from "../../admin/pages/Dashboard/DashboardSlice";
 import { societyBillsReducer } from "../../admin/pages/SocietyBills/SocietyBillsSlice";
+import { marketPLaceReducer } from "./Slice/MarketPlaceSlice/MarketPlace";
 
 const store = configureStore({
   reducer: {
@@ -121,6 +121,7 @@ const store = configureStore({
     staffVisitor: staffVisitors,
     societyLis: societyLicence,
     AdminResidents: residentsReducer,
+    MarketPlace: marketPLaceReducer,
 
     //Admin
     //Residents

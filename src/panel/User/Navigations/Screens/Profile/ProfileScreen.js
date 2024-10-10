@@ -160,6 +160,18 @@ const ProfileScreen = () => {
           </View>
           <Icon name="chevron-right" size={24} color="#818181" />
         </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => navigation.navigate("My Adds")}
+        >
+          <View style={styles.menuItemContent}>
+            <Icon name="home" size={24} color="#7D0431" />
+            <Text style={styles.menuItemText}>My Adds</Text>
+          </View>
+          <Icon name="chevron-right" size={24} color="#818181" />
+        </TouchableOpacity>
+
         <TouchableOpacity
           style={styles.menuItem}
           onPress={() => navigation.navigate("Reset Password ")}
@@ -205,7 +217,7 @@ const styles = StyleSheet.create({
   profileImageWrapper: {
     margin: 5,
   },
- 
+
   cameraIconContainer: {
     position: "absolute",
     bottom: 0,

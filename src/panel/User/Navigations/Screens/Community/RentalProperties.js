@@ -43,7 +43,6 @@ const RentalProperties = ({ navigation }) => {
         if (userString !== null) {
           const user = JSON.parse(userString);
           setUserType(user.userType);
-          setSocietyId(user.societyId);
           setBuildingName(user.buildingName);
           setFlatNumber(user.flatNumber);
         }

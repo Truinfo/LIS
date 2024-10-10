@@ -72,7 +72,7 @@ const PlumberList = () => {
     <View style={styles.container}>
       <FlatList
         data={data.plumber}
-        keyExtractor={(item) => item}
+        keyExtractor={(item) => item._id}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
       />

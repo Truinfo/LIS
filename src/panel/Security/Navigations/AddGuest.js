@@ -47,7 +47,6 @@ const AddGuest = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const [image, setImage] = useState(null);
 
-
   const [societyId, setSocietyId] = useState(null);
   useEffect(() => {
     const getSocietyId = async () => {
@@ -141,15 +140,12 @@ const AddGuest = ({ route, navigation }) => {
       formData.append("block", block);
       formData.append("flatNo", flatNo);
       formData.append("date", date);
-      console.log(image)
-      if (image) {
-        const imageName = image.uri.split('/').pop();
-        const imageType = image.uri.split('.').pop(); // Example: 'jpg', 'png'
-
-        formData.append('pictures', {
-          uri: image.uri,
-          name: imageName,
-          type: `image/${imageType}`,
+      console.log(image);
+      if (imageFile) {
+        formData.append("pictures", {
+          uri: imageFile.uri,
+          name: imageFile.name,
+          type: imageFile.type,
         });
       }
       try {
@@ -161,7 +157,7 @@ const AddGuest = ({ route, navigation }) => {
           setBlock("");
           setFlatNo("");
           setImage(null);
-          setDialogMessage(response.payload.message); 
+          setDialogMessage(response.payload.message);
           setShowDialog(true);
           setTimeout(() => {
             setShowDialog(false);
@@ -169,15 +165,15 @@ const AddGuest = ({ route, navigation }) => {
             navigation.navigate("SecurityTabs", { screen: "Visitors Entries" });
           }, 1000);
         } else {
-          setDialogMessage(response.payload.message || "An error occurred"); 
+          setDialogMessage(response.payload.message || "An error occurred");
           setShowDialog(true);
           setTimeout(() => {
             setShowDialog(false);
           }, 1000);
         }
       } catch (error) {
-        console.error(error); 
-        setDialogMessage("An error occurred while creating the visitor."); 
+        console.error(error);
+        setDialogMessage("An error occurred while creating the visitor.");
         setShowDialog(true);
         setTimeout(() => {
           setShowDialog(false);
@@ -188,67 +184,125 @@ const AddGuest = ({ route, navigation }) => {
     }
   };
   const handleImagePick = async () => {
-    Alert.alert(
-      'Select Image Source',
-      'Choose an option to upload an image:',
-      [
-        {
-          text: 'Camera',
-          onPress: () => pickImage(ImagePicker.launchCameraAsync),
-        },
-        {
-          text: 'Gallery',
-          onPress: () => pickImage(ImagePicker.launchImageLibraryAsync),
-        },
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-      ]
-    );
+    Alert.alert("Select Image Source", "Choose an option to upload an image:", [
+      {
+        text: "Camera",
+        onPress: () => pickImage(ImagePicker.launchCameraAsync),
+      },
+      {
+        text: "Gallery",
+        onPress: () => pickImage(ImagePicker.launchImageLibraryAsync),
+      },
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+    ]);
   };
-
-  const pickImage = async (launchFunction) => {
-    let result = await launchFunction({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: false,
-      aspect: [4, 3],
       quality: 1,
     });
 
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
-      setImage(result.assets[0]);
+      const uri = result.assets[0]?.uri;
+      if (uri) {
+        setImageFile({ uri, name: uri.split("/").pop(), type: "image/jpeg" });
+        setImagePreview(uri);
+        setShowModal(false);
+      }
     }
   };
+  // const pickImage = async (launchFunction) => {
+  //   let result = await launchFunction({
+  //     mediaTypes: ImagePicker.MediaTypeOptions.All,
+  //     allowsEditing: false,
+  //     aspect: [4, 3],
+  //     quality: 1,
+  //   });
 
+  //   if (!result.canceled) {
+  //     setImage(result.assets[0].uri);
+  //     setImage(result.assets[0]);
+  //   }
+  // };
+  const deletePhoto = () => {
+    Alert.alert(
+      "Remove Profile Photo",
+      "Are you sure you want to remove the profile photo?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Remove",
+          onPress: () => {
+            setImageFile(null);
+            setImagePreview(null);
+            setShowModal(false);
+          },
+          style: "destructive",
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+  
+  const takePhoto = async () => {
+    try {
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: false,
+        quality: 1,
+      });
 
-
-
+      if (!result.canceled) {
+        const uri = result.assets && result.assets[0]?.uri;
+        if (uri) {
+          setImageFile({ uri, name: uri.split("/").pop(), type: "image/jpeg" });
+          setImagePreview(uri);
+          setShowModal(false);
+        }
+      }
+    } catch (error) {
+      console.error("Error launching camera:", error);
+    }
+  };
+  const handleAvatarPress = () => {
+    if (imagePreview) {
+      setImageModalVisible(true);
+    } else {
+      Alert.alert("No Image", "Please upload an image.");
+    }
+  };
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <View style={styles.avatarWrapper}>
           <TouchableOpacity
             style={styles.avatarContainer}
+            onPress={handleAvatarPress}
           >
-            <Avatar.Image
-              size={174}
-              style={styles.avatar}
-              color="#fff"
-              source={image ? { uri: image } : require('../../../assets/Security/images/user.png')}
-            />
+            {imagePreview ? (
+              <Avatar.Image
+                style={styles.avatar}
+                resizeMode="cover"
+                size={174}
+                source={{ uri: imagePreview }}
+              />
+            ) : (
+              <Avatar.Image
+                size={174}
+                style={styles.avatar}
+                color="#fff"
+                source={require("../../../assets/Security/images/user.png")}
+              />
+            )}
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.cameraIconContainer}
-            onPress={handleImagePick}
-          >
-            <MaterialCommunityIcons
-              name="camera-outline"
-              size={25}
-              color="#ddd"
-            />
-          </TouchableOpacity>
+  
         </View>
 
         <View style={styles.inputContent}>
@@ -387,7 +441,7 @@ const AddGuest = ({ route, navigation }) => {
         showDialog={showDialog}
         onClose={() => setShowDialog(false)}
       />
-      {/* <Modal
+      <Modal
           animationType="fade"
           transparent={true}
           visible={showModal}
@@ -438,7 +492,7 @@ const AddGuest = ({ route, navigation }) => {
               </View>
             </View>
           </View>
-        </Modal> */}
+        </Modal>
 
       <Modal
         visible={isImageModalVisible}
@@ -450,7 +504,6 @@ const AddGuest = ({ route, navigation }) => {
           <View style={styles.profileHeader}>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <TouchableOpacity onPress={() => setImageModalVisible(false)}>
-
                 <AntDesign name="arrowleft" size={28} color="#fff" />
               </TouchableOpacity>
               <Text style={styles.profileText}>Profile Photo</Text>
@@ -492,7 +545,6 @@ const styles = StyleSheet.create({
 
   avatar: {
     backgroundColor: "#ccc",
-
   },
   cameraIconContainer: {
     bottom: 60,
@@ -553,7 +605,7 @@ const styles = StyleSheet.create({
   confirmButtonText: {
     color: "#fff",
     fontSize: 20,
-    fontWeight: '600',
+    fontWeight: "600",
     textAlign: "center",
   },
   modalBackground: {

@@ -23,6 +23,7 @@ import { fetchUserProfiles } from "../../Redux/Slice/ProfileSlice/ProfileSlice";
 import * as ImagePicker from "expo-image-picker";
 import { Calendar } from "react-native-calendars";
 import { ImagebaseURL } from "../../../Security/helpers/axios";
+import socketServices from "../../Socket/SocketServices";
 const { width, height } = Dimensions.get("window");
 
 const QuickActions = ({ navigation }) => {
@@ -121,11 +122,15 @@ const QuickActions = ({ navigation }) => {
       }
     };
     getUserName();
+    socketServices.initializeSocket();
   }, []);
 
   useEffect(() => {
     if (userId && societyId) {
       dispatch(fetchUserProfiles({ userId, societyId }));
+    }
+    if (societyId) {
+      socketServices.emit("joinSecurityPanel",  societyId );
     }
   }, [dispatch, userId, societyId]);
   useEffect(() => {
@@ -417,9 +422,32 @@ const QuickActions = ({ navigation }) => {
   };
 
   const handleRaiseAlarm = () => {
-    toggleModal();
-    toggleAlertModal();
+    if (!selectedOption) {
+      alert("Please select an option before raising an alarm.");
+      return;
+    }
+
+    const alarmData = {
+      option: selectedOption,
+      societyId: societyId, // Make sure you have the society ID available
+      block: buildingName, // or any relevant block information
+      flatNumber: flatNumber, // Resident's flat number
+      residentName: userId, // Resident's name
+    };
+
+    // Emit the alert to the backend
+    socketServices.emit("Notify-Gate", { alarmData });
+
+    // Optional: Alert the user that the alarm has been raised
+    alert("Alarm raised! Security has been notified.");
+
+    toggleModal(); // Close the modal
   };
+
+  // const handleRaiseAlarm = () => {
+  //   toggleModal();
+  //   toggleAlertModal();
+  // };
 
   const renderOption = (option, imageSource, label) => (
     <TouchableOpacity
@@ -785,7 +813,7 @@ const QuickActions = ({ navigation }) => {
                 onPress={() => setIsCheckboxChecked(!isCheckboxChecked)}
                 theme={{ colors: { primary: "#7d0431" } }}
               />
-              <Text style={{marginTop:7}}>Add to frequent Visitor</Text>
+              <Text style={{ marginTop: 7 }}>Add to frequent Visitor</Text>
             </View>
 
             <TouchableOpacity
@@ -917,6 +945,51 @@ const QuickActions = ({ navigation }) => {
           </View>
         </View>
       </Modal>
+
+      {/* <Modal
+        visible={isModalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={toggleModal}
+      >
+        <View style={[styles.modalOverlay1]}>
+          <View style={styles.modalContent1}>
+            <TouchableOpacity style={styles.closeButton} onPress={toggleModal}>
+              <Text style={styles.closeButtonText}>X</Text>
+            </TouchableOpacity>
+
+            <View style={styles.iconContainer1}>
+              {renderOption(
+                "Fire",
+                require("../../../../assets/User/images/fire.png"),
+                "Fire"
+              )}
+              {renderOption(
+                "Stuck in Lift",
+                require("../../../../assets/User/images/elevator.png"),
+                "Stuck in Lift"
+              )}
+              {renderOption(
+                "Animal Threat",
+                require("../../../../assets/User/images/snake.png"),
+                "Animal Threat"
+              )}
+              {renderOption(
+                "Visitors Threat",
+                require("../../../../assets/User/images/traveler.png"),
+                "Visitors Threat"
+              )}
+            </View>
+
+            <TouchableOpacity
+              style={styles.raiseAlarmButton}
+              onPress={handleRaiseAlarm}
+            >
+              <Text style={styles.raiseAlarmButtonText}>Raise Alarm</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal> */}
 
       <Modal
         visible={isAlertModalVisible}

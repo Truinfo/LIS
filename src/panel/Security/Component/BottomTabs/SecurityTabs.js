@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { Avatar } from 'react-native-paper';
 import HomeScreen from '../../Navigations/HomeScreen';
@@ -11,10 +11,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchGuard } from '../../../User/Redux/Slice/Security_Panel/SettingsSlice';
 import { ImagebaseURL } from '../../helpers/axios';
 import { fetchSocietyById } from '../../../User/Redux/Slice/Security_Panel/SocietyByIdSlice';
-import { TouchableOpacity } from 'react-native';
 import { logout } from '../../../User/Redux/Slice/AuthSlice/Login/LoginSlice';
-import { CommonActions, useNavigation } from '@react-navigation/native';
+import { CommonActions, useFocusEffect, useNavigation } from '@react-navigation/native';
 import StaffVisitors from '../../Navigations/StaffVisitors';
+import socketServices from '../../../User/Socket/SocketServices';
+import { Audio } from 'expo-av';
 
 const Tab = createBottomTabNavigator();
 
@@ -24,12 +25,15 @@ function SecurityTabs() {
   const Guard = useSelector((state) => state.setting.settings);
   const { society } = useSelector((state) => state.societyById);
   const [sequrityId, setSequrityId] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [alertData, setAlertData] = useState(null);
+  const [sound, setSound] = useState();
 
   useEffect(() => {
     const getUserName = async () => {
       try {
         const userString = await AsyncStorage.getItem("user");
-        if (userString !== null) {
+        if (userString) {
           const user = JSON.parse(userString);
           setSocietyId(user.societyId);
           setSequrityId(user.sequrityId);
@@ -43,6 +47,7 @@ function SecurityTabs() {
   }, []);
 
   const navigation = useNavigation();
+
   useEffect(() => {
     if (societyId) {
       dispatch(fetchSocietyById(societyId));
@@ -54,6 +59,7 @@ function SecurityTabs() {
       dispatch(fetchGuard({ societyId, sequrityId }));
     }
   }, [societyId, sequrityId, dispatch]);
+
   const handleLogout = async () => {
     try {
       await AsyncStorage.removeItem('user');
@@ -65,70 +71,174 @@ function SecurityTabs() {
     navigation.dispatch(
       CommonActions.reset({
         index: 0,
-        routes: [{ name: 'Login' }], // Adjust 'Login' to the correct name of your login screen
+        routes: [{ name: 'Login' }],
       })
     );
   };
-  const handleNotifications = async () => {
 
+  const playAlertSound = async () => {
+    const { sound: newSound } = await Audio.Sound.createAsync(
+      require('../../assets/alert-33762.mp3') // Make sure this path is correct
+    );
+    setSound(newSound);
+    await newSound.playAsync();
+  
+    const status = await newSound.getStatusAsync();
+    
+    if (!status.isPlaying) {
+      // Play sound again if it has finished
+      newSound.setOnPlaybackStatusUpdate((playbackStatus) => {
+        if (playbackStatus.didJustFinish) {
+          newSound.replayAsync();
+        }
+      });
+    }
   };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      socketServices.initializeSocket();
+
+      if (societyId) {
+        socketServices.emit("joinSecurityPanel", societyId);
+      }
+
+      const handleGateAlertReceived = (data) => {
+        console.log("Received Gate Alert:", data);
+        setAlertData(data);
+        setModalVisible(true);
+        playAlertSound(); // Play sound when alert is received
+      };
+
+      socketServices.on("Gate_alert_received", handleGateAlertReceived);
+
+      return () => {
+        socketServices.removeListener("Gate_alert_received", handleGateAlertReceived);
+        if (sound) {
+          sound.stopAsync(); // Stop sound when the component unmounts
+        }
+      };
+    }, [societyId, sound])
+  );
+
+  const closeModal = async () => {
+    setModalVisible(false);
+    if (sound) {
+      await sound.stopAsync(); // Stop the sound when closing the modal
+    }
+  };
+
   return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ color, size }) => {
-          let iconName;
-          if (route.name === 'Home') {
-            iconName = 'home-outline'; // You can change to 'home' for filled icon
-          } else if (route.name === 'Visitors Entries') {
-            iconName = 'log-in-outline'; // Change to 'log-in' for filled icon
-          } else if (route.name === 'Staff Entries') {
-            iconName = 'people-outline'; // You can change this as per your requirement
-          } else if (route.name === 'Settings') {
-            iconName = 'settings-outline'; // Change to 'settings' for filled icon
-          }
-
-          return <Ionicons name={iconName} size={size} color={color} />;
-        },
-        tabBarActiveTintColor: '#7d0431',
-        tabBarInactiveTintColor: 'gray',
-        headerTitle: () => null,
-        headerStyle: {
-          backgroundColor: '#7d0431',
-        },
-        headerLeft: () => (
-          <View style={styles.headerLeftContainer}>
-            <Avatar.Image
-              size={40}
-              source={{ uri: `${ImagebaseURL}${Guard.pictures}` }}
-            />
-            <View style={styles.nameContainer}>
-              <Text style={styles.nameText}>{Guard.name}</Text>
-              <Text style={styles.societyText}>{society ? society.societyName : '...'}</Text>
+    <>
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          tabBarIcon: ({ color, size }) => {
+            let iconName;
+            if (route.name === 'Home') {
+              iconName = 'home-outline';
+            } else if (route.name === 'Visitors Entries') {
+              iconName = 'log-in-outline';
+            } else if (route.name === 'Staff Entries') {
+              iconName = 'people-outline';
+            } else if (route.name === 'Settings') {
+              iconName = 'settings-outline';
+            }
+            return <Ionicons name={iconName} size={size} color={color} />;
+          },
+          tabBarActiveTintColor: '#7d0431',
+          tabBarInactiveTintColor: 'gray',
+          headerTitle: () => null,
+          headerStyle: {
+            backgroundColor: '#7d0431',
+          },
+          headerLeft: () => (
+            <View style={styles.headerLeftContainer}>
+              <Avatar.Image
+                size={40}
+                source={{ uri: `${ImagebaseURL}${Guard.pictures}` }}
+              />
+              <View style={styles.nameContainer}>
+                <Text style={styles.nameText}>{Guard.name}</Text>
+                <Text style={styles.societyText}>{society ? society.societyName : '...'}</Text>
+              </View>
             </View>
-          </View>
-        ),
-        headerRight: () => (
-          <View style={styles.headerRightContainer}>
-            <TouchableOpacity onPress={handleNotifications} >
-              <Ionicons name="notifications" size={24} color="white" />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleLogout} style={styles.notificationIcon}>
-              <Ionicons name="log-out" size={24} color="white" />
-            </TouchableOpacity>
+          ),
+          headerRight: () => (
+            <View style={styles.headerRightContainer}>
+              <TouchableOpacity onPress={handleLogout} style={styles.notificationIcon}>
+                <Ionicons name="log-out" size={24} color="white" />
+              </TouchableOpacity>
+            </View>
+          ),
+        })}
+      >
+        <Tab.Screen name="Home" component={HomeScreen} />
+        <Tab.Screen name="Visitors Entries" component={InandOut1} />
+        <Tab.Screen name="Staff Entries" component={StaffVisitors} />
+        <Tab.Screen name="Settings" component={Settings} />
+      </Tab.Navigator>
 
+      {/* Modal for Alert Notifications */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={closeModal}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Alert Notification</Text>
+            {alertData && (
+              <>
+                <Text style={styles.modalText}>Alert: {alertData.alert}</Text>
+                <Text style={styles.modalText}>Block: {alertData.block}</Text>
+                <Text style={styles.modalText}>Flat Number: {alertData.flatNumber}</Text>
+                <Text style={styles.modalText}>Resident Name: {alertData.residentName}</Text>
+                <Text style={styles.modalText}>Time: {new Date(alertData.alertTime).toLocaleString()}</Text>
+              </>
+            )}
+            <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
+              <Text style={styles.closeButtonText}>Close</Text>
+            </TouchableOpacity>
           </View>
-        ),
-      })}
-    >
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Visitors Entries" component={InandOut1} />
-      <Tab.Screen name="Staff Entries" component={StaffVisitors} />
-      <Tab.Screen name="Settings" component={Settings} />
-    </Tab.Navigator>
+        </View>
+      </Modal>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: '80%',
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 15,
+  },
+  modalText: {
+    fontSize: 16,
+    marginBottom: 10,
+  },
+  closeButton: {
+    marginTop: 15,
+    padding: 10,
+    backgroundColor: '#7d0431',
+    borderRadius: 5,
+  },
+  closeButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
   headerLeftContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -140,11 +250,11 @@ const styles = StyleSheet.create({
   nameText: {
     fontWeight: 'bold',
     fontSize: 20,
-    color: '#FFFFFF', // Set text color to white for better visibility
+    color: '#FFFFFF',
   },
   societyText: {
     fontSize: 14,
-    color: '#E0E0E0', // Light gray for society name
+    color: '#E0E0E0',
   },
   headerRightContainer: {
     flexDirection: 'row',

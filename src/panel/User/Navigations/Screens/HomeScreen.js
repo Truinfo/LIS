@@ -189,7 +189,6 @@ const HomeScreen = () => {
   const unpaidBills = Array.isArray(payments)
     ? payments.filter((bill) => bill.status !== "Paid")
     : [];
-  console.log("payments unpaidBills", unpaidBills);
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>

@@ -68,7 +68,8 @@
     "react-native-webview": "13.8.6",
     "react-redux": "^9.1.2",
     "reanimated-bottom-sheet": "^1.0.0-alpha.22",
-    "socket.io-client": "^4.7.5"
+    "socket.io-client": "^4.7.5",
+    "expo-av": "~14.0.7"
   },
   "devDependencies": {
     "@babel/core": "^7.24.0"

@@ -250,7 +250,11 @@ const AddGuest = ({ route, navigation }) => {
       { cancelable: true }
     );
   };
-  
+
+  const closeCross = () => {
+    setShowModal(false);
+  };
+
   const takePhoto = async () => {
     try {
       const result = await ImagePicker.launchCameraAsync({
@@ -278,6 +282,10 @@ const AddGuest = ({ route, navigation }) => {
       Alert.alert("No Image", "Please upload an image.");
     }
   };
+  const handleOpenModal = () => {
+    setShowModal(true);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
@@ -302,7 +310,16 @@ const AddGuest = ({ route, navigation }) => {
               />
             )}
           </TouchableOpacity>
-  
+          <TouchableOpacity
+            style={styles.cameraIconContainer}
+            onPress={handleOpenModal}
+          >
+            <MaterialCommunityIcons
+              name="camera-outline"
+              size={25}
+              color="#ddd"
+            />
+          </TouchableOpacity>
         </View>
 
         <View style={styles.inputContent}>
@@ -442,57 +459,60 @@ const AddGuest = ({ route, navigation }) => {
         onClose={() => setShowDialog(false)}
       />
       <Modal
-          animationType="fade"
-          transparent={true}
-          visible={showModal}
-          onRequestClose={() => setShowModal(false)}
-        >
-          <View style={styles.modalBackground}>
-            <View style={styles.modalContainer}>
-              <View style={styles.modalHeader}>
-                <Text style={{ fontSize: 22, fontWeight: "700" }}>
-                  Profile Photo
-                </Text>
-                <TouchableOpacity style={{ position: "absolute", right: 0 }}>
-                  <Entypo
-                    name="circle-with-cross"
+        animationType="fade"
+        transparent={true}
+        visible={showModal}
+        onRequestClose={() => setShowModal(false)}
+      >
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalHeader}>
+              <Text style={{ fontSize: 22, fontWeight: "700" }}>
+                Profile Photo
+              </Text>
+              <TouchableOpacity
+                style={{ position: "absolute", right: 0 }}
+                onPress={closeCross}
+              >
+                <Entypo
+                  name="circle-with-cross"
+                  size={27}
+                  color="#800336"
+                  onPress={closeCross}
+                />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.icons}>
+              <View style={styles.camera}>
+                <TouchableOpacity onPress={takePhoto}>
+                  <MaterialCommunityIcons
+                    name="camera-outline"
                     size={27}
                     color="#800336"
-                    onPress={closeCross}
                   />
+                  <Text style={styles.camText}>Camera</Text>
                 </TouchableOpacity>
               </View>
-              <View style={styles.icons}>
-                <View style={styles.camera}>
-                  <TouchableOpacity onPress={takePhoto}>
-                    <MaterialCommunityIcons
-                      name="camera-outline"
-                      size={27}
-                      color="#800336"
-                    />
-                    <Text style={styles.camText}>Camera</Text>
-                  </TouchableOpacity>
-                </View>
-                <View>
-                  <TouchableOpacity onPress={pickImage}>
-                    <MaterialCommunityIcons
-                      name="view-gallery-outline"
-                      size={27}
-                      color="#800336"
-                    />
-                    <Text style={styles.camText}>Gallery</Text>
-                  </TouchableOpacity>
-                </View>
-                 <View>
-                  <TouchableOpacity onPress={deletePhoto}>
-                    <AntDesign name="delete" size={27} color="#800336" />
-                    <Text style={styles.camText}>Delete</Text>
-                  </TouchableOpacity>
-                </View> 
+              <View>
+                <TouchableOpacity onPress={pickImage}>
+                  <MaterialCommunityIcons
+                    name="view-gallery-outline"
+                    size={27}
+                    color="#800336"
+                  />
+                  <Text style={styles.camText}>Gallery</Text>
+                </TouchableOpacity>
+              </View>
+              <View>
+                <TouchableOpacity onPress={deletePhoto}>
+                  <AntDesign name="delete" size={27} color="#800336" />
+                  <Text style={styles.camText}>Delete</Text>
+                </TouchableOpacity>
               </View>
             </View>
           </View>
-        </Modal>
+        </View>
+      </Modal>
 
       <Modal
         visible={isImageModalVisible}

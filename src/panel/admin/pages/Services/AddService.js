@@ -178,7 +178,6 @@ const AddService = () => {
 
         if (!result.canceled) {
             setImage(result.assets[0].uri);
-            setImage(result.assets[0]);
         }
     };
     return (

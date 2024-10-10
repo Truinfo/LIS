@@ -34,15 +34,8 @@ const Profile = () => {
   const commityMember = useSelector(
     (state) => state.commityMembers.commityMember || []
   );
-  // const loading = useSelector(state => state.commityMembers.loading );
   const [cityName, setCityName] = useState("");
-  // const societyId = "6683b57b073739a31e8350d0";
-  // useEffect(() => {
-  //     if (societyId) {
-  //         dispatch(fetchResidentProfile(societyId));
-  //         dispatch(fetchCommityMembers(societyId));
-  //     }
-  // }, [dispatch, societyId]);
+ 
   useEffect(() => {
     const getSocietyId = async () => {
       try {

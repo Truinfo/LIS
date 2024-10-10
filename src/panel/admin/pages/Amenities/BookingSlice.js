@@ -51,7 +51,11 @@ export const updateAmenityBooking = createAsyncThunk(
     const response = await axiosInstance.put(
       `/updateAmenityBooking/${societyId}/${userId}`,
       formData,
-
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
     );
     return response.data;
   }

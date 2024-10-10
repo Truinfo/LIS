@@ -22,6 +22,7 @@ import * as ImagePicker from "expo-image-picker";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AntDesign, Entypo, MaterialIcons } from "@expo/vector-icons";
+import socketServices from "../../User/Socket/SocketServices";
 
 const AddGuest = ({ route, navigation }) => {
   const [name, setName] = useState("");
@@ -63,6 +64,7 @@ const AddGuest = ({ route, navigation }) => {
       }
     };
     getSocietyId();
+    socketServices.initializeSocket();
   }, []);
   const { society } = useSelector((state) => state.societyById);
   useEffect(() => {
@@ -74,6 +76,7 @@ const AddGuest = ({ route, navigation }) => {
   useEffect(() => {
     if (societyId) {
       dispatch(fetchSocietyById(societyId));
+      socketServices.emit("joinSecurityPanel", societyId);
     }
   }, [dispatch, societyId]);
 
@@ -152,20 +155,30 @@ const AddGuest = ({ route, navigation }) => {
         const response = await dispatch(createVisitor(formData));
         if (response.type === "visitor/createVisitor/fulfilled") {
           console.log(response);
+          const data = {
+            visitorName: name,
+            flatNumber: flatNo,
+            buildingName: block,
+            societyId:societyId,
+            action: "approve or decline",
+          };
+          socketServices.emit("AddVisitor", { data });
           setName("");
           setPhoneNumber("");
           setBlock("");
           setFlatNo("");
           setImage(null);
-          setDialogMessage(response.payload.message);
+          setDialogMessage(`${response.payload.message}`);
           setShowDialog(true);
           setTimeout(() => {
             setShowDialog(false);
             dispatch(resetState());
             navigation.navigate("SecurityTabs", { screen: "Visitors Entries" });
-          }, 1000);
+          }, 2000);
         } else {
-          setDialogMessage(response.payload.message || "An error occurred");
+          setDialogMessage(
+            `${response.payload.message}` || "An error occurred"
+          );
           setShowDialog(true);
           setTimeout(() => {
             setShowDialog(false);

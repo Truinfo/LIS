@@ -12,20 +12,29 @@ import {
 } from "react-native";
 import { Avatar, TextInput } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
-import { createVisitor, resetState } from "../../User/Redux/Slice/Security_Panel/VisitorsSlice";
+import {
+  createVisitor,
+  resetState,
+} from "../../User/Redux/Slice/Security_Panel/VisitorsSlice";
 import { fetchSocietyById } from "../../User/Redux/Slice/Security_Panel/SocietyByIdSlice";
 import MyDialog from "../DialogBox/DialogBox";
 import * as ImagePicker from "expo-image-picker";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AntDesign, Entypo, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  AntDesign,
+  Entypo,
+  MaterialCommunityIcons,
+  MaterialIcons,
+} from "@expo/vector-icons";
+import socketServices from "../../User/Socket/SocketServices";
 
 const AddDelivery = ({ route, navigation }) => {
   const [name, setName] = useState("");
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [company, setCompany] = useState('');
-  const [companyError, setCompanyError] = useState('');
+  const [company, setCompany] = useState("");
+  const [companyError, setCompanyError] = useState("");
   const [block, setBlock] = useState("");
   const [flatNo, setFlatNo] = useState("");
   const [showBuildingDropdown, setShowBuildingDropdown] = useState(false);
@@ -48,22 +57,22 @@ const AddDelivery = ({ route, navigation }) => {
   useEffect(() => {
     const getSocietyId = async () => {
       try {
-        const user = await AsyncStorage.getItem('user');
-        const id = JSON.parse(user).societyId
+        const user = await AsyncStorage.getItem("user");
+        const id = JSON.parse(user).societyId;
         if (id !== null) {
           setSocietyId(id);
         } else {
-          console.error('No societyId found in AsyncStorage');
+          console.error("No societyId found in AsyncStorage");
         }
       } catch (error) {
-        console.error('Error fetching societyId from AsyncStorage:', error);
+        console.error("Error fetching societyId from AsyncStorage:", error);
       }
     };
     getSocietyId();
+    socketServices.initializeSocket();
   }, []);
 
   const { society } = useSelector((state) => state.societyById);
-  console.log(successMessage)
 
   useEffect(() => {
     if (society) {
@@ -74,6 +83,7 @@ const AddDelivery = ({ route, navigation }) => {
   useEffect(() => {
     if (societyId) {
       dispatch(fetchSocietyById(societyId));
+      socketServices.emit("joinSecurityPanel", societyId);
     }
   }, [dispatch, societyId]);
 
@@ -102,7 +112,7 @@ const AddDelivery = ({ route, navigation }) => {
     setPhoneNumberError("");
     setBlockError("");
     setFlatNoError("");
-    setCompanyError('');
+    setCompanyError("");
 
     if (!name) {
       setNameError("Name is required");
@@ -116,7 +126,7 @@ const AddDelivery = ({ route, navigation }) => {
     }
 
     if (!company) {
-      setCompanyError('Please enter your Company.');
+      setCompanyError("Please enter your Company.");
       isValid = false;
     }
 
@@ -162,6 +172,14 @@ const AddDelivery = ({ route, navigation }) => {
       try {
         const response = await dispatch(createVisitor(formData));
         if (response.meta.requestStatus === "fulfilled") {
+          const data = {
+            visitorName: name,
+            flatNumber: flatNo,
+            buildingName: block,
+            societyId: societyId,
+            action: "approve or decline",
+          };
+          socketServices.emit("AddVisitor", { data });
           setName("");
           setPhoneNumber("");
           setCompany("");
@@ -169,7 +187,7 @@ const AddDelivery = ({ route, navigation }) => {
           setFlatNo("");
           setImageFile(null);
           setImagePreview(null);
-          setDialogMessage(response.payload.message); 
+          setDialogMessage(`${response.payload.message}`);
           setShowDialog(true);
           setTimeout(() => {
             setShowDialog(false);
@@ -177,15 +195,17 @@ const AddDelivery = ({ route, navigation }) => {
             navigation.navigate("SecurityTabs", { screen: "Visitors Entries" });
           }, 1000);
         } else {
-          setDialogMessage(response.payload.message || "An error occurred"); 
+          setDialogMessage(
+            `${response.payload.message}` || "An error occurred"
+          );
           setShowDialog(true);
           setTimeout(() => {
             setShowDialog(false);
           }, 1000);
         }
       } catch (error) {
-        console.error(error); 
-        setDialogMessage("An error occurred while creating the visitor."); 
+        console.error(error);
+        setDialogMessage("An error occurred while creating the visitor.");
         setShowDialog(true);
         setTimeout(() => {
           setShowDialog(false);
@@ -311,11 +331,7 @@ const AddDelivery = ({ route, navigation }) => {
 
         <View style={styles.inputContent}>
           <TextInput
-            style={[
-              styles.inputBlock,
-
-              nameError && { borderColor: "red" },
-            ]}
+            style={[styles.inputBlock, nameError && { borderColor: "red" }]}
             label="Name *"
             value={name}
             mode="outlined"
@@ -354,15 +370,21 @@ const AddDelivery = ({ route, navigation }) => {
           ) : null}
 
           <TextInput
-            style={[styles.inputBlock, { marginTop: 10 }, companyError && { borderColor: "red" },]}
+            style={[
+              styles.inputBlock,
+              { marginTop: 10 },
+              companyError && { borderColor: "red" },
+            ]}
             label="Company *"
             value={company}
             mode="outlined"
             outlineColor={companyError ? "red" : "#CCC"}
-            theme={{ colors: { primary: companyError ? "red" : "#800336", } }}
+            theme={{ colors: { primary: companyError ? "red" : "#800336" } }}
             onChangeText={setCompany}
           />
-          {companyError ? (<Text style={styles.errorMessage}> {companyError}</Text>) : null}
+          {companyError ? (
+            <Text style={styles.errorMessage}> {companyError}</Text>
+          ) : null}
 
           <TouchableOpacity
             style={[
@@ -440,9 +462,7 @@ const AddDelivery = ({ route, navigation }) => {
                   style={styles.dropdownItem}
                   onPress={() => selectFlatNo(flat)}
                 >
-                  <Text style={styles.dropdownItemText}>
-                    {flat.flatNumber}
-                  </Text>
+                  <Text style={styles.dropdownItemText}>{flat.flatNumber}</Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -454,9 +474,7 @@ const AddDelivery = ({ route, navigation }) => {
           onPress={handleConfirm}
           disabled={loading}
         >
-          <Text style={styles.confirmButtonText}>
-            Add
-          </Text>
+          <Text style={styles.confirmButtonText}>Add</Text>
         </TouchableOpacity>
       </ScrollView>
       <MyDialog
@@ -527,7 +545,6 @@ const AddDelivery = ({ route, navigation }) => {
           <View style={styles.profileHeader}>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <TouchableOpacity onPress={() => setImageModalVisible(false)}>
-
                 <AntDesign name="arrowleft" size={28} color="#fff" />
               </TouchableOpacity>
               <Text style={styles.profileText}>Profile Photo</Text>
@@ -586,7 +603,6 @@ const styles = StyleSheet.create({
   errorMessage: {
     color: "red",
     fontSize: 12,
-
   },
   dropdownButton: {
     backgroundColor: "#fff",
@@ -629,7 +645,7 @@ const styles = StyleSheet.create({
   confirmButtonText: {
     color: "#fff",
     fontSize: 20,
-    fontWeight: '600',
+    fontWeight: "600",
     textAlign: "center",
   },
   modalBackground: {

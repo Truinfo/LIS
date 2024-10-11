@@ -10,7 +10,9 @@ export const createService = createAsyncThunk(
     'staff/createService',
     async (formData) => {
         try {
-            const response = await axiosInstance.post('/createService', formData);
+            const response = await axiosInstance.post('/createService', formData, {headers: {
+                'Content-Type': 'multipart/form-data',
+              }});
             return response.data;
         } catch (error) {
             console.error('Error creating service:', error);

@@ -217,10 +217,12 @@ const styles = StyleSheet.create({
     avatarContainer: {
         alignSelf: 'center',
         marginBottom: 20,
-        position: 'relative', // Needed for positioning camera button
+        position: 'relative',
+        // Needed for positioning camera button
     },
     avatar: {
         alignSelf: 'center',
+         backgroundColor:"#ccc",
     },
     cameraButton: {
         position: 'absolute',

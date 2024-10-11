@@ -20,6 +20,7 @@ import * as ImagePicker from "expo-image-picker";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AntDesign, Entypo, MaterialIcons } from "@expo/vector-icons";
+import socketServices from "../../User/Socket/SocketServices";
 
 const AddService = ({ route, navigation  }) => {
   const [name, setName] = useState("");
@@ -68,7 +69,8 @@ const AddService = ({ route, navigation  }) => {
         console.error("Error fetching societyId from AsyncStorage:", error);
       }
     };
-    getSocietyId();
+    getSocietyId(); 
+    socketServices.initializeSocket();
   }, []);
   const { society } = useSelector((state) => state.societyById);
   console.log(successMessage);
@@ -82,6 +84,7 @@ const AddService = ({ route, navigation  }) => {
   useEffect(() => {
     if (societyId) {
       dispatch(fetchSocietyById(societyId));
+      socketServices.emit("joinSecurityPanel", societyId);
     }
   }, [dispatch, societyId]);
 
@@ -179,6 +182,14 @@ const AddService = ({ route, navigation  }) => {
       try {
         const response = await dispatch(createVisitor(formData));
         if (response.meta.requestStatus === "fulfilled") {
+          const data = {
+            visitorName: name,
+            flatNumber: flatNo,
+            buildingName: block,
+            societyId:societyId,
+            action: "approve or decline",
+          };
+          socketServices.emit("AddVisitor", { data });
           setName("");
           setPhoneNumber("");
           setDetails("");

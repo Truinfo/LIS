@@ -1,21 +1,32 @@
-import React, { useEffect, useState } from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import { Avatar } from 'react-native-paper';
-import HomeScreen from '../../Navigations/HomeScreen';
-import Settings from '../Header/Settings';
-import InandOut1 from '../Header/InandOut1';
-import { useDispatch, useSelector } from 'react-redux';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { fetchGuard } from '../../../User/Redux/Slice/Security_Panel/SettingsSlice';
-import { ImagebaseURL } from '../../helpers/axios';
-import { fetchSocietyById } from '../../../User/Redux/Slice/Security_Panel/SocietyByIdSlice';
-import { logout } from '../../../User/Redux/Slice/AuthSlice/Login/LoginSlice';
-import { CommonActions, useFocusEffect, useNavigation } from '@react-navigation/native';
-import StaffVisitors from '../../Navigations/StaffVisitors';
-import socketServices from '../../../User/Socket/SocketServices';
-import { Audio } from 'expo-av';
+import React, { useEffect, useState } from "react";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Modal,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import { Avatar } from "react-native-paper";
+import HomeScreen from "../../Navigations/HomeScreen";
+import Settings from "../Header/Settings";
+import InandOut1 from "../Header/InandOut1";
+import { useDispatch, useSelector } from "react-redux";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { fetchGuard } from "../../../User/Redux/Slice/Security_Panel/SettingsSlice";
+import { ImagebaseURL } from "../../helpers/axios";
+import { fetchSocietyById } from "../../../User/Redux/Slice/Security_Panel/SocietyByIdSlice";
+import { logout } from "../../../User/Redux/Slice/AuthSlice/Login/LoginSlice";
+import {
+  CommonActions,
+  useFocusEffect,
+  useNavigation,
+} from "@react-navigation/native";
+import StaffVisitors from "../../Navigations/StaffVisitors";
+import socketServices from "../../../User/Socket/SocketServices";
+import { Audio } from "expo-av";
 
 const Tab = createBottomTabNavigator();
 
@@ -62,29 +73,29 @@ function SecurityTabs() {
 
   const handleLogout = async () => {
     try {
-      await AsyncStorage.removeItem('user');
-      await AsyncStorage.removeItem('userToken');
+      await AsyncStorage.removeItem("user");
+      await AsyncStorage.removeItem("userToken");
     } catch (e) {
-      console.error('Error clearing user from AsyncStorage:', e);
+      console.error("Error clearing user from AsyncStorage:", e);
     }
     dispatch(logout());
     navigation.dispatch(
       CommonActions.reset({
         index: 0,
-        routes: [{ name: 'Login' }],
+        routes: [{ name: "Login" }],
       })
     );
   };
 
   const playAlertSound = async () => {
     const { sound: newSound } = await Audio.Sound.createAsync(
-      require('../../assets/alert-33762.mp3') // Make sure this path is correct
+      require("../../assets/alert-33762.mp3") // Make sure this path is correct
     );
     setSound(newSound);
     await newSound.playAsync();
-  
+
     const status = await newSound.getStatusAsync();
-    
+
     if (!status.isPlaying) {
       // Play sound again if it has finished
       newSound.setOnPlaybackStatusUpdate((playbackStatus) => {
@@ -112,8 +123,38 @@ function SecurityTabs() {
 
       socketServices.on("Gate_alert_received", handleGateAlertReceived);
 
+      const handleresponseRecieved = (data) => {
+        console.log("Received response Alert:", data);
+        const message = `
+        Building: ${data.buildingName || "N/A"}
+        Flat Number: ${data.flatNumber || "N/A"}
+        Visitor Name: ${data.visitorName || "N/A"}
+        Resident Name: ${data.residentName || "N/A"}
+        Resident Name: ${data.userId || "N/A"}
+        Response: ${data.response || "N/A"}
+    `;
+
+        Alert.alert(
+          "Alert Details", // Title of the alert
+          message.trim(), // Message to be displayed
+          [{ text: "OK", onPress: () => console.log("OK Pressed") }] // Button options
+        );
+      };
+
+      socketServices.on(
+        "Visitor_Response_Notification",
+        handleresponseRecieved
+      );
+
       return () => {
-        socketServices.removeListener("Gate_alert_received", handleGateAlertReceived);
+        socketServices.removeListener(
+          "Gate_alert_received",
+          handleGateAlertReceived
+        );
+        socketServices.removeListener(
+          "Visitor_Response_Notification",
+          handleresponseRecieved
+        );
         if (sound) {
           sound.stopAsync(); // Stop sound when the component unmounts
         }
@@ -134,22 +175,22 @@ function SecurityTabs() {
         screenOptions={({ route }) => ({
           tabBarIcon: ({ color, size }) => {
             let iconName;
-            if (route.name === 'Home') {
-              iconName = 'home-outline';
-            } else if (route.name === 'Visitors Entries') {
-              iconName = 'log-in-outline';
-            } else if (route.name === 'Staff Entries') {
-              iconName = 'people-outline';
-            } else if (route.name === 'Settings') {
-              iconName = 'settings-outline';
+            if (route.name === "Home") {
+              iconName = "home-outline";
+            } else if (route.name === "Visitors Entries") {
+              iconName = "log-in-outline";
+            } else if (route.name === "Staff Entries") {
+              iconName = "people-outline";
+            } else if (route.name === "Settings") {
+              iconName = "settings-outline";
             }
             return <Ionicons name={iconName} size={size} color={color} />;
           },
-          tabBarActiveTintColor: '#7d0431',
-          tabBarInactiveTintColor: 'gray',
+          tabBarActiveTintColor: "#7d0431",
+          tabBarInactiveTintColor: "gray",
           headerTitle: () => null,
           headerStyle: {
-            backgroundColor: '#7d0431',
+            backgroundColor: "#7d0431",
           },
           headerLeft: () => (
             <View style={styles.headerLeftContainer}>
@@ -159,13 +200,18 @@ function SecurityTabs() {
               />
               <View style={styles.nameContainer}>
                 <Text style={styles.nameText}>{Guard.name}</Text>
-                <Text style={styles.societyText}>{society ? society.societyName : '...'}</Text>
+                <Text style={styles.societyText}>
+                  {society ? society.societyName : "..."}
+                </Text>
               </View>
             </View>
           ),
           headerRight: () => (
             <View style={styles.headerRightContainer}>
-              <TouchableOpacity onPress={handleLogout} style={styles.notificationIcon}>
+              <TouchableOpacity
+                onPress={handleLogout}
+                style={styles.notificationIcon}
+              >
                 <Ionicons name="log-out" size={24} color="white" />
               </TouchableOpacity>
             </View>
@@ -183,7 +229,8 @@ function SecurityTabs() {
         animationType="slide"
         transparent={true}
         visible={modalVisible}
-        onRequestClose={closeModal}>
+        onRequestClose={closeModal}
+      >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Alert Notification</Text>
@@ -191,9 +238,15 @@ function SecurityTabs() {
               <>
                 <Text style={styles.modalText}>Alert: {alertData.alert}</Text>
                 <Text style={styles.modalText}>Block: {alertData.block}</Text>
-                <Text style={styles.modalText}>Flat Number: {alertData.flatNumber}</Text>
-                <Text style={styles.modalText}>Resident Name: {alertData.residentName}</Text>
-                <Text style={styles.modalText}>Time: {new Date(alertData.alertTime).toLocaleString()}</Text>
+                <Text style={styles.modalText}>
+                  Flat Number: {alertData.flatNumber}
+                </Text>
+                <Text style={styles.modalText}>
+                  Resident Name: {alertData.residentName}
+                </Text>
+                <Text style={styles.modalText}>
+                  Time: {new Date(alertData.alertTime).toLocaleString()}
+                </Text>
               </>
             )}
             <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
@@ -209,20 +262,20 @@ function SecurityTabs() {
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    width: '80%',
-    backgroundColor: 'white',
+    width: "80%",
+    backgroundColor: "white",
     padding: 20,
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: "center",
   },
   modalTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 15,
   },
   modalText: {
@@ -232,33 +285,33 @@ const styles = StyleSheet.create({
   closeButton: {
     marginTop: 15,
     padding: 10,
-    backgroundColor: '#7d0431',
+    backgroundColor: "#7d0431",
     borderRadius: 5,
   },
   closeButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: "white",
+    fontWeight: "bold",
   },
   headerLeftContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginLeft: 15,
   },
   nameContainer: {
     marginLeft: 10,
   },
   nameText: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
     fontSize: 20,
-    color: '#FFFFFF',
+    color: "#FFFFFF",
   },
   societyText: {
     fontSize: 14,
-    color: '#E0E0E0',
+    color: "#E0E0E0",
   },
   headerRightContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginRight: 10,
   },
   notificationIcon: {

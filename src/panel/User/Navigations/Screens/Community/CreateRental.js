@@ -109,7 +109,7 @@ const CreateRental = () => {
       if (result.type === 'createRental/createRental/fulfilled') {
         dispatch(getSocietiesByAdvertisements());
         setLoadingsubmission(true)
-        navigation.navigate('RentalProperties')
+        navigation.navigate('Tabs', { screen: "Social" })
       }
     }
     catch (error) {

@@ -77,7 +77,6 @@ import MyBookings from './src/panel/User/Navigations/Screens/Profile/MyBookings'
 import StaffVisitors from "./src/panel/Security/Navigations/StaffVisitors";
 import RentalPropertyType from './src/panel/User/Navigations/Screens/Community/RentalPropertyType';
 import RentalFlatDetails from './src/panel/User/Navigations/Screens/Community/RentalFlatDetails';
-import RentalProperties from './src/panel/User/Navigations/Screens/Community/RentalProperties';
 import SocietyBills from './src/panel/User/Navigations/Screens/Community/SocietyBills';
 import EventDetails from './src/panel/User/Navigations/Screens/Community/EventDetails';
 import GetHelp from './src/panel/User/Navigations/Screens/GetHelp';
@@ -301,7 +300,6 @@ export default function App() {
             <Stack.Screen name="Create Rental" component={CreateRental} />
             <Stack.Screen name="RentalPropertyType" component={RentalPropertyType} />
             <Stack.Screen name="RentalFlat Details" component={RentalFlatDetails} />
-            <Stack.Screen name="RentalProperties" component={RentalProperties} />
             <Stack.Screen name="Society Bills" component={SocietyBills} />
             <Stack.Screen name="EventDetails" component={EventDetails} />
             <Stack.Screen name="My Bookings" component={MyBookings} />

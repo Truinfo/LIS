@@ -226,16 +226,7 @@ const HomeScreen = () => {
     ? payments.filter((bill) => bill.status !== "Paid")
     : [];
 
-  useEffect(() => {
-    const subscription = Linking.addEventListener('url', (event) => {
-      const { url } = event;
-      handleUpiResponse(url);
-    });
 
-    return () => {
-      subscription.remove();
-    };
-  }, []);
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -577,7 +568,7 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 5,
     marginVertical: 5,
-
+    marginBottom: 20,
     // Shadow for Android
     elevation: 5, // Elevation level to create shadow effect
   },

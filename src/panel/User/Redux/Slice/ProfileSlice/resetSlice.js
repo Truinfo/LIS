@@ -5,9 +5,11 @@ import axiosInstance from '../../../../Security/helpers/axios';
 // Define the async thunk to fetch data from the backend
 export const fetchUserData = createAsyncThunk(
     'password/fetchUserData',
-    async (userData,  { rejectWithValue }) => {
+    async (userData, { rejectWithValue }) => {
         try {
-            const response = await axiosInstance.post('/api/user/resetPassword', userData);
+            const response = await axiosInstance.post('/user/resetPassword', userData, {
+                headers: { 'Content-Type': 'application/json' }
+            });
             console.log(response.data);
             return response.data;
         } catch (error) {

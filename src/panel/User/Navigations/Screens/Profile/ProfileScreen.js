@@ -76,8 +76,8 @@ const ProfileScreen = () => {
   }, [profiles]);
 
   return (
-    <KeyboardAvoidingView 
-      behavior={Platform.OS === "ios" ? "padding" : "height"} 
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.container}
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -141,7 +141,7 @@ const ProfileScreen = () => {
             </View>
             <Icon name="chevron-right" size={24} color="#818181" />
           </TouchableOpacity>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.menuItem}
             onPress={() => navigation.navigate("My Documents")}
           >
@@ -150,7 +150,7 @@ const ProfileScreen = () => {
               <Text style={styles.menuItemText}>My Documents</Text>
             </View>
             <Icon name="chevron-right" size={24} color="#818181" />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity
             style={styles.menuItem}
             onPress={() => navigation.navigate("My Bookings")}
@@ -181,7 +181,7 @@ const ProfileScreen = () => {
             </View>
             <Icon name="chevron-right" size={24} color="#818181" />
           </TouchableOpacity>
-          
+
           <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
             <View style={styles.menuItemContent}>
               <Icon name="exit-to-app" size={24} color="#7D0431" />

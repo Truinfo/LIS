@@ -122,7 +122,7 @@ const Dashboard = () => {
     const { monthAndYear, paymentDetails } = maintainances;
     const paidPayments = paymentDetails?.filter(payment => payment.status === 'Paid');
 
-   
+
     if (status === "loading") {
         return (
             <View style={styles.loadingContainer}>
@@ -134,8 +134,8 @@ const Dashboard = () => {
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <View style={styles.row}>
-                <DashboardCard title="Blocks" count={blocksCount} onPress={() => handleNavigation('UserManagement')} />
-                <DashboardCard title="Flats" count={flatsCount ? flatsCount : 0} onPress={() => handleNavigation('UserManagement')} />
+                <DashboardCard title="Blocks" count={blocksCount} />
+                <DashboardCard title="Flats" count={flatsCount ? flatsCount : 0} />
                 <DashboardCard title="Complaints" count={complaintsCount} onPress={() => handleNavigation('Complaints')} />
             </View>
             <View>

@@ -14,22 +14,26 @@ const Tab = createBottomTabNavigator();
 
 function Tabs() {
   const [societyId, setSocietyId] = useState(null);
-  useEffect(() => {
-    const getSocietyId = async () => {
-      try {
-        const user = await AsyncStorage.getItem("user");
-        const id = JSON.parse(user).societyId;
-        if (id !== null) {
-          setSocietyId(id);
-        } else {
-          console.error("No societyId found in AsyncStorage");
+  const [userName, setUserName] = useState(null);
+  useFocusEffect(
+    React.useCallback(() => {
+      const getUserName = async () => {
+        try {
+          const userString = await AsyncStorage.getItem("user");
+          if (userString) {
+            const user = JSON.parse(userString);
+            setSocietyId(user.societyId);
+            setUserName(user.name);
+          }
+        } catch (error) {
+          console.error("Failed to fetch the user from async storage", error);
         }
-      } catch (error) {
-        console.error("Error fetching societyId from AsyncStorage:", error);
-      }
-    };
-    getSocietyId();
-  }, []);
+      };
+
+      getUserName();
+    }, []) 
+  );
+  console.log("userName",userName);
   useFocusEffect(
     React.useCallback(() => {
       socketServices.initializeSocket();

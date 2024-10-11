@@ -1,5 +1,5 @@
 import io from 'socket.io-client';
-const BaseUrl = 'http://192.168.29.35:2000'
+const BaseUrl = 'https://livinsync.onrender.com'
 class WSService {
     constructor() {
         this.socket = null;
@@ -16,7 +16,7 @@ class WSService {
                 console.log('=== socket connected ===');
             });
             this.socket.on('disconnect', (reason) => {
-                console.log('=== socket disconnected: ', reason);
+                console.log('=== socket disconnected:', reason);
             });
             this.socket.on('error', (error) => {
                 console.log('Socket error', error);

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
   View,
-  Text,
   TextInput,
   Button,
   ScrollView,
@@ -29,7 +28,7 @@ const AddAdvertisements = ({ navigation }) => {
           setSocietyID(societyAdmin._id);
           setFormData((prevFormData) => ({
             ...prevFormData,
-            societyId: societyAdmin._id, // Update societyId in formData here
+            societyId: societyAdmin._id, 
           }));
           dispatch(fetchResidentProfile());
         } else {
@@ -124,7 +123,7 @@ const AddAdvertisements = ({ navigation }) => {
 
     setFormData((prevFormData) => ({
       ...prevFormData,
-      pictures: updatedPictures.slice(-5), // Keep only the last 5 pictures
+      pictures: updatedPictures.slice(-5), 
       picturePreviews: [
         ...prevFormData.picturePreviews,
         ...updatedPicturePreviews,
@@ -153,17 +152,14 @@ const AddAdvertisements = ({ navigation }) => {
       return;
     }
 
-    // Prepare form data for submission
+
     const submissionData = new FormData();
     submissionData.append("societyId", formData.societyId);
     submissionData.append("adv", formData.adv);
     submissionData.append("userName", formData.userName);
     submissionData.append("status", formData.status);
     submissionData.append("phoneNumber", formData.phoneNumber);
-
-    // Details must be sent as a JSON string
     submissionData.append("details", JSON.stringify(formData.details));
-    // Append pictures (files)
     formData.pictures.forEach((picture) => {
       submissionData.append("pictures", {
         uri: picture.uri,
@@ -181,7 +177,6 @@ const AddAdvertisements = ({ navigation }) => {
           // Handle success (reset form, show message, etc.)
           setDialogMessage("Advertisement added successfully!");
           setShowDialog(true);
-          // Reset form
           setFormData({
             societyId: "",
             adv: "",
@@ -250,7 +245,6 @@ const AddAdvertisements = ({ navigation }) => {
           type: "image/jpeg",
         }));
 
-        // Call handleFileChange to update state
         handleFileChange(selectedImages);
       } else {
         Alert.alert("Cancelled", "Image selection was cancelled.");
@@ -405,7 +399,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 5,
     marginBottom: 12,
-    backgroundColor: "#fefefe", // Light background for the picker
+    backgroundColor: "#fefefe",
   },
   formContainer: {
     backgroundColor: "#ffffff",

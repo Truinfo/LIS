@@ -2,7 +2,6 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../../Security/helpers/axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Wrap AsyncStorage call inside the thunk
 export const fetchResidentProfile = createAsyncThunk(
   'profile/fetchResidentProfile',
   async () => {
@@ -35,7 +34,7 @@ const profileSlice = createSlice({
       })
       .addCase(fetchResidentProfile.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;  // Use error message from action
+        state.error = action.error.message;  
       });
   },
 });

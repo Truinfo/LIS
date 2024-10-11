@@ -1,12 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axiosInstance from "../../../Security/helpers/axios";
 
 const fetchSocietyId = async () => {
   const storedAdmin = await AsyncStorage.getItem("user");
   const societyAdmin = JSON.parse(storedAdmin);
-  return societyAdmin._id; // Default ID
+  return societyAdmin._id; 
 };
 
 export const getAmenityOfCommunityHal = createAsyncThunk(
@@ -20,7 +19,6 @@ export const getAmenityOfCommunityHal = createAsyncThunk(
   }
 );
 
-// router.get('/getAmenityByIdAndUserId/:id/:userId', getAmenityByIdAndUserId);
 export const getAmenityByIdAndUserId = createAsyncThunk(
   "booking/getAmenityByIdAndUserId",
   async ({ userId }) => {
@@ -32,7 +30,6 @@ export const getAmenityByIdAndUserId = createAsyncThunk(
   }
 );
 
-// router.put('/bookAmenity/:id', bookAmenity);
 export const bookAmenity = createAsyncThunk(
   "booking/bookAmenity",
   async ({ id, formData }) => {
@@ -43,7 +40,6 @@ export const bookAmenity = createAsyncThunk(
   }
 );
 
-// router.put('/updateAmenityBooking/:id/:userId', updateAmenityBooking);
 export const updateAmenityBooking = createAsyncThunk(
   "booking/updateAmenityBooking",
   async ({ userId, formData }) => {

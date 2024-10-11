@@ -9,15 +9,15 @@ import {
   StyleSheet,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigation, useFocusEffect } from "@react-navigation/native"; // Import useFocusEffect
-import { deleteAmenity, getAllAmenityBySocietyId } from "./AmenitiesSlice"; // Keep this as it is for your API actions
+import { useNavigation, useFocusEffect } from "@react-navigation/native"; 
+import { deleteAmenity, getAllAmenityBySocietyId } from "./AmenitiesSlice"; 
 import { ImagebaseURL } from "../../../Security/helpers/axios";
-import { Ionicons } from "@expo/vector-icons"; // Add icons from Expo
-import { Dialog, Portal, Paragraph, Button, FAB, ActivityIndicator, Snackbar } from "react-native-paper"; // Import from react-native-paper
+import { Ionicons } from "@expo/vector-icons"; 
+import { Dialog, Portal, Paragraph, Button, FAB, ActivityIndicator, Snackbar } from "react-native-paper"; 
 import { Provider as PaperProvider } from "react-native-paper";
 const Amenities = () => {
   const [selectedAmenity, setSelectedAmenity] = useState(null);
-  const [deleteDialogVisible, setDeleteDialogVisible] = useState(false); // State for Dialog visibility
+  const [deleteDialogVisible, setDeleteDialogVisible] = useState(false); 
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [selectedMenuId, setSelectedMenuId] = useState(null); // Track which menu is open
 
@@ -34,11 +34,8 @@ const Amenities = () => {
   const status = useSelector(
     (state) => state.adminAmenities.status
   );
-  const error = useSelector(
-    (state) => state.adminAmenities.error
-  );
 
-  // Use useFocusEffect to fetch amenities whenever the screen is focused
+
   useFocusEffect(
     React.useCallback(() => {
       dispatch(getAllAmenityBySocietyId());
@@ -48,7 +45,7 @@ const Amenities = () => {
 
   const handleDeleteConfirm = async () => {
     console.log(selectedAmenity);
-    const response = await dispatch(deleteAmenity({ id: selectedAmenity._id }))
+     await dispatch(deleteAmenity({ id: selectedAmenity._id }))
       .then((response) => {
         setDeleteDialogVisible(false);
         setSnackMessage(response.payload.message);
@@ -61,15 +58,15 @@ const Amenities = () => {
         setSnackVisible(true);
       });
   };
-  const hideDeleteDialog = () => setDeleteDialogVisible(false); // Function to close the dialog
-  if (status === "loading") { // Show spinner while loading
+  const hideDeleteDialog = () => setDeleteDialogVisible(false); 
+  if (status === "loading") { 
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#7d0431" />
       </View>
     );
   }
-  if (!amenities) { // Show spinner while loading
+  if (!amenities) {
     return (
       <View style={styles.noDataContainer}>
         <Image
@@ -152,7 +149,7 @@ const Amenities = () => {
         </View>
 
         {amenities.length === 0 ? (
-          // Display "Data not found" message if amenities is empty
+       
           <View style={styles.noDataContainer}>
             <Image
               source={require('../../../../assets/Admin/Imgaes/nodatadound.png')}
@@ -163,7 +160,7 @@ const Amenities = () => {
           </View>
         ) : (
           <FlatList
-            data={amenities} // Now displaying all amenities without pagination
+            data={amenities}
             keyExtractor={(item) => item._id}
             renderItem={renderItem}
           />
@@ -247,7 +244,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     height: 320,
     overflow: "hidden",
-    position: 'relative', // Added to position children absolutely
+    position: 'relative', 
   },
   image: {
     width: "100%",
@@ -269,11 +266,11 @@ const styles = StyleSheet.create({
   },
   menuIcon: {
     position: "absolute",
-    top: 10, // Set top position to place it near the top
-    right: 10, // Set right position to align it at the right
+    top: 10, 
+    right: 10, 
     padding: 5,
     borderRadius: 50,
-    backgroundColor: 'rgba(255, 255, 255, 0.5)', // Optional: Add a background for better visibility
+    backgroundColor: 'rgba(255, 255, 255, 0.5)', 
   },
   menu: {
     position: "absolute",

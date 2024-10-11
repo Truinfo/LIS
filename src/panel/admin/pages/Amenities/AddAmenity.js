@@ -65,6 +65,7 @@ const AddAmenity = () => {
     const submissionData = new FormData();
     submissionData.append('societyId', formData.societyId);
     submissionData.append('amenityName', formData.amenityName);
+    submissionData.append('capacity', formData.capacity);
     submissionData.append('timings', formData.timings);
     submissionData.append('location', formData.location);
     submissionData.append('status', formData.status);
@@ -79,7 +80,7 @@ const AddAmenity = () => {
       });
     }
 
-    const response = await dispatch(createAmenity(submissionData))
+     await dispatch(createAmenity(submissionData))
     .then((response) => {
       console.log(response)
       if (response.type === 'amenities/createAmenity/fulfilled') {

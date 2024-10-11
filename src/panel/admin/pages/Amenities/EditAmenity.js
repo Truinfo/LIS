@@ -11,11 +11,8 @@ import {
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import * as ImagePicker from "expo-image-picker"; 
-import {
-  getAmenityById,
-  updateAmenity,
-} from "./AmenitiesSlice";
+import * as ImagePicker from "expo-image-picker";
+import { getAmenityById, updateAmenity } from "./AmenitiesSlice";
 import { ImagebaseURL } from "../../../Security/helpers/axios";
 import { Snackbar } from "react-native-paper";
 
@@ -43,9 +40,9 @@ const EditAmenity = () => {
 
   const [previewImages, setPreviewImages] = useState("");
   const [newFilesSelected, setNewFilesSelected] = useState(false);
-  const [snackVisible, setSnackVisible] = useState(false); 
-  const [snackMessage, setSnackMessage] = useState(""); 
-  const [Loading, setLoading] = useState(""); 
+  const [snackVisible, setSnackVisible] = useState(false);
+  const [snackMessage, setSnackMessage] = useState("");
+  const [Loading, setLoading] = useState("");
   const requestPermission = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
@@ -64,7 +61,7 @@ const EditAmenity = () => {
         societyId: amenity.societyId || "",
         image: amenity.image || "",
         amenityName: amenity.amenityName || "",
-        capacity: amenity.capacity || "",
+        capacity: amenity.capacity != null ? amenity.capacity.toString() : "",
         timings: amenity.timings || "",
         location: amenity.location || "",
         cost: amenity.cost || "",
@@ -72,7 +69,8 @@ const EditAmenity = () => {
       });
 
       const imagePreviews = amenity.image
-        ? `${ImagebaseURL}${amenity.image}` : null;
+        ? `${ImagebaseURL}${amenity.image}`
+        : null;
       setPreviewImages(imagePreviews);
     }
   }, [amenity]);
@@ -100,37 +98,39 @@ const EditAmenity = () => {
 
   const handleSubmit = async () => {
     const formDataToSend = new FormData();
-    formDataToSend.append('societyId', formData.societyId);
-    formDataToSend.append('amenityName', formData.amenityName);
-    formDataToSend.append('capacity', formData.capacity);
-    formDataToSend.append('timings', formData.timings);
-    formDataToSend.append('location', formData.location);
-    formDataToSend.append('cost', formData.cost);
-    formDataToSend.append('status', formData.status);
+    formDataToSend.append("societyId", formData.societyId);
+    formDataToSend.append("amenityName", formData.amenityName);
+    formDataToSend.append("capacity", formData.capacity);
+    formDataToSend.append("timings", formData.timings);
+    formDataToSend.append("location", formData.location);
+    formDataToSend.append("cost", formData.cost);
+    formDataToSend.append("status", formData.status);
 
     if (newFilesSelected) {
-      formDataToSend.append('image', {
+      formDataToSend.append("image", {
         uri: previewImages,
         name: `image_${id}.jpg`,
-        type: 'image/jpeg',
+        type: "image/jpeg",
       });
     }
 
     setLoading(true); // Set loading to true when submission starts
 
     try {
-      const response = await dispatch(updateAmenity({ id, formData: formDataToSend }));
+      const response = await dispatch(
+        updateAmenity({ id, formData: formDataToSend })
+      );
       console.log(response);
       if (response.type === "amenities/updateAmenity/fulfilled") {
         setSnackMessage(successMessage || "Updated successfully");
-        setSnackVisible(true); 
+        setSnackVisible(true);
         dispatch(getAmenityById(id));
         navigation.goBack();
       }
     } catch (error) {
       console.error("Error:", error.message);
-      setSnackMessage("Update failed. Please try again."); 
-      setSnackVisible(true); 
+      setSnackMessage("Update failed. Please try again.");
+      setSnackVisible(true);
     } finally {
       setLoading(false); // Set loading to false when done
     }
@@ -156,10 +156,7 @@ const EditAmenity = () => {
             <Text>No image selected</Text>
           )}
         </View>
-        <TouchableOpacity
-          style={styles.uploadButton}
-          onPress={pickImage}
-        >
+        <TouchableOpacity style={styles.uploadButton} onPress={pickImage}>
           <Text style={styles.uploadButtonText}>Upload Image</Text>
         </TouchableOpacity>
 
@@ -176,6 +173,7 @@ const EditAmenity = () => {
             value={formData.amenityName}
             onChangeText={(value) => handleChange("amenityName", value)}
           />
+          {console.log(formData.capacity)}
           <TextInput
             style={styles.input}
             placeholder="Capacity"

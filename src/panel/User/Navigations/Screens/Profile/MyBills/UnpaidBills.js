@@ -39,10 +39,10 @@ const UnpaidBills = () => {
             <View style={styles.header}>
                 <Text style={{ fontSize: 20, fontWeight: '600' }}>{item.monthAndYear}</Text>
                 <View style={styles.chip}>
-                    <Text style={styles.chipText}>{item.status}</Text>
+                    <Text style={styles.chipText}>{item.status === "UnPaid" ? "Pay Now" : ""}</Text>
                 </View>
             </View>
-                <Text style={{ fontSize: 20, fontWeight: '600' }}>₹{item.amount}</Text>
+            <Text style={{ fontSize: 20, fontWeight: '600' }}>₹{item.amount}</Text>
         </View>
     );
     return (

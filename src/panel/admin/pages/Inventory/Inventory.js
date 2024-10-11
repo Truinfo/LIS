@@ -149,7 +149,7 @@ const Inventory = () => {
     };
     if (status === "loading") { // Show spinner while loading
         return (
-            <View style={{justifyContent:"center",alignItems:"center"}}>
+            <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color="#7d0431" />
             </View>
         );
@@ -423,7 +423,11 @@ const styles = StyleSheet.create({
         color: '#7d0431',
         textAlign: 'center',
     },
-
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
 });
 
 export default Inventory;

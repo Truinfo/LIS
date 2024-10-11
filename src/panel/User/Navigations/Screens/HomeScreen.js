@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Image,
   SafeAreaView,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -18,7 +19,7 @@ import { fetchUserProfiles } from "../../Redux/Slice/ProfileSlice/ProfileSlice";
 import { ImagebaseURL } from "../../../Security/helpers/axios";
 import { Dimensions } from "react-native";
 import { fetchEvents } from "../../Redux/Slice/CommunitySlice/EventSlice";
-
+import * as Linking from 'expo-linking';
 import {
   fetchNotices,
   selectNotices,
@@ -41,6 +42,40 @@ const HomeScreen = () => {
   const { profiles } = useSelector((state) => state.profiles);
   const [expanded, setExpanded] = useState(false);
   const [expandedPollId, setExpandedPollId] = useState(null);
+
+  const [upiId, setUpiId] = useState('7997148737@ibl');
+  const [payeeName, setPayeeName] = useState('');
+  // const [amount, setAmount] = useState('1');
+  const [transactionNote, setTransactionNote] = useState('Maintenance');
+  const [SelectedMonthPayment, setSelectedMonthPayment] = useState(null);
+  const viewShotRef = useRef(); // Reference for ViewShot
+
+
+  const generateUpiUrl = (upiId, payeeName, amount, transactionNote) => {
+    const currency = 'INR';
+    const encodedPayeeName = encodeURIComponent(payeeName);
+    const encodedTransactionNote = encodeURIComponent(transactionNote);
+
+    return `upi://pay?pa=${upiId}&pn=${encodedPayeeName}&am=${amount}&cu=${currency}&tn=${encodedTransactionNote}`;
+  };
+
+  const initiateUpiPayment = async (data) => {
+    const upiUrl = generateUpiUrl(upiId, payeeName, data.amount, transactionNote);
+    setSelectedMonthPayment(data.monthAndYear)
+
+    try {
+      const supported = await Linking.canOpenURL(upiUrl);
+
+      if (supported) {
+        await Linking.openURL(upiUrl);
+      } else {
+        Alert.alert('Error', 'No UPI apps installed to handle the payment.');
+      }
+    } catch (err) {
+      Alert.alert('Error', 'Failed to initiate UPI payment.');
+      console.error(err);
+    }
+  };
 
   const toggleExpand = (pollId) => {
     setExpandedPollId((prevId) => (prevId === pollId ? null : pollId));
@@ -144,6 +179,7 @@ const HomeScreen = () => {
           const user = JSON.parse(userString);
           setSocietyId(user.societyId);
           setUserId(user.userId);
+          setPayeeName(user?.name)
         }
       } catch (error) {
         console.error("Failed to fetch the user from async storage", error);
@@ -189,6 +225,17 @@ const HomeScreen = () => {
   const unpaidBills = Array.isArray(payments)
     ? payments.filter((bill) => bill.status !== "Paid")
     : [];
+
+  useEffect(() => {
+    const subscription = Linking.addEventListener('url', (event) => {
+      const { url } = event;
+      handleUpiResponse(url);
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -230,17 +277,16 @@ const HomeScreen = () => {
           </View>
           {unpaidBills.map((bill) => (
             <View w key={bill._id}>
-              <View  style={styles.divider} />
+              <View style={styles.divider} />
               <Text style={styles.description}>
                 Your maintenance bill of{" "}
                 <Text style={styles.logoTitle}>Rs. {bill.amount}</Text> for{" "}
                 <Text style={styles.logoTitle}>{bill.monthAndYear}</Text> is
                 due. Please make the payment.
               </Text>
-               
-                <TouchableOpacity style={styles.payButton}>
-                  <Text style={styles.payButtonText}>Make Payment</Text>
-                </TouchableOpacity>
+              <TouchableOpacity style={styles.payButton} onPress={() => initiateUpiPayment(bill)}>
+                <Text style={styles.payButtonText}>Make Payment</Text>
+              </TouchableOpacity>
             </View>
           ))}
         </View>
@@ -310,14 +356,14 @@ const HomeScreen = () => {
                                 width:
                                   events.events[events.events.length - 1]
                                     .pictures.length === 1 ||
-                                  (events.events[events.events.length - 1]
-                                    .pictures.length %
-                                    2 !==
-                                    0 &&
-                                    index ===
+                                    (events.events[events.events.length - 1]
+                                      .pictures.length %
+                                      2 !==
+                                      0 &&
+                                      index ===
                                       events.events[events.events.length - 1]
                                         .pictures.length -
-                                        1)
+                                      1)
                                     ? "100%"
                                     : "49%",
                                 height: 100,

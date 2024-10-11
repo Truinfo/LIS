@@ -42,7 +42,15 @@ export const getPropertyById = createAsyncThunk(
 export const ResidentsAdds = createAsyncThunk(
     'marketPlace/getResidentById',
     async (id) => {
-        const response = await axios.get(`http://192.168.29.151:2000/api/getMyAddByid/${id}`);
+        const response = await axiosInstance.get(`/getMyAddByid/${id}`);
+        return response.data;
+    }
+);
+export const DeletePost = createAsyncThunk(
+    'marketPlace/deleteResident',
+    async (id) => {
+        console.log(id)
+        const response = await axiosInstance.delete(`/deleteItem/${id}`);
         return response.data;
     }
 );
@@ -76,7 +84,6 @@ const MarketPlaceSlice = createSlice({
             .addCase(getSocityAdds.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message;
-
             })
             .addCase(getPropertyById.pending, (state) => {
                 state.loading = true;
@@ -89,7 +96,6 @@ const MarketPlaceSlice = createSlice({
             .addCase(getPropertyById.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message;
-
             })
             .addCase(ResidentsAdds.pending, (state) => {
                 state.loading = true;
@@ -102,7 +108,17 @@ const MarketPlaceSlice = createSlice({
             .addCase(ResidentsAdds.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message;
-
+            })
+            .addCase(DeletePost.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(DeletePost.fulfilled, (state, action) => {
+                state.loading = false;
+            })
+            .addCase(DeletePost.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message;
             })
     },
 });

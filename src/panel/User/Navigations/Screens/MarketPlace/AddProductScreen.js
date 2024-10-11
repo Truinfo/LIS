@@ -5,7 +5,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Snackbar } from 'react-native-paper';  // Import Snackbar
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { AddProperty } from '../../../Redux/Slice/MarketPlaceSlice/MarketPlace';
 import { useNavigation } from '@react-navigation/native';
 
@@ -17,6 +17,7 @@ const AddProductScreen = () => {
   const [snackbarMessage, setSnackbarMessage] = useState(''); // Snackbar message state
   const dispatch = useDispatch()
   const navigation = useNavigation()
+  const { loading, error } = useSelector((state) => state.MarketPlace);
   useEffect(() => {
     const getUserName = async () => {
       try {
@@ -120,7 +121,9 @@ const AddProductScreen = () => {
   };
 
   const onDismissSnackBar = () => setSnackbarVisible(false); // Dismiss snackbar
-
+  if (loading) {
+    return <Text>loading.</Text>;
+}
   return (
     <ScrollView style={styles.container}>
       <TextInput

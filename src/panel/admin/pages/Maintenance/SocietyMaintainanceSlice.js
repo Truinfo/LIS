@@ -48,7 +48,11 @@ export const updatePaymentDetails = createAsyncThunk(
     'maintainances/updatePaymentDetails',
     async ({ formData }, { rejectWithValue }) => {
         try {
-            const response = await axiosInstance.put('/updatePaymentDetails', formData);
+            const response = await axiosInstance.put('/updatePaymentDetails', formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response ? error.response.data : error.message);

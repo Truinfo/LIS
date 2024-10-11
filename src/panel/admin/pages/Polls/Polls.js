@@ -48,8 +48,8 @@ const Polls = () => {
             if (societyId) {
                 socketServices.emit('get_polls_by_society_id', { societyId });
             }
-
             const handlePollsBySocietyId = (fetchedPolls) => {
+                console.log(fetchedPolls)
                 setPolls(fetchedPolls);
                 setLoading(false);
             };
@@ -114,6 +114,7 @@ const Polls = () => {
     const ActivePolls = () => {
         const activePolls = polls.filter(item => !isPollExpired(item.poll.expDate));
         if (loading) { // Show spinner while loading
+            console.log(loading)
             return (
                 <View style={styles.loadingContainer}>
                     <ActivityIndicator size="large" color="#7d0431" />

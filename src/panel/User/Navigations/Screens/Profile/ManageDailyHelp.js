@@ -70,11 +70,7 @@ const ManageDailyHelp = () => {
     setShowModal(true);
   };
 
-  const handleFeedback = (item, type) => {
-    setSelectedService(item);
-    setSelectedServiceType(type);
-    setShowFeedbackModal(true);
-  };
+;
 
   const submitFeedback = async () => {
     if (selectedService && selectedServiceType) {
@@ -168,9 +164,6 @@ const ManageDailyHelp = () => {
           <Text style={styles.timing}>Timing: {timings || 'N/A'}</Text>
         </View>
         <View style={styles.actions}>
-          <TouchableOpacity style={styles.feedbackButton} onPress={() => handleFeedback(item, type)}>
-            <Text style={styles.feedbackText}>Feedback</Text>
-          </TouchableOpacity>
           <TouchableOpacity style={styles.deleteIcon} onPress={() => handleDelete(item, type)}>
             <Icon name="trash" size={20} color="red" />
           </TouchableOpacity>

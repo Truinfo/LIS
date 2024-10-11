@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
     View, Text, FlatList, TouchableOpacity, Modal, StyleSheet, TextInput, Button, Alert, Image, ActivityIndicator
 } from 'react-native';
@@ -12,7 +12,7 @@ import { FAB, Snackbar } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 const Maintenance = ({ navigation }) => {
     const dispatch = useDispatch();
-    const { status, error } = useSelector((state) => state.adminMaintainance);
+    const { status, } = useSelector((state) => state.adminMaintainance);
     const maintainances = useSelector((state) => state.adminMaintainance.maintainances) || [];
     const [date, setDate] = useState(new Date());
     const [modalVisible, setModalVisible] = useState(false);
@@ -260,6 +260,7 @@ const Maintenance = ({ navigation }) => {
                 <Modal visible={modalVisible} animationType="slide" transparent={true}>
                     <View style={styles.modalContainer}>
                         <View style={styles.modalContent}>
+                            {console.log(`${ImagebaseURL}${selectedUser.pictures}`)}
                             <Image source={{ uri: `${ImagebaseURL}${selectedUser.pictures}` }} alt='No Bill Updated' style={styles.modalImage} resizeMode="cover" />
                             <View style={styles.infoContainer}>
                                 <View style={styles.infoRow}>

@@ -1,11 +1,11 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import axiosInstance from '../../../../../Security/helpers/axios';
+import axiosInstance, { Api } from '../../../../../Security/helpers/axios';
 export const addFamilyMemberAsync = createAsyncThunk(
     'houseHolds/addFamilyMember',
     async (updatedProfile, thunkAPI) => {
         const { societyId, userId, memberData } = updatedProfile;
         try {
-            const response = await axiosInstance.post(
+            const response = await Api.post(
                 `/addFamilyMember/${societyId}/${userId}`,
                 memberData
             );
@@ -18,7 +18,7 @@ export const addFamilyMemberAsync = createAsyncThunk(
 export const getFamilyMembersAsync = createAsyncThunk(
     'houseHolds/getFamilyMembers',
     async ({ societyId, userId }, thunkAPI) => {
-        
+
         try {
             const response = await axiosInstance.get(
                 `/user/getUserProfiles/${userId}/${societyId}`

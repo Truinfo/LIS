@@ -9,7 +9,7 @@ import { fetchUserProfiles } from "../../../Redux/Slice/ProfileSlice/ProfileSlic
 
 const ResetPassword = ({ navigation }) => {
   const dispatch = useDispatch();
-  const {  error } = useSelector(state => state.userResetPassword);
+  const { error } = useSelector(state => state.userResetPassword);
 
   const [password, setPassword] = useState("");
   const [societyId, setSocietyId] = useState("");
@@ -25,8 +25,9 @@ const ResetPassword = ({ navigation }) => {
         const userString = await AsyncStorage.getItem("user");
         if (userString !== null) {
           const user = JSON.parse(userString);
+          console.log("User data:", user); // Log the user object
           setSocietyId(user.societyId);
-          setUserId(user.userId);
+          setUserId(user._id);
         }
       } catch (error) {
         console.error("Failed to fetch the user from async storage", error);
@@ -37,6 +38,16 @@ const ResetPassword = ({ navigation }) => {
   }, []);
 
   const handleSave = async () => {
+    // Validate password and confirmation
+    if (!password) {
+      setPasswordError("Password cannot be empty");
+      return;
+    }
+    if (password !== confirmPassword) {
+      setConfirmPasswordError("Passwords do not match");
+      return;
+    }
+
     try {
       const userData = {
         userId,
@@ -44,17 +55,19 @@ const ResetPassword = ({ navigation }) => {
         password
       };
       const result = await dispatch(fetchUserData(userData));
+
       if (result.type === "password/fetchUserData/fulfilled") {
         dispatch(fetchUserProfiles({ userId, societyId }));
-        navigation.navigate('Profile')
-      }
-      else{
-       Alert.alert("Unable to Reset Password",result);
+        navigation.navigate('Profile');
+      } else {
+        console.log(result.error)
+        Alert.alert("Unable to Reset Password", String(result.error.message === "Rejected" ? "Reset password Failed" : ""));
       }
     } catch (error) {
       console.error('Error retrieving userId from AsyncStorage:', error);
     }
   };
+
   return (
     <View style={styles.container}>
       <ScrollView>
@@ -70,7 +83,7 @@ const ResetPassword = ({ navigation }) => {
           error={error !== null}
         />
         {error && (
-          <Text style={styles.errorText}>{error}</Text>
+          <Text style={styles.errorText}>{String(error)}</Text>
         )}
         <TextInput
           mode="outlined"

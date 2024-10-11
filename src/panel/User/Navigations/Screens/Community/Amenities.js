@@ -13,8 +13,9 @@ import { TabView, TabBar } from "react-native-tab-view";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { getAmenitiesBySocietyId } from "../../../Redux/Slice/CommunitySlice/Amenities";
-import { useDispatch, useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
 const DetailBox = ({ title, value, backgroundColor, width }) => (
   <View style={[styles.detailBox, { backgroundColor, width }]}>
     <Text style={styles.detailTitle}>{title}</Text>
@@ -22,65 +23,39 @@ const DetailBox = ({ title, value, backgroundColor, width }) => (
   </View>
 );
 
-const CommunityHall = (data) => {
-  const navigation = useNavigation();
-  if (!data.data || data.data.length === 0) {
-    return (
-      <View style={styles.scene}>
-        <Text>No Community Hall Available in Our Society</Text>
-      </View>
-    );
-  }
-  const communityHall = data.data.find(eachAme => eachAme.amenityName === "Community Hall");
+const NoAmenityAvailable = ({ amenityName }) => (
+  <View style={styles.scene}>
+    <Text>No {amenityName} Available in Our Society</Text>
+  </View>
+);
 
-  if (!communityHall) {
-    return (
-      <View style={styles.scene}>
-        <Text>No Community Hall Available in Our Society</Text>
-      </View>
-    );
-  }
-  const navigateData = data.data
+const CommunityHall = ({ data }) => {
+  const navigation = useNavigation();
+  const communityHall = data.find((amenity) => amenity.amenityName === "Community Hall");
+
+  if (!communityHall) return <NoAmenityAvailable amenityName="Community Hall" />;
+
   return (
     <View style={styles.scene}>
       <View key={communityHall._id}>
         <Image
-          source={{
-            uri: `https://livinsync.onrender.com${communityHall.image}`,
-          }}
+          source={{ uri: `https://livinsync.onrender.com${communityHall?.image}` }}
           style={styles.image}
         />
         <Text style={styles.description}>
           Residents can book the hall for private events such as birthday parties,
-          weddings, and anniversaries, providing a convenient and affordable venue
-          option. A fully equipped kitchen is available for catering purposes,
-          making it convenient for hosting events that involve food and beverages.
+          weddings, and anniversaries. A fully equipped kitchen is available for catering purposes.
         </Text>
         <View style={styles.detailsContainer}>
           <View style={styles.detailRow}>
-            <DetailBox
-              title="Capacity"
-              value={communityHall.capacity}
-              backgroundColor="#fff"
-              width="48%"
-            />
-            <DetailBox
-              title="Timings"
-              value={communityHall.timings}
-              backgroundColor="#fff"
-              width="48%"
-            />
+            <DetailBox title="Capacity" value={communityHall?.capacity} backgroundColor="#fff" width="48%" />
+            <DetailBox title="Timings" value={communityHall?.timings} backgroundColor="#fff" width="48%" />
           </View>
-          <DetailBox
-            title="Location"
-            value={communityHall.location}
-            backgroundColor="#fff"
-            width="100%"
-          />
+          <DetailBox title="Location" value={communityHall?.location} backgroundColor="#fff" width="100%" />
         </View>
         <TouchableOpacity
           style={styles.buttonContainer}
-          onPress={() => navigation.navigate("Booking Screen", { navigateData })}
+          onPress={() => navigation.navigate("Booking Screen", { navigateData: data })}
         >
           <Text style={styles.buttonText}>Book Now</Text>
         </TouchableOpacity>
@@ -89,140 +64,90 @@ const CommunityHall = (data) => {
   );
 };
 
-const PlayArea = (data) => {
-  if (!data.data || data.data.length === 0) {
-    return (
-      <View style={styles.scene}>
-        <Text>No Play Area Available in Our Society</Text>
-      </View>
-    );
-  }
-  const PlayArea = data.data.find(eachAme => eachAme.amenityName === "Play Area");
+const PlayArea = ({ data }) => {
+  const playArea = data.find((amenity) => amenity.amenityName === "Play Area");
 
-  if (!PlayArea) {
-    return (
-      <View style={styles.scene}>
-        <Text>No Play Area Available in Our Society</Text>
-      </View>
-    );
-  }
+  if (!playArea) return <NoAmenityAvailable amenityName="Play Area" />;
+
   return (
     <View style={styles.scene}>
       <Image
-        source={{
-          uri: `https://livinsync.onrender.com${PlayArea.image}`,
-        }}
+        source={{ uri: `https://livinsync.onrender.com${playArea?.image}` }}
         style={styles.image}
       />
       <ScrollView>
-        <View >
+        <View>
           <View style={styles.header}>
-            <Text>{Gym.status} </Text>
+            <Text style={{ color: "#7d0431", fontWeight: "700", fontSize: 15 }}>{playArea?.status}</Text>
             <Text style={styles.description}>
-              The society's play area offers a safe and engaging environment for children and families to enjoy outdoor
-              activities. Equipped with modern play structures, including swings, slides, and climbing frames, the play
-              area is designed to provide hours of fun and physical activity. The space also features ample seating and
-              shaded areas for parents to relax while supervising their children. Additionally, the play area is surrounded
-              by lush greenery, creating a refreshing and natural ambiance. The play area is an ideal spot for kids to
-              interact, explore, and burn off energy, fostering a sense of community among residents.
+              The society's play area offers a safe and engaging environment for children and families to enjoy outdoor activities.
             </Text>
           </View>
           <View style={styles.content}>
             <View style={styles.row}>
               <Icon name="clock-o" size={20} color="#c59358" />
-              <Text style={styles.text}>
-                {PlayArea.timings}
-              </Text>
+              <Text style={styles.text}>{playArea?.timings}</Text>
             </View>
             <View style={styles.row}>
               <Icon name="map-marker" size={20} color="#c59358" />
-              <Text style={styles.text}>
-                {PlayArea.location}
-              </Text>
+              <Text style={styles.text}>{playArea?.location}</Text>
             </View>
           </View>
         </View>
-      </ScrollView >
-    </View >
-  )
-}
+      </ScrollView>
+    </View>
+  );
+};
 
-const Gym = (data) => {
-  const [modalVisible, setModalVisible] = useState(false);
-  if (!data.data || data.data.length === 0) {
-    return (
-      <View style={styles.scene}>
-        <Text>No Play Area Available in Our Society</Text>
-      </View>
-    );
-  }
-  const Gym = data.data.find(eachAme => eachAme.amenityName === "Gym");
-  if (!PlayArea) {
-    return (
-      <View style={styles.scene}>
-        <Text>No Play Area Available in Our Society</Text>
-      </View>
-    );
-  }
+const Gym = ({ data }) => {
+  const gym = data.find((amenity) => amenity.amenityName === "Gym");
 
+  if (!gym) return <NoAmenityAvailable amenityName="Gym" />;
 
   return (
     <View style={styles.scene}>
       <Image
-        source={{
-          uri: `https://livinsync.onrender.com${Gym.image}`,
-        }}
+        source={{ uri: `https://livinsync.onrender.com${gym?.image}` }}
         style={styles.image}
       />
-     
       <ScrollView>
-        <View >
+        <View>
           <View style={styles.header}>
             <Text style={styles.description}>
-              Our state-of-the-art gym is equipped with the latest equipment and
-              offers a variety of fitness classes to help you stay in shape. Whether
-              you're looking to lift weights, do cardio, or take a yoga class, we have
-              something for everyone.
+              Our state-of-the-art gym is equipped with the latest equipment and offers a variety of fitness classes.
             </Text>
           </View>
           <View style={styles.content}>
             <View style={styles.row}>
               <Icon name="clock-o" size={20} color="#c59358" />
-              <Text style={styles.text}>
-                {Gym.capacity}
-              </Text>
+              <Text style={styles.text}>{gym?.capacity}</Text>
             </View>
             <View style={styles.row}>
               <Icon name="clock-o" size={20} color="#c59358" />
-              <Text style={styles.text}>
-                {Gym.timings}
-              </Text>
+              <Text style={styles.text}>{gym?.timings}</Text>
             </View>
             <View style={styles.row}>
               <Icon name="map-marker" size={20} color="#c59358" />
-              <Text style={styles.text}>
-                {Gym.location}
-              </Text>
+              <Text style={styles.text}>{gym?.location}</Text>
             </View>
           </View>
         </View>
-      </ScrollView >
+      </ScrollView>
     </View>
   );
 };
 
 const Amenities = () => {
   const layout = useWindowDimensions();
-  const [societyId, setSocietyId] = useState('')
-  const [date, setDate] = useState(new Date());
-  const [show, setShow] = useState(false);
-  const dispatch = useDispatch()
-  const { amenities, status } = useSelector((state) => state.amenities)
+  const [societyId, setSocietyId] = useState('');
+  const dispatch = useDispatch();
+  const { amenities } = useSelector((state) => state.amenities);
+
   useEffect(() => {
     const getUserName = async () => {
       try {
         const userString = await AsyncStorage.getItem("user");
-        if (userString !== null) {
+        if (userString) {
           const user = JSON.parse(userString);
           setSocietyId(user.societyId);
         }
@@ -230,45 +155,28 @@ const Amenities = () => {
         console.error("Failed to fetch the user from async storage", error);
       }
     };
-
     getUserName();
   }, []);
+
   useEffect(() => {
     if (societyId) {
-      dispatch(getAmenitiesBySocietyId(societyId))
+      dispatch(getAmenitiesBySocietyId(societyId));
     }
-  }, [societyId])
-  const onChange = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
-    setShow(Platform.OS === "ios");
-    setDate(currentDate);
-  };
+  }, [societyId, dispatch]);
 
-  const showDatePicker = () => {
-    setShow(true);
-  };
-
-  const [index, setIndex] = React.useState(0);
-  const [routes] = React.useState([
+  const [index, setIndex] = useState(0);
+  const routes = [
     { key: "community", title: "Hall" },
-    { key: "playArea", title: "Play area" },
+    { key: "playArea", title: "Play Area" },
     { key: "gym", title: "Gym" },
-  ]);
+  ];
 
   const renderScene = ({ route }) => {
     switch (route.key) {
       case "community":
         return <CommunityHall data={amenities} />;
       case "playArea":
-        return (
-          <PlayArea
-            date={date}
-            show={show}
-            showDatePicker={showDatePicker}
-            onChange={onChange}
-            data={amenities}
-          />
-        );
+        return <PlayArea data={amenities} />;
       case "gym":
         return <Gym data={amenities} />;
       default:
@@ -298,6 +206,7 @@ const Amenities = () => {
   );
 };
 
+
 const styles = StyleSheet.create({
   scene: {
     flex: 1,
@@ -315,11 +224,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 16,
     color: "#7a7873",
-    textAlign: "justify",
     paddingHorizontal: 5,
   },
   detailsContainer: {
-    flex:0.8,
+    flex: 0.8,
     marginBottom: 10,
   },
   detailBox: {
@@ -363,7 +271,7 @@ const styles = StyleSheet.create({
     position: 'absolute', bottom: 1, width: "100%",
     justifyContent: "center",
     alignItems: "center",
-    textAlign: "center", 
+    textAlign: "center",
     margin: "auto",
   },
   buttonText: {
@@ -373,10 +281,9 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    flexDirection: "row",
+    flexDirection: "column",
     justifyContent: "space-between",
-    alignItems: "center",
-    width: "100%"
+    width: "100%",
   },
   headerText: {
     flexDirection: "row",

@@ -179,7 +179,7 @@ const SocietyBills = () => {
 
     if (status === 'loading') {
         return (
-            <View style={styles.loader}>
+            <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color="#630000" />
             </View>
         );
@@ -444,6 +444,11 @@ const styles = StyleSheet.create({
     modelbuttonText: {
         fontSize: 16,
         color: "white",
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });
 

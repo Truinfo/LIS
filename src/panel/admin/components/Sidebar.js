@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -18,17 +18,26 @@ import Maintenance from '../pages/Maintenance/Maintenance';
 import NoticeBoard from '../pages/NoticeBoard/NoticeBoard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { logout } from '../../User/Redux/Slice/AuthSlice/Login/LoginSlice';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { CommonActions, useNavigation } from '@react-navigation/native';
 import EmergencyContact from '../pages/EmergencyContacts/EmergencyContact';
-
+import { fetchResidentProfile } from '../pages/Advertisements/profileSlice';
+import { fetchNotifications } from '../pages/Dashboard/DashboardSlice';
 const Drawer = createDrawerNavigator();
 
 export default function Sidebar() {
   const dispatch = useDispatch();
   const navigation = useNavigation();
-
+  const fetchedProfile = useSelector(state => state.profile.profile);
   const [dropdownVisible, setDropdownVisible] = useState(false);
+  const expiryDate = fetchedProfile?.expiryDate ? new Date(fetchedProfile?.expiryDate) : null;
+  const currentDate = new Date();
+  const daysRemaining = expiryDate ? Math.ceil((expiryDate - currentDate) / (1000 * 60 * 60 * 24)) : null;
+  const notifications = useSelector(state => state.DashBoard.Notification || []);
+  useEffect(() => {
+    dispatch(fetchResidentProfile());
+    dispatch(fetchNotifications());
+  }, [])
 
   const toggleDropdown = () => {
     setDropdownVisible(!dropdownVisible);
@@ -58,19 +67,22 @@ export default function Sidebar() {
       })
     );
   };
+  
+  // if (daysRemaining !== null && daysRemaining <= 0) {
+  //         navigation.navigate("Renewal Plan")
+  //     }
 
   return (
     <View style={{ flex: 1 }}>
       <Drawer.Navigator
-        initialRouteName="Events"
+        initialRouteName="Dashboard"
         screenOptions={{
           headerRight: () => (
             <View style={{ flexDirection: 'row', alignItems: "center", gap: 15, marginRight: 10 }}>
               <TouchableOpacity onPress={(() => navigation.navigate("Admin Notifications"))}>
-
                 <Icon name="bell-o" size={25} color="#7d0431" />
                 <View style={styles.badge}>
-                  <Text style={styles.badgeText}>3</Text>
+                  <Text style={styles.badgeText}>{notifications?.length > 0 ? notifications.length : null}</Text>
                 </View>
               </TouchableOpacity>
               <TouchableOpacity onPress={toggleDropdown}>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDispatch, useSelector } from 'react-redux';
-import { ResidentsAdds } from '../../../Redux/Slice/MarketPlaceSlice/MarketPlace';
+import { DeletePost, ResidentsAdds } from '../../../Redux/Slice/MarketPlaceSlice/MarketPlace';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { FAB } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -11,8 +11,6 @@ import { ImagebaseURL } from '../../../../Security/helpers/axios';
 const MyAdds = () => {
     const [societyId, setSocietyId] = useState("");
     const [userId, setUserId] = useState("");
-    const [selectedProperty, setSelectedProperty] = useState(null);
-    const [menuVisible, setMenuVisible] = useState(false); // State for dropdown visibility
     const navigation = useNavigation();
     const dispatch = useDispatch();
     const { loading, error } = useSelector((state) => state.MarketPlace);
@@ -43,9 +41,8 @@ const MyAdds = () => {
     );
 
     const renderItem = ({ item }) => (
-        <TouchableOpacity
+        <View
             style={styles.card}
-            onPress={() => navigation.navigate("Property Details", { id: item._id })}
         >
             {item.pictures && item.pictures.length > 0 ? (
                 <View style={styles.imageContainer}>
@@ -53,23 +50,17 @@ const MyAdds = () => {
                         source={{ uri: `${ImagebaseURL}${item.pictures[0].img}` }}
                         style={styles.image}
                     />
-                    <TouchableOpacity onPress={() => toggleMenu(item)} style={styles.menuIcon}>
-                        <Icon name="more-vert" size={24} color="#fff" />
+                    <TouchableOpacity onPress={() => handleMenuAction(item._id)} style={styles.menuIcon}>
+                        <Icon name="delete-sweep" size={24} color="#fff" />
                     </TouchableOpacity>
-                    {menuVisible && selectedProperty === item && (
-                        <View style={styles.dropdownMenu}>
-                            <TouchableOpacity onPress={() => handleMenuAction('edit', item._id)}>
-                                <Text style={styles.dropdownItem}>Edit</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={() => handleMenuAction('delete', item._id)}>
-                                <Text style={styles.dropdownItem}>Delete</Text>
-                            </TouchableOpacity>
-                        </View>
-                    )}
                 </View>
             ) : null}
             <View style={styles.infoContainer}>
                 <Text style={styles.title}>{item.title}</Text>
+                <View style={{ flexDirection: "row", justifyContent: "space-between", }}>
+                    <Text style={styles.contact}>{item.title}</Text>
+                    <Text style={{ color: "#222" }}> {item.price}</Text>
+                </View>
                 <View style={{ flexDirection: "row" }}>
                     <Text style={styles.contact}>Price</Text>
                     <Text style={{ color: "#222" }}>: {item.price}</Text>
@@ -80,38 +71,38 @@ const MyAdds = () => {
                 </View>
                 <Text style={styles.description}>{item.description}</Text>
             </View>
-        </TouchableOpacity>
+        </View>
     );
 
-    const toggleMenu = (property) => {
-        if (selectedProperty === property) {
-            setMenuVisible(!menuVisible);
-        } else {
-            setSelectedProperty(property);
-            setMenuVisible(true);
-        }
-    };
 
-    const handleMenuAction = (action, propertyId) => {
-        if (action === 'edit') {
-            navigation.navigate("Edit Property", { id: propertyId });
-            setMenuVisible(false); // Close the menu after action
-        } else if (action === 'delete') {
-            Alert.alert(
-                "Delete Property",
-                "Are you sure you want to delete this property?",
-                [
-                    { text: "Cancel", style: "cancel" },
-                    {
-                        text: "Delete", onPress: () => {
-                            // Add delete logic here
-                            console.log(`Deleting property with ID: ${propertyId}`);
-                            setMenuVisible(false); // Close the menu after action
-                        }
-                    },
-                ]
-            );
-        }
+
+    const handleMenuAction = (propertyId) => {
+        console.log(propertyId,": post id")
+        Alert.alert(
+            "Delete Property",
+            "Are you sure you want to delete this property?",
+            [
+                { text: "Cancel", style: "cancel" },
+                {
+                    text: "Delete", onPress: () => {
+                        // Add delete logic here
+                        dispatch(DeletePost(propertyId))
+                            .then((response) => {
+                                if (response.type === "marketPlace/deleteResident/fulfilled") {
+                                    dispatch(ResidentsAdds(userId));
+                                }
+                                else {
+                                    console.log("failed")
+                                }
+                            }).catch((error) => {
+                                Alert.alert("Error", "An error occurred while updating the booking.");
+                            });
+
+                    }
+                },
+            ]
+        );
+
     };
 
     if (loading) {

@@ -45,6 +45,7 @@ const EditAmenity = () => {
   const [newFilesSelected, setNewFilesSelected] = useState(false);
   const [snackVisible, setSnackVisible] = useState(false); 
   const [snackMessage, setSnackMessage] = useState(""); 
+  const [Loading, setLoading] = useState(""); 
   const requestPermission = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {

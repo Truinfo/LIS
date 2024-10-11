@@ -1,15 +1,17 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Alert } from 'react-native';
 import renewal from "../../../../assets/Admin/Imgaes/renewal2.png";
 import * as Linking from 'expo-linking';
-const PlanRenewalScreen = () => {
 
-    const paymentSuru = async() => {
-        const upiUrl = `7997148737@ibl`;
+const PlanRenewalScreen = () => {
+    const upiPaymentURL = `upi://pay?pa=7997148737@ibl&pn=MerchantName&am=10&cu=INR&tn=Payment+for+Order&tr=TXN123456`;
+
+    const paymentSuru = async () => {
         try {
-            const supported = await Linking.canOpenURL(upiUrl);
+            const supported = await Linking.canOpenURL(upiPaymentURL);
             if (supported) {
-                await Linking.openURL(upiUrl);
+                // Open the UPI payment URL in the external UPI app
+                await Linking.openURL(upiPaymentURL);
             } else {
                 Alert.alert('Error', 'No UPI apps installed to handle the payment.');
             }
@@ -17,15 +19,36 @@ const PlanRenewalScreen = () => {
             Alert.alert('Error', 'Failed to initiate UPI payment.');
             console.error(err);
         }
-    }
-    const successCallback = (data) => {
-        console.log("success")
-        Alert.alert("success", "payment Successfully done", data)
-    }
-    const failureCallback = (data) => {
-        console.log("failed")
-        Alert.alert("error", "payment Successfully done", data)
-    }
+    };
+
+    useEffect(() => {
+        const handleUrl = async (url) => {
+            // Parse the URL to check for the payment status
+            const { queryParams } = Linking.parse(url);
+            if (queryParams) {
+                // Check if txnStatus is present in the query params
+                const { txnStatus } = queryParams;
+                if (txnStatus === 'SUCCESS') {
+                    Alert.alert('Payment Successful', 'Your payment was successful.');
+                } else if (txnStatus === 'FAILURE') {
+                    Alert.alert('Payment Failed', 'Your payment failed.');
+                } else {
+                    Alert.alert('Unknown Status', 'Unable to determine the payment status.');
+                }
+            }
+        };
+
+        // Listen for incoming links
+        const subscription = Linking.addEventListener('url', ({ url }) => {
+            handleUrl(url);
+        });
+
+        // Clean up the event listener on unmount
+        return () => {
+            subscription.remove();
+        };
+    }, []);
+
     return (
         <View style={styles.container}>
             <Image
@@ -36,9 +59,9 @@ const PlanRenewalScreen = () => {
             <Text style={styles.text}>
                 Your plan has expired. Please renew the plan by clicking on the button below.
             </Text>
-            <TouchableOpacity style={styles.renewButton} onPress={paymentSuru}>
+            {/* <TouchableOpacity style={styles.renewButton} onPress={paymentSuru}>
                 <Text style={styles.renewButtonText}>Renew Expired Plan</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
         </View>
     );
 };
@@ -48,17 +71,17 @@ export default PlanRenewalScreen;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',  // Center content vertically
-        alignItems: 'center',      // Center content horizontally
+        justifyContent: 'center',
+        alignItems: 'center',
         backgroundColor: '#f0f0f0',
-        padding: 20,               // Add padding for better spacing
+        padding: 20,
     },
     renewButton: {
         backgroundColor: '#7d0431',
         paddingVertical: 15,
         paddingHorizontal: 30,
         borderRadius: 8,
-        marginTop: 20,            // Add margin to separate from text
+        marginTop: 20,
     },
     renewButtonText: {
         color: '#fff',
@@ -66,14 +89,14 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     image: {
-        width: 300,               // Adjust image width
-        height: 300,              // Adjust image height
-        marginBottom: 20,         // Add margin below the image
+        width: 300,
+        height: 300,
+        marginBottom: 20,
     },
     text: {
         fontSize: 16,
-        color: '#333',            // Set text color
-        textAlign: 'center',      // Center the text
-        marginBottom: 20,         // Add margin below the text
+        color: '#333',
+        textAlign: 'center',
+        marginBottom: 20,
     },
 });

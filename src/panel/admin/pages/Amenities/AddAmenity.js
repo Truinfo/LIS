@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, Button, TouchableOpacity, StyleSheet, Image, Alert, ScrollView } from 'react-native';
+import {  Text, TextInput,  TouchableOpacity, StyleSheet, Image, Alert, ScrollView } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import { createAmenity } from './AmenitiesSlice';

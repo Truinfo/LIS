@@ -8,11 +8,11 @@ import { ImagebaseURL } from '../../../../Security/helpers/axios';
 
 const EditProfile = ({ route }) => {
   const dispatch = useDispatch();
-  const { profiles,   } = useSelector((state) => state.profiles);
+  const { profiles, } = useSelector((state) => state.profiles);
   const [name, setName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
-  const [profileImage, setProfileImage] = useState( require("../../../../../assets/User/images/girl.png"));
+  const [profileImage, setProfileImage] = useState(require("../../../../../assets/User/images/girl.png"));
   const { userId, societyId, id } = route.params;
   useEffect(() => {
     if (userId && societyId) {
@@ -60,7 +60,7 @@ const EditProfile = ({ route }) => {
       console.log('No image selected');
     }
     try {
-      await dispatch(EditUserProfile({formData,id})).unwrap();
+      await dispatch(EditUserProfile({ formData, id })).unwrap();
       // await AsyncStorage.setItem('userProfile', JSON.stringify({ name, mobileNumber: phoneNumber, email, id }));
       Alert.alert('Profile Updated', 'Your profile has been updated successfully!');
     } catch (error) {
@@ -114,7 +114,7 @@ const EditProfile = ({ route }) => {
     <View style={styles.container}>
       <View style={styles.profileContainer}>
         <View style={styles.profileImageWrapper}>
-          <Image source={profileImage ? { uri: `${ImagebaseURL}${profileImage}` } : { uri: profileImage }} style={styles.profileImage} />
+          <Image source={{ uri: `${ImagebaseURL}${profileImage}` || profileImage }} style={styles.profileImage} />
           <TouchableOpacity style={styles.cameraIconContainer} onPress={chooseImageSource}>
             <Image source={require('../../../../../assets/User/images/camera.png')} style={styles.cameraIcon} />
           </TouchableOpacity>

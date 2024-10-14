@@ -1,18 +1,22 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../../Security/helpers/axios';
-import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// const societyAdmin = JSON.parse(localStorage.getItem('societyAdmin')) || {};
-const societyId = "6683b57b073739a31e8350d0";
 
-// router.post('/createService', createService);
+const fetchSocietyId = async () => {
+    const storedAdmin = await AsyncStorage.getItem('societyAdmin');
+    const societyAdmin = JSON.parse(storedAdmin) || {};
+    return societyAdmin._id || "6683b57b073739a31e8350d0"; // Default ID
+};
 export const createService = createAsyncThunk(
     'staff/createService',
     async (formData) => {
         try {
-            const response = await axiosInstance.post('/createService', formData, {headers: {
-                'Content-Type': 'multipart/form-data',
-              }});
+            const response = await axiosInstance.post('/createService', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                }
+            });
             return response.data;
         } catch (error) {
             console.error('Error creating service:', error);
@@ -24,27 +28,27 @@ export const createService = createAsyncThunk(
     }
 );
 
-// router.get('/getAllServicePersons/:societyId', getAllServicePersons);
 export const getAllServicePersons = createAsyncThunk(
     'staff/getAllServicePersons',
     async () => {
+        const societyId = await fetchSocietyId()
         const response = await axiosInstance.get(`/getAllServicePersons/${societyId}`);
         return response.data.service.society;
     });
 
-// router.get('/getAllServiceTypes/:societyId/:serviceType', getAllServiceTypes);
 export const fetchAllServiceTypes = createAsyncThunk(
     'staff/fetchAllServiceTypes',
     async (serviceType) => {
+        const societyId = await fetchSocietyId()
         const response = await axiosInstance.get(`/getAllServiceTypes/${societyId}/${serviceType}`);
         return response.data.providers;
     });
 
 
-// router.get('/getServicePersonById/:societyId/:userId', getServicePersonById); 
 export const fetchServicePersonById = createAsyncThunk(
     'staff/fetchServicePersonById',
     async ({ serviceType, userid }) => {
+        const societyId = await fetchSocietyId()
         const response = await axiosInstance.get(`/getServicePersonById/${societyId}/${serviceType}/${userid}`);
         return response.data.ServicePerson;
     }
@@ -67,6 +71,7 @@ export const deleteServicePerson = createAsyncThunk(
     async ({ userid, serviceType, societyId }) => {
 
         try {
+            const societyId = await fetchSocietyId()
             const response = await axiosInstance.delete('/deleteServicePerson', {
                 data: { societyId, serviceType, userid },
                 headers: {
@@ -80,20 +85,11 @@ export const deleteServicePerson = createAsyncThunk(
     }
 );
 
-// router.put('/addList', addList);
-// export const addList = createAsyncThunk(
-//     'staff/addList',
-//     async (formData) => {
-//         const response = await axiosInstance.delete('/addList', formData);
-//         return response.data.service.society;
-//     });
-
-
-// router.delete('/deleteUserService', deleteUserService);
 export const deleteUserService = createAsyncThunk(
     'staff/deleteUserService',
     async ({ societyId, serviceType, userid, userIdToDelete }) => {
         try {
+            const societyId = await fetchSocietyId()
             const response = await axiosInstance.delete('/deleteUserService', {
                 data: { societyId, serviceType, userid, userIdToDelete }
             });
@@ -198,7 +194,7 @@ const staffSlice = createSlice({
                 state.error = action.error.message;
             })
 
-          
+
             .addCase(deleteUserService.pending, (state) => {
                 state.status = 'loading';
             })

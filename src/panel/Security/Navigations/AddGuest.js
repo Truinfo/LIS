@@ -111,7 +111,7 @@ const AddGuest = ({ route, navigation }) => {
 
   const selectuser = (user) => {
     setuser(user.name);
-    setuserId(user.userId);
+    setuserId(user._id);
     setShowUserDropdown(false);
   };
 
@@ -152,6 +152,7 @@ const AddGuest = ({ route, navigation }) => {
       const role = "Guest";
       const date = new Date().toISOString();
       const formData = new FormData();
+
       formData.append("name", name);
       formData.append("phoneNumber", phoneNumber);
       formData.append("societyId", societyId);
@@ -160,7 +161,6 @@ const AddGuest = ({ route, navigation }) => {
       formData.append("block", block);
       formData.append("flatNo", flatNo);
       formData.append("date", date);
-      console.log(image);
       if (imageFile) {
         formData.append("pictures", {
           uri: imageFile.uri,
@@ -168,20 +168,21 @@ const AddGuest = ({ route, navigation }) => {
           type: imageFile.type,
         });
       }
+
       try {
         const response = await dispatch(createVisitor(formData));
         if (response.type === "visitor/createVisitor/fulfilled") {
-          console.log(userId);
           const data = {
             visitorName: name,
             flatNumber: flatNo,
             buildingName: block,
             societyId: societyId,
-            userId:userId,
-            
+            userId: userId, // Make sure the userId is correct here
             action: "approve or decline",
           };
           socketServices.emit("AddVisitor", { data });
+
+          // Clear form and navigate
           setName("");
           setPhoneNumber("");
           setBlock("");
@@ -195,21 +196,15 @@ const AddGuest = ({ route, navigation }) => {
             navigation.navigate("SecurityTabs", { screen: "Visitors Entries" });
           }, 2000);
         } else {
-          setDialogMessage(
-            `${response.payload.message}` || "An error occurred"
-          );
+          setDialogMessage(`${response.payload.message}` || "An error occurred");
           setShowDialog(true);
-          setTimeout(() => {
-            setShowDialog(false);
-          }, 1000);
+          setTimeout(() => setShowDialog(false), 1000);
         }
       } catch (error) {
         console.error(error);
         setDialogMessage("An error occurred while creating the visitor.");
         setShowDialog(true);
-        setTimeout(() => {
-          setShowDialog(false);
-        }, 1000);
+        setTimeout(() => setShowDialog(false), 1000);
       } finally {
         setLoading(false);
       }
@@ -306,9 +301,7 @@ const AddGuest = ({ route, navigation }) => {
     setShowModal(true);
   };
   const filterResidents = (selectedBlock, selectedFlat) => {
-    console.log("filterResidents", selectedBlock, selectedFlat);
     return userProfiles.filter((resident) => {
-      console.log(resident);
       return (
         resident.buildingName === selectedBlock && resident.flatNumber === selectedFlat
       );
@@ -317,13 +310,13 @@ const AddGuest = ({ route, navigation }) => {
   const selectFlatNo = (flat) => {
     setFlatNo(flat.flatNumber);
     setShowFlatNoDropdown(false);
-
     // Filter residents based on selected block and flat
     const filteredResidents = filterResidents(block, flat.flatNumber);
-    console.log(filteredResidents);
+
     setUsersInFlat(filteredResidents);// Update usersInFlat with filtered residents
     setShowUserDropdown(true); // Show the user dropdown
   };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
@@ -481,7 +474,6 @@ const AddGuest = ({ route, navigation }) => {
               ))}
             </View>
           )}
-
           <TouchableOpacity
             style={[
               styles.dropdownButton,
@@ -508,7 +500,6 @@ const AddGuest = ({ route, navigation }) => {
           ) : null} */}
           {showUserDropdown && usersInFlat.length > 0 && (
             <View style={styles.dropdownMenu}>
-              {console.log("usersInFlat", usersInFlat)}
               {usersInFlat.map((user) => (
                 <TouchableOpacity
                   key={user._id}

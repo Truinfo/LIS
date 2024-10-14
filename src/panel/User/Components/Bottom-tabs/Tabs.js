@@ -7,29 +7,33 @@ import Services from "../../Navigations/Screens/Services";
 import Community from "../../Navigations/Screens/Community";
 import RentalProperties from "../../Navigations/Screens/Community/RentalProperties";
 import socketServices from "../../Socket/SocketServices";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import { Ionicons } from '@expo/vector-icons';
 const Tab = createBottomTabNavigator();
 
 function Tabs() {
   const [societyId, setSocietyId] = useState(null);
-  useEffect(() => {
-    const getSocietyId = async () => {
-      try {
-        const user = await AsyncStorage.getItem("user");
-        const id = JSON.parse(user).societyId;
-        if (id !== null) {
-          setSocietyId(id);
-        } else {
-          console.error("No societyId found in AsyncStorage");
+  const [userName, setUserName] = useState(null);
+  useFocusEffect(
+    React.useCallback(() => {
+      const getUserName = async () => {
+        try {
+          const userString = await AsyncStorage.getItem("user");
+          if (userString) {
+            const user = JSON.parse(userString);
+            setSocietyId(user.societyId);
+            setUserName(user.name);
+          }
+        } catch (error) {
+          console.error("Failed to fetch the user from async storage", error);
         }
-      } catch (error) {
-        console.error("Error fetching societyId from AsyncStorage:", error);
-      }
-    };
-    getSocietyId();
-  }, []);
+      };
+
+      getUserName();
+    }, []) 
+  );
+  console.log("userName",userName);
   useFocusEffect(
     React.useCallback(() => {
       socketServices.initializeSocket();
@@ -39,12 +43,12 @@ function Tabs() {
       }
       // Listening for visitor notifications
       socketServices.on("Visitor_Notification", (data) => {
-        console.log("Visitor Notification Data:", data);
-
+        console.log(data)
         if (data) {
           const visitorName = data.visitorName || "Unknown Visitor";
           const flatNumber = data.flatNumber || "Unknown Flat";
           const buildingName = data.buildingName || "Unknown Building";
+          const userId = data.userId || "unknown User"
 
           // Show alert to the user
           Alert.alert(
@@ -58,10 +62,10 @@ function Tabs() {
                   socketServices.emit("Visitor_Response", {
                     visitorName,
                     response: "declined",
-                    flatNumber,
+                    flatNumber,userId,
                     buildingName,
-                    residentName: "Your Name", // Replace with actual resident's name
-                    societyId, // Use the state value for societyId
+                    residentName: userName, 
+                    societyId,
                   });
                 },
               },
@@ -72,10 +76,10 @@ function Tabs() {
                   socketServices.emit("Visitor_Response", {
                     visitorName,
                     response: "approved",
-                    flatNumber,
+                    flatNumber,userId,
                     buildingName,
-                    residentName: "Your Name", // Replace with actual resident's name
-                    societyId, // Use the state value for societyId
+                    residentName: userName, 
+                    societyId, 
                   });
                 },
               },
@@ -191,9 +195,9 @@ function Tabs() {
           headerStyle: { backgroundColor: "#7D0431" },
           headerTintColor: "#fff",
           headerRight: () => (
-            <Icon
-              name="storefront-sharp" // Change this to your desired icon
-              size={28}
+
+            <Ionicons name="storefront-sharp"
+              size={24}
               color="#fff"
               style={{ marginRight: 15 }} // Add some margin to align properly
               onPress={() => navigation.navigate("Property List")} // Handle icon press here

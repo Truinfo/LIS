@@ -54,13 +54,11 @@ const AddService = () => {
     const [errors, setErrors] = useState({});
     const validateForm = () => {
         const newErrors = {};
-
         if (!serviceType) newErrors.serviceType = 'Please select a service type.';
         if (!name) newErrors.name = 'Name is required.';
         if (!mobileNumber) newErrors.mobileNumber = 'Mobile number is required.';
         if (!address) newErrors.address = 'Address is required.';
         if (!selectedTimings.length) newErrors.timings = 'Please select at least one timing.';
-
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0; // Return true if no errors
     };
@@ -76,14 +74,18 @@ const AddService = () => {
             selectedTimings.forEach(timing => formData.append('timings', timing));
     
             if (image) {
-                const imageName = image.uri.split('/').pop();
-                const imageType = image.uri.split('.').pop(); // Example: 'jpg', 'png'
+                // Ensure image.uri is defined before using it
+                const imageUri = image.uri || image; // Fallback if image is a string
+                const imageName = imageUri.split('/').pop();
+                const imageType = imageUri.split('.').pop(); // Example: 'jpg', 'png'
     
                 formData.append('pictures', {
-                    uri: image.uri,
+                    uri: imageUri,
                     name: imageName,
                     type: `image/${imageType}`, 
                 });
+            } else {
+                console.warn("No image selected"); // Add a warning if no image is selected
             }
     
             dispatch(createService(formData))
@@ -94,13 +96,13 @@ const AddService = () => {
                         
                         // Navigate to Services page after a short delay
                         setTimeout(() => navigation.navigate("Services"), 3000);
+                        
                         // Clear the form fields
                         setName('');
                         setMobileNumber('');
                         setAddress('');
                         setSelectedTimings([]);
                         setImage(null);
-    
                     }
                 })
                 .catch(error => {
@@ -109,32 +111,7 @@ const AddService = () => {
         }
     };
     
-    // const handleSubmit = () => {
-    //     const formData = new FormData();
-    //     formData.append('societyId', societyId);
-    //     formData.append('serviceType', serviceType);
-    //     formData.append('name', name);
-    //     formData.append('phoneNumber', mobileNumber);
-    //     formData.append('address', address);
-    //     selectedTimings.forEach(timing => formData.append('timings', timing));
-    //     if (image) {
-    //         formData.append('pictures', {
-    //             uri: image.uri,
-    //             type: image.type,
-    //             name: image.uri.split('/').pop(),
-    //         });
-    //     }
-    //     dispatch(createService(formData)).then((response) => {
-    //         if (response.meta.requestStatus === 'fulfilled') {
-    //             setSnackbarMessage(`${response.payload.message}`);
-    //             setSnackbarVisible(true);
-    //             setTimeout(() => navigation.navigate("Services"), 3000); 
-    //         }
-    //     }).catch((error) => {
-    //         console.error("Error:", error);
-    //     });
-    // };
-
+  
     const toggleTiming = (timing) => {
         setSelectedTimings((prevTimings) =>
             prevTimings.includes(timing)
@@ -145,9 +122,33 @@ const AddService = () => {
     const removeTiming = (timing) => {
         setSelectedTimings(selectedTimings.filter(item => item !== timing));
     };
-
-
+    const requestPermissions = async () => {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+            Alert.alert('Permission required', 'You need to grant permission to access the gallery.');
+            return false; // Return false if permission is not granted
+        }
+        return true; // Return true if permission is granted
+    };
+    
+    const requestCameraPermissions = async () => {
+        const { status } = await ImagePicker.requestCameraPermissionsAsync();
+        if (status !== 'granted') {
+            Alert.alert('Permission required', 'You need to grant permission to use the camera.');
+            return false; // Return false if permission is not granted
+        }
+        return true; // Return true if permission is granted
+    };
+    
     const handleImagePick = async () => {
+        const cameraPermissionGranted = await requestCameraPermissions(); // Request camera permissions
+        const galleryPermissionGranted = await requestPermissions(); // Request gallery permissions
+    
+        // If either permission is not granted, exit the function
+        if (!cameraPermissionGranted || !galleryPermissionGranted) {
+            return;
+        }
+    
         Alert.alert(
             'Select Image Source',
             'Choose an option to upload an image:',
@@ -167,25 +168,31 @@ const AddService = () => {
             ]
         );
     };
-
+    
     const pickImage = async (launchFunction) => {
-        let result = await launchFunction({
-            mediaTypes: ImagePicker.MediaTypeOptions.All,
-            allowsEditing: false,
-            aspect: [4, 3],
-            quality: 1,
-        });
-
-        if (!result.canceled) {
-            setImage(result.assets[0].uri);
+        try {
+            let result = await launchFunction({
+                mediaTypes: ImagePicker.MediaTypeOptions.All,
+                allowsEditing: false,
+                aspect: [4, 3],
+                quality: 1,
+            });
+    
+            if (!result.canceled) {
+                setImage(result.assets[0].uri);
+            }
+        } catch (error) {
+            console.error('Image picker error:', error);
+            Alert.alert('Error', 'Something went wrong while picking the image.');
         }
     };
+    
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <View style={styles.avatarContainer}>
                 <Avatar.Image
                     size={120}
-                    source={image ? { uri: image } : require('../../../../assets/User/Avatar/man (2).png')} // Use a placeholder image if there's no image selected
+                    source={image ? { uri: image } : { uri: "https://thumbs.dreamstime.com/b/default-avatar-profile-trendy-style-social-media-user-icon-187599373.jpg" }} // Use a placeholder image if there's no image selected
                     style={styles.avatar}
                 />
                 <TouchableOpacity style={styles.cameraButton} onPress={handleImagePick}>

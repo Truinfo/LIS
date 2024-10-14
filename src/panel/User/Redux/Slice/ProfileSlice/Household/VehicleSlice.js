@@ -1,11 +1,11 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import axiosInstance from '../../../../../Security/helpers/axios';
+import axiosInstance, { Api } from '../../../../../Security/helpers/axios';
 export const addVehicleAsync = createAsyncThunk(
     'houseHolds/addVehicle',
     async (updatedProfile, thunkAPI) => {
         const { societyId, userId, vehicleData } = updatedProfile;
         try {
-            const response = await axiosInstance.post(
+            const response = await Api.post(
                 `/addVehicle/${societyId}/${userId}`,
                 vehicleData
             );

@@ -9,27 +9,31 @@ import {
   Modal,
   Alert,
   Image,
-  BackHandler
+  BackHandler,
 } from "react-native";
 import { Avatar, TextInput } from "react-native-paper";
-import { useDispatch, useSelector } from 'react-redux';
-import { createVisitor,resetState, } from "../../User/Redux/Slice/Security_Panel/VisitorsSlice";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  createVisitor,
+  resetState,
+} from "../../User/Redux/Slice/Security_Panel/VisitorsSlice";
 import { fetchSocietyById } from "../../User/Redux/Slice/Security_Panel/SocietyByIdSlice";
 import MyDialog from "../DialogBox/DialogBox";
 import * as ImagePicker from "expo-image-picker";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AntDesign, Entypo, MaterialIcons } from "@expo/vector-icons";
+import socketServices from "../../User/Socket/SocketServices";
 
-const AddOthers = ({ route, navigation  }) => {
+const AddOthers = ({ route, navigation }) => {
   const [name, setName] = useState("");
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [nameError, setNameError] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [phoneNumberError, setPhoneNumberError] = useState("");
-  const [details, setDetails] = useState('');
-  const [detailsError, setDetailsError] = useState('');
+  const [details, setDetails] = useState("");
+  const [detailsError, setDetailsError] = useState("");
   const [block, setBlock] = useState("");
   const [blockError, setBlockError] = useState("");
   const [flatNo, setFlatNo] = useState("");
@@ -45,9 +49,11 @@ const AddOthers = ({ route, navigation  }) => {
   const successMessage = useSelector((state) => state.visitor.successMessage);
   const [showModal, setShowModal] = useState(false);
   const [isImageModalVisible, setImageModalVisible] = useState(false);
-  const [bellImage, setBellImage] = useState(require('../../../assets/Security/gif/notification.gif'));
-  const [ringingText, setRingingText] = useState('Ringing....');
-  const [subText, setSubText] = useState('They are getting informed');
+  const [bellImage, setBellImage] = useState(
+    require("../../../assets/Security/gif/notification.gif")
+  );
+  const [ringingText, setRingingText] = useState("Ringing....");
+  const [subText, setSubText] = useState("They are getting informed");
   const [isConfirmationClicked, setIsConfirmationClicked] = useState(false);
   const dispatch = useDispatch();
 
@@ -67,6 +73,7 @@ const AddOthers = ({ route, navigation  }) => {
       }
     };
     getSocietyId();
+    socketServices.initializeSocket();
   }, []);
   const { society } = useSelector((state) => state.societyById);
   console.log(successMessage);
@@ -80,6 +87,7 @@ const AddOthers = ({ route, navigation  }) => {
   useEffect(() => {
     if (societyId) {
       dispatch(fetchSocietyById(societyId));
+      socketServices.emit("joinSecurityPanel", societyId);
     }
   }, [dispatch, societyId]);
 
@@ -90,7 +98,8 @@ const AddOthers = ({ route, navigation  }) => {
     setFlatsForSelectedBlock(fetchedFlats);
   };
   const fetchFlatsForBlock = (block) => {
-    const flats = buildings.find(item => item.blockName === block)?.flats || [];
+    const flats =
+      buildings.find((item) => item.blockName === block)?.flats || [];
     return flats;
   };
 
@@ -121,10 +130,10 @@ const AddOthers = ({ route, navigation  }) => {
       }
     }
     if (!details) {
-      setDetailsError('Please enter your Details.');
+      setDetailsError("Please enter your Details.");
       isValid = false;
     } else {
-      setDetailsError('');
+      setDetailsError("");
     }
 
     if (!block) {
@@ -169,6 +178,14 @@ const AddOthers = ({ route, navigation  }) => {
       try {
         const response = await dispatch(createVisitor(formData));
         if (response.meta.requestStatus === "fulfilled") {
+          const data = {
+            visitorName: name,
+            flatNumber: flatNo,
+            buildingName: block,
+            societyId: societyId,
+            action: "approve or decline",
+          };
+          socketServices.emit("AddVisitor", { data });
           setName("");
           setPhoneNumber("");
           setDetails("");
@@ -176,7 +193,7 @@ const AddOthers = ({ route, navigation  }) => {
           setFlatNo("");
           setImageFile(null);
           setImagePreview(null);
-          setDialogMessage(response.payload.message); 
+          setDialogMessage(response.payload.message);
           setShowDialog(true);
           setTimeout(() => {
             setShowDialog(false);
@@ -184,15 +201,15 @@ const AddOthers = ({ route, navigation  }) => {
             navigation.navigate("SecurityTabs", { screen: "Visitors Entries" });
           }, 1000);
         } else {
-          setDialogMessage(response.payload.message || "An error occurred"); 
+          setDialogMessage(response.payload.message || "An error occurred");
           setShowDialog(true);
           setTimeout(() => {
             setShowDialog(false);
           }, 1000);
         }
       } catch (error) {
-        console.error(error); 
-        setDialogMessage("An error occurred while creating the visitor."); 
+        console.error(error);
+        setDialogMessage("An error occurred while creating the visitor.");
         setShowDialog(true);
         setTimeout(() => {
           setShowDialog(false);
@@ -280,9 +297,12 @@ const AddOthers = ({ route, navigation  }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView vertical={true} contentContainerStyle={styles.scrollViewContent}>
+      <ScrollView
+        vertical={true}
+        contentContainerStyle={styles.scrollViewContent}
+      >
         <View style={styles.avatarWrapper}>
-        <TouchableOpacity
+          <TouchableOpacity
             style={styles.avatarContainer}
             onPress={handleAvatarPress}
           >
@@ -293,16 +313,14 @@ const AddOthers = ({ route, navigation  }) => {
                 size={174}
                 source={{ uri: imagePreview }}
               />
-            ) : 
-            (
+            ) : (
               <Avatar.Image
                 size={174}
                 style={styles.avatar}
                 color="#fff"
                 source={require("../../../assets/Security/images/user.png")}
               />
-            )
-            }
+            )}
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.cameraIconContainer}
@@ -323,7 +341,7 @@ const AddOthers = ({ route, navigation  }) => {
             value={name}
             mode="outlined"
             outlineColor={nameError ? "red" : "#ccc"}
-            theme={{ colors: { primary:  nameError ? "red" : "#800336",} }}
+            theme={{ colors: { primary: nameError ? "red" : "#800336" } }}
             // error={!!nameError}
             onChangeText={setName}
           />
@@ -332,41 +350,70 @@ const AddOthers = ({ route, navigation  }) => {
           ) : null}
 
           <TextInput
-            style={[styles.inputBlock, { marginTop: 10 }, phoneNumberError && { borderColor: "red" },]}
+            style={[
+              styles.inputBlock,
+              { marginTop: 10 },
+              phoneNumberError && { borderColor: "red" },
+            ]}
             label="Phone Number *"
             value={phoneNumber}
             keyboardType="phone-pad"
             mode="outlined"
             outlineColor={phoneNumberError ? "red" : "#CCC"}
-            theme={{ colors: { primary:  phoneNumberError ? "red" : "#800336", } }}
+            theme={{
+              colors: { primary: phoneNumberError ? "red" : "#800336" },
+            }}
             // error={!!phoneNumberError}
-            onChangeText={(text) => { setPhoneNumber(text); setPhoneNumberError(""); }}
+            onChangeText={(text) => {
+              setPhoneNumber(text);
+              setPhoneNumberError("");
+            }}
           />
           {phoneNumberError ? (
             <Text style={styles.errorMessage}>{phoneNumberError}</Text>
           ) : null}
 
           <TextInput
-            style={[styles.inputBlock, { marginTop: 10},  detailsError && { borderColor: "red" },]}
-            label='Details *'
+            style={[
+              styles.inputBlock,
+              { marginTop: 10 },
+              detailsError && { borderColor: "red" },
+            ]}
+            label="Details *"
             value={details}
-            mode='outlined'
+            mode="outlined"
             outlineColor={detailsError ? "red" : "#CCC"}
-            theme={{ colors: { primary: detailsError ? "red" : "#800336",} }}
+            theme={{ colors: { primary: detailsError ? "red" : "#800336" } }}
             // error={!!detailsError}
             onChangeText={(text) => setDetails(text)}
           />
-          {detailsError ? (<Text style={styles.errorMessage}>{detailsError}</Text>) : null}
+          {detailsError ? (
+            <Text style={styles.errorMessage}>{detailsError}</Text>
+          ) : null}
 
           <View>
             <TouchableOpacity
-              style={[styles.dropdownButton, showBuildingDropdown && styles.dropdownActive, { marginTop: 15 },
-                blockError && { borderColor: "red" },]}
+              style={[
+                styles.dropdownButton,
+                showBuildingDropdown && styles.dropdownActive,
+                { marginTop: 15 },
+                blockError && { borderColor: "red" },
+              ]}
               onPress={() => setShowBuildingDropdown(!showBuildingDropdown)}
             >
-              <Text style={styles.dropdownButtonText}>  {block ? `${block}` : "Select Block *"} </Text>
+              <Text style={styles.dropdownButtonText}>
+                {" "}
+                {block ? `${block}` : "Select Block *"}{" "}
+              </Text>
               <Text>
-                <MaterialIcons name={showBuildingDropdown ? 'arrow-drop-up' : 'arrow-drop-down'} size={20} color="#000" style={{ marginRight: 5 }} />
+                <MaterialIcons
+                  name={
+                    showBuildingDropdown ? "arrow-drop-up" : "arrow-drop-down"
+                  }
+                  size={20}
+                  color="#000"
+                  style={{ marginRight: 5 }}
+                />
               </Text>
             </TouchableOpacity>
             {showBuildingDropdown && (
@@ -377,22 +424,41 @@ const AddOthers = ({ route, navigation  }) => {
                     style={styles.dropdownItem}
                     onPress={() => selectBuilding(building)}
                   >
-                    <Text style={styles.dropdownItemText}>{building.blockName}</Text>
+                    <Text style={styles.dropdownItemText}>
+                      {building.blockName}
+                    </Text>
                   </TouchableOpacity>
                 ))}
               </View>
             )}
           </View>
-          {blockError ? (<Text style={styles.errorMessage}>{blockError}</Text>) : null}
+          {blockError ? (
+            <Text style={styles.errorMessage}>{blockError}</Text>
+          ) : null}
 
           <View style={styles.dropdownContainer}>
             <TouchableOpacity
-              style={[styles.dropdownButton, showFlatNoDropdown && styles.dropdownActive, { marginTop: 15 }, flatNoError && { borderColor: "red" },]}
+              style={[
+                styles.dropdownButton,
+                showFlatNoDropdown && styles.dropdownActive,
+                { marginTop: 15 },
+                flatNoError && { borderColor: "red" },
+              ]}
               onPress={() => setShowFlatNoDropdown(!showFlatNoDropdown)}
             >
-              <Text style={styles.dropdownButtonText }>  {flatNo ? `${flatNo}` : "Select Flat Number *"}  </Text>
+              <Text style={styles.dropdownButtonText}>
+                {" "}
+                {flatNo ? `${flatNo}` : "Select Flat Number *"}{" "}
+              </Text>
               <Text>
-                <MaterialIcons name={showFlatNoDropdown ? 'arrow-drop-up' : 'arrow-drop-down'} size={20} color="#000" style={{ marginRight: 5 }} />
+                <MaterialIcons
+                  name={
+                    showFlatNoDropdown ? "arrow-drop-up" : "arrow-drop-down"
+                  }
+                  size={20}
+                  color="#000"
+                  style={{ marginRight: 5 }}
+                />
               </Text>
             </TouchableOpacity>
             {showFlatNoDropdown && (
@@ -403,78 +469,86 @@ const AddOthers = ({ route, navigation  }) => {
                     style={styles.dropdownItem}
                     onPress={() => selectFlatNo(flat)}
                   >
-                    <Text style={styles.dropdownItemText}>{flat.flatNumber}</Text>
+                    <Text style={styles.dropdownItemText}>
+                      {flat.flatNumber}
+                    </Text>
                   </TouchableOpacity>
                 ))}
               </View>
             )}
           </View>
-          {flatNoError ? <Text style={styles.errorMessage}>{flatNoError}</Text> : null}
+          {flatNoError ? (
+            <Text style={styles.errorMessage}>{flatNoError}</Text>
+          ) : null}
         </View>
 
-      <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm} disabled={loading}>
-        <Text style={styles.confirmButtonText}>Add</Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.confirmButton}
+          onPress={handleConfirm}
+          disabled={loading}
+        >
+          <Text style={styles.confirmButtonText}>Add</Text>
+        </TouchableOpacity>
       </ScrollView>
       <MyDialog
-          message={dialogMessage || error}
-          showDialog={showDialog}
-          onClose={() => setShowDialog(false)}
-        />
+        message={dialogMessage || error}
+        showDialog={showDialog}
+        onClose={() => setShowDialog(false)}
+      />
       <Modal
         animationType="fade"
         transparent={true}
         visible={showModal}
         onRequestClose={() => setShowModal(false)}
-        >
-         <View style={styles.modalBackground}>
-            <View style={styles.modalContainer}>
-              <View style={styles.modalHeader}>
-                <Text style={{ fontSize: 22, fontWeight: "700" }}>
-                  Profile Photo
-                </Text>
-                <TouchableOpacity style={{ position: "absolute", right: 0 }}>
-                  <Entypo
-                    name="circle-with-cross"
+      >
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalHeader}>
+              <Text style={{ fontSize: 22, fontWeight: "700" }}>
+                Profile Photo
+              </Text>
+              <TouchableOpacity style={{ position: "absolute", right: 0 }}>
+                <Entypo
+                  name="circle-with-cross"
+                  size={27}
+                  color="#800336"
+                  onPress={closeCross}
+                />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.icons}>
+              <View style={styles.camera}>
+                <TouchableOpacity onPress={takePhoto}>
+                  <MaterialCommunityIcons
+                    name="camera-outline"
                     size={27}
                     color="#800336"
-                    onPress={closeCross}
                   />
+                  <Text style={styles.camText}>Camera</Text>
                 </TouchableOpacity>
               </View>
-              <View style={styles.icons}>
-                <View style={styles.camera}>
-                  <TouchableOpacity onPress={takePhoto}>
-                    <MaterialCommunityIcons
-                      name="camera-outline"
-                      size={27}
-                      color="#800336"
-                    />
-                    <Text style={styles.camText}>Camera</Text>
-                  </TouchableOpacity>
-                </View>
-                <View>
-                  <TouchableOpacity onPress={pickImage}>
-                    <MaterialCommunityIcons
-                      name="view-gallery-outline"
-                      size={27}
-                      color="#800336"
-                    />
-                    <Text style={styles.camText}>Gallery</Text>
-                  </TouchableOpacity>
-                </View>
-                <View>
-                  <TouchableOpacity onPress={deletePhoto}>
-                    <AntDesign name="delete" size={27} color="#800336" />
-                    <Text style={styles.camText}>Delete</Text>
-                  </TouchableOpacity>
-                </View>
+              <View>
+                <TouchableOpacity onPress={pickImage}>
+                  <MaterialCommunityIcons
+                    name="view-gallery-outline"
+                    size={27}
+                    color="#800336"
+                  />
+                  <Text style={styles.camText}>Gallery</Text>
+                </TouchableOpacity>
+              </View>
+              <View>
+                <TouchableOpacity onPress={deletePhoto}>
+                  <AntDesign name="delete" size={27} color="#800336" />
+                  <Text style={styles.camText}>Delete</Text>
+                </TouchableOpacity>
               </View>
             </View>
           </View>
-        </Modal>
-      
-        <Modal
+        </View>
+      </Modal>
+
+      <Modal
         visible={isImageModalVisible}
         transparent={true}
         animationType="fade"
@@ -483,8 +557,7 @@ const AddOthers = ({ route, navigation  }) => {
         <View style={styles.fullScreenImageContainer}>
           <View style={styles.profileHeader}>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <TouchableOpacity onPress={()=> setImageModalVisible(false)}>
-                
+              <TouchableOpacity onPress={() => setImageModalVisible(false)}>
                 <AntDesign name="arrowleft" size={28} color="#fff" />
               </TouchableOpacity>
               <Text style={styles.profileText}>Profile Photo</Text>
@@ -501,7 +574,6 @@ const AddOthers = ({ route, navigation  }) => {
           />
         </View>
       </Modal>
-   
     </SafeAreaView>
   );
 };
@@ -513,7 +585,7 @@ const styles = StyleSheet.create({
   },
   scrollViewContent: {
     paddingHorizontal: 20,
-    paddingVertical:20
+    paddingVertical: 20,
   },
   avatarWrapper: {
     alignItems: "center",
@@ -573,7 +645,7 @@ const styles = StyleSheet.create({
   dropdownItemText: {
     color: "#192c4c",
   },
- 
+
   confirmButton: {
     backgroundColor: "#800336",
     padding: 12,
@@ -591,7 +663,7 @@ const styles = StyleSheet.create({
   confirmButtonText: {
     color: "#fff",
     fontSize: 20,
-    fontWeight: '600',
+    fontWeight: "600",
     textAlign: "center",
   },
   modalBackground: {

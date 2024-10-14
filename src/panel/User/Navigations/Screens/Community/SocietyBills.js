@@ -11,7 +11,7 @@ const SocietyBills = () => {
     const dispatch = useDispatch();
     const [societyId, setSocietyId] = useState('');
     const { society } = useSelector((state) => state.societyBills.societyBills);
-    const { loading,error} = useSelector((state) => state.societyBills);
+    const { loading, error } = useSelector((state) => state.societyBills);
     useEffect(() => {
         const getUserName = async () => {
             try {
@@ -35,7 +35,7 @@ const SocietyBills = () => {
     }, [dispatch, societyId]);
     const downloadFile = async (relativeUrl) => {
         try {
-            const baseUrl = "http://192.168.29.226:2000";
+            const baseUrl = "https://livinsync.onrender.com";
             const fullUrl = `${baseUrl}${relativeUrl}`;
             const fileName = relativeUrl.split('/').pop();
             const fileUri = FileSystem.documentDirectory + fileName;
@@ -71,6 +71,7 @@ const SocietyBills = () => {
     const renderItem = ({ item }) => (
         <View style={styles.billContainer}>
             <View style={{ width: "100%", position: 'relative' }}>
+                {console.log(item.pictures)}
                 <Image
                     source={{ uri: `https://livinsync.onrender.com${item.pictures}` }}
                     style={styles.billImage}
@@ -107,7 +108,7 @@ const SocietyBills = () => {
             <View style={[styles.containerSpin, styles.horizontalSpin]}>
                 <ActivityIndicator size="large" color="#7d0431" />
             </View>
-        );         
+        );
     };
 
     if (loading === "loading") {

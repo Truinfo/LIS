@@ -46,7 +46,6 @@ import SubCategories from "./src/panel/User/Navigations/Screens/GetHelp/SubCateg
 import CalltoSecurity from "./src/panel/User/Navigations/Screens/QuickActions/CalltoSecurity";
 import ProfileScreen from "./src/panel/User/Navigations/Screens/Profile/ProfileScreen";
 import EditProfile1 from "./src/panel/User/Navigations/Screens/Profile/EditProfile";
-import TermsandConditions1 from "./src/panel/User/Navigations/Screens/Profile/TermsandConditions";
 import ResetPassword1 from "./src/panel/User/Navigations/Screens/Profile/ResetPassword";
 import Amenities from "./src/panel/User/Navigations/Screens/Community/Amenities";
 import BookingScreen from "./src/panel/User/Navigations/Screens/Community/BookingScreen";
@@ -78,7 +77,6 @@ import MyBookings from './src/panel/User/Navigations/Screens/Profile/MyBookings'
 import StaffVisitors from "./src/panel/Security/Navigations/StaffVisitors";
 import RentalPropertyType from './src/panel/User/Navigations/Screens/Community/RentalPropertyType';
 import RentalFlatDetails from './src/panel/User/Navigations/Screens/Community/RentalFlatDetails';
-import RentalProperties from './src/panel/User/Navigations/Screens/Community/RentalProperties';
 import SocietyBills from './src/panel/User/Navigations/Screens/Community/SocietyBills';
 import EventDetails from './src/panel/User/Navigations/Screens/Community/EventDetails';
 import GetHelp from './src/panel/User/Navigations/Screens/GetHelp';
@@ -283,7 +281,6 @@ export default function App() {
             <Stack.Screen name="Security" component={Guard} />
             <Stack.Screen name="My Bills" component={MyBills} />
             <Stack.Screen name="Profile" component={ProfileScreen} />
-            <Stack.Screen name="Terms and Conditions " component={TermsandConditions1} />
             <Stack.Screen name="Reset Password " component={ResetPassword1} />
             <Stack.Screen name="Amenities" component={Amenities} />
             <Stack.Screen name="Booking Screen" component={BookingScreen} />
@@ -303,7 +300,6 @@ export default function App() {
             <Stack.Screen name="Create Rental" component={CreateRental} />
             <Stack.Screen name="RentalPropertyType" component={RentalPropertyType} />
             <Stack.Screen name="RentalFlat Details" component={RentalFlatDetails} />
-            <Stack.Screen name="RentalProperties" component={RentalProperties} />
             <Stack.Screen name="Society Bills" component={SocietyBills} />
             <Stack.Screen name="EventDetails" component={EventDetails} />
             <Stack.Screen name="My Bookings" component={MyBookings} />

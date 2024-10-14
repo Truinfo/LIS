@@ -1,21 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, Button, Image, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TextInput,  Image, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { launchImageLibrary } from 'react-native-image-picker';
 import { editAdvertisement, getAdvertisementsById } from './AdvertisementSlice';
 import { ImagebaseURL } from '../../../Security/helpers/axios';
 import * as ImagePicker from "expo-image-picker";
 const EditAdd = () => {
     const dispatch = useDispatch();
     const route = useRoute();
-    const { id } = route.params; // Get advertisement ID from route parameters
+    const { id } = route.params; 
     const navigation = useNavigation();
 
     const advertisement = useSelector(state => state.advertisements.adds);
-    const status = useSelector((state) => state.advertisements.status);
-    const error = useSelector((state) => state.advertisements.error);
-    const successMessage = useSelector((state) => state.advertisements.successMessage);
 
     const [formData, setFormData] = useState({
         adv: '',
@@ -32,11 +28,9 @@ const EditAdd = () => {
             maintainancePrice: "",
             parkingSpace: '',
         },
-        pictures: [], // Stores both current and new pictures
+        pictures: [], 
     });
 
-    const statusOptions = ['Occupied', 'Unoccupied'];
-    const roomOptions = ['1BHK', '2BHK', '3BHK', '4BHK', '5BHK'];
     const [previewImages, setPreviewImages] = useState([]);
     const [newFilesSelected, setNewFilesSelected] = useState(false);
 
@@ -90,13 +84,11 @@ const EditAdd = () => {
     const handleFileChange = (selectedImages) => {
         const totalImages = formData.pictures.length + selectedImages.length;
 
-        // Check if adding new images exceeds the limit of 5
         if (totalImages > 5) {
             Alert.alert("Limit Exceeded", "You can only add up to 5 images in total.");
             return;
         }
 
-        // If it doesn't exceed, update the state with new images
         const filePreviews = selectedImages.map(asset => asset.uri);
         const newPictures = selectedImages.map(asset => ({
             uri: asset.uri,
@@ -104,7 +96,6 @@ const EditAdd = () => {
             fileName: asset.fileName,
         }));
 
-        // Merge existing images with new images
         setPreviewImages(prevImages => [...prevImages, ...filePreviews]);
         setFormData(prevData => ({
             ...prevData,
@@ -123,7 +114,6 @@ const EditAdd = () => {
     const handleSubmit = () => {
         const data = new FormData();
 
-        // Append form fields to FormData
         Object.keys(formData).forEach((key) => {
             if (key === 'details') {
                 Object.keys(formData[key]).forEach((nestedKey) => {
@@ -134,20 +124,18 @@ const EditAdd = () => {
             }
         });
 
-        // Handle existing and new images separately
         formData.pictures.forEach((file, index) => {
             if (file.uri) {
-                const isExistingImage = !newFilesSelected; // Adjust condition if needed
+                const isExistingImage = !newFilesSelected; 
 
                 data.append('pictures', {
                     uri: file.uri,
-                    type: 'image/jpeg', // Ensure 'type' exists or provide default
-                    name: file.fileName || (isExistingImage ? `existingImage${index}.jpg` : `newImage${index}.jpg`), // Differentiate between new and existing
+                    type: 'image/jpeg', 
+                    name: file.fileName || (isExistingImage ? `existingImage${index}.jpg` : `newImage${index}.jpg`), 
                 });
             }
         });
 
-        // Dispatch formData to the API
         dispatch(editAdvertisement({ id, formData: data }))
             .then((response) => {
                 if (response.meta.requestStatus === 'fulfilled') {
@@ -174,12 +162,11 @@ const EditAdd = () => {
             const options = {
                 mediaTypes: ImagePicker.MediaTypeOptions.Images,
                 quality: 1,
-                allowsMultipleSelection: true, // Allow multiple selection
+                allowsMultipleSelection: true,
             };
 
             const result = await ImagePicker.launchImageLibraryAsync(options);
             if (!result.canceled) {
-                // Call handleFileChange to update state with selected images
                 handleFileChange(result.assets);
             } else {
                 Alert.alert("Cancelled", "Image selection was cancelled.");

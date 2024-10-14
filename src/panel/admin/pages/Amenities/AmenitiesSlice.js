@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../../../Security/helpers/axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
 
 const fetchSocietyId = async () => {
   const storedAdmin = await AsyncStorage.getItem("societyAdmin");
@@ -24,7 +23,7 @@ export const createAmenity = createAsyncThunk(
 export const getAllAmenityBySocietyId = createAsyncThunk(
   "amenities/getAllAmenityBySocietyId",
   async () => {
-    const societyId = await fetchSocietyId(); // Fetch society ID inside the function
+    const societyId = await fetchSocietyId(); 
     const response = await axiosInstance.get(
       `/getAllAmenityBySocietyId/${societyId}`
     );
@@ -51,9 +50,9 @@ export const updateAmenity = createAsyncThunk(
       });
       return response.data;
     } catch (error) {
-      // Handle error and return a meaningful message
+
       const errorMessage = error.response?.data?.message || "An error occurred while updating the amenity.";
-      return rejectWithValue(errorMessage); // Use rejectWithValue to pass the error message
+      return rejectWithValue(errorMessage);
     }
   }
 );

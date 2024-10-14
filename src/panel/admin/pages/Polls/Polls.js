@@ -12,9 +12,8 @@ const Polls = () => {
     const [userId, setUserId] = useState("");
     const [societyId, setSocietyId] = useState("");
     const [index, setIndex] = useState(0);
-    const [deletePollId, setDeltePollId] = useState('')
     const navigation = useNavigation();
-    const [loading, setLoading] = useState(true); // Add loading state
+    const [loading, setLoading] = useState(false); // Add loading state
     const [routes] = useState([
         { key: 'active', title: 'Active Polls' },
         { key: 'closed', title: 'Closed Polls' },
@@ -48,13 +47,14 @@ const Polls = () => {
             if (societyId) {
                 socketServices.emit('get_polls_by_society_id', { societyId });
             }
-
             const handlePollsBySocietyId = (fetchedPolls) => {
+                console.log(fetchedPolls, "poll")
                 setPolls(fetchedPolls);
                 setLoading(false);
             };
 
             const handleVoteUpdate = (data) => {
+                console.log(data)
                 alert(data.message);
                 setPolls(prevPolls => {
                     const updatedPollIndex = prevPolls.findIndex(poll => poll._id === data.votes._id);
@@ -69,11 +69,12 @@ const Polls = () => {
             };
 
             const handlePollDeleted = (pollId) => {
+                console.log(pollId)
                 setPolls(prevPolls => prevPolls.filter(poll => poll._id !== pollId));
                 setLoading(false);
             };
             const handlePollEdited = (fetchedPolls) => {
-                setPolls(prevPolls => [newPoll, ...prevPolls]);
+                setPolls(prevPolls => [fetchedPolls, ...prevPolls]);
                 setLoading(false);
             };
 
@@ -112,7 +113,7 @@ const Polls = () => {
     };
 
     const ActivePolls = () => {
-        const activePolls = polls.filter(item => !isPollExpired(item.poll.expDate));
+        const activePolls = polls.filter(item => !isPollExpired(item.poll?.expDate));
         if (loading) { // Show spinner while loading
             return (
                 <View style={styles.loadingContainer}>
@@ -120,6 +121,7 @@ const Polls = () => {
                 </View>
             );
         }
+      
         return (
             <ScrollView>
                 {activePolls.length === 0 ? (
@@ -141,7 +143,7 @@ const Polls = () => {
     };
 
     const ClosedPolls = () => {
-        const closedPolls = polls.filter(item => isPollExpired(item.poll.expDate));
+        const closedPolls = polls.filter(item => isPollExpired(item.poll?.expDate));
         if (loading) { // Show spinner while loading
             return (
                 <View style={styles.loadingContainer}>
@@ -149,6 +151,7 @@ const Polls = () => {
                 </View>
             );
         }
+        console.log(polls)
         return (
             <ScrollView>
                 {closedPolls.length === 0 ? (
@@ -186,7 +189,7 @@ const Polls = () => {
             <View style={styles.pollContainer}>
                 <View style={styles.pollHeader}>
                     <Text style={styles.pollQuestion}>
-                        {item.poll.question} <Text style={styles.voteCount}>({item.poll.votes.length} Votes)</Text>
+                        {item.poll?.question} <Text style={styles.voteCount}>({item.poll?.votes.length} Votes)</Text>
                     </Text>
                     <Menu
                         visible={menuVisible}
@@ -200,12 +203,12 @@ const Polls = () => {
                 </View>
 
                 {/* Poll Options and Details */}
-                <Text style={styles.pollDescription}>{item.poll.Description}</Text>
-                {item.poll.options.map((option, index) => (
+                <Text style={styles.pollDescription}>{item.poll?.Description}</Text>
+                {item.poll?.options.map((option, index) => (
                     <View key={index} style={styles.optionContainer}>
                         <View style={styles.optionDetails}>
                             <ProgressBar
-                                progress={calculateVotePercentage(item.poll.votes, option)}
+                                progress={calculateVotePercentage(item.poll?.votes, option)}
                                 theme={{ colors: { primary: "#7D0431" } }}
                                 style={styles.progressBar}
                             />
@@ -216,7 +219,7 @@ const Polls = () => {
 
                 <View style={styles.separator} />
                 <Text style={styles.dateText}>
-                    Posted On: {new Date(item.poll.date).toLocaleDateString('en-US', { day: 'numeric', month: 'short' })}, {new Date(item.poll.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    Posted On: {new Date(item.poll?.date).toLocaleDateString('en-US', { day: 'numeric', month: 'short' })}, {new Date(item.poll?.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </Text>
             </View>
         );

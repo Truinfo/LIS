@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 const EditProductScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { productId } = route.params;
+  const { productId } = route.params; // Get product ID from navigation params
   const dispatch = useDispatch();
   const { loading, error, Properties } = useSelector((state) => state.MarketPlace);
   const [productDetails, setProductDetails] = useState(null);
@@ -23,6 +23,7 @@ const EditProductScreen = () => {
     contactNumber: '',
   });
 
+  // Fetch product details when component mounts
   useEffect(() => {
     const fetchProductDetails = async () => {
       try {
@@ -37,7 +38,7 @@ const EditProductScreen = () => {
             type: response.payload.type,
             contactNumber: response.payload.contactNumber,
           });
-          setPictures(response.payload.pictures || []);
+          setPictures(response.payload.pictures || []); // Set existing images
         }
       } catch (error) {
         console.error('Error fetching product details:', error);
@@ -65,7 +66,7 @@ const EditProductScreen = () => {
       });
     });
     try {
-      const response = await axios.put(`/api/products/${productId}`, data);
+      const response = await axios.put(`/api/products/${productId}`, data); // Adjust the URL to your backend endpoint
       if (response.data.success) {
         Alert.alert('Product updated successfully');
         navigation.goBack();

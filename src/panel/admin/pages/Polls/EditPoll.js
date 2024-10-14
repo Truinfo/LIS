@@ -62,12 +62,12 @@ const EditPoll = () => {
         const pollId = pollData._id
         const updatedPollData = {
             _id: pollData._id, // Include the poll ID for editing
-            question: formData.question,
-            Description: formData.description,
-            options: formData.option,
-            expDate: formData.expDate,
+            question: formData?.question,
+            Description: formData?.description,
+            options: formData?.option,
+            expDate: formData?.expDate,
             date: Date.now(),
-            time: formData.time,
+            time: formData?.time,
             pollType: "Individual",
         };
 

@@ -1,12 +1,13 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import axiosInstance from '../../../../../Security/helpers/axios';
+import axiosInstance, { Api } from '../../../../../Security/helpers/axios';
 
 export const addPetAsync = createAsyncThunk(
     'houseHolds/addPet',
     async (updatedProfile, thunkAPI) => {
         const { societyId, userId, petData } = updatedProfile;
+        console.log(updatedProfile, "hello")
         try {
-            const response = await axiosInstance.post(
+            const response = await Api.post(
                 `/addPet/${societyId}/${userId}`,
                 petData
             );
@@ -50,6 +51,7 @@ const addPetSlice = createSlice({
             .addCase(addPetAsync.fulfilled, (state, action) => {
                 state.status = 'succeeded';
                 state.error = null;
+                console.log(action.payload, "success")
 
             })
             .addCase(addPetAsync.rejected, (state, action) => {

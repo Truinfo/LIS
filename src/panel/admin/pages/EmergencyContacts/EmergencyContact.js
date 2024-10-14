@@ -5,7 +5,7 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 import { useDispatch, useSelector } from 'react-redux';
 import { createEmergencyContact, deleteEmergencyContact, fetchEmergencyContacts, updateEmergencyContact } from '../../../User/Redux/Slice/CommunitySlice/EmergencyContactSlice';
 import { deletecommityMembers, fetchCommityMembers } from '../Profile/committeeSlice';
-import { Avatar, Chip, FAB, IconButton, Snackbar } from 'react-native-paper';
+import { ActivityIndicator, Avatar, Chip, FAB, IconButton, Snackbar } from 'react-native-paper';
 import { TouchableOpacity } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ImagebaseURL } from '../../../Security/helpers/axios';
@@ -18,14 +18,21 @@ const ContactsTab = ({ fetchContacts, contacts, renderItem, snackbarVisible, set
     const dispatch = useDispatch();
     const navigation = useNavigation();
 
-    useFocusEffect(
-        React.useCallback(() => {
-            if (societyId) {
-                dispatch(fetchContacts(societyId));
-            }
-        }, [dispatch, fetchContacts, societyId])
-    );
-
+    const status =
+        useFocusEffect(
+            React.useCallback(() => {
+                if (societyId) {
+                    dispatch(fetchContacts(societyId));
+                }
+            }, [dispatch, fetchContacts, societyId])
+        );
+    if (status === "loading") {
+        return (
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#7d0431" />
+            </View>
+        );
+    }
     return (
         <View style={styles.container}>
             <FlatList
@@ -56,6 +63,7 @@ const EmergencyContactsTab = () => {
     const [anchor, setAnchor] = useState(null);
     const dispatch = useDispatch();
     const contacts = useSelector(state => state.emergencyContacts.contacts);
+    const status = useSelector(state => state.emergencyContacts.status);
     const [editContact, setEditContact] = useState({ name: '', profession: '', phoneNumber: '', serviceType: "" });
     const [newContact, setNewContact] = useState({ name: '', profession: '', phoneNumber: '', serviceType: "" });
     const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -104,13 +112,13 @@ const EmergencyContactsTab = () => {
         );
     };
     const handleEditSubmit = async () => {
-        const result = await dispatch(updateEmergencyContact({ 
+        const result = await dispatch(updateEmergencyContact({
             id: editContact._id,
             name: editContact.name,
             phoneNumber: editContact.phoneNumber,
             profession: editContact.profession,
-            serviceType:editContact.serviceType,
-            societyId 
+            serviceType: editContact.serviceType,
+            societyId
         }));
         if (result.type === "emergencyContacts/updateContact/fulfilled") {
             setSnackbarMessage(`${result.payload.message}`);
@@ -156,6 +164,7 @@ const EmergencyContactsTab = () => {
             )}
         </View>
     );
+ 
 
     return (
         <>
@@ -312,7 +321,7 @@ const CommitteeMembersTab = () => {
                             ? { uri: `${ImagebaseURL}${item.pictures}` }
                             : { uri: "https://thumbs.dreamstime.com/b/default-avatar-profile-trendy-style-social-media-user-icon-187599373.jpg" } // Fallback to a local image
                     }
-                    style={{backgroundColor:"#ddd"}}
+                    style={{ backgroundColor: "#ddd" }}
                 />
                 <View style={styles.column}>
                     <Text style={{ fontSize: 16, fontWeight: 600 }}>{item.name}</Text>
@@ -525,7 +534,11 @@ const styles = StyleSheet.create({
         color: 'white',
         fontWeight: 'bold',
     },
-
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
 });
 
 export default EmergencyContact;

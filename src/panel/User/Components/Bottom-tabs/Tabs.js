@@ -33,7 +33,7 @@ function Tabs() {
       getUserName();
     }, []) 
   );
-  console.log("userName",userName);
+
   useFocusEffect(
     React.useCallback(() => {
       socketServices.initializeSocket();

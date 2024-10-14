@@ -45,14 +45,23 @@ const Login = () => {
         const resultAction = await dispatch(userLogin({  email: email.toLowerCase(), password }));
         if (resultAction.type === "auth/userLogin/fulfilled") {
           await AsyncStorage.setItem('userToken', resultAction.payload.token);
-          const userRole = resultAction.payload.profile.role;
+          const user = resultAction.payload.profile;
+          console.log("user", user)
+          const userRole = user.role;
+          const isVerified = user.isVerified;
+          console.log("userRole", userRole)
           setEmail("");
           setPassword("");
           if (userRole === 'User') {
+            if(isVerified === true){
             navigation.reset({
               index: 0,
               routes: [{ name: "Tabs" }],
             });
+          }else{
+            navigation.navigate("WaitingForAccess");
+          }
+
           } else if (userRole === 'Sequrity') {
             navigation.reset({
               index: 0,

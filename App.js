@@ -3,6 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { SafeAreaView, StatusBar } from 'react-native';
 import Login from "./src/panel/User/Navigations/Authentication/Login";
+import WaitingForAccess from "./src/panel/User/Navigations/Authentication/WaitingForAccess";
 import Header from "./src/panel/Security/Component/Header/Header";
 import { Provider } from 'react-redux';
 import store from './src/panel/User/Redux/Store';
@@ -212,6 +213,9 @@ export default function App() {
 
             />
             <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
+            <Stack.Screen name="WaitingForAccess" component={WaitingForAccess} options={{
+              headerShown: false,
+            }} />
             <Stack.Screen name="Apartment Details" component={ApartmentDetails} />
             <Stack.Screen name="Polls" component={Polls} />
             <Stack.Screen name="Tabs" component={Tabs} options={{

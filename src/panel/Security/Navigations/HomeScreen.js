@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity, ScrollView, Image, ActivityIndicator } from 'react-native';
 import DialpadPin from "../Component/CustomKeypad/DailpadPin";
 import DialpadKeypad from "../Component/CustomKeypad/DialpadKeypad";
 import {  useNavigation } from "@react-navigation/native";
@@ -28,6 +28,7 @@ const HomeScreen = ({ }) => {
     const [selectedOption, setSelectedOption] = useState('Guest');
     const [societyId, setSocietyId] = useState(null);
     const successMessage = useSelector(state => state.homeScreen.successMessage);
+    const status = useSelector(state => state.homeScreen.status);
     const error = useSelector(state => state.homeScreen.error);
     const [showDialog, setShowDialog] = useState(false);
     const [openFab, setOpenFab] = useState(false);
@@ -35,7 +36,6 @@ const HomeScreen = ({ }) => {
         if (selectedOption !== null) {
             AsyncStorage.setItem('selectedVisitorOption', selectedOption)
                 .then(() => {
-                    console.log('selectedVisitorOption saved:', selectedOption);
                     return AsyncStorage.getItem('selectedVisitorOption');
                 })
                 .then((value) => console.log('Fetched selectedVisitorOption:', value))
@@ -76,8 +76,7 @@ const HomeScreen = ({ }) => {
                 visitorType: selectedOption
             };
             dispatch(fetchVisitorVerify(payload)).then((response) => {
-                console.log(response)
-
+              setCode([]);
                 if (response.meta.requestStatus === 'fulfilled') {
                     setPinEnabled(false);
                     setModalVisible(true);
@@ -89,6 +88,7 @@ const HomeScreen = ({ }) => {
                     }, 1000);
                 } else {
                     setShowDialog(true);
+                    
                     setTimeout(() => {
                         dispatch(resetState());
                         setShowDialog(false);
@@ -102,6 +102,14 @@ const HomeScreen = ({ }) => {
     const handleOptionSelect = (option) => {
         setSelectedOption(option); // No need for additional logic here
     };
+
+    if (status === 'loading') {
+      return (
+        <View style={styles.loader}>
+          <ActivityIndicator size="large" color="#630000" />
+        </View>
+      );
+    }
 
     return (
         <View style={styles.container}>
@@ -235,6 +243,11 @@ const styles = StyleSheet.create({
         backgroundColor: "#fff",
         paddingHorizontal: 10,
     },
+    loader: {
+      flex: 1,
+      justifyContent: 'center',
+      backgroundColor: 'transparent'
+    },
     image: {
         width: 80,
         height: 80
@@ -321,3 +334,4 @@ const styles = StyleSheet.create({
         backgroundColor: '#7D0431', // Customize the color if needed
     },
 });
+  

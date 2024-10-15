@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { View, StyleSheet, Image, Text, TouchableOpacity, SafeAreaView } from "react-native";
+import { View, StyleSheet, Image, Text, TouchableOpacity, SafeAreaView, ActivityIndicator } from "react-native";
 import { TextInput } from "react-native-paper";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import { userLogin } from "../../Redux/Slice/AuthSlice/Login/LoginSlice";
@@ -15,7 +15,9 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [emailError, setEmailError] = useState("");
+
   const [showPassword, setShowPassword] = useState(false);
+  const status = useSelector((state) => state.userLogin.status);
 
   // Email Validation Regex
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -42,17 +44,26 @@ const Login = () => {
 
     if (isValid) {
       try {
-        const resultAction = await dispatch(userLogin({  email: email.toLowerCase(), password }));
+        const resultAction = await dispatch(userLogin({ email: email.toLowerCase(), password }));
         if (resultAction.type === "auth/userLogin/fulfilled") {
           await AsyncStorage.setItem('userToken', resultAction.payload.token);
-          const userRole = resultAction.payload.profile.role;
+          const user = resultAction.payload.profile;
+          console.log("user", user)
+          const userRole = user.role;
+          const isVerified = user.isVerified;
+          console.log("userRole", userRole)
           setEmail("");
           setPassword("");
           if (userRole === 'User') {
-            navigation.reset({
-              index: 0,
-              routes: [{ name: "Tabs" }],
-            });
+            if (isVerified === true) {
+              navigation.reset({
+                index: 0,
+                routes: [{ name: "Tabs" }],
+              });
+            } else {
+              navigation.navigate("WaitingForAccess");
+            }
+
           } else if (userRole === 'Sequrity') {
             navigation.reset({
               index: 0,
@@ -144,7 +155,13 @@ const Login = () => {
           Forgot Password
         </Text>
         <TouchableOpacity style={styles.Button} onPress={handleLogin}>
-          <Text style={styles.signInText}>Sign In</Text>
+          {status === 'loading' ? (
+            <View style={styles.loader}>
+              <ActivityIndicator size="large" color="#fff" />
+            </View>
+          ) : (
+            <Text style={styles.signInText}>Sign In</Text>
+          )}
         </TouchableOpacity>
         <Text style={styles.signUpPrompt}>
           Don't have an account!
@@ -159,6 +176,10 @@ const Login = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  loader: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   halfContainer1: {
     flex: 1,

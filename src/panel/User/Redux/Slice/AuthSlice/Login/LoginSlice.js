@@ -34,6 +34,7 @@ const userSlice = createSlice({
         token: null,
         loading: false,
         error: null,
+        status: "idle",
     },
     reducers: {
         logout: (state) => {
@@ -45,13 +46,14 @@ const userSlice = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(userLogin.pending, (state) => {
-                state.loading = true;
+                state.status = 'loading';
                 state.error = null;
             })
             .addCase(userLogin.fulfilled, (state, action) => {
                 state.loading = false;
                 state.user = action.payload.profile;
                 state.token = action.payload.token;
+                state.status = '';
                 const { _id, name, role, societyId, userId, buildingName, flatNumber, societyName, sequrityId, userType } = action.payload.profile;
                 const userData = {
                     _id,
@@ -67,6 +69,7 @@ const userSlice = createSlice({
             })
             .addCase(userLogin.rejected, (state, action) => {
                 state.loading = false;
+                state.status = '';
                 state.error = action.payload.message;
             });
     },

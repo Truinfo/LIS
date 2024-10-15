@@ -7,7 +7,7 @@ import Services from "../../Navigations/Screens/Services";
 import Community from "../../Navigations/Screens/Community";
 import RentalProperties from "../../Navigations/Screens/Community/RentalProperties";
 import socketServices from "../../Socket/SocketServices";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from '@expo/vector-icons';
 const Tab = createBottomTabNavigator();
@@ -15,8 +15,10 @@ const Tab = createBottomTabNavigator();
 function Tabs() {
   const [societyId, setSocietyId] = useState(null);
   const [userName, setUserName] = useState(null);
+  const [userId, setUserId] = useState(null);
   useFocusEffect(
     React.useCallback(() => {
+
       const getUserName = async () => {
         try {
           const userString = await AsyncStorage.getItem("user");
@@ -24,33 +26,38 @@ function Tabs() {
             const user = JSON.parse(userString);
             setSocietyId(user.societyId);
             setUserName(user.name);
+            setUserId(user._id);
+
           }
         } catch (error) {
           console.error("Failed to fetch the user from async storage", error);
         }
       };
-
       getUserName();
-    }, []) 
+    }, [])
   );
-  console.log("userName",userName);
+
+  useEffect(() => {
+    if (userId) {
+      console.log("Joining user room:", userId);
+      socketServices.emit("joinUser", userId);
+    }
+
+    if (societyId) {
+      socketServices.emit("joinSecurityPanel", societyId);
+    }
+  }, [])
   useFocusEffect(
     React.useCallback(() => {
       socketServices.initializeSocket();
-
-      if (societyId) {
-        socketServices.emit("joinSecurityPanel", societyId);
-      }
-      // Listening for visitor notifications
+      // Listen for Visitor Notifications
       socketServices.on("Visitor_Notification", (data) => {
-        console.log(data)
+        console.log("recieving data")
         if (data) {
           const visitorName = data.visitorName || "Unknown Visitor";
           const flatNumber = data.flatNumber || "Unknown Flat";
           const buildingName = data.buildingName || "Unknown Building";
-          const userId = data.userId || "unknown User"
 
-          // Show alert to the user
           Alert.alert(
             `Visitor Request`,
             `Visitor ${visitorName} is requesting access to your flat ${flatNumber} in ${buildingName}. Do you want to approve?`,
@@ -58,42 +65,43 @@ function Tabs() {
               {
                 text: "Decline",
                 onPress: () => {
-                  // Emit decline response
                   socketServices.emit("Visitor_Response", {
                     visitorName,
                     response: "declined",
-                    flatNumber,userId,
+                    flatNumber,
                     buildingName,
-                    residentName: userName, 
+                    residentName: userName,
                     societyId,
+                    userId,
                   });
                 },
               },
               {
                 text: "Approve",
                 onPress: () => {
-                  // Emit approve response
                   socketServices.emit("Visitor_Response", {
                     visitorName,
                     response: "approved",
-                    flatNumber,userId,
+                    flatNumber,
                     buildingName,
-                    residentName: userName, 
-                    societyId, 
+                    residentName: userName,
+                    societyId,
+                    userId,
                   });
                 },
               },
             ],
-            { cancelable: false } // Prevents closing the alert by tapping outside
+            { cancelable: false }
           );
         } else {
           console.error("Received data is undefined or null");
         }
       });
+
       return () => {
         socketServices.removeListener("Visitor_Notification");
       };
-    }, [societyId])
+    }, [userId, societyId])
   );
 
   return (

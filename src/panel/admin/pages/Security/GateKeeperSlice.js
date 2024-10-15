@@ -1,8 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../../Security/helpers/axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
-
 const getSocietyId = async () => {
   const societyAdmin = await AsyncStorage.getItem('user');
   return JSON.parse(societyAdmin)?._id ;
@@ -13,6 +11,7 @@ export const fetchGatekeepers = createAsyncThunk(
   'sequrity/fetchGatekeepers',
   async () => {
     const societyId = await getSocietyId();
+    
     const response = await axiosInstance.get(`/sequrity/getSequrityBySocietyId/${societyId}`);
     return response.data.sequrity;
   }

@@ -14,17 +14,14 @@ import { deleteAmenityBooking, getAmenityOfCommunityHal } from './BookingSlice';
 import { Ionicons } from "@expo/vector-icons";
 import { ImagebaseURL } from '../../../Security/helpers/axios';
 import { ActivityIndicator, Modal } from 'react-native-paper';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AmenityBookingsList = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const status = useSelector((state) => state.adminBooking.status);
-  const error = useSelector((state) => state.adminBooking.error);
   const Allbooking = useSelector((state) => state.adminBooking.booking);
   const booking = Allbooking && Allbooking.list ? Allbooking.list : [];
   const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
-  const [selectDeletedItem, setSelectDeletedItem] = useState(null);
   const [anchor, setAnchor] = useState(null);
 
   useFocusEffect(
@@ -84,14 +81,14 @@ const AmenityBookingsList = () => {
     </View>
   );
 
-  if (status === "loading") { // Show spinner while loading
+  if (status === "loading") { 
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#7d0431" />
       </View>
     );
   }
-  if (!booking || !Allbooking && Allbooking?.list.length === 0) { // Show spinner while loading
+  if (!booking || !Allbooking && Allbooking?.list.length === 0) { 
     return (
       <View style={styles.noDataContainer}>
         <Image
@@ -160,7 +157,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 20,
     right: 20,
-    zIndex: 1, // Ensures it appears above other components
+    zIndex: 1, 
   },
   amenityCard: {
     borderWidth: 1,
@@ -169,8 +166,8 @@ const styles = StyleSheet.create({
     padding: 20,
     marginBottom: 20,
     backgroundColor: '#fff',
-    elevation: 2, // Android shadow
-    shadowColor: '#000', // iOS shadow
+    elevation: 2, 
+    shadowColor: '#000', 
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 3,
@@ -193,8 +190,8 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     padding: 10,
     backgroundColor: '#fff',
-    elevation: 1, // Android shadow
-    shadowColor: '#000', // iOS shadow
+    elevation: 1, 
+    shadowColor: '#000', 
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
@@ -210,7 +207,7 @@ const styles = StyleSheet.create({
   menu: {
     position: 'absolute',
     top: 10,
-    left: -120, // Adjust this value as needed to position the menu
+    left: -120, 
     backgroundColor: 'white',
     borderWidth: 1,
     borderColor: '#ccc',

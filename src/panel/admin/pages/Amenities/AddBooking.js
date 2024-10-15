@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, Alert, ScrollView, Modal } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Picker } from '@react-native-picker/picker';
-import DateTimePicker from '@react-native-community/datetimepicker'; // Import DateTimePicker
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { bookAmenity } from './BookingSlice';
 import { Snackbar } from 'react-native-paper'; // Import Snackbar
 
@@ -23,9 +23,9 @@ const AddBooking = () => {
   const navigation = useNavigation();
   const [showDialog, setShowDialog] = useState(false);
   const successMessage = useSelector((state) => state.adminBooking.successMessage);
-  const [showDatePicker, setShowDatePicker] = useState(false); // State for DatePicker visibility
-  const [snackVisible, setSnackVisible] = useState(false); // State for Snackbar visibility
-  const [snackMessage, setSnackMessage] = useState(''); // State for Snackbar message
+  const [showDatePicker, setShowDatePicker] = useState(false); 
+  const [snackVisible, setSnackVisible] = useState(false); 
+  const [snackMessage, setSnackMessage] = useState(''); 
   const statusOptions = ["InProgress", "Completed", "Cancelled"];
 
   const handleChange = (name, value) => {

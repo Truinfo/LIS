@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import {  Text, TextInput,  TouchableOpacity, StyleSheet, Image, Alert, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert, ScrollView } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import { createAmenity } from './AmenitiesSlice';
 import * as ImagePicker from 'expo-image-picker';
-import { Snackbar } from 'react-native-paper'; // Import Snackbar
+import { Snackbar } from 'react-native-paper';
 
 const AddAmenity = () => {
   const dispatch = useDispatch();
@@ -61,7 +61,6 @@ const AddAmenity = () => {
       setErrors(newErrors);
       return;
     }
-
     const submissionData = new FormData();
     submissionData.append('societyId', formData.societyId);
     submissionData.append('amenityName', formData.amenityName);
@@ -101,25 +100,40 @@ const AddAmenity = () => {
         setTimeout(() => {
           navigation.goBack();
         }, 2000);
+    await dispatch(createAmenity(submissionData))
+      .then((response) => {
+        console.log(response)
+        if (response.type === 'amenities/createAmenity/fulfilled') {
+          setFormData({
+            societyId: '6683b57b073739a31e8350d0',
+            amenityName: "",
+            capacity: "",
+            timings: "",
+            location: "",
+            cost: "",
+            status: "",
+            image: null,
+            picturePreview: null,
+          });
+          setSnackbarMessage(response.payload.message);
+          setSnackbarVisible(true);
+          // Show Snackbar on success
+          setTimeout(() => {
+            navigation.goBack();
+          }, 2000);
 
-      } else {
-        setSnackbarMessage(successMessage);
+        } else {
+          setSnackbarMessage(successMessage);
+          setSnackbarVisible(true); // Show Snackbar on error
+        }
+      }).catch((error) => {
+        console.error('Error:', error);
+        setSnackbarMessage("There was an error creating the amenity.");
         setSnackbarVisible(true); // Show Snackbar on error
-      }
-    }).catch((error) => {
-      console.error('Error:', error);
-      setSnackbarMessage("There was an error creating the amenity.");
-      setSnackbarVisible(true); // Show Snackbar on error
-    });
+      });
   };
 
   const handleDismissSnackbar = () => setSnackbarVisible(false); // Dismiss Snackbar
-
-  useEffect(() => {
-    return () => {
-      // Clean up URLs to avoid memory leaks if needed
-    };
-  }, [formData.picturePreview]);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>

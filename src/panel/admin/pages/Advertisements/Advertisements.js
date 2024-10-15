@@ -59,7 +59,7 @@ const Advertisements = () => {
   };
 
   const handleOutsidePress = () => {
-    setMenuVisible(null); // Close the menu when clicking outside
+    setMenuVisible(null);
   };
 
   const renderAddItem = ({ item }) => (
@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
   },
   actionMenu: {
     position: 'absolute',
-    top: 10, // Adjust to position below the menu icon
+    top: 10, 
     right: 30,
     backgroundColor: '#fff',
     borderRadius: 5,
@@ -210,9 +210,9 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   loadingContainer: {
-    flex: 1, // Use full height and width of the parent
-    justifyContent: 'center', // Center vertically
-    alignItems: 'center', // Center horizontally
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
   },
   noDataContainer: {
     flex: 1,

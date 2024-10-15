@@ -111,8 +111,8 @@ const styles = StyleSheet.create({
   },
   amountContainer: {
     flexDirection: "row",
-    justifyContent: "flex-end", // Aligns content to the right end
-    marginTop: 5, // Optional, for spacing
+    justifyContent: "flex-end", 
+    marginTop: 5, 
   },
 });
 

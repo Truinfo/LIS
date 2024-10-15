@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../../../Security/helpers/axios';
-import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const initialState = {
@@ -10,14 +9,13 @@ const initialState = {
 };
 
 const fetchSocietyId = async () => {
-    const storedAdmin = await AsyncStorage.getItem("societyAdmin");
+    const storedAdmin = await AsyncStorage.getItem("user");
     const societyAdmin = JSON.parse(storedAdmin) || {};
-    return societyAdmin._id || "6683b57b073739a31e8350d0";
+    return societyAdmin.societyId || "";
 };
 export const AddProperty = createAsyncThunk(
     'marketPlace/addProperty',
     async (data) => {
-
         const response = await axiosInstance.post(`/AddItems`, data, {
             headers: { 'Content-Type': 'multipart/form-data' },
         });

@@ -62,7 +62,7 @@ const ProfileScreen = () => {
     navigation.dispatch(
       CommonActions.reset({
         index: 0,
-        routes: [{ name: 'Login' }], // Adjust 'Login' to the correct name of your login screen
+        routes: [{ name: 'Login' }], 
       })
     );
   };
@@ -141,16 +141,6 @@ const ProfileScreen = () => {
             </View>
             <Icon name="chevron-right" size={24} color="#818181" />
           </TouchableOpacity>
-          {/* <TouchableOpacity
-            style={styles.menuItem}
-            onPress={() => navigation.navigate("My Documents")}
-          >
-            <View style={styles.menuItemContent}>
-              <Icon name="edit-document" size={24} color="#7D0431" />
-              <Text style={styles.menuItemText}>My Documents</Text>
-            </View>
-            <Icon name="chevron-right" size={24} color="#818181" />
-          </TouchableOpacity> */}
           <TouchableOpacity
             style={styles.menuItem}
             onPress={() => navigation.navigate("My Bookings")}

@@ -52,7 +52,6 @@ const Notice = () => {
     );
   }
 
-  // Sort notices in descending order (most recent at the top)
   const sortedNotices = [...notices.notices].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
   return (

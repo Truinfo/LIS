@@ -130,8 +130,8 @@ const store = configureStore({
     adminProfile: AdminProfileReducer,
     adminComplaints: AdminComplaintReducer,
     staff: staffReducer,
-    profile:AdminprofileReducer,
-    commityMembers:CommityMembersReducer,
+    profile: AdminprofileReducer,
+    commityMembers: CommityMembersReducer,
     societyEvents: SocietyEventReducer,
     inventory: inventoryReducer,
     adminNotices: AdminNoticeReducer,
@@ -140,8 +140,8 @@ const store = configureStore({
     adminAmenities: AdminAmenitiesReducer,
     adminBooking: AdminBookingReducer,
     adminMaintainance: AdminMaintainanceReducer,
-    DashBoard:DashboardReducer,
-    adminSocietyBills:societyBillsReducer
+    DashBoard: DashboardReducer,
+    adminSocietyBills: societyBillsReducer,
   },
 });
 export default store;

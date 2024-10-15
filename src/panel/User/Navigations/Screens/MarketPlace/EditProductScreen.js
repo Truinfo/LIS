@@ -9,9 +9,8 @@ import { useDispatch, useSelector } from 'react-redux';
 const EditProductScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { productId } = route.params; // Get product ID from navigation params
+  const { productId } = route.params;
   const dispatch = useDispatch();
-  const { loading, error, Properties } = useSelector((state) => state.MarketPlace);
   const [productDetails, setProductDetails] = useState(null);
   const [pictures, setPictures] = useState([]);
   const [formData, setFormData] = useState({
@@ -23,7 +22,6 @@ const EditProductScreen = () => {
     contactNumber: '',
   });
 
-  // Fetch product details when component mounts
   useEffect(() => {
     const fetchProductDetails = async () => {
       try {
@@ -102,7 +100,7 @@ const EditProductScreen = () => {
   };
 
   if (!productDetails) {
-    return <Text>Loading...</Text>; // Display loading indicator while fetching product details
+    return <Text>Loading...</Text>; 
   }
 
   return (

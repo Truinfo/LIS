@@ -14,7 +14,6 @@ export const fetchPreApprovals = createAsyncThunk(
             const response = await axiosInstance.get(`/getPreApprovedVisitors/${societyId}/${block}/${flatNo}`);
             return response.data.preApprovedVisitors;
         } catch (err) {
-            // Check if the error has a response and pass the message
             if (err.response && err.response.data && err.response.data.message) {
                 return rejectWithValue(err.response.data.message);
             } else {

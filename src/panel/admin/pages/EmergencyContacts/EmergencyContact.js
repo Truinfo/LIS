@@ -1,11 +1,11 @@
 // EmergencyContact.js
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Modal, Button, ScrollView, Alert, TextInput } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, FlatList, Modal,  ScrollView, Alert, TextInput } from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { useDispatch, useSelector } from 'react-redux';
 import { createEmergencyContact, deleteEmergencyContact, fetchEmergencyContacts, updateEmergencyContact } from '../../../User/Redux/Slice/CommunitySlice/EmergencyContactSlice';
 import { deletecommityMembers, fetchCommityMembers } from '../Profile/committeeSlice';
-import { ActivityIndicator, Avatar, Chip, FAB, IconButton, Snackbar } from 'react-native-paper';
+import { ActivityIndicator, Avatar,  FAB, IconButton, Snackbar } from 'react-native-paper';
 import { TouchableOpacity } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ImagebaseURL } from '../../../Security/helpers/axios';
@@ -63,7 +63,6 @@ const EmergencyContactsTab = () => {
     const [anchor, setAnchor] = useState(null);
     const dispatch = useDispatch();
     const contacts = useSelector(state => state.emergencyContacts.contacts);
-    const status = useSelector(state => state.emergencyContacts.status);
     const [editContact, setEditContact] = useState({ name: '', profession: '', phoneNumber: '', serviceType: "" });
     const [newContact, setNewContact] = useState({ name: '', profession: '', phoneNumber: '', serviceType: "" });
     const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -452,24 +451,6 @@ const styles = StyleSheet.create({
         backgroundColor: "#7d0431",
         borderRadius: 50,
     },
-    // modalContainer: {
-    //     flex: 1,
-    //     justifyContent: 'center',
-    //     alignItems: 'center',
-    //     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    // },
-    // modalContent: {
-    //     width: 300,
-    //     padding: 20,
-    //     backgroundColor: 'white',
-    //     borderRadius: 10,
-    //     alignItems: 'center',
-    // },
-    // modalTitle: {
-    //     fontSize: 18,
-    //     fontWeight: 'bold',
-    //     marginBottom: 20,
-    // },
     chipContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',

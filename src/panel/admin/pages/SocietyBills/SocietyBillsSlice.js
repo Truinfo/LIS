@@ -2,21 +2,16 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from "../../../Security/helpers/axios";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const getSocietyId = async () => {
-    try {
-        const societyAdminString = await AsyncStorage.getItem("societyAdmin");
-        const data = societyAdminString ? JSON.parse(societyAdminString) : {};
-        return data._id || "6683b57b073739a31e8350d0";
-    } catch (error) {
-        console.error("Error fetching societyId:", error);
-        return "6683b57b073739a31e8350d0"; 
-    }
+const fetchSocietyId = async () => {
+    const storedAdmin = await AsyncStorage.getItem('user');
+    const societyAdmin = JSON.parse(storedAdmin) || {};
+    return societyAdmin._id || ""; // Default ID
 };
 
 export const fetchBillsBySocietyId = createAsyncThunk(
     'bills/fetchBillsBySocietyId',
     async () => {
-        const societyId = await getSocietyId();
+        const societyId = await fetchSocietyId();
         const response = await axiosInstance.get(`/getBillsBySocietyId/${societyId}`);
         return response.data.society.bills;
     }
@@ -25,7 +20,7 @@ export const fetchBillsBySocietyId = createAsyncThunk(
 export const getBillById = createAsyncThunk(
     'bills/getBillById',
     async ({ id }) => {
-        const societyId = await getSocietyId();
+        const societyId = await fetchSocietyId();
         const response = await axiosInstance.get(`/getBillById/${societyId}/${id}`);
         return response.data.bill;
     }
@@ -48,7 +43,7 @@ export const editBill = createAsyncThunk(
     'bills/editBill',
     async ({ id, formData }, { rejectWithValue }) => {
         try {
-            const societyId = await getSocietyId();
+            const societyId = await fetchSocietyId();
             const response = await axiosInstance.put(
                 `/editBill/${societyId}/${id}`,
                 formData,
@@ -69,7 +64,7 @@ export const editBill = createAsyncThunk(
 export const deleteBill = createAsyncThunk(
     "bills/deleteBill",
     async ({ id }) => {
-        const societyId = await getSocietyId();
+        const societyId = await fetchSocietyId();
         const response = await axiosInstance.delete(`/deleteBill/${societyId}/${id}`);
         return response.data;
     }

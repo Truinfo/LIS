@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, SafeAreaView, Image, TouchableOpacity } from 'react-native';
 import { Swipeable, GestureHandlerRootView } from 'react-native-gesture-handler';
 
-// Importing icons
 import bellIcon from '../../../../../assets/User/images/alarm.png';
 import checkIcon from '../../../../../assets/User/images/check.png';
 import closeIcon from '../../../../../assets/User/images/tick.png';
@@ -11,10 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Notifications = () => {
-  const [notifications, setNotifications] = useState([]);
   const dispatch = useDispatch();
-  const [userName, setUserName] = useState("");
-  const [userId, setUserId] = useState("");
   const [societyId, setSocietyId] = useState("");
   const NotifyData = useSelector((state) => state.notification.notifications || "");
 
@@ -24,9 +20,7 @@ const Notifications = () => {
         const userString = await AsyncStorage.getItem("user");
         if (userString !== null) {
           const user = JSON.parse(userString);
-          setUserName(user.name);
           setSocietyId(user.societyId);
-          setUserId(user.userId);
         }
       } catch (error) {
         console.error("Failed to fetch the user from async storage", error);
@@ -52,8 +46,6 @@ const Notifications = () => {
   };
 
   const renderItem = ({ item }) => {
-    const timestamp = new Date(item.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-
     return (
       <Swipeable renderRightActions={() => renderRightActions(item.id)}>
         <View style={styles.notificationItem}>

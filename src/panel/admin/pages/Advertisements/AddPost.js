@@ -66,10 +66,7 @@ const AddAdvertisements = ({ navigation }) => {
   const profileData = useSelector((state) => state.adminProfile.profile);
   const [blockOptions, setBlockOptions] = useState([]);
   const [flatOptions, setFlatOptions] = useState([]);
-
-  const [errors, setErrors] = useState({});
   const [showDialog, setShowDialog] = useState(false);
-  const [dialogMessage, setDialogMessage] = useState("");
   const successMessage = useSelector(
     (state) => state.advertisements.successMessage || state.advertisements.error
   );
@@ -148,7 +145,7 @@ const AddAdvertisements = ({ navigation }) => {
     });
 
     if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
+      console.log(newErrors);
       return;
     }
 
@@ -175,7 +172,6 @@ const AddAdvertisements = ({ navigation }) => {
         console.log(response)
         if (response.meta.requestStatus === "fulfilled") {
           // Handle success (reset form, show message, etc.)
-          setDialogMessage("Advertisement added successfully!");
           setShowDialog(true);
           setFormData({
             societyId: "",
@@ -202,7 +198,6 @@ const AddAdvertisements = ({ navigation }) => {
           }, 2000);
         } else {
           // Handle failure
-          setDialogMessage("Failed to add advertisement. Please try again.");
           setShowDialog(true);
           setTimeout(() => {
             setShowDialog(false);
@@ -211,7 +206,6 @@ const AddAdvertisements = ({ navigation }) => {
       })
       .catch(() => {
         // Handle errors
-        setDialogMessage("Error occurred while submitting. Please try again.");
         setShowDialog(true);
         setTimeout(() => {
           setShowDialog(false);

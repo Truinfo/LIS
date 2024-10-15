@@ -8,14 +8,12 @@ import {
   TouchableOpacity,
   TextInput,
   Alert,
-  Image,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { Linking } from "react-native";
 import { fetchresidents } from "../../../Redux/Slice/CommunitySlice/residentsSlice";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchSocietyById } from "../../../Redux/Slice/Security_Panel/SocietyByIdSlice";
-import { ImagebaseURL } from "../../../../Security/helpers/axios";
 
 const Residents = () => {
   const dispatch = useDispatch();
@@ -82,10 +80,8 @@ const Residents = () => {
 
   const renderItem = ({ item }) => (
     <View style={styles.contactItem}>
-      {/* <Image source={{ uri: `${ImagebaseURL}${item.profilePicture}` }} style={styles.avatar} /> */}
       <View style={styles.contactInfo}>
         <Text style={styles.name}>{item.name}</Text>
-        {/* <Text style={styles.mobileNumber}>{item.mobileNumber}</Text> */}
         <View style={styles.blockFlat}>
           <View style={styles.button}>
             <Text style={styles.buttonText}>{item.buildingName}</Text>

@@ -1,20 +1,16 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
 import { Api } from '../../../../Security/helpers/axios';
-// Define the initial state
+
 const initialState = {
     bills: [],
-    status: 'idle', // idle | loading | succeeded | failed
+    status: 'idle', 
     error: null,
 };
 
-// Async thunk for fetching bills using Axios
 export const fetchBills = createAsyncThunk(
     'bills/fetchBills',
     async ({ societyId, blockno, flatno }) => {
-
         const response = await Api.get(`/getPaymentsOfEach/${societyId}/${blockno}/${flatno}`); 
-
         return response.data;
     }
 );

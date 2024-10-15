@@ -18,14 +18,13 @@ import { Rating } from 'react-native-ratings';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { addService } from "../../../Redux/Slice/ServiceSlice/AddServiceSlice";
 
-const PaperBoyProfile = ({ navigation, route }) => {
+const PaperBoyProfile = ({ route }) => {
   const [modalVisible, setModalVisible] = useState(false);
-  const [secondModalVisible, setSecondModalVisible] = useState(false);
   const dispatch = useDispatch();
   const { id, userid } = route.params;
 
   const [radioValue, setRadioValue] = useState("Time of India");
-  const { data, loading, error } = useSelector((state) => state.services);
+  const { data, } = useSelector((state) => state.services);
   const [userId, setUserId] = useState(null);
   const [flatNumber, setFlatNumber] = useState(null);
   const [blockName, setblockName] = useState(null);
@@ -55,7 +54,6 @@ const PaperBoyProfile = ({ navigation, route }) => {
 
   const handleAddPress = () => {
     if (radioValue) {
-      // Proceed with adding to household
       setModalVisible(true);
     } else {
       Alert.alert("Please select a News Paper.");
@@ -142,7 +140,6 @@ const PaperBoyProfile = ({ navigation, route }) => {
               </View>
             </View>
           </View>
-          {/* New Card */}
           <View style={styles.newCard}>
             <View style={styles.newCardItem}>
               <Image

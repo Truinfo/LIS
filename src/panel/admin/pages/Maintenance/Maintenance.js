@@ -21,8 +21,24 @@ const Maintenance = ({ navigation }) => {
     const [showPicker, setShowPicker] = useState(false);
     const [selectedMenuId, setSelectedMenuId] = useState(null);
     const [fabModalVisible, setFabModalVisible] = useState(false)
+    const [societyId, setSocietyId] = useState("");
+
+    useEffect(() => {
+        const getSocietyAdmin = async () => {
+            try {
+                const storedAdmin = await AsyncStorage.getItem('user');
+                if (storedAdmin) {
+                    const societyAdmin = JSON.parse(storedAdmin);
+                    setSocietyId(societyAdmin._id || "");
+                }
+            } catch (error) {
+                console.error("Error retrieving society admin data:", error);
+            }
+        };
+        getSocietyAdmin();
+    }, []);
     const [inventoryData, setInventoryData] = useState({
-        societyId: "6683b57b073739a31e8350d0",
+        societyId: societyId,
         amount: '',
         monthAndYear: ''
     });
@@ -102,7 +118,7 @@ const Maintenance = ({ navigation }) => {
                 dispatch(getByMonthAndYear(`${inventoryData.monthAndYear}`));
                 setTimeout(() => {
                     setInventoryData({
-                        societyId: "6683b57b073739a31e8350d0",
+                        societyId: "",
                         amount: '',
                         monthAndYear: '',
                     });
@@ -459,8 +475,8 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     noDataImage: {
-        width: 300,
-        height: 300,
+        width: 150,
+        height: 150,
         alignItems: "center",
     },
     noDataText: {

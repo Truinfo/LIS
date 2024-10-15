@@ -16,7 +16,7 @@ export const fetchVisitors = createAsyncThunk(
 const visitorsSlice = createSlice({
   name: 'visitors',
   initialState: {
-    visitors: [], // Ensure this is initialized as an empty array or with data structure matching your expected format
+    visitors: [], 
     status: 'idle',
     error: null,
   },

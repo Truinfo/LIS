@@ -28,9 +28,9 @@ const EditPoll = () => {
     useEffect(() => {
         socketServices.initializeSocket();
         const getAdminId = async () => {
-            const societyAdmin = await AsyncStorage.getItem('societyAdmin');
+            const societyAdmin = await AsyncStorage.getItem('user');
             const parsedAdmin = societyAdmin ? JSON.parse(societyAdmin) : {};
-            setSocietyId(parsedAdmin._id || "6683b57b073739a31e8350d0");
+            setSocietyId(parsedAdmin._id || "");
         };
         getAdminId();
     }, []);

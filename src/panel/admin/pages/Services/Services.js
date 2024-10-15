@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { View, FlatList, StyleSheet, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { FAB, Text, IconButton, Badge } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchServices } from '../../../User/Redux/Slice/ServiceSlice/ServiceSlice';
+import { fetchAdminServices } from './ServicesSlice';
 
 const people = [
     { id: 1, name: 'Milkman', named: 'milkMan', image: require('../../../../assets/Admin/Imgaes/service.png'), count: 0 },
@@ -25,19 +25,18 @@ const people = [
 const Services = () => {
     const navigation = useNavigation();
     const dispatch = useDispatch();
-    const { data, loading, error } = useSelector((state) => state.services);
+    const { data, loading, error } = useSelector((state) => state.staff);
     const [servicePeople, setServicePeople] = useState(people);
-
-    useEffect(() => {
-        dispatch(fetchServices());
-    }, [dispatch]);
+    useFocusEffect(
+        React.useCallback(() => {
+            dispatch(fetchAdminServices());
+        }, [dispatch]),);
 
     useEffect(() => {
         if (data && Object.keys(data).length > 0) {
             const updatedPeople = people.map(person => {
                 const matchingService = data[person.named];
                 const serviceCount = matchingService ? matchingService.length : 0;
-
                 return {
                     ...person,
                     count: serviceCount

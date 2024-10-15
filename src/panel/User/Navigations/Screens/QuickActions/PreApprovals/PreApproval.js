@@ -7,7 +7,6 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  // Share,
   Alert,
 } from "react-native";
 import * as Sharing from "expo-sharing";
@@ -75,18 +74,14 @@ const PreApproval = () => {
   }, [societyId, buildingName, flatNumber, dispatch]);
   const handleShare = async (visitorId, imageUrl) => {
     try {
-      // Download the image to a local file
       const localUri = FileSystem.documentDirectory + "image.jpg"; // Name your image file
       const response = await FileSystem.downloadAsync(imageUrl, localUri);
 
-      // Create a message including the visitor ID
       const message = `Check out this visitor's pin: ${visitorId}`;
 
-      // Create a temporary text file to hold the visitor ID
       const messageUri = FileSystem.documentDirectory + "visitor_id.txt";
       await FileSystem.writeAsStringAsync(messageUri, message);
 
-      // Share the image and the message URI
       await Sharing.shareAsync(response.uri, {
         dialogTitle: message,
         UTI: "public.image",

@@ -1,17 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { View, Text, FlatList, StyleSheet, Alert, TouchableOpacity, ScrollView, Modal, TextInput } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { fetchInventory, deleteInventoryAsync, fetchaddInventory, fetchEditInventoryAsync } from './InventorySlice';
 import { ActivityIndicator, FAB, Snackbar } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Image } from 'react-native';
 
 const Inventory = () => {
     const dispatch = useDispatch();
     const inventoryItems = useSelector(state => state.inventory.inventoryItems) || [];
     const status = useSelector(state => state.inventory.status);
-    const error = useSelector(state => state.inventory.error);
-    const successMessage = useSelector(state => state.inventory.successMessage);
     const [anchor, setAnchor] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
     const [modalVisible1, setModalVisible1] = useState(false);
@@ -36,8 +34,6 @@ const Inventory = () => {
         setAnchor(anchor === item._id ? null : item._id);
 
     };
-
-
 
     const confirmDelete = (id) => {
         setAnchor(false)
@@ -64,7 +60,7 @@ const Inventory = () => {
                                 console.error("Error:", error);
                             });
                     },
-                    style: 'destructive', // Optional: Makes the delete option visually distinct
+                    style: 'destructive', 
                 },
             ],
             { cancelable: true }
@@ -82,7 +78,6 @@ const Inventory = () => {
     };
     const handleEditSubmit = async () => {
         try {
-            // Pass both id and editInventoryData properly
             const response = await dispatch(fetchEditInventoryAsync({
                 id: editInventoryData.id, // extract the id
                 editInventoryData: {
@@ -105,8 +100,6 @@ const Inventory = () => {
             console.error("Error:", error);
         }
     };
-
-
     const handleChange = (name, value) => {
         setInventoryData(prevState => ({
             ...prevState,
@@ -115,7 +108,6 @@ const Inventory = () => {
     };
 
     const handleSubmit = async () => {
-        // Check if all required fields are filled
         if (!inventoryData.name || !inventoryData.quantity || !inventoryData.societyId) {
             setSnackbarMessage("Please fill out all fields");
             setSnackbarVisible(true);
@@ -131,11 +123,10 @@ const Inventory = () => {
                 dispatch(fetchInventory());
                 setModalVisible(false);
 
-                // Clear the fields by resetting inventoryData to its initial state
                 setInventoryData({
                     name: "",
                     quantity: "",
-                    societyId: "" // default societyId
+                    societyId: ""
                 });
             } else if (response.error) {
                 setSnackbarMessage(`Failed to add inventory: ${response.error.message}`);
@@ -147,14 +138,14 @@ const Inventory = () => {
             setSnackbarVisible(true);
         }
     };
-    if (status === "loading") { // Show spinner while loading
+    if (status === "loading") {
         return (
             <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color="#7d0431" />
             </View>
         );
     }
-    if (!inventoryItems || !inventoryItems.length === 0 || status === "error") { // Show spinner while loading
+    if (!inventoryItems || status === "failed") {
         return (
             <View style={styles.noDataContainer}>
                 <Image
@@ -166,6 +157,7 @@ const Inventory = () => {
             </View>
         );
     }
+
     const capitalizeFirstLetter = (string) => {
         return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
     };
@@ -177,40 +169,45 @@ const Inventory = () => {
     };
     return (
         <View style={styles.container}>
-            <FlatList
-                data={inventoryItems}
-                keyExtractor={(item) => item._id}
-                renderItem={({ item }) => (
-                    <View style={styles.listItem}>
-                        <View style={styles.itemDetails}>
-                            <Text style={styles.itemText}>{capitalizeFirstLetter(item.name)}</Text>
-                            <Text style={styles.itemSubText}>Count: {item.quantity}</Text>
+            {inventoryItems?.length !== 0 ?
+                <FlatList
+                    data={inventoryItems}
+                    keyExtractor={(item) => item._id}
+                    renderItem={({ item }) => (
+                        <View style={styles.listItem}>
+                            <View style={styles.itemDetails}>
+                                <Text style={styles.itemText}>{capitalizeFirstLetter(item.name)}</Text>
+                                <Text style={styles.itemSubText}>Count: {item.quantity}</Text>
+                            </View>
+                            <TouchableOpacity onPress={() => handleMenuPress(item)}>
+                                <MaterialCommunityIcons name="dots-vertical" size={24} color="#424242" />
+                            </TouchableOpacity>
+                            {anchor === item._id && (
+                                <ScrollView style={styles.menuList}>
+                                    <TouchableOpacity onPress={() => handleEditClick(item)} style={styles.menuItem}>
+                                        <Text>Edit</Text>
+                                    </TouchableOpacity>
+                                    <View style={styles.divider} />
+                                    <TouchableOpacity onPress={() => confirmDelete(item._id)} style={styles.menuItem}>
+                                        <Text>Delete</Text>
+                                    </TouchableOpacity>
+                                </ScrollView>
+                            )}
                         </View>
-                        <TouchableOpacity onPress={() => handleMenuPress(item)}>
-                            <MaterialCommunityIcons name="dots-vertical" size={24} color="#424242" />
-                        </TouchableOpacity>
-                        {anchor === item._id && (
-                            <ScrollView style={styles.menuList}>
-                                <TouchableOpacity onPress={() => handleEditClick(item)} style={styles.menuItem}>
-                                    <Text>Edit</Text>
-                                </TouchableOpacity>
-                                <View style={styles.divider} />
-                                <TouchableOpacity onPress={() => confirmDelete(item._id)} style={styles.menuItem}>
-                                    <Text>Delete</Text>
-                                </TouchableOpacity>
-                            </ScrollView>
-                        )}
-                    </View>
-                )}
-                ListEmptyComponent={<Text style={styles.emptyMessage}>No inventory items found</Text>}
-            />
-
+                    )}
+                /> : <View style={styles.noDataContainer}>
+                    <Image
+                        source={require('../../../../assets/Admin/Imgaes/nodatadound.png')}
+                        style={styles.noDataImage}
+                        resizeMode="contain"
+                    />
+                    <Text style={styles.noDataText}>No Amenities Found</Text>
+                </View>}
             <FAB
                 style={styles.fab}
                 icon={() => <MaterialCommunityIcons name="plus" size={24} color="white" />}
                 onPress={() => setModalVisible(true)}
             />
-
             <Modal
                 animationType="slide"
                 transparent={true}
@@ -267,9 +264,9 @@ const Inventory = () => {
                         <TextInput
                             style={styles.input}
                             placeholder="Quantity"
-                            value={editInventoryData.quantity} // Bind to editInventoryData
+                            value={editInventoryData.quantity}
                             keyboardType="numeric"
-                            onChangeText={(value) => handleEditChange("quantity", value)} // Use handleEditChange
+                            onChangeText={(value) => handleEditChange("quantity", value)}
                         />
                         <TouchableOpacity style={styles.submitButton} onPress={handleEditSubmit}>
                             <Text style={styles.submitButtonText}>Update</Text>

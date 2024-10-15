@@ -1,17 +1,13 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
-// Waiting-pana.png
 const WaitingForAccessScreen = () => {
   return (
     <View style={styles.container}>
-      {/* Display the image */}
       <Image
           source={require("../../../../assets/User/images/Waiting-pana.png")}
           style={styles.image}
           resizeMode="cover"
         />
-
-      {/* Display the message */}
       <Text style={styles.message}>Waiting For Admin Access</Text>
     </View>
   );

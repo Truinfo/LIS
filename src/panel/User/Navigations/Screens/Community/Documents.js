@@ -11,9 +11,9 @@ import {
 } from "react-native";
 import { Icon } from "react-native-elements";
 import { Button } from "react-native-paper";
-import { launchCamera, launchImageLibrary } from "react-native-image-picker";
+import { launchCamera,  } from "react-native-image-picker";
 
-const Documents = ({ navigation }) => {
+const Documents = () => {
   const [expanded, setExpanded] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [name, setName] = useState("");

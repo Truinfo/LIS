@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#202020",
     fontWeight: "700",
-    width: 120, // Increase width to accommodate longer labels
+    width: 120, 
     flexShrink: 1,
   },
   propertyText1: {

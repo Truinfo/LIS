@@ -39,11 +39,10 @@ const EditProfile = ({ route }) => {
     if (profileImage) {
       try {
         const uri = profileImage;
-        const fileExtension = uri.split('.').pop(); // Gets the file extension (e.g., 'jpeg', 'png')
-        const mimeType = `image/${fileExtension}`; // Gets the MIME type (e.g., 'image/jpeg')
-        const fileName = `profile.${fileExtension}`; // Default file name
+        const fileExtension = uri.split('.').pop(); 
+        const mimeType = `image/${fileExtension}`; 
+        const fileName = `profile.${fileExtension}`; 
 
-        // Ensure the image file is accessible
         const file = {
           uri,
           type: mimeType,
@@ -61,7 +60,6 @@ const EditProfile = ({ route }) => {
     }
     try {
       await dispatch(EditUserProfile({ formData, id })).unwrap();
-      // await AsyncStorage.setItem('userProfile', JSON.stringify({ name, mobileNumber: phoneNumber, email, id }));
       Alert.alert('Profile Updated', 'Your profile has been updated successfully!');
     } catch (error) {
       Alert.alert('Profile Update Failed', 'There was an error updating your profile. Please try again.');

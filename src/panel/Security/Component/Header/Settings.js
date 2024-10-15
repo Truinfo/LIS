@@ -126,31 +126,6 @@ const Settings = () => {
                 </TouchableOpacity>
             ))}
 
-            {/* <Text style={{ marginTop: 10, marginRight: "78%", fontSize: 18, fontWeight: "bold" }}>
-                More
-            </Text>
-            <TouchableOpacity onPress={() => navigation.navigate("Terms and Conditions")}>
-                <View style={styles.rowContent}>
-                    <Image
-                        source={require("../../../../assets/Security/images/terms-and-conditions.png")}
-                        style={styles.Image2}
-                    />
-                    <View style={styles.imagecontent}>
-                        <Text style={styles.rowText}>Terms and Conditions</Text>
-                    </View>
-                </View>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleLogout}>
-                <View style={styles.rowContent}>
-                    <Image
-                        source={require("../../../../assets/Security/images/log-out.png")}
-                        style={styles.Image2}
-                    />
-                    <View style={styles.imagecontent}>
-                        <Text style={styles.rowText}>Logout</Text>
-                    </View>
-                </View>
-            </TouchableOpacity> */}
              </View>
         </ScrollView>
     );
@@ -186,13 +161,13 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     name: {
-        fontSize: 22, // Larger font for emphasis
+        fontSize: 22,
         fontWeight: 'bold',
-        color: '#202020', // Darker color for contrast
+        color: '#202020', 
     },
     id: {
         fontSize: 15,
-        color: '#555', // Muted color for secondary info
+        color: '#555', 
     },
     email: {
         fontSize: 15,

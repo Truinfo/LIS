@@ -4,9 +4,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const fetchSocietyId = async () => {
-    const storedAdmin = await AsyncStorage.getItem('societyAdmin');
+    const storedAdmin = await AsyncStorage.getItem('user');
     const societyAdmin = JSON.parse(storedAdmin) || {};
-    return societyAdmin._id || "6683b57b073739a31e8350d0"; // Default ID
+    return societyAdmin._id; // Default ID
 };
 export const createService = createAsyncThunk(
     'staff/createService',
@@ -87,7 +87,7 @@ export const deleteServicePerson = createAsyncThunk(
 
 export const deleteUserService = createAsyncThunk(
     'staff/deleteUserService',
-    async ({ societyId, serviceType, userid, userIdToDelete }) => {
+    async ({ serviceType, userid, userIdToDelete }) => {
         try {
             const societyId = await fetchSocietyId()
             const response = await axiosInstance.delete('/deleteUserService', {
@@ -100,8 +100,18 @@ export const deleteUserService = createAsyncThunk(
     }
 );
 
-
-
+export const fetchAdminServices = createAsyncThunk(
+    'services/fetchAdminServices',
+    async () => {
+        try {
+            const societyId = await fetchSocietyId();
+            const response = await axiosInstance.get(`/getAllServicePersons/${societyId}`);
+            return response.data.service.society;
+        } catch (error) {
+            throw error;
+        }
+    }
+)
 const staffSlice = createSlice({
     name: 'staff',
     initialState: {
@@ -109,6 +119,7 @@ const staffSlice = createSlice({
         status: 'idle',
         error: null,
         successMessage: null,
+        loading: false,
     },
     reducers: {
     },
@@ -121,10 +132,12 @@ const staffSlice = createSlice({
             .addCase(createService.fulfilled, (state, action) => {
                 state.status = 'succeeded';
                 state.successMessage = action.payload.message;
+                console.log("hello success")
             })
             .addCase(createService.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.error.message;
+                console.log("hello failed")
             })
 
             //getAllServicePersons
@@ -206,6 +219,18 @@ const staffSlice = createSlice({
                 state.status = 'failed';
                 state.error = action.error.message;
             })
+            .addCase(fetchAdminServices.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchAdminServices.fulfilled, (state, action) => {
+                state.loading = false;
+                state.data = action.payload;
+            })
+            .addCase(fetchAdminServices.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message;
+            });
     },
 });
 

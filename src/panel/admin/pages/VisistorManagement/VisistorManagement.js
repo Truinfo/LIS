@@ -56,7 +56,7 @@ const VisitorManagement = () => {
         setDeleteDialogVisible(false);
         if (selectedEntry) {
 
-            dispatch(deleteEntry({block:selectedEntry.block,flatNo:selectedEntry.flatNo,visitorId:selectedEntry._id}))
+            dispatch(deleteEntry({ block: selectedEntry.block, flatNo: selectedEntry.flatNo, visitorId: selectedEntry._id }))
                 .then((result) => {
                     if (result.meta.requestStatus === "fulfilled") {
                         setSnackbarMessage("Notice deleted successfully.");
@@ -91,7 +91,7 @@ const VisitorManagement = () => {
                 style={styles.noDataImage}
                 resizeMode="contain"
             />
-            <Text style={styles.noDataText}>No Bills Found</Text>
+            <Text style={styles.noDataText}>No visitors Found</Text>
         </View>);
     }
     const renderItem = ({ item }) => (
@@ -373,21 +373,7 @@ const styles = StyleSheet.create({
         color: '#7D0431',
         fontWeight: '700',
     },
-    noDataContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    noDataImage: {
-        width: 150,
-        height: 150,
-        marginBottom: 16,
-    },
-    noDataText: {
-        fontSize: 18,
-        color: '#7d0431',
-        textAlign: 'center',
-    },
+  
 });
 
 export default VisitorManagement;

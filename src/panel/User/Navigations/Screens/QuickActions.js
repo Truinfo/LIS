@@ -95,7 +95,7 @@ const QuickActions = ({ navigation }) => {
     ]);
   };
 
-  const { profiles, status, error } = useSelector((state) => state.profiles);
+  const { profiles,  } = useSelector((state) => state.profiles);
   const dispatch = useDispatch();
   const resetFields = () => {
     setImage("");
@@ -288,7 +288,6 @@ const QuickActions = ({ navigation }) => {
       return;
     }
 
-    // All fields are valid, proceed to dispatch the createVisitor action
     dispatch(createVisitor(formData))
       .then((result) => {
         console.log(result);
@@ -435,19 +434,14 @@ const QuickActions = ({ navigation }) => {
       residentName: userId, // Resident's name
     };
 
-    // Emit the alert to the backend
+
     socketServices.emit("Notify-Gate", { alarmData });
 
-    // Optional: Alert the user that the alarm has been raised
     alert("Alarm raised! Security has been notified.");
 
-    toggleModal(); // Close the modal
+    toggleModal(); 
   };
 
-  // const handleRaiseAlarm = () => {
-  //   toggleModal();
-  //   toggleAlertModal();
-  // };
 
   const renderOption = (option, imageSource, label) => (
     <TouchableOpacity
@@ -946,51 +940,7 @@ const QuickActions = ({ navigation }) => {
         </View>
       </Modal>
 
-      {/* <Modal
-        visible={isModalVisible}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={toggleModal}
-      >
-        <View style={[styles.modalOverlay1]}>
-          <View style={styles.modalContent1}>
-            <TouchableOpacity style={styles.closeButton} onPress={toggleModal}>
-              <Text style={styles.closeButtonText}>X</Text>
-            </TouchableOpacity>
-
-            <View style={styles.iconContainer1}>
-              {renderOption(
-                "Fire",
-                require("../../../../assets/User/images/fire.png"),
-                "Fire"
-              )}
-              {renderOption(
-                "Stuck in Lift",
-                require("../../../../assets/User/images/elevator.png"),
-                "Stuck in Lift"
-              )}
-              {renderOption(
-                "Animal Threat",
-                require("../../../../assets/User/images/snake.png"),
-                "Animal Threat"
-              )}
-              {renderOption(
-                "Visitors Threat",
-                require("../../../../assets/User/images/traveler.png"),
-                "Visitors Threat"
-              )}
-            </View>
-
-            <TouchableOpacity
-              style={styles.raiseAlarmButton}
-              onPress={handleRaiseAlarm}
-            >
-              <Text style={styles.raiseAlarmButtonText}>Raise Alarm</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal> */}
-
+      
       <Modal
         visible={isAlertModalVisible}
         transparent={true}
@@ -1238,15 +1188,15 @@ const styles = StyleSheet.create({
   },
   profilecontainer: {
     alignItems: "center",
-    position: "relative", // Set relative positioning for the container
+    position: "relative", 
   },
   cameraIcon: {
-    position: "absolute", // Positioning it absolutely within the container
-    bottom: 10, // Align to the bottom of the Avatar
-    right: 5, // Align to the right of the Avatar
+    position: "absolute", 
+    bottom: 10, 
+    right: 5, 
     borderRadius: 50,
-    backgroundColor: " rgba(0,0,0,0.2)", // Make the background transparent
-    padding: 10, // Add some padding for touchable area
+    backgroundColor: " rgba(0,0,0,0.2)", 
+    padding: 10, 
   },
 });
 

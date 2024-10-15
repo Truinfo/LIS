@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity, ScrollView, Image, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity,  ActivityIndicator } from 'react-native';
 import DialpadPin from "../Component/CustomKeypad/DailpadPin";
 import DialpadKeypad from "../Component/CustomKeypad/DialpadKeypad";
 import {  useNavigation } from "@react-navigation/native";
@@ -11,7 +11,7 @@ import {
   resetState,
 } from "../../User/Redux/Slice/Security_Panel/HomeScreenSlice";
 import { FAB, RadioButton } from "react-native-paper";
-const { width, height } = Dimensions.get("window");
+const { width,  } = Dimensions.get("window");
 const dialPadContent = [1, 2, 3, 4, 5, 6, 7, 8, 9, "Y", 0, "X"];
 const dialPadSize = width * 0.2;
 const dialPadTextSize = dialPadSize * 0.28;
@@ -100,7 +100,7 @@ const HomeScreen = ({ }) => {
         };
     };
     const handleOptionSelect = (option) => {
-        setSelectedOption(option); // No need for additional logic here
+        setSelectedOption(option); 
     };
 
     if (status === 'loading') {
@@ -128,8 +128,8 @@ const HomeScreen = ({ }) => {
                     <View style={{ flexDirection: 'row', alignItems: 'center', paddingLeft: 20 }}>
                         <RadioButton
                             value="Staff"
-                            status={selectedOption === 'Staff' ? 'checked' : 'unchecked'}  // Compare with "service"
-                            onPress={() => handleOptionSelect('Staff')}  // Pass "service"
+                            status={selectedOption === 'Staff' ? 'checked' : 'unchecked'}  
+                            onPress={() => handleOptionSelect('Staff')}  
                             color="#7d0431"
                         />
                         <Text style={styles.radioText}>Service</Text>
@@ -180,7 +180,7 @@ const HomeScreen = ({ }) => {
               setOpenFab(false);
               navigation.navigate("Add Guest");
             },
-            style: { backgroundColor: "#7d0431" }, // Set background color for this action
+            style: { backgroundColor: "#7d0431" }, 
             color: "white",
           },
           {
@@ -190,7 +190,7 @@ const HomeScreen = ({ }) => {
               setOpenFab(false);
               navigation.navigate("Add Delivery");
             },
-            style: { backgroundColor: "#7d0431" }, // Set background color for this action
+            style: { backgroundColor: "#7d0431" },
             color: "white",
           },
           {
@@ -200,7 +200,7 @@ const HomeScreen = ({ }) => {
               setOpenFab(false);
               navigation.navigate("Add Service");
             },
-            style: { backgroundColor: "#7d0431" }, // Set background color for this action
+            style: { backgroundColor: "#7d0431" }, 
             color: "white",
           },
           {
@@ -210,7 +210,7 @@ const HomeScreen = ({ }) => {
               setOpenFab(false);
               navigation.navigate("Add Cab");
             },
-            style: { backgroundColor: "#7d0431" }, // Set background color for this action
+            style: { backgroundColor: "#7d0431" },
             color: "white",
           },
           {
@@ -220,7 +220,7 @@ const HomeScreen = ({ }) => {
               setOpenFab(false);
               navigation.navigate("Add Others");
             },
-            style: { backgroundColor: "#7d0431" }, // Set background color for this action
+            style: { backgroundColor: "#7d0431" },
             color: "white",
           },
         ]}

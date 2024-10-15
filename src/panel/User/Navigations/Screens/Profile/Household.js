@@ -1,6 +1,6 @@
 import { React, useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, ScrollView, SafeAreaView, StyleSheet, Image, Modal, TextInput, Alert, } from "react-native";
-import { ActivityIndicator, Avatar, Menu } from "react-native-paper";
+import {  Avatar } from "react-native-paper";
 import { Entypo } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import Icon from "react-native-vector-icons/MaterialIcons";
@@ -313,7 +313,6 @@ const Household = ({ route }) => {
 
 
       if (resultData.type === "frequentVisitors/deleteFrequentVisitor/fulfilled") {
-        // Ensure that fetchFrequentVisitors is awaited properly
        dispatch(fetchFrequentVisitors({
           societyId,
           block: buildingName,
@@ -321,11 +320,9 @@ const Household = ({ route }) => {
         }));
         
       } else {
-        // Handle the case where deletion was not successful, but no error was thrown
         Alert.alert('Error', 'Failed to delete visitor');
       }
     } catch (error) {
-      // On failure, show an alert with the error message
       Alert.alert('Error', `Failed to delete visitor: ${error.message}`);
     }
   };

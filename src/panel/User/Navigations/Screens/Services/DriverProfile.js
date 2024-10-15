@@ -490,13 +490,12 @@ const styles = StyleSheet.create({
     width: "100%",
     borderTopRightRadius: 30,
     borderTopLeftRadius: 30,
-    // alignItems: "center",
   },
   secondModalHeading: {
     fontSize: 20,
     fontWeight: "bold",
     color: "white",
-    paddingVertical: 10, // Add padding
+    paddingVertical: 10, 
     marginLeft: "30%",
   },
   secondModalButtonContainer: {

@@ -21,7 +21,22 @@ const EditAdminMaintaince = () => {
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [errors, setErrors] = useState({});
     const [showDialog, setShowDialog] = useState(false);
-    const societyId = "6683b57b073739a31e8350d0";
+    const [societyId, setSocietyId] = useState("");
+ 
+    useEffect(() => {
+        const getSocietyAdmin = async () => {
+          try {
+            const storedAdmin = await AsyncStorage.getItem('user');
+            if (storedAdmin) {
+              const societyAdmin = JSON.parse(storedAdmin);
+              setSocietyId(societyAdmin._id || "");
+            }
+          } catch (error) {
+            console.error("Error retrieving society admin data:", error);
+          }
+        };
+        getSocietyAdmin();
+      }, []);
     const [previewImage, setPreviewImage] = useState('');
     const [formState, setFormState] = useState({
         societyId: societyId,

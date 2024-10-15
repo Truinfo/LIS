@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, {  useEffect } from "react";
 import {
   View,
   StyleSheet,
   FlatList,
   Text,
   TouchableOpacity,
-  Modal,
-  Linking,
   ActivityIndicator,
 } from "react-native";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";

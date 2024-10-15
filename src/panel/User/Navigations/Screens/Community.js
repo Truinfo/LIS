@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     },
     card: {
         width: "49%",
-        height: 75, // Adjusted height to fit content naturally
+        height: 75, 
         backgroundColor: "#f7f7f7",
         borderWidth: 1,
         borderColor: "#f0f3f4",
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
     cardImage: {
         width: 40,
         height: 40,
-        marginRight: 12, // Margin to space out image and text
+        marginRight: 12, 
     },
     cardContent: {
         flex: 1,
@@ -186,13 +186,13 @@ const styles = StyleSheet.create({
         fontSize: 15,
         fontWeight: "bold",
         marginBottom: 4,
-        textAlign: "left", // Align text to the left
+        textAlign: "left", 
         color:"#484848"
     },
     cardSubheading: {
         fontSize: 10,
         color: "#666",
-        textAlign: "left", // Align text to the left
+        textAlign: "left",
     },
 });
 

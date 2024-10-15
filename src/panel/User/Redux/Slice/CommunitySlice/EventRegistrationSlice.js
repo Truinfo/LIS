@@ -1,9 +1,8 @@
-// src/features/registration/registrationSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../../../Security/helpers/axios';
 
 
-// Thunk to handle the registration process
+
 export const registerParticipant = createAsyncThunk(
   'registration/registerParticipant',
   async ({ societyId, participantId, activities, participantName, eventId }, { rejectWithValue }) => {

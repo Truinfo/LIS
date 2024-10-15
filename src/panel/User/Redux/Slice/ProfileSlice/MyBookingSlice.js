@@ -5,8 +5,6 @@ import axiosInstance from '../../../../Security/helpers/axios';
 export const fetchAmenityBookings = createAsyncThunk(
     'amenityBooking/fetchAmenityBookings',
     async ({ id, userId }) => {
-        console.log("id", id);
-        console.log("userId", userId);
         try {
             const response = await axiosInstance.get(`/getAmenityByIdAndUserId/${id}/${userId}`);
             return response.data;
@@ -15,7 +13,6 @@ export const fetchAmenityBookings = createAsyncThunk(
         }
     }
 );
-
 
 const amenityBookingSlice = createSlice({
     name: 'amenityBooking',

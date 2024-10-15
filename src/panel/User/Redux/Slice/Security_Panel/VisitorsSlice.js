@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../../../Security/helpers/axios';
 
-// Async thunk for creating a visitor
 export const createVisitor = createAsyncThunk(
   'visitor/createVisitor',
   async (formData, { rejectWithValue }) => {

@@ -23,10 +23,9 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AntDesign, Entypo, MaterialIcons } from "@expo/vector-icons";
 import socketServices from "../../User/Socket/SocketServices";
-import { fetchUsers } from "../../admin/pages/ResidentialUnit/ResidentsSlice";
 import { fetchresidents } from "../../User/Redux/Slice/CommunitySlice/residentsSlice";
 
-const AddGuest = ({ route, navigation }) => {
+const AddGuest = ({  navigation }) => {
   const [name, setName] = useState("");
   const [user, setuser] = useState("");
   const [userId, setuserId] = useState("");
@@ -45,8 +44,6 @@ const AddGuest = ({ route, navigation }) => {
   const [flatNoError, setFlatNoError] = useState("");
   const error = useSelector((state) => state.visitor.error);
   const [buildings, setBuildings] = useState([]);
-
-  const [allResidents, setAllResidents] = useState([]);
   const [usersInFlat, setUsersInFlat] = useState([]);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [flatsForSelectedBlock, setFlatsForSelectedBlock] = useState([]);
@@ -91,7 +88,7 @@ const AddGuest = ({ route, navigation }) => {
     if (societyId) {
       dispatch(fetchresidents(societyId)).then((response) => {
         if (response.type === "residents/fetchResidents/fulfilled") {
-          setAllResidents(response.payload); // Set all residents here
+          console.log(response.payload); // Set all residents here
         }
       });
     }
@@ -210,22 +207,7 @@ const AddGuest = ({ route, navigation }) => {
       }
     }
   };
-  const handleImagePick = async () => {
-    Alert.alert("Select Image Source", "Choose an option to upload an image:", [
-      {
-        text: "Camera",
-        onPress: () => pickImage(ImagePicker.launchCameraAsync),
-      },
-      {
-        text: "Gallery",
-        onPress: () => pickImage(ImagePicker.launchImageLibraryAsync),
-      },
-      {
-        text: "Cancel",
-        style: "cancel",
-      },
-    ]);
-  };
+
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -495,9 +477,6 @@ const AddGuest = ({ route, navigation }) => {
               />
             </Text>
           </TouchableOpacity>
-          {/* {flatNoError ? (
-            <Text style={styles.errorMessage}>{flatNoError}</Text>
-          ) : null} */}
           {showUserDropdown && usersInFlat.length > 0 && (
             <View style={styles.dropdownMenu}>
               {usersInFlat.map((user) => (

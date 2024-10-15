@@ -89,7 +89,7 @@ function SecurityTabs() {
 
   const playAlertSound = async () => {
     const { sound: newSound } = await Audio.Sound.createAsync(
-      require("../../assets/alert-33762.mp3") // Make sure this path is correct
+      require("../../assets/alert-33762.mp3") 
     );
     setSound(newSound);
     await newSound.playAsync();
@@ -97,7 +97,6 @@ function SecurityTabs() {
     const status = await newSound.getStatusAsync();
 
     if (!status.isPlaying) {
-      // Play sound again if it has finished
       newSound.setOnPlaybackStatusUpdate((playbackStatus) => {
         if (playbackStatus.didJustFinish) {
           newSound.replayAsync();
@@ -118,7 +117,7 @@ function SecurityTabs() {
         console.log("Received Gate Alert:", data);
         setAlertData(data);
         setModalVisible(true);
-        playAlertSound(); // Play sound when alert is received
+        playAlertSound(); 
       };
 
       socketServices.on("Gate_alert_received", handleGateAlertReceived);
@@ -135,9 +134,9 @@ function SecurityTabs() {
     `;
 
         Alert.alert(
-          "Alert Details", // Title of the alert
-          message.trim(), // Message to be displayed
-          [{ text: "OK", onPress: () => console.log("OK Pressed") }] // Button options
+          "Alert Details", 
+          message.trim(), 
+          [{ text: "OK", onPress: () => console.log("OK Pressed") }] 
         );
       };
 
@@ -156,7 +155,7 @@ function SecurityTabs() {
           handleresponseRecieved
         );
         if (sound) {
-          sound.stopAsync(); // Stop sound when the component unmounts
+          sound.stopAsync();
         }
       };
     }, [societyId, sound])
@@ -165,7 +164,7 @@ function SecurityTabs() {
   const closeModal = async () => {
     setModalVisible(false);
     if (sound) {
-      await sound.stopAsync(); // Stop the sound when closing the modal
+      await sound.stopAsync(); 
     }
   };
 

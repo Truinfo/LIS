@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, SafeAreaView } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import { Button, TextInput } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
@@ -276,7 +276,7 @@ const CreateUser = () => {
                                 {blockError ? <Text style={styles.errorText}>{blockError}</Text> : null}
                             </View>
 
-                            {/* Flat Dropdown */}
+                           
                             <View style={styles.dropdownContainer}>
                                 <TouchableOpacity
                                     onPress={toggleFlatMenu}

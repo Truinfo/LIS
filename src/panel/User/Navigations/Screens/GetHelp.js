@@ -161,7 +161,6 @@ const GetHelp = () => {
   };
   const sortComplaints = (tickets) => {
     return tickets.sort((a, b) => {
-      // First, prioritize unresolved complaints
       if (a.resolution === "Pending" && b.resolution === "Resolved") {
         return -1;
       }
@@ -169,7 +168,6 @@ const GetHelp = () => {
         return 1;
       }
 
-      // If both are the same resolution, sort by date (most recent first)
       const dateA = new Date(a.dateAndTime);
       const dateB = new Date(b.dateAndTime);
       return dateB - dateA;  // Most recent first
@@ -284,8 +282,6 @@ const GetHelp = () => {
 
             <Text style={styles.date}>{item.complaintTitle}</Text>
             <Text style={styles.date}>{item.description}</Text>
-
-            {/* Complaint Date and Complaint By aligned together */}
             <View style={styles.row}>
               <Text style={styles.label}>Complaint Date</Text>
               <Text style={styles.value}>: {formatDate(item.dateAndTime)}</Text>
@@ -492,11 +488,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-start',
     marginTop: 4,
-    // Ensures items are displayed in a row
   },
   label: {
     fontWeight: '400',
-    width: 105,  // Adjust the width to align labels
+    width: 105,  
     color: '#333',
     fontSize: 14,
   },

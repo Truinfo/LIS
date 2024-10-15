@@ -1,16 +1,19 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../../../Security/helpers/axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
+
+const fetchSocietyId = async () => {
+  const storedAdmin = await AsyncStorage.getItem('user');
+  const societyAdmin = JSON.parse(storedAdmin) || {};
+  return societyAdmin._id || ""; // Default ID
+};
 
 export const fetchVisitors = createAsyncThunk(
   "visitors/fetchVisitors",
   async () => {
-    const societyAdminString = await AsyncStorage.getItem("user");
-    const data = societyAdminString ? JSON.parse(societyAdminString) : {};
-    const societyId = data._id; // Default ID
-    const response = await axios.get(
-      `http://192.168.29.35:2000/api/getAllVisitorsBySocietyId/${societyId}`
+    const societyId = await fetchSocietyId();
+    const response = await axiosInstance.get(
+      `/getAllVisitorsBySocietyId/${societyId}`
     );
     return response.data.visitors;
   }
@@ -18,10 +21,8 @@ export const fetchVisitors = createAsyncThunk(
 
 export const deleteEntry = createAsyncThunk(
   "visitors/Delete",
-  async ({block,flatNo,visitorId}) => {
-    const societyAdminString = await AsyncStorage.getItem("user");
-    const data = societyAdminString ? JSON.parse(societyAdminString) : {};
-    const societyId = data._id; 
+  async ({ block, flatNo, visitorId }) => {
+    const societyId = await fetchSocietyId();
     const response = await axiosInstance.delete(
       `/deleteEntryVisitor/${societyId}/${block}/${flatNo}/${visitorId}`
     );

@@ -1,4 +1,3 @@
-// noticeSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../../../Security/helpers/axios';
 
@@ -9,7 +8,7 @@ export const fetchNotices = createAsyncThunk('notices/fetchNotices', async (soci
       return response.data;
     }
   } catch (error) {
-    console.error("API call failed:", error); // Log error for more context
+    console.error("API call failed:", error); 
     throw error;
   }
 });

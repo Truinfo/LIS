@@ -4,7 +4,6 @@ import {
   Text,
   Image,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
   FlatList,
 } from "react-native";
@@ -155,12 +154,6 @@ const styles = StyleSheet.create({
     marginTop: 5,
     marginBottom: 5,
   },
-  // alternatingRow: {
-  //   flexDirection: "row",
-  //   justifyContent:"space-between",
-  //   alignItems: "center",
-  //   marginTop: 10,
-  // },
   alternatingText: {
     fontSize: 14,
     color: "#333",

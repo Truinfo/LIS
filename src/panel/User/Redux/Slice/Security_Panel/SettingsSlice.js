@@ -14,7 +14,6 @@ export const fetchGuard = createAsyncThunk(
     }
 );
 
-
 const settingsSlice = createSlice({
     name: "settings",
     initialState: {

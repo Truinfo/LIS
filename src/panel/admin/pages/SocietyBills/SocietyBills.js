@@ -6,6 +6,7 @@ import {
     Linking,
     ActivityIndicator,
     TouchableOpacity,
+    Image,
 } from 'react-native';
 import {
     Card,
@@ -176,36 +177,45 @@ const SocietyBills = () => {
             </Card.Content>
         </Card>
     );
-
-    if (status === 'loading') {
+    if (status === "loading") { // Show spinner while loading
         return (
             <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#630000" />
+                <ActivityIndicator size="large" color="#7d0431" />
             </View>
         );
     }
-
     if (status === 'failed') {
         return (
-            <View style={styles.center}>
-                <Text>Error: {error}</Text>
+            <View style={styles.noDataContainer}>
+                <Image
+                    source={require('../../../../assets/Admin/Imgaes/nodatadound.png')}
+                    style={styles.noDataImage}
+                    resizeMode="contain"
+                />
+                <Text style={styles.noDataText}>No visitors Found</Text>
             </View>
         );
     }
 
     return (
         <View style={styles.container}>
-            <FlatList
-                data={filteredBills}
-                keyExtractor={(item) => item._id}
-                renderItem={renderItem}
-                contentContainerStyle={styles.list}
-                ListEmptyComponent={
-                    <View style={styles.center}>
-                        <Text>No Data Found</Text>
-                    </View>
-                }
-            />
+            {filteredBills?.length !== 0 ?
+                <FlatList
+                    data={filteredBills}
+                    keyExtractor={(item) => item._id}
+                    renderItem={renderItem}
+                    contentContainerStyle={styles.list}
+
+                />
+                : <View style={styles.noDataContainer}>
+                    <Image
+                        source={require('../../../../assets/Admin/Imgaes/nodatadound.png')}
+                        style={styles.noDataImage}
+                        resizeMode="contain"
+                    />
+                    <Text style={styles.noDataText}>No visitors Found</Text>
+                </View>}
+
 
             <Dialog
                 visible={dialogVisible}
@@ -449,7 +459,25 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        marginTop: 300
     },
+    noDataContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+    },
+    noDataImage: {
+        width: 150,
+        height: 150,
+        alignItems: "center",
+    },
+    noDataText: {
+        fontSize: 16,
+        color: '#7D0431',
+        fontWeight: '700',
+    },
+
 });
 
 export default SocietyBills;

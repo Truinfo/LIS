@@ -37,7 +37,7 @@ const ViewEvents = () => {
                         />
                     )}
                     style={styles.carousel}
-                    animationDuration={isSinglePicture ? 0 : 2000} // Set animation duration for multiple pictures
+                    animationDuration={isSinglePicture ? 0 : 2000} 
                 />
                 <Text style={styles.sectionTitle}>Society Profile Details:</Text>
                 <View style={styles.detailsContainer}>

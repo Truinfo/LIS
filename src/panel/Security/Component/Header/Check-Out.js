@@ -1,37 +1,18 @@
 
-import React, { useEffect, useState } from 'react';
+import React, {  useState } from 'react';
 import { View, Text, FlatList, StyleSheet, } from 'react-native';
 import { ImagebaseURL } from '../../helpers/axios';
 import {  useSelector } from 'react-redux';
 import MyDialog from '../../DialogBox/DialogBox';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Avatar } from 'react-native-paper'
-
 
 const CheckOut = ({ data,  }) => {
 
-  const [responses, setResponses] = useState({});
-  const [societyId, setSocietyId] = useState(null);
   const successMessage = useSelector(state => state.checkOuting.successMessage);
   const error = useSelector(state => state.checkOuting.error);
   const [showDialog, setShowDialog] = useState(false);
 
-  useEffect(() => {
-    const getSocietyId = async () => {
-      try {
-        const user = await AsyncStorage.getItem('user');
-        const id = JSON.parse(user).societyId;
-        if (id !== null) {
-          setSocietyId(id);
-        } else {
-          console.error('No societyId found in AsyncStorage');
-        }
-      } catch (error) {
-        console.error('Error fetching societyId from AsyncStorage:', error);
-      }
-    };
-    getSocietyId();
-  }, []);
+
 
 
   const renderItem = ({ item }) => {

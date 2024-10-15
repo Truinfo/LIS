@@ -92,7 +92,7 @@ const ServicesList = () => {
             );
         }
     };
-    
+
     const handleEdit = (userId) => {
         setSelectedservicePerson(userId);
         console.log(selectedservicePerson)
@@ -119,7 +119,7 @@ const ServicesList = () => {
                 <Icon name="more-vert" size={20} color="#424242" />
             </TouchableOpacity>
             {anchor === item._id && (
-                <ScrollView style={[styles.menuList, { top: 0 }]}>
+                <ScrollView style={[styles.menuList, { top:3}]}>
                     <TouchableOpacity style={styles.menuItem} onPress={handleEdit}>
                         <Text>Edit</Text>
                     </TouchableOpacity>
@@ -128,10 +128,6 @@ const ServicesList = () => {
                     </TouchableOpacity>
                 </ScrollView>
             )}
-            {/* <TouchableOpacity onPress={() => handleDelete(item.userid)}>
-                <Ionicons name="trash-outline" size={24} color="red" />
-            </TouchableOpacity> */}
-
         </TouchableOpacity>
     );
     const handlePress = (item) => {
@@ -266,7 +262,7 @@ const styles = StyleSheet.create({
         height: 50,
         borderRadius: 25,
         marginRight: 10,
-        backgroundColor:"#f6f6f6"
+        backgroundColor: "#f6f6f6"
     },
     details: {
         flex: 1,
@@ -276,17 +272,18 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     menuItem: {
-        padding: 10,
+        padding:7,
     },
     menuList: {
         position: 'absolute',
-        right: 30,
+        right: 35,
         backgroundColor: '#fff',
         borderRadius: 5,
         elevation: 3,
-        padding: 5,
+        padding: 2,
         zIndex: 10,
         overflow: 'hidden',
+        marginBottom: 50
     },
     modalContainer: {
         justifyContent: 'center',

@@ -2,12 +2,17 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../../Security/helpers/axios';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from 'axios';
+
+
+const fetchSocietyId = async () => {
+    const storedAdmin = await AsyncStorage.getItem("user");
+    const societyAdmin = JSON.parse(storedAdmin) || {};
+    return societyAdmin._id || "";
+  };
 export const fetchnotices = createAsyncThunk(
     'notice/fetchnotice',
     async () => {
-        const storedAdmin = await AsyncStorage.getItem('user');
-        const societyAdmin = JSON.parse(storedAdmin) || {};
-        const societyId = societyAdmin._id ; 
+        const societyId = await fetchSocietyId();
         const response = await axiosInstance.get(`/getNotice/${societyId}`);
         return response.data.notices;
     }
@@ -16,9 +21,7 @@ export const fetchnotices = createAsyncThunk(
 export const fetchnoticeById = createAsyncThunk(
     'notice/fetchnoticeById',
     async () => {
-        const storedAdmin = await AsyncStorage.getItem('user');
-        const societyAdmin = JSON.parse(storedAdmin) || {};
-        const societyId = societyAdmin._id ; 
+        const societyId = await fetchSocietyId();
         const response = await axiosInstance.get(`/getAllNotice/${societyId}`);
         return response.data.notices;
     }

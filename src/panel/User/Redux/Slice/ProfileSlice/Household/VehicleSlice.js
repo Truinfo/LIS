@@ -46,7 +46,6 @@ const addVehicleSlice = createSlice({
             .addCase(addVehicleAsync.fulfilled, (state, action) => {
                 state.status = 'succeeded';
                 state.error = null;
-                // state.data.push(action.payload);
             })
             .addCase(addVehicleAsync.rejected, (state, action) => {
                 state.status = 'failed';
@@ -59,7 +58,6 @@ const addVehicleSlice = createSlice({
             .addCase(deleteVehicleAsync.fulfilled, (state, action) => {
                 state.status = 'succeeded';
                 state.error = null;
-                // state.data = action.payload;
             })
             .addCase(deleteVehicleAsync.rejected, (state, action) => {
                 state.status = 'failed';

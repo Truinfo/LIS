@@ -1,19 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { View, Button, TextInput, Text, TouchableOpacity, StyleSheet, Alert, Modal } from 'react-native';
+import { View, TextInput, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons'; // Using Material Icons for Android
 import { createMaintenanceRecords } from './SocietyMaintainanceSlice';
 import DateTimePicker from '@react-native-community/datetimepicker'; // Import DateTimePicker
 
 const AddMaintenanceBill = () => {
   const dispatch = useDispatch();
-  const societyId = "6683b57b073739a31e8350d0";
-  const [formData, setFormData] = useState({
-    societyId: societyId,
-    amount: '',
-    monthAndYear: '',
-  });
+
   const [errors, setErrors] = useState({});
   const [showDialog, setShowDialog] = useState(false);
   const [dialogMessage, setDialogMessage] = useState('');
@@ -23,7 +17,26 @@ const AddMaintenanceBill = () => {
   // State for Date Picker
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
-
+  const [societyId, setSocietyId] = useState("");
+  const [formData, setFormData] = useState({
+    societyId: societyId,
+    amount: '',
+    monthAndYear: '',
+  });
+  useEffect(() => {
+    const getSocietyAdmin = async () => {
+      try {
+        const storedAdmin = await AsyncStorage.getItem('user');
+        if (storedAdmin) {
+          const societyAdmin = JSON.parse(storedAdmin);
+          setSocietyId(societyAdmin._id || "");
+        }
+      } catch (error) {
+        console.error("Error retrieving society admin data:", error);
+      }
+    };
+    getSocietyAdmin();
+  }, []);
   const handleChange = (name, value) => {
     setFormData((prevFormData) => ({
       ...prevFormData,

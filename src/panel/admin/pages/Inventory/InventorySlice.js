@@ -1,19 +1,19 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import axiosInstance from '../../../Security/helpers/axios';
-import axios from 'axios';
 
-// const societyAdmin = JSON.parse(localStorage.getItem('societyAdmin')) || {};
-const societyId = "6683b57b073739a31e8350d0";
-
+const getSocietyId = async () => {
+  const societyAdmin = await AsyncStorage.getItem('user');
+  return JSON.parse(societyAdmin)?._id || "";
+};
 export const fetchInventory = createAsyncThunk(
   'inventory/fetchInventoryList',
   async () => {
+    const societyId = await getSocietyId();
     const response = await axiosInstance.get(`/getAllInventory/${societyId}`)
     return response.data.inventory
   }
 );
 
-// router.get('/getInventoryById/:id', getInventoryById);
 export const getInventoryById = createAsyncThunk(
   'inventory/getInventoryById',
   async ({ id }) => {

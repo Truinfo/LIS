@@ -10,7 +10,6 @@ const PlanRenewalScreen = () => {
         try {
             const supported = await Linking.canOpenURL(upiPaymentURL);
             if (supported) {
-                // Open the UPI payment URL in the external UPI app
                 await Linking.openURL(upiPaymentURL);
             } else {
                 Alert.alert('Error', 'No UPI apps installed to handle the payment.');

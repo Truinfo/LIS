@@ -36,7 +36,7 @@ const AddEvent = () => {
   // Date and Time Picker Handlers
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
-  const [currentPickerField, setCurrentPickerField] = useState(null); // 'startDate', 'endDate', 'activity_start', 'activity_end'
+  const [currentPickerField, setCurrentPickerField] = useState(null); 
   const [currentActivityIndex, setCurrentActivityIndex] = useState(null);
   const [tempDate, setTempDate] = useState(new Date());
 

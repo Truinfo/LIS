@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Modal, ActivityIndicator, FlatList, ScrollView, TextInput } from 'react-native';
+import { View, Text, StyleSheet,  TouchableOpacity, Modal, ActivityIndicator, FlatList,  TextInput } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteUserService, fetchServicePerson, updateRatingAndReview } from '../../../Redux/Slice/ProfileSlice/manageServiceSlice';

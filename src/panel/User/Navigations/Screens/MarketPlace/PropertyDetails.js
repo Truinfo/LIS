@@ -1,7 +1,6 @@
-// PropertyDetails.js
 import React, { useEffect } from 'react';
 import { View, Text, ScrollView, Image, StyleSheet, Button, Linking } from 'react-native';
-import Carousel from 'react-native-reanimated-carousel'; // Make sure you install this package
+import Carousel from 'react-native-reanimated-carousel'; 
 import { useDispatch, useSelector } from 'react-redux';
 import { getPropertyById } from '../../../Redux/Slice/MarketPlaceSlice/MarketPlace';
 import { ActivityIndicator } from 'react-native-paper';

@@ -5,7 +5,6 @@ const TermsandConditions = () => {
     return (
         <View style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollViewContainer}>
-                {/* <Text style={styles.header}>Terms & Conditions</Text> */}
                 <Text style={styles.text}>
                     <Text style={styles.subHeader}>User Agreement:</Text> By downloading, accessing, or using the apartment security management app <Text style={{ color: "#800336", fontWeight: 'bold' }}>LivInSync</Text>, you agree to abide by these terms and conditions. If you do not agree with any part of these terms, you may not use the App.
                 </Text>

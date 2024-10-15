@@ -16,7 +16,7 @@ import { useNavigation } from '@react-navigation/native'; // Import useNavigatio
 
 const AdminNotifications = () => {
     const dispatch = useDispatch();
-    const navigation = useNavigation(); // Initialize useNavigation hook
+    const navigation = useNavigation(); 
 
     useFocusEffect(
         React.useCallback(() => {
@@ -46,7 +46,6 @@ const AdminNotifications = () => {
         });
     };
     const handleNotificationPress = (notif) => {
-        // Navigate based on notification category
         switch (notif.category) {
             case 'event_registration':
                 navigation.navigate('Events');
@@ -92,7 +91,6 @@ const AdminNotifications = () => {
                                     </Text>
                                 </View>
 
-                                {/* Close/Dismiss Button */}
                                 <TouchableOpacity
                                     onPress={() => dismissNotification(notif._id)}
                                     style={styles.closeButton}

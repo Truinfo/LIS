@@ -1,8 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../../../Security/helpers/axios';
-import axios from 'axios';
-
-// Async thunk for fetching complaints
 export const fetchComplaints = createAsyncThunk(
     'complaints/fetchComplaints',
     async (societyId, thunkAPI) => {
@@ -15,7 +12,6 @@ export const fetchComplaints = createAsyncThunk(
     }
 );
 
-// Async thunk for creating a complaint
 export const createComplaint = createAsyncThunk(
     'complaints/createComplaint',
     async (complaintData, thunkAPI) => {
@@ -51,7 +47,6 @@ const complaintsSlice = createSlice({
     },
     reducers: {},
     extraReducers: (builder) => {
-        // Handling the fetch complaints actions
         builder
             .addCase(fetchComplaints.pending, (state) => {
                 state.status = 'loading';
@@ -64,13 +59,12 @@ const complaintsSlice = createSlice({
                 state.status = 'failed';
                 state.error = action.payload;
             })
-            // Handling the create complaint actions
             .addCase(createComplaint.pending, (state) => {
                 state.status = 'loading';
             })
             .addCase(createComplaint.fulfilled, (state, action) => {
                 state.status = 'succeeded';
-                state.complaints = action.payload; // Assuming action.payload is the created complaint
+                state.complaints = action.payload;
                 console.log("success")
             })
             .addCase(createComplaint.rejected, (state, action) => {

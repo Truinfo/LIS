@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Text, FlatList, Alert, ScrollView, ActivityIndicator } from "react-native";
+import { StyleSheet, View, Text, FlatList, Alert, ScrollView, ActivityIndicator, Image } from "react-native";
 import { Searchbar, Avatar, FAB, Snackbar } from "react-native-paper";
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUsers, deleteUser } from './ResidentsSlice';
@@ -106,6 +106,19 @@ const ResidentialUnit = () => {
 
     if (status === 'failed') {
         return <Text>Error: {error}</Text>;
+    }
+
+    if (error || status === 'failed' || filteredResidents?.length === 0) { // Show spinner while loading
+        return (
+            <View style={styles.noDataContainer}>
+                <Image
+                    source={require('../../../../assets/Admin/Imgaes/nodatadound.png')}
+                    style={styles.noDataImage}
+                    resizeMode="contain"
+                />
+                <Text style={styles.noDataText}>No Adds Found</Text>
+            </View>
+        );
     }
 
     return (
@@ -241,5 +254,20 @@ const styles = StyleSheet.create({
     },
     menuItem: {
         padding: 10,
+    },
+    noDataContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    noDataImage: {
+        width: 150,
+        height: 150,
+        marginBottom: 0,
+    },
+    noDataText: {
+        fontSize: 18,
+        color: '#7d0431',
+        textAlign: 'center',
     },
 });

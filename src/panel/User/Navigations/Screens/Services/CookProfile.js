@@ -20,10 +20,10 @@ import { Avatar } from "react-native-paper";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { addService } from "../../../Redux/Slice/ServiceSlice/AddServiceSlice";
 
-const CookProfile = ({ navigation, route }) => {
+const CookProfile = ({ route }) => {
   const dispatch = useDispatch();
   const { id, userid } = route.params;
-  const { data, loading, error } = useSelector((state) => state.services);
+  const { data, } = useSelector((state) => state.services);
   const [userId, setUserId] = useState(null);
   const [flatNumber, setFlatNumber] = useState(null);
   const [blockName, setblockName] = useState(null);
@@ -51,7 +51,6 @@ const CookProfile = ({ navigation, route }) => {
     dispatch(fetchServices());
   }, [dispatch]);
   const [modalVisible, setModalVisible] = useState(false);
-  const [secondModalVisible, setSecondModalVisible] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(null);
 
   const handleAddPress = () => {
@@ -561,7 +560,6 @@ const styles = StyleSheet.create({
     width: "100%",
     borderTopRightRadius: 30,
     borderTopLeftRadius: 30,
-    // alignItems: "center",
   },
   secondModalHeading: {
     fontSize: 20,

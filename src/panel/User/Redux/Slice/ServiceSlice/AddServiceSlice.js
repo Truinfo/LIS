@@ -1,9 +1,7 @@
-// src/Redux/Slice/ServiceSlice/addServiceSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../../../Security/helpers/axios';
 
 export const addService = createAsyncThunk('services/addService', async (serviceData) => {
-
   const response = await axiosInstance.put('/addList', serviceData, {
     headers: { 'Content-Type': 'application/json' }
   });

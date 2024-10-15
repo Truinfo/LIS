@@ -7,7 +7,7 @@ import {
   View,
   Image,
 } from "react-native";
-import { Appbar, Button, Provider as PaperProvider } from "react-native-paper";
+import {  Button, Provider as PaperProvider } from "react-native-paper";
 
 const Invoice = ({ title, amount, dueDate, fine }) => {
   return (

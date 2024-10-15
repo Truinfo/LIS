@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { createRental, resetState } from '../../../Redux/Slice/CommunitySlice/Rental/createRentalSlice';
-import { StyleSheet, View, Text, Button, ScrollView, TextInput, TouchableOpacity, Alert, Image, SafeAreaView } from 'react-native';
+import { createRental,  } from '../../../Redux/Slice/CommunitySlice/Rental/createRentalSlice';
+import { StyleSheet, View, Text,  ScrollView, TextInput, TouchableOpacity, Alert, Image, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -46,7 +46,6 @@ const CreateRental = () => {
   const dispatch = useDispatch();
   const createRentalState = useSelector((state) => state.createRental);
 
-  const { loading = false, success = false, error = null } = createRentalState || {};
   const handleSubmit = async () => {
 
     try {

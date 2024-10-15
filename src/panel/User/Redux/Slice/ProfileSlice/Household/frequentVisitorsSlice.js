@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axiosInstance from '../../../../../Security/helpers/axios';
 
-// Async thunk to fetch frequent visitors
+
 export const fetchFrequentVisitors = createAsyncThunk(
   'frequentVisitors/fetchFrequentVisitors',
   async ({ societyId, block, flatNo }) => {
@@ -16,7 +16,7 @@ export const fetchFrequentVisitors = createAsyncThunk(
   }
 );
 
-// Async thunk to delete a visitor
+
 export const deleteFrequentVisitor = createAsyncThunk(
   'frequentVisitors/deleteFrequentVisitor',
   async ({ societyId, block, flatNo, visitorId }) => {
@@ -31,8 +31,8 @@ export const deleteFrequentVisitor = createAsyncThunk(
 
 const initialState = {
   visitors: [],
-  fetchStatus: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
-  deleteStatus: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
+  fetchStatus: 'idle', 
+  deleteStatus: 'idle', 
   error: null,
 };
 

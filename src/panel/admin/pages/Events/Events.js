@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {  useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet, ActivityIndicator } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchEvent, deleteEvent } from './EventSlice';
@@ -10,7 +10,7 @@ import Toast from 'react-native-toast-message';
 
 const Events = () => {
     const dispatch = useDispatch();
-    const { status, error, event } = useSelector(state => state.societyEvents);
+    const { status,  event } = useSelector(state => state.societyEvents);
     const [selectedEvent, setSelectedEvent] = useState(null);
     const [actionMenuVisible, setActionMenuVisible] = useState(null);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);

@@ -10,7 +10,7 @@ class WSService {
             this.socket = io(BaseUrl, {
                 transports: ['websocket'],
                 cors: {
-                    origin: '*', // Set to '*' to allow any origin or specify the allowed client URL
+                    origin: '*', 
                 },
             });
             this.socket.on('connect', () => {

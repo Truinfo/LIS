@@ -50,7 +50,6 @@ import EditProfile1 from "./src/panel/User/Navigations/Screens/Profile/EditProfi
 import ResetPassword1 from "./src/panel/User/Navigations/Screens/Profile/ResetPassword";
 import Amenities from "./src/panel/User/Navigations/Screens/Community/Amenities";
 import BookingScreen from "./src/panel/User/Navigations/Screens/Community/BookingScreen";
-import DiscussionChat from "./src/panel/User/Navigations/Screens/Community/DiscussionChat";
 import Documents from "./src/panel/User/Navigations/Screens/Community/Documents";
 import Emergency from "./src/panel/User/Navigations/Screens/Community/Emergency";
 import Flats from "./src/panel/User/Navigations/Screens/Community/Flats";
@@ -67,11 +66,9 @@ import ForgotVerification from './src/panel/User/Navigations/Authentication/Forg
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ManageDailyHelp from './src/panel/User/Navigations/Screens/Profile/ManageDailyHelp';
 import Events from './src/panel/User/Navigations/Screens/Community/Events';
-import IndividualChatRoom from './src/panel/User/Navigations/Screens/Community/IndividualChatRoom';
 import CreateRental from './src/panel/User/Navigations/Screens/Community/CreateRental';
 import InandOut1 from './src/panel/Security/Component/Header/InandOut1';
 import MyDocuments from './src/panel/User/Navigations/Screens/Profile/MyDocuments';
-import Communication from './src/panel/User/Navigations/Screens/Community/Communication';
 import MyBills from './src/panel/User/Navigations/Screens/Profile/MyBills/MyBills';
 import Guard from './src/panel/Security/Component/Header/Guard';
 import MyBookings from './src/panel/User/Navigations/Screens/Profile/MyBookings';
@@ -288,8 +285,6 @@ export default function App() {
             <Stack.Screen name="Reset Password " component={ResetPassword1} />
             <Stack.Screen name="Amenities" component={Amenities} />
             <Stack.Screen name="Booking Screen" component={BookingScreen} />
-            <Stack.Screen name="Communication" component={Communication} />
-            <Stack.Screen name="DiscussionChat" component={DiscussionChat} />
             <Stack.Screen name="Documents" component={Documents} />
             <Stack.Screen name="Emergency" component={Emergency} />
             <Stack.Screen name="Flats" component={Flats} />
@@ -300,7 +295,6 @@ export default function App() {
             <Stack.Screen name="Pre Approval Visitors" component={PreApproval} />
             <Stack.Screen name="Household" component={Household} />
             <Stack.Screen name="GetHelp" component={GetHelp} />
-            <Stack.Screen name="IndividualChatRoom" component={IndividualChatRoom} />
             <Stack.Screen name="Create Rental" component={CreateRental} />
             <Stack.Screen name="RentalPropertyType" component={RentalPropertyType} />
             <Stack.Screen name="RentalFlat Details" component={RentalFlatDetails} />

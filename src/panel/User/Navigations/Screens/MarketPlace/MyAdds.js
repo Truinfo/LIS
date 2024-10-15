@@ -9,7 +9,6 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { ImagebaseURL } from '../../../../Security/helpers/axios';
 
 const MyAdds = () => {
-    const [societyId, setSocietyId] = useState("");
     const [userId, setUserId] = useState("");
     const navigation = useNavigation();
     const dispatch = useDispatch();
@@ -22,7 +21,6 @@ const MyAdds = () => {
                 const userString = await AsyncStorage.getItem("user");
                 if (userString !== null) {
                     const user = JSON.parse(userString);
-                    setSocietyId(user.societyId);
                     setUserId(user._id);
                 }
             } catch (error) {
@@ -85,7 +83,6 @@ const MyAdds = () => {
                 { text: "Cancel", style: "cancel" },
                 {
                     text: "Delete", onPress: () => {
-                        // Add delete logic here
                         dispatch(DeletePost(propertyId))
                             .then((response) => {
                                 if (response.type === "marketPlace/deleteResident/fulfilled") {
@@ -166,7 +163,7 @@ const styles = StyleSheet.create({
     },
     dropdownMenu: {
         position: 'absolute',
-        top: 40, // Adjust based on your design
+        top: 40,
         right: 10,
         backgroundColor: '#fff',
         borderRadius: 5,

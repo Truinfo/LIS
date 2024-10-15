@@ -1,8 +1,6 @@
-// src/redux/passwordSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../../../Security/helpers/axios';
 
-// Define the async thunk to fetch data from the backend
 export const fetchUserData = createAsyncThunk(
     'password/fetchUserData',
     async (userData, { rejectWithValue }) => {

@@ -3,9 +3,9 @@ import axiosInstance from "../../../Security/helpers/axios";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const fetchSocietyId = async () => {
-    const storedAdmin = await AsyncStorage.getItem('societyAdmin');
+    const storedAdmin = await AsyncStorage.getItem('user');
     const societyAdmin = JSON.parse(storedAdmin) || {};
-    return societyAdmin._id || "6683b57b073739a31e8350d0"; // Default ID
+    return societyAdmin._id || ""; // Default ID
 };
 
 export const getByMonthAndYear = createAsyncThunk(

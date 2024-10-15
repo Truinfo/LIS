@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, TextInput, StyleSheet, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
-import { verifyOTP, resetVerification, selectLoadingStatus, selectError, selectVerificationStatus } from '../../Redux/Slice/AuthSlice/Signup/otpSlice';
+import { verifyOTP, resetVerification, selectLoadingStatus, } from '../../Redux/Slice/AuthSlice/Signup/otpSlice';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { fetchUserProfile } from '../../Redux/Slice/AuthSlice/Signup/userProfileSlice';
 import Toast from 'react-native-toast-message';
@@ -46,7 +46,6 @@ const Verification = ({ route }) => {
 
   const handleResendOTP = () => {
     setCountdown(180);
-    // Add logic to resend OTP if needed
   };
 
   const handleContinue = async () => {

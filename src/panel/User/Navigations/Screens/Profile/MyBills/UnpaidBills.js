@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
         fontSize: 14,
     },
     chip: {
-        backgroundColor: '#dc2626', // Red color for Unpaid bills
+        backgroundColor: '#dc2626', 
         borderRadius: 12,
         paddingVertical: 4,
         paddingHorizontal: 8,
@@ -126,8 +126,8 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     }, amountContainer: {
         flexDirection: 'row',
-        justifyContent: 'flex-end', // Aligns content to the right end
-        marginTop: 5, // Optional, for spacing
+        justifyContent: 'flex-end', 
+        marginTop: 5, 
     },
 });
 

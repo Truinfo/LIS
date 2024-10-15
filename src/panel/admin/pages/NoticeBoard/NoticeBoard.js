@@ -94,12 +94,13 @@ const NoticeBoard = () => {
     }
     if (!notices || notices.length === 0) {
         return (
-            <View style={styles.errorContainer}>
+            <View style={styles.noDataContainer}>
                 <Image
                     source={require('../../../../assets/Admin/Imgaes/nodatadound.png')}
-                    style={styles.errorImage}
-                    alt="No Data Found"
+                    style={styles.noDataImage}
+                    resizeMode="contain"
                 />
+                <Text style={styles.noDataText}>No Adds Found</Text>
             </View>
         );
     }
@@ -289,10 +290,20 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    errorContainer: {
+    noDataContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    noDataImage: {
+        width: 150,
+        height: 150,
+        marginBottom: 16,
+    },
+    noDataText: {
+        fontSize: 18,
+        color: '#7d0431',
+        textAlign: 'center',
     },
     errorImage: {
         width: 300,

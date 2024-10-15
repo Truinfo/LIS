@@ -25,9 +25,9 @@ const AddNotice = ({ navigation }) => {
 
     useEffect(() => {
         const fetchSocietyId = async () => {
-            const storedAdmin = await AsyncStorage.getItem('societyAdmin');
+            const storedAdmin = await AsyncStorage.getItem('user');
             const societyAdmin = JSON.parse(storedAdmin) || {};
-            const societyId = societyAdmin._id || "6683b57b073739a31e8350d0"; // Default ID
+            const societyId = societyAdmin._id || ""; // Default ID
 
             // Update formData with the fetched societyId
             setFormData(prevFormData => ({

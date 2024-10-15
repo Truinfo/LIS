@@ -6,7 +6,6 @@ import { getSocietiesByAdvertisements } from '../../../Redux/Slice/CommunitySlic
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const PropertyItem = ({ property, navigation }) => {
-
   return (
     <TouchableOpacity
       style={styles.itemContainer}
@@ -30,10 +29,6 @@ const PropertyItem = ({ property, navigation }) => {
 
 const RentalProperties = ({ navigation }) => {
   const dispatch = useDispatch();
-
-  const [societyId, setSocietyId] = useState("");
-  const [buildingName, setBuildingName] = useState("");
-  const [flatNumber, setFlatNumber] = useState("");
   const [userType, setUserType] = useState('');
   const { properties } = useSelector((state) => state.rental);
   useEffect(() => {
@@ -43,8 +38,6 @@ const RentalProperties = ({ navigation }) => {
         if (userString !== null) {
           const user = JSON.parse(userString);
           setUserType(user.userType);
-          setBuildingName(user.buildingName);
-          setFlatNumber(user.flatNumber);
         }
       } catch (error) {
         console.error("Failed to fetch the user from async storage", error);

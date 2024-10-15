@@ -1,13 +1,12 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axiosInstance from "../../../../Security/helpers/axios";
-import axios from "axios";
 
 export const getAmenitiesBySocietyId = createAsyncThunk(
     'amenities/fetchAmenities',
     async (societyId, { rejectWithValue }) => {
         try {
             const response = await axiosInstance.get(`/getAllAmenityBySocietyId/${societyId}`);
-            return response.data.society; // Return the data directly
+            return response.data.society; 
         } catch (error) {
             console.error("Error fetching amenities:", error);
             return rejectWithValue(error.response ? error.response.data : error.message);
@@ -15,17 +14,17 @@ export const getAmenitiesBySocietyId = createAsyncThunk(
     }
 );
 export const bookAmenity = createAsyncThunk(
-    'amenities/booking', // Renamed to a more accurate string
+    'amenities/booking',
     async (BookingData, { rejectWithValue }) => {
         console.log("Booking data",BookingData)
         try {
             const response = await axiosInstance.post(`/bookAmenity/${BookingData.amenityId}`, BookingData.data,{
                 headers: { 'Content-Type': 'application/json'}
             });
-            return response.data; // Return the data directly
+            return response.data;
         } catch (error) {
             console.error("Error fetching amenities:", error);
-            return rejectWithValue(error.response ? error.response.data : error.message); // Improved error handling
+            return rejectWithValue(error.response ? error.response.data : error.message); 
         }
     }
 );

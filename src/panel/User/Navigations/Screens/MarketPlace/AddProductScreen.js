@@ -4,7 +4,7 @@ import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
 import { Picker } from '@react-native-picker/picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Snackbar } from 'react-native-paper';  // Import Snackbar
+import { Snackbar } from 'react-native-paper';  
 import { useDispatch, useSelector } from 'react-redux';
 import { AddProperty } from '../../../Redux/Slice/MarketPlaceSlice/MarketPlace';
 import { useNavigation } from '@react-navigation/native';
@@ -13,11 +13,11 @@ const AddProductScreen = () => {
   const [societyId, setSocietyId] = useState("");
   const [userId, setUserId] = useState("");
   const [pictures, setPictures] = useState([]);
-  const [snackbarVisible, setSnackbarVisible] = useState(false);  // Snackbar visibility state
-  const [snackbarMessage, setSnackbarMessage] = useState(''); // Snackbar message state
+  const [snackbarVisible, setSnackbarVisible] = useState(false); 
+  const [snackbarMessage, setSnackbarMessage] = useState(''); 
   const dispatch = useDispatch()
   const navigation = useNavigation()
-  const { loading, error } = useSelector((state) => state.MarketPlace);
+  const { loading} = useSelector((state) => state.MarketPlace);
   useEffect(() => {
     const getUserName = async () => {
       try {
@@ -147,12 +147,12 @@ const AddProductScreen = () => {
         keyboardType="numeric"
       />
 
-      {/* Dropdown for Category */}
+    
       <Text style={styles.label}>Category</Text>
       <View style={styles.pickerContainer}>
         <Picker
           selectedValue={formData.category}
-          style={{ height: 50, color: formData.category ? '#222' : '#222' }} // Change color based on selected option
+          style={{ height: 50, color: formData.category ? '#222' : '#222' }} 
           onValueChange={(itemValue) => handleInputChange('category', itemValue)}
         >
           <Picker.Item label="Rent" value="Rent" />
@@ -165,7 +165,7 @@ const AddProductScreen = () => {
       <View style={styles.pickerContainer}>
         <Picker
           selectedValue={formData.type}
-          style={{ height: 50, color: formData.category ? '#222' : '#222' }} // Change color based on selected option
+          style={{ height: 50, color: formData.category ? '#222' : '#222' }} 
           onValueChange={(itemValue) => handleInputChange('type', itemValue)}
         >
           <Picker.Item label="Flats" value="Propety" />

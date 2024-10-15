@@ -12,7 +12,6 @@ export const fetchFrequentVisitors = createAsyncThunk(
     }
   });
 
-
 const frequentVisitorSlice = createSlice({
   name: 'frequentVisitors',
   initialState: {

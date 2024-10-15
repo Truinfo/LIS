@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 16,
-        backgroundColor: "#f9f9f9", // Softer background color for better contrast
+        backgroundColor: "#f9f9f9", 
     },
     card: {
         padding: 20,
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 3 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
-        elevation: 4, // Higher elevation for stronger shadow
+        elevation: 4, 
         position: "relative",
     },
     statusChip: {
@@ -129,12 +129,12 @@ const styles = StyleSheet.create({
         color: "#fff",
         fontSize: 12,
         fontWeight: "bold",
-        textTransform: "uppercase", // Makes status text all caps
+        textTransform: "uppercase", 
     },
     amenityName: {
         fontSize: 18,
         fontWeight: "bold",
-        color: "#333", // Darker text for better readability
+        color: "#333", 
         marginBottom: 10,
     },
     row: {
@@ -144,13 +144,13 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 14,
-        color: "#777", // Muted color for labels
+        color: "#777", 
         fontWeight: "500",
     },
     value: {
         fontSize: 14,
         color: "#000",
-        fontWeight: "600", // Slightly bolder for values
+        fontWeight: "600", 
     },
     noBookingsText: {
         fontSize: 16,

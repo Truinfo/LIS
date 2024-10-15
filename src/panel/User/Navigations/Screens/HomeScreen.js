@@ -48,7 +48,6 @@ const HomeScreen = () => {
   // const [amount, setAmount] = useState('1');
   const [transactionNote, setTransactionNote] = useState('Maintenance');
   const [SelectedMonthPayment, setSelectedMonthPayment] = useState(null);
-  const viewShotRef = useRef(); // Reference for ViewShot
 
 
   const generateUpiUrl = (upiId, payeeName, amount, transactionNote) => {
@@ -569,8 +568,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginVertical: 5,
     marginBottom: 20,
-    // Shadow for Android
-    elevation: 5, // Elevation level to create shadow effect
+    elevation: 5,
   },
   row: {
     flexDirection: "row",

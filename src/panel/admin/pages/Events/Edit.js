@@ -27,7 +27,6 @@ const EditEvent = () => {
   const route = useRoute();
   const { eventId } = route.params;
   const event = useSelector(state => state.societyEvents.event || '');
-  const successMessage = useSelector((state) => state.societyEvents.successMessage);
   const status = useSelector((state) => state.societyEvents.status);
   const error = useSelector((state) => state.societyEvents.error);
 
@@ -48,7 +47,7 @@ const EditEvent = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
-  const [currentPickerField, setCurrentPickerField] = useState(null); // 'startDate', 'endDate', 'activity_start', 'activity_end'
+  const [currentPickerField, setCurrentPickerField] = useState(null);
   const [currentActivityIndex, setCurrentActivityIndex] = useState(null);
   const [tempDate, setTempDate] = useState(new Date());
   const [errors, setErrors] = useState({});

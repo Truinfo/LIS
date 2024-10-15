@@ -61,7 +61,7 @@ const UpiPayment = () => {
         }
     };
 
-    const captureScreenshot = async (txnId, paidAmount, transactionDate) => {
+    const captureScreenshot = async () => {
         try {
             const uri = await viewShotRef.current.capture();
             console.log('Screenshot captured:', uri);

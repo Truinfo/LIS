@@ -3,8 +3,8 @@ import axiosInstance from '../../../Security/helpers/axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const getSocietyId = async () => {
-    const societyAdmin = await AsyncStorage.getItem('societyAdmin');
-    return JSON.parse(societyAdmin)?._id || "6683b57b073739a31e8350d0";
+    const societyAdmin = await AsyncStorage.getItem('user');
+    return JSON.parse(societyAdmin)?._id || "";
 };
 
 export const fetchEvent = createAsyncThunk(

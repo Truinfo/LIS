@@ -242,7 +242,7 @@ export default function App() {
                 is24Hour={false}
                 display="default"
                 onChange={onChange}
-                minimumDate={new Date()} // Optional: Prevent selecting past dates
+                minimumDate={new Date()}
               />
             )}
           </View>
@@ -505,10 +505,10 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: "#fff",
     position: "absolute",
-    top: 80, // Adjust based on the input's position
+    top: 80, 
     width: "100%",
-    zIndex: 1000, // Ensure dropdown is above other elements
-    maxHeight: 150, // Limit height to enable scrolling
+    zIndex: 1000, 
+    maxHeight: 150, 
   },
   dropdownItem: {
     padding: 10,
@@ -533,7 +533,7 @@ const styles = StyleSheet.create({
     right: 10,
   },
   iconInside: {
-    // Optional: Add any additional styling for icons here
+    // 
   },
   popupContainer: {
     flex: 1,

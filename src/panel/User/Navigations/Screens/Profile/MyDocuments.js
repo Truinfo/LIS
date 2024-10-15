@@ -93,7 +93,7 @@ const DocumentItem = ({
   const fileUrl = item.fileUri ? `${ImagebaseURL}${item.fileUri}` : null;
 
   const handleDownload = () => {
-    setShowWebView(true); // Show WebView when the button is clicked
+    setShowWebView(true); 
   };
 
   const renderContent = () => {
@@ -110,7 +110,7 @@ const DocumentItem = ({
                 style={styles.pdfPreview}
                 source={{ uri: fileUrl }}
                 onError={(error) => console.error("PDF Load Error:", error)}
-                onLoad={() => setShowWebView(false)} // Optionally hide WebView after loading
+                onLoad={() => setShowWebView(false)} 
               />
             )}
           </View>

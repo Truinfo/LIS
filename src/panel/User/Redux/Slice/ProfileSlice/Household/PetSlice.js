@@ -33,7 +33,7 @@ export const deletePetAsync = createAsyncThunk(
 );
 
 const initialState = {
-    pets: [], // Changed to plural to better represent the array of pets
+    pets: [], 
     status: 'idle',
     error: null,
 };

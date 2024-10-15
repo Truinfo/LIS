@@ -3,7 +3,6 @@ import axiosInstance from '../../../../Security/helpers/axios';
 export const fetchUserProfiles = createAsyncThunk(
   'profiles/fetchUserProfiles',
   async ({userId, societyId}, thunkAPI) => {
-
     try {
       const response = await axiosInstance.get(`/user/getUserProfiles/${userId}/${societyId}`);
 

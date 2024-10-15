@@ -9,7 +9,6 @@ import {
   Modal,
   Alert,
   Image,
-  BackHandler
 } from "react-native";
 import { Avatar, TextInput } from "react-native-paper";
 import { useDispatch, useSelector } from 'react-redux';
@@ -48,10 +47,6 @@ const AddService = ({ route, navigation  }) => {
   const successMessage = useSelector((state) => state.visitor.successMessage);
   const [showModal, setShowModal] = useState(false);
   const [isImageModalVisible, setImageModalVisible] = useState(false);
-  const [bellImage, setBellImage] = useState(require('../../../assets/Security/gif/notification.gif'));
-  const [ringingText, setRingingText] = useState('Ringing....');
-  const [subText, setSubText] = useState('They are getting informed');
-  const [isConfirmationClicked, setIsConfirmationClicked] = useState(false);
   const dispatch = useDispatch();
 
   const [societyId, setSocietyId] = useState(null);
@@ -615,12 +610,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 20,
     marginBottom: 3,
-    //  height: 50,
-    // justifyContent: "center",
-    // position: 'absolute',
-    // bottom: 20,
-    // left: 30,
-    // right: 30,
   },
   confirmButtonText: {
     color: "#fff",

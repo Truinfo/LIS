@@ -88,9 +88,19 @@ const Security = () => {
     );
   }
 
-  if (status === "failed") {
-    return <Text style={styles.errorText}>Error: {error}</Text>;
+  if (error || status === 'failed' || sequrity?.length === 0) { // Show spinner while loading
+    return (
+      <View style={styles.noDataContainer}>
+        <Image
+          source={require('../../../../assets/Admin/Imgaes/nodatadound.png')}
+          style={styles.noDataImage}
+          resizeMode="contain"
+        />
+        <Text style={styles.noDataText}>No Adds Found</Text>
+      </View>
+    );
   }
+
 
   const renderItem = ({ item }) => (
     <TouchableOpacity onPress={() => handleView(item)}>
@@ -167,10 +177,10 @@ const Security = () => {
         data={
           Array.isArray(sequrity)
             ? sequrity.filter(
-                (user) =>
-                  user.name.toLowerCase().includes(searchText.toLowerCase()) ||
-                  user.email.toLowerCase().includes(searchText.toLowerCase())
-              )
+              (user) =>
+                user.name.toLowerCase().includes(searchText.toLowerCase()) ||
+                user.email.toLowerCase().includes(searchText.toLowerCase())
+            )
             : []
         }
         keyExtractor={(item) => item._id}
@@ -351,6 +361,21 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
+  },
+  noDataContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noDataImage: {
+    width: 150,
+    height: 150,
+    marginBottom: 0,
+  },
+  noDataText: {
+    fontSize: 18,
+    color: '#7d0431',
+    textAlign: 'center',
   },
 });
 

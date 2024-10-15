@@ -50,7 +50,6 @@ function Tabs() {
   useFocusEffect(
     React.useCallback(() => {
       socketServices.initializeSocket();
-      // Listen for Visitor Notifications
       socketServices.on("Visitor_Notification", (data) => {
         console.log("recieving data")
         if (data) {
@@ -132,7 +131,6 @@ function Tabs() {
               : require("../../../../assets/User/gif/bottom-tabv/community123.png");
           }
 
-          // Adding a wrapper View to apply an indicator at the top of the icon
           return (
             <View style={{ alignItems: "center", justifyContent: "center" }}>
               {focused && (
@@ -207,8 +205,8 @@ function Tabs() {
             <Ionicons name="storefront-sharp"
               size={24}
               color="#fff"
-              style={{ marginRight: 15 }} // Add some margin to align properly
-              onPress={() => navigation.navigate("Property List")} // Handle icon press here
+              style={{ marginRight: 15 }} 
+              onPress={() => navigation.navigate("Property List")} 
             />
           ),
         }}

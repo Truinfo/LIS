@@ -5,7 +5,6 @@ import {
     TouchableOpacity,
     StyleSheet,
     TextInput,
-    Alert,
 } from "react-native";
 import { RadioButton, Snackbar } from "react-native-paper"; // Import Snackbar
 import { useNavigation } from "@react-navigation/native";
@@ -19,13 +18,12 @@ const AdminRiseComplaints = () => {
     const [checked, setChecked] = useState("");
     const [inputValue, setInputValue] = useState("");
     const [title, setTitle] = useState("");
-    const [societyId, setSocietyId] = useState("");
     const [isFocused, setIsFocused] = useState(false);
     const [category, setCategory] = useState(""); // State for selected category
     const successMessage = useSelector((state) => state.adminComplaints.successMessage);
     const error = useSelector((state) => state.adminComplaints.error);
     const navigation = useNavigation();
-    const [finalData, setFinalData] = useState("6683b57b073739a31e8350d0"); // Default ID
+    const [finalData, setFinalData] = useState(""); // Default ID
 
     // Snackbar state
     const [snackbarVisible, setSnackbarVisible] = useState(false);
@@ -34,10 +32,10 @@ const AdminRiseComplaints = () => {
     useEffect(() => {
         const getSocietyAdmin = async () => {
             try {
-                const storedAdmin = await AsyncStorage.getItem('societyAdmin');
+                const storedAdmin = await AsyncStorage.getItem('user');
                 if (storedAdmin) {
                     const societyAdmin = JSON.parse(storedAdmin);
-                    setFinalData(societyAdmin._id || "6683b57b073739a31e8350d0");
+                    setFinalData(societyAdmin._id || "");
                 }
             } catch (error) {
                 console.error("Error retrieving society admin data:", error);
@@ -217,8 +215,8 @@ const styles = StyleSheet.create({
     },
     pickerContainer: {
         borderWidth: 1,
-        borderColor: "#cacecf", // Set border color
-        borderRadius: 5, // Border radius for rounded corners
+        borderColor: "#cacecf",
+        borderRadius: 5,
         marginHorizontal: 20,
         marginVertical: 10,
     },

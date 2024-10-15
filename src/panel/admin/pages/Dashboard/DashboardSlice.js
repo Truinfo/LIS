@@ -2,9 +2,9 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../../Security/helpers/axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 const fetchSocietyId = async () => {
-    const storedAdmin = await AsyncStorage.getItem('societyAdmin');
+    const storedAdmin = await AsyncStorage.getItem('user');
     const societyAdmin = JSON.parse(storedAdmin) || {};
-    return societyAdmin._id || "6683b57b073739a31e8350d0"; // Default ID
+    return societyAdmin._id || ""; // Default ID
 };
 export const updateRequestStatus = createAsyncThunk(
     'dashboard/updateRequestStatus',
@@ -42,8 +42,7 @@ export const DeleteNotifications = createAsyncThunk(
     'admin/deleteNotification',
     async (id) => {
         const response = await axiosInstance.delete(`/deleteNotifications/${id}`);
-        // Check the response to ensure it contains the necessary data
-        return response.data; // Assuming the server returns the deleted notification or success message
+        return response.data;
     }
 );
 const DashboardSlice = createSlice({

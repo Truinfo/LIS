@@ -95,7 +95,7 @@ const Advertisements = () => {
   );
 
 
-  if (error) { // Show spinner while loading
+  if (error || adds?.length === 0) { // Show spinner while loading
     return (
       <View style={styles.noDataContainer}>
         <Image
@@ -103,7 +103,7 @@ const Advertisements = () => {
           style={styles.noDataImage}
           resizeMode="contain"
         />
-        <Text style={styles.noDataText}>No Posts Found</Text>
+        <Text style={styles.noDataText}>No Adds Found</Text>
       </View>
     );
   }
@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
   },
   actionMenu: {
     position: 'absolute',
-    top: 10, 
+    top: 10,
     right: 30,
     backgroundColor: '#fff',
     borderRadius: 5,
@@ -210,9 +210,9 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   loadingContainer: {
-    flex: 1, 
-    justifyContent: 'center', 
-    alignItems: 'center', 
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   noDataContainer: {
     flex: 1,

@@ -22,7 +22,6 @@ const PlumberList = () => {
   }, [dispatch]);
 
 
-
   const renderItem = ({ item }) => (
     <View style={styles.itemContainer}>
       <View style={styles.rowContainer}>

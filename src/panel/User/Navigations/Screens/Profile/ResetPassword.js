@@ -25,7 +25,7 @@ const ResetPassword = ({ navigation }) => {
         const userString = await AsyncStorage.getItem("user");
         if (userString !== null) {
           const user = JSON.parse(userString);
-          console.log("User data:", user); // Log the user object
+          console.log("User data:", user);
           setSocietyId(user.societyId);
           setUserId(user._id);
         }
@@ -38,7 +38,6 @@ const ResetPassword = ({ navigation }) => {
   }, []);
 
   const handleSave = async () => {
-    // Validate password and confirmation
     if (!password) {
       setPasswordError("Password cannot be empty");
       return;

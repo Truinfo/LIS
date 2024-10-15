@@ -331,8 +331,8 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     noDataImage: {
-        width: 300,
-        height: 300,
+        width: 150,
+        height: 150,
         marginTop: 100,
         alignItems: "center",
     },

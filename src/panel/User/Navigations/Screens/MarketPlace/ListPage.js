@@ -5,11 +5,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getSocityAdds } from '../../../Redux/Slice/MarketPlaceSlice/MarketPlace';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { FAB } from 'react-native-paper';
-// import Icon from 'react-native-vector-icons/MaterialIcons';  // Uncomment if you have the icon library installed
 import { ImagebaseURL } from '../../../../Security/helpers/axios';
 const ListPage = () => {
     const [societyId, setSocietyId] = useState("");
-    const [userId, setUserId] = useState("");
     const navigation = useNavigation()
     const dispatch = useDispatch();
     const { loading, error } = useSelector((state) => state.MarketPlace);
@@ -22,7 +20,6 @@ const ListPage = () => {
                 if (userString !== null) {
                     const user = JSON.parse(userString);
                     setSocietyId(user.societyId);
-                    setUserId(user._id);
                 }
             } catch (error) {
                 console.error("Failed to fetch the user from async storage", error);
@@ -127,19 +124,17 @@ const styles = StyleSheet.create({
     row: {
         flexDirection: "row",
         alignItems: "center",
-        marginBottom: 5, // Add space between rows if needed
+        marginBottom: 5,
     },
     contact: {
-        // Set a fixed width for the contact label
-        width: 70, // Adjust the width based on your design
+        width: 70,
         color: "#222",
-        fontWeight: "bold", // Make the contact label bold
+        fontWeight: "bold", 
     },
     value: {
         color: "#222",
-        flex: 1, // This makes the value take the remaining space
+        flex: 1,
     },
-    // Floating Action Button (FAB) styling
     fab: {
         position: 'absolute',
         width: 60,
@@ -148,8 +143,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#7d0431',
         justifyContent: 'center',
         alignItems: 'center',
-        bottom: 20,  // Position from bottom
-        right: 20,   // Position from right
+        bottom: 20,  
+        right: 20,   
         elevation: 5,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },

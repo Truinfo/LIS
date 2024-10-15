@@ -44,14 +44,12 @@ const SocietyBills = () => {
             const { uri } = await FileSystem.downloadAsync(fullUrl, fileUri);
             console.log('File downloaded to:', uri);
 
-            // Request media library permissions
             const { status } = await MediaLibrary.requestPermissionsAsync();
             if (status !== 'granted') {
                 Alert.alert('Permission Required', 'Please grant access to your media library.');
                 return;
             }
 
-            // Ensure the file exists
             const fileInfo = await FileSystem.getInfoAsync(fileUri);
             if (!fileInfo.exists) {
                 Alert.alert('Error', 'File not found.');
@@ -165,19 +163,19 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 10,
         left: 10,
-        backgroundColor: '#4caf50', // Green color for paid bills
+        backgroundColor: '#4caf50',
         borderRadius: 12,
         paddingVertical: 4,
         paddingHorizontal: 8,
-        zIndex: 1, // Ensure it appears on top of the image
+        zIndex: 1,
     },
     shareButton: {
         position: 'absolute',
-        bottom: 10, // Adjust the vertical positioning
-        right: 10,  // Adjust the horizontal positioning
-        backgroundColor: 'rgba(0, 0, 0, 0.08)', // Semi-transparent background
-        padding: 8,  // Add some padding around the icon
-        borderRadius: 20,  // Make it circular or rounded
+        bottom: 10, 
+        right: 10,  
+        backgroundColor: 'rgba(0, 0, 0, 0.08)', 
+        padding: 8,  
+        borderRadius: 20, 
     },
     chipText: {
         color: '#fff',

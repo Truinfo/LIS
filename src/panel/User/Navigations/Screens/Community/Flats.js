@@ -25,7 +25,7 @@ export default function App() {
     const currentDate = new Date();
     setSelectedDate(currentDate.toLocaleDateString());
   }, []);
-  const onChange = (event, selectedDate) => {
+  const onChange = ( selectedDate) => {
     const currentDate = selectedDate || date;
     setShow(Platform.OS === "ios");
     setDate(currentDate);

@@ -1,29 +1,16 @@
-import React, { useEffect, useId, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, Image } from 'react-native';
+import React, { useEffect,  useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList,  } from 'react-native';
 import { Avatar } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import call from 'react-native-phone-call';
-import DropDownPicker from 'react-native-dropdown-picker';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchSecurities } from '../../../Redux/Slice/QuickActionsSlice/SecuiritySlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const data = [
-    { id: '1', name: 'Swami', phone: '7894562156', gate: 'gate1', avatar_url: require('../../../../../assets/User/images/kishore_360.jpg') },
-    { id: '2', name: 'Narayana Rao', phone: '7894562156', gate: 'gate2', avatar_url: require('../../../../../assets/User/images/kishore_360.jpg') },
-    { id: '3', name: 'Sundaram', phone: '7894562156', gate: 'gate3', avatar_url: require('../../../../../assets/User/images/kishore_360.jpg') },
-    { id: '4', name: 'Naidu', phone: '7894562156', gate: 'gate1', avatar_url: require('../../../../../assets/User/images/kishore_360.jpg') },
-    { id: '5', name: 'Basha', phone: '7894562156', gate: 'gate2', avatar_url: require('../../../../../assets/User/images/kishore_360.jpg') },
-    { id: '6', name: 'Ganapathi', phone: '7894562156', gate: 'gate3', avatar_url: require('../../../../../assets/User/images/kishore_360.jpg') },
-    { id: '7', name: 'Virayya', phone: '7894562156', gate: 'gate1', avatar_url: require('../../../../../assets/User/images/kishore_360.jpg') },
-];
 
 const CalltoSecurity = () => {
     const dispatch = useDispatch();
-    const [selectedGate, setSelectedGate] = useState(null);
     const [societyId, setSocietyId] = useState("");
-
-    const [openGate, setOpenGate] = useState(false);
     const sequrity = useSelector((state) => state.security.security);
     useEffect(() => {
         const getUserName = async () => {

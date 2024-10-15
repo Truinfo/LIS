@@ -7,7 +7,6 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
-  Platform,
 } from "react-native";
 import { TabView, TabBar } from "react-native-tab-view";
 import { useNavigation } from "@react-navigation/native";

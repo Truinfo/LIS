@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, StyleSheet,  TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { ImagebaseURL } from '../../helpers/axios';
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,7 +10,7 @@ import { fetchVisitors } from '../../../User/Redux/Slice/Security_Panel/InandOut
 import { denyEntry } from '../../../User/Redux/Slice/Security_Panel/DenySlice';
 import { Avatar } from 'react-native-paper'
 
-const Waiting = ({ data, setActiveTab }) => {
+const Waiting = ({ data,  }) => {
   const [societyId, setSocietyId] = useState(null);
   const dispatch = useDispatch();
   const [showDialog, setShowDialog] = useState(false);
@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
   },
   list: {
     paddingHorizontal: 15,
-    backgroundColor: '#f5f5f5', // Added background color to the list
+    backgroundColor: '#f5f5f5', 
   },
   buttonContainer: {
     flexDirection: 'row',

@@ -243,13 +243,16 @@ const AddSecurity = () => {
             />
             {errors.name && <Text style={styles.error}>{errors.name}</Text>}
 
-            <TextInput
+               <TextInput
               mode="outlined"
               label="Email"
               value={formData.email}
-              onChangeText={(value) => handleChange('email', value.toLowerCase())}
+              onChangeText={(value) => handleChange('email', value)}
               theme={{ colors: { primary: "#7d0431" } }}
               style={styles.textInput}
+              keyboardType="email-address"
+              autoCapitalize="none" // Prevent automatic capitalization
+              autoCorrect={false}
             />
             {errors.email && <Text style={styles.error}>{errors.email}</Text>}
 

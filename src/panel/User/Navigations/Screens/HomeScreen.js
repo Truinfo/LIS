@@ -176,7 +176,6 @@ const HomeScreen = () => {
     getUserName();
   }, []);
   useEffect(() => {
-    console.log(verified);
     if (verified === false) {
       navigation.reset({
         index: 0,

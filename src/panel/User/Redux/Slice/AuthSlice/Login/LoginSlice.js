@@ -53,7 +53,7 @@ const userSlice = createSlice({
                 state.user = action.payload.profile;
                 state.token = action.payload.token;
                 state.status = '';
-                const { _id, name, role, societyId, userId, buildingName, flatNumber, societyName, sequrityId, userType } = action.payload.profile;
+                const { _id, name, role, societyId, userId, buildingName, flatNumber,isVerified, societyName, sequrityId, userType } = action.payload.profile;
                 const userData = {
                     _id,
                     sequrityId,
@@ -61,7 +61,7 @@ const userSlice = createSlice({
                     name,
                     role,
                     societyId, societyName,
-                    buildingName, flatNumber, userType
+                    buildingName, flatNumber, userType,isVerified
                 };
                 const userDataString = JSON.stringify(userData);
                 AsyncStorage.setItem('user', userDataString)

@@ -1,13 +1,43 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
+
 const WaitingForAccessScreen = () => {
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    const checkUserVerification = async () => {
+      try {
+        const userString = await AsyncStorage.getItem("user");
+        if (userString) {
+          const user = JSON.parse(userString);
+          const isVerified = user.isVerified;
+
+          // Navigate to Tabs if verified
+          console.log(isVerified)
+          if (isVerified) {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: "Tabs" }],
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching user data", error);
+      }
+    };
+
+    checkUserVerification();
+  }, [navigation]);
+
   return (
     <View style={styles.container}>
       <Image
-          source={require("../../../../assets/User/images/Waiting-pana.png")}
-          style={styles.image}
-          resizeMode="cover"
-        />
+        source={require("../../../../assets/User/images/Waiting-pana.png")}
+        style={styles.image}
+        resizeMode="cover"
+      />
       <Text style={styles.message}>Waiting For Admin Access</Text>
     </View>
   );

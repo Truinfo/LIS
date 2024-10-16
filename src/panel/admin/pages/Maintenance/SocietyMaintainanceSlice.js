@@ -12,6 +12,7 @@ export const getByMonthAndYear = createAsyncThunk(
     'maintainances/getByMonthAndYear',
     async (monthAndYear) => {
         const societyId = await fetchSocietyId()
+        console.log(societyId)
         const response = await axiosInstance.get(`/getByMonthAndYear/${societyId}/${monthAndYear}`);
         return response.data.maintenance.society;
     }

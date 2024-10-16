@@ -1,23 +1,36 @@
 // EmergencyContact.js
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Modal,  ScrollView, Alert, TextInput } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, Modal, ScrollView, Alert, TextInput, Image } from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { useDispatch, useSelector } from 'react-redux';
 import { createEmergencyContact, deleteEmergencyContact, fetchEmergencyContacts, updateEmergencyContact } from '../../../User/Redux/Slice/CommunitySlice/EmergencyContactSlice';
 import { deletecommityMembers, fetchCommityMembers } from '../Profile/committeeSlice';
-import { ActivityIndicator, Avatar,  FAB, IconButton, Snackbar } from 'react-native-paper';
+import { ActivityIndicator, Avatar, FAB, IconButton, Snackbar } from 'react-native-paper';
 import { TouchableOpacity } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ImagebaseURL } from '../../../Security/helpers/axios';
-
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const Tab = createMaterialTopTabNavigator();
-const societyId = "6683b57b073739a31e8350d0";
 
 const ContactsTab = ({ fetchContacts, contacts, renderItem, snackbarVisible, setSnackbarVisible, snackbarMessage }) => {
     const dispatch = useDispatch();
     const navigation = useNavigation();
-
+    const [societyId, setSocietyId] = useState('')
+    useEffect(() => {
+        const getSocietyAdmin = async () => {
+            try {
+                const storedAdmin = await AsyncStorage.getItem('user');
+                if (storedAdmin) {
+                    const societyAdmin = JSON.parse(storedAdmin);
+                    setSocietyId(societyAdmin._id || "");
+                }
+            } catch (error) {
+                console.error("Error retrieving society admin data:", error);
+            }
+        };
+        getSocietyAdmin();
+    }, []);
     const status =
         useFocusEffect(
             React.useCallback(() => {
@@ -63,6 +76,7 @@ const EmergencyContactsTab = () => {
     const [anchor, setAnchor] = useState(null);
     const dispatch = useDispatch();
     const contacts = useSelector(state => state.emergencyContacts.contacts);
+    const { error } = useSelector(state => state.emergencyContacts);
     const [editContact, setEditContact] = useState({ name: '', profession: '', phoneNumber: '', serviceType: "" });
     const [newContact, setNewContact] = useState({ name: '', profession: '', phoneNumber: '', serviceType: "" });
     const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -131,17 +145,27 @@ const EmergencyContactsTab = () => {
     };
     const renderContactItem = ({ item }) => (
         <View style={styles.contactCard}>
-            <View style={styles.column}>
+            {item || !error ? <View> <View style={styles.column}>
                 <Text style={{ fontSize: 16, fontWeight: 600 }}>{item.name}</Text>
                 <Text style={{ fontSize: 14, fontWeight: 400, color: "gray" }}>{item.profession}</Text>
                 <Text>{item.phoneNumber}</Text>
             </View>
-            <IconButton
-                icon="dots-vertical"
-                onPress={() => handleMenuPress(item)}
-                size={20}
-                style={styles.iconButton}
-            />
+                <IconButton
+                    icon="dots-vertical"
+                    onPress={() => handleMenuPress(item)}
+                    size={20}
+                    style={styles.iconButton}
+                /> </View> :
+                <View style={styles.noDataContainer}>
+                    <Image
+                        source={require('../../../../assets/Admin/Imgaes/nodatadound.png')}
+                        style={styles.noDataImage}
+                        resizeMode="contain"
+                    />
+                    <Text style={styles.noDataText}>No Amenities Found</Text>
+                </View>
+            }
+
             {anchor === item._id && (
                 <ScrollView style={[styles.menuList, { top: 0 }]}>
                     <TouchableOpacity style={styles.menuItem} onPress={() => {
@@ -163,7 +187,7 @@ const EmergencyContactsTab = () => {
             )}
         </View>
     );
- 
+
 
     return (
         <>
@@ -519,6 +543,21 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    noDataContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    noDataImage: {
+        width: 150,
+        height: 150,
+        marginBottom: 16,
+    },
+    noDataText: {
+        fontSize: 18,
+        color: '#7d0431',
+        textAlign: 'center',
     },
 });
 

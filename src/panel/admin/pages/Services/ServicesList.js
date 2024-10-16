@@ -14,25 +14,40 @@ import { useDispatch, useSelector } from 'react-redux';
 import { deleteServicePerson, fetchAllServiceTypes } from './ServicesSlice';
 import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import { ImagebaseURL } from '../../../Security/helpers/axios';
-import { Button, Modal, Portal, Snackbar } from 'react-native-paper';
+import { Modal, Snackbar } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const ServicesList = () => {
     const dispatch = useDispatch();
     const navigation = useNavigation();
     const route = useRoute();
     const { serviceType } = route.params;
-    const societyId = "6683b57b073739a31e8350d0";
+    const [societyId, setSocietyId] = useState("");
     const staff = useSelector((state) => state.staff.data);
-
     const [anchor, setAnchor] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
-
     const [selectedservicePerson, setSelectedservicePerson] = useState(null);
     const [searchText, setSearchText] = useState('');
     const [loading, setLoading] = useState(true);
     const [snackbarVisible, setSnackbarVisible] = useState(false); // Snackbar visibility state
     const [snackbarMessage, setSnackbarMessage] = useState(''); // Snackbar message state
-
+    useEffect(() => {
+        const getUserName = async () => {
+            try {
+                const userString = await AsyncStorage.getItem("user");
+                const societyAdmin = await AsyncStorage.getItem('user');
+                const parsedAdmin = societyAdmin ? JSON.parse(societyAdmin) : {};
+                setSocietyId(parsedAdmin._id || "");
+                if (userString !== null) {
+                    const user = JSON.parse(userString);
+                    setSocietyId(user.societyId);
+                }
+            } catch (error) {
+                console.error("Failed to fetch the user from async storage", error);
+            }
+        };
+        getUserName();
+    }, []);
     useFocusEffect(
         useCallback(() => {
             const fetchData = async () => {
@@ -119,7 +134,7 @@ const ServicesList = () => {
                 <Icon name="more-vert" size={20} color="#424242" />
             </TouchableOpacity>
             {anchor === item._id && (
-                <ScrollView style={[styles.menuList, { top:3}]}>
+                <ScrollView style={[styles.menuList, { top: 3 }]}>
                     <TouchableOpacity style={styles.menuItem} onPress={handleEdit}>
                         <Text>Edit</Text>
                     </TouchableOpacity>
@@ -272,7 +287,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     menuItem: {
-        padding:7,
+        padding: 7,
     },
     menuList: {
         position: 'absolute',

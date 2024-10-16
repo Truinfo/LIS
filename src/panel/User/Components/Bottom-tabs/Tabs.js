@@ -14,10 +14,9 @@ const Tab = createBottomTabNavigator();
 
 function Tabs() {
   const [societyId, setSocietyId] = useState(null);
-  const [userName, setUserName] = useState(null);
   const [userId, setUserId] = useState(null);
   const [payeeName, setPayeeName] = useState('');
-  const [NotifyUser, setNotifyUser] = useState('');
+  const [NotifyUser, setNotifyUser] = useState(null);
   useEffect(() => {
     const getUserName = async () => {
       try {
@@ -48,62 +47,81 @@ function Tabs() {
   useFocusEffect(
     React.useCallback(() => {
       socketServices.initializeSocket();
-      // socketServices.on("Visitor_Request", (data) => {
-      //   if (!data || !data.userId || !userId) {
-      //     console.error("Invalid data received for Visitor Request:", data);
-      //     return;
-      //   }
-      //   if (data.userId === userId) {
-      //     const visitorName = data.visitorName || "Unknown Visitor";
-      //     const flatNumber = data.flatNumber || "Unknown Flat";
-      //     const buildingName = data.buildingName || "Unknown Building";
-      //     const securityId = data.securityId || "Unknown Building";
-      //     Alert.alert(
-      //       `Visitor Request`,
-      //       `Visitor ${visitorName} is requesting access to your flat ${flatNumber} in ${buildingName}. Do you want to approve?`,
-      //       [
-      //         {
-      //           text: "Decline",
-      //           onPress: () => {
-      //             socketServices.emit("Visitor_Response", {
-      //               visitorName,
-      //               response: "declined",
-      //               flatNumber,
-      //               buildingName,
-      //               residentName: userName,
-      //               societyId,
-      //               userId,
-      //               securityId
-      //             });
-      //           },
-      //         },
-      //         {
-      //           text: "Approve",
-      //           onPress: () => {
-      //             socketServices.emit("Visitor_Response", {
-      //               visitorName,
-      //               response: "approved",
-      //               flatNumber,
-      //               buildingName,
-      //               residentName: userName,
-      //               societyId,
-      //               userId,
-      //               securityId
-      //             });
-      //           },
-      //         },
-      //       ],
-      //       { cancelable: false }
-      //     );
-      //   } else {
-      //     console.error("Received data is undefined or null");
-      //   }
-      // });
+
+      if (societyId) {
+        socketServices.emit("joinSecurityPanel", societyId);
+      }
+
+      socketServices.on("Visitor_Request", async (data) => {
+        console.log(data, "Received Visitor_Request Data");
+
+        // Fetch the NotifyUser if it's not already set
+        if (!NotifyUser) {
+          const userString = await AsyncStorage.getItem("user");
+          if (userString !== null) {
+            const user = JSON.parse(userString);
+            if (user._id) {
+              setNotifyUser(user._id);
+            }
+          }
+        }
+        if (data?.userId && NotifyUser) {
+          console.log("Comparing User IDs:", data.userId, NotifyUser);
+          if (data.userId === NotifyUser) {
+            console.log("Matching visitor request data received:", data);
+            const visitorName = data.visitorName || "Unknown Visitor";
+            const flatNumber = data.flatNumber || "Unknown Flat";
+            const buildingName = data.buildingName || "Unknown Building";
+            const securityId = data.securityId || "Unknown Security ID";
+            Alert.alert(
+              `Visitor Request`,
+              `Visitor ${visitorName} is requesting access to your flat ${flatNumber} in ${buildingName}. Do you want to approve?`,
+              [
+                {
+                  text: "Decline",
+                  onPress: () => {
+                    socketServices.emit("Visitor_Response", {
+                      visitorName,
+                      response: "declined",
+                      flatNumber,
+                      buildingName,
+                      residentName: payeeName,
+                      societyId,
+                      userId,
+                      securityId,
+                    });
+                  },
+                },
+                {
+                  text: "Approve",
+                  onPress: () => {
+                    socketServices.emit("Visitor_Response", {
+                      visitorName,
+                      response: "approved",
+                      flatNumber,
+                      buildingName,
+                      residentName: payeeName,
+                      societyId,
+                      userId,
+                      securityId,
+                    });
+                  },
+                },
+              ],
+              { cancelable: false }
+            );
+          } else {
+            console.log("UserId does not match the NotifyUser or incomplete data received.");
+          }
+        } else {
+          console.error("Invalid data received for Visitor Request or NotifyUser not set:", data);
+        }
+      });
 
       return () => {
-        // socketServices.removeListener("Visitor_Notification");
+        socketServices.removeListener("Visitor_Request");
       };
-    }, [userId, societyId])
+    }, [societyId, NotifyUser])
   );
 
   return (

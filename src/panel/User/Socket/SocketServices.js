@@ -1,5 +1,6 @@
 import io from 'socket.io-client';
 const BaseUrl = 'https://livinsync.onrender.com'
+// const BaseUrl = 'http://192.168.29.151:2000/'
 class WSService {
     constructor() {
         this.socket = null;

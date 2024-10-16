@@ -51,6 +51,7 @@ const QuickActions = ({ navigation }) => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [vehicleNumber, setVehicleNumber] = useState("");
   const [company, setCompany] = useState("");
+  const [userName, setUserName] = useState("");
 
   //Delivery
   const [details, setDetails] = useState("");
@@ -95,7 +96,7 @@ const QuickActions = ({ navigation }) => {
     ]);
   };
 
-  const { profiles,  } = useSelector((state) => state.profiles);
+  const { profiles, } = useSelector((state) => state.profiles);
   const dispatch = useDispatch();
   const resetFields = () => {
     setImage("");
@@ -116,6 +117,8 @@ const QuickActions = ({ navigation }) => {
           const user = JSON.parse(userString);
           setUserId(user.userId);
           setSocietyId(user.societyId);
+          console.log(user)
+          setUserName(user.residentName);
         }
       } catch (error) {
         console.error("Failed to fetch the user from async storage", error);
@@ -130,7 +133,7 @@ const QuickActions = ({ navigation }) => {
       dispatch(fetchUserProfiles({ userId, societyId }));
     }
     if (societyId) {
-      socketServices.emit("joinSecurityPanel",  societyId );
+      socketServices.emit("joinSecurityPanel", societyId);
     }
   }, [dispatch, userId, societyId]);
   useEffect(() => {
@@ -425,13 +428,13 @@ const QuickActions = ({ navigation }) => {
       alert("Please select an option before raising an alarm.");
       return;
     }
-
+    console.log(userName, "username")
     const alarmData = {
       option: selectedOption,
-      societyId: societyId, // Make sure you have the society ID available
-      block: buildingName, // or any relevant block information
-      flatNumber: flatNumber, // Resident's flat number
-      residentName: userId, // Resident's name
+      societyId: societyId,
+      block: buildingName,
+      flatNumber: flatNumber,
+      residentName: userName,
     };
 
 
@@ -439,7 +442,7 @@ const QuickActions = ({ navigation }) => {
 
     alert("Alarm raised! Security has been notified.");
 
-    toggleModal(); 
+    toggleModal();
   };
 
 
@@ -940,7 +943,7 @@ const QuickActions = ({ navigation }) => {
         </View>
       </Modal>
 
-      
+
       <Modal
         visible={isAlertModalVisible}
         transparent={true}
@@ -1188,15 +1191,15 @@ const styles = StyleSheet.create({
   },
   profilecontainer: {
     alignItems: "center",
-    position: "relative", 
+    position: "relative",
   },
   cameraIcon: {
-    position: "absolute", 
-    bottom: 10, 
-    right: 5, 
+    position: "absolute",
+    bottom: 10,
+    right: 5,
     borderRadius: 50,
-    backgroundColor: " rgba(0,0,0,0.2)", 
-    padding: 10, 
+    backgroundColor: " rgba(0,0,0,0.2)",
+    padding: 10,
   },
 });
 

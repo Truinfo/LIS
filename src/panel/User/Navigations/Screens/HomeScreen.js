@@ -90,13 +90,13 @@ const HomeScreen = () => {
       }
 
       socketServices.on("Visitor_Request", async (data) => {
-        console.log(data, "Received Visitor_Request Data");
 
         // Fetch the NotifyUser if it's not already set
         if (!NotifyUser) {
           const userString = await AsyncStorage.getItem("user");
           if (userString !== null) {
             const user = JSON.parse(userString);
+            console.log(user)
             if (user._id) {
               setNotifyUser(user._id);
             }

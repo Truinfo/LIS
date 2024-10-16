@@ -113,7 +113,7 @@ function SecurityTabs() {
     const getUserName = async () => {
       try {
         const userString = await AsyncStorage.getItem("user");
-  
+
         if (userString) {
           const user = JSON.parse(userString);
           console.log(user._id, "security id");
@@ -125,27 +125,27 @@ function SecurityTabs() {
         console.error("Failed to fetch the user from async storage", error);
       }
     };
-  
+
     getUserName();
   }, []);
-  
+
   useFocusEffect(
     React.useCallback(() => {
       socketServices.initializeSocket();
-  
+
       if (societyId) {
         socketServices.emit("joinSecurityPanel", societyId);
       }
-  
+
       const handleGateAlertReceived = (data) => {
         console.log("Received Gate Alert:", data);
         setAlertData(data);
         setModalVisible(true);
         playAlertSound();
       };
-  
+
       socketServices.on("Gate_alert_received", handleGateAlertReceived);
-  
+
       const handleresponseRecieved = async (data) => {
         // Check and ensure the verifySecurityId is fetched before comparing
         if (!verifySecurityId) {
@@ -155,17 +155,17 @@ function SecurityTabs() {
             setVerifySecurityId(user._id);
           }
         }
-  
+
         // Log the IDs for debugging
         console.log(verifySecurityId, "verifySecurityId after AsyncStorage check");
         console.log(data.securityId, "data.securityId");
-  
+
         // Proceed with the comparison only if both IDs are available
         if (!data?.securityId || !verifySecurityId) {
           console.error("Invalid data received or verifySecurityId is null:", data);
           return;
         }
-  
+
         if (data?.securityId === verifySecurityId) {
           const message = `
             Flat Details: ${data.buildingName}/ ${data.flatNumber || "N/A"}
@@ -181,9 +181,9 @@ function SecurityTabs() {
           );
         }
       };
-  
+
       socketServices.on("Visitor_Response_Notification", handleresponseRecieved);
-  
+
       return () => {
         socketServices.removeListener("Gate_alert_received", handleGateAlertReceived);
         socketServices.removeListener("Visitor_Response_Notification", handleresponseRecieved);

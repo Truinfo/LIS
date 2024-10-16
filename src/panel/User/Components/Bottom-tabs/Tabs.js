@@ -16,27 +16,27 @@ function Tabs() {
   const [societyId, setSocietyId] = useState(null);
   const [userName, setUserName] = useState(null);
   const [userId, setUserId] = useState(null);
-  useFocusEffect(
-    React.useCallback(() => {
+  const [payeeName, setPayeeName] = useState('');
+  useEffect(() => {
+    const getUserName = async () => {
+      try {
+        const userString = await AsyncStorage.getItem("user");
+        if (userString !== null) {
+          const user = JSON.parse(userString);
+          setSocietyId(user.societyId);
+          setUserId(user.userId);
+          setPayeeName(user?.name);
 
-      const getUserName = async () => {
-        try {
-          const userString = await AsyncStorage.getItem("user");
-
-          if (userString) {
-            const user = JSON.parse(userString);
-            setSocietyId(user.societyId);
-            setUserName(user.name);
-            setUserId(user._id);
-
+          if (user._id) {
+            setNotifyUser(user._id);
           }
-        } catch (error) {
-          console.error("Failed to fetch the user from async storage", error);
         }
-      };
-      getUserName();
-    }, [])
-  );
+      } catch (error) {
+        console.error("Failed to fetch the user from async storage", error);
+      }
+    };
+    getUserName();
+  }, []);
 
   useEffect(() => {
 

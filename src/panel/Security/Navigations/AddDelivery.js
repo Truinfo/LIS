@@ -54,13 +54,17 @@ const AddDelivery = ({ route, navigation }) => {
   const [isImageModalVisible, setImageModalVisible] = useState(false);
   const dispatch = useDispatch();
   const [societyId, setSocietyId] = useState(null);
+  const [securityId, setSecurityId] = useState(null);
+
   useEffect(() => {
     const getSocietyId = async () => {
       try {
         const user = await AsyncStorage.getItem("user");
-        const id = JSON.parse(user).societyId;
+        const id = JSON.parse(user);
+        console.log(user, "security")
         if (id !== null) {
-          setSocietyId(id);
+          setSocietyId(id.societyId);
+          setSecurityId(id._id);
         } else {
           console.error("No societyId found in AsyncStorage");
         }
@@ -71,6 +75,7 @@ const AddDelivery = ({ route, navigation }) => {
     getSocietyId();
     socketServices.initializeSocket();
   }, []);
+
 
   const { society } = useSelector((state) => state.societyById);
 
@@ -178,6 +183,7 @@ const AddDelivery = ({ route, navigation }) => {
             buildingName: block,
             societyId: societyId,
             action: "approve or decline",
+            securityId: securityId
           };
           socketServices.emit("AddVisitor", { data });
           setName("");

@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { Avatar, TextInput } from "react-native-paper";
 import { useDispatch, useSelector } from 'react-redux';
-import { createVisitor,resetState, } from "../../User/Redux/Slice/Security_Panel/VisitorsSlice";
+import { createVisitor, resetState, } from "../../User/Redux/Slice/Security_Panel/VisitorsSlice";
 import { fetchSocietyById } from "../../User/Redux/Slice/Security_Panel/SocietyByIdSlice";
 import MyDialog from "../DialogBox/DialogBox";
 import * as ImagePicker from "expo-image-picker";
@@ -21,7 +21,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AntDesign, Entypo, MaterialIcons } from "@expo/vector-icons";
 import socketServices from "../../User/Socket/SocketServices";
 
-const AddService = ({ route, navigation  }) => {
+const AddService = ({ route, navigation }) => {
   const [name, setName] = useState("");
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -50,13 +50,17 @@ const AddService = ({ route, navigation  }) => {
   const dispatch = useDispatch();
 
   const [societyId, setSocietyId] = useState(null);
+  const [securityId, setSecurityId] = useState(null);
+
   useEffect(() => {
     const getSocietyId = async () => {
       try {
         const user = await AsyncStorage.getItem("user");
-        const id = JSON.parse(user).societyId;
+        const id = JSON.parse(user);
+        console.log(user, "security")
         if (id !== null) {
-          setSocietyId(id);
+          setSocietyId(id.societyId);
+          setSecurityId(id._id);
         } else {
           console.error("No societyId found in AsyncStorage");
         }
@@ -64,7 +68,7 @@ const AddService = ({ route, navigation  }) => {
         console.error("Error fetching societyId from AsyncStorage:", error);
       }
     };
-    getSocietyId(); 
+    getSocietyId();
     socketServices.initializeSocket();
   }, []);
   const { society } = useSelector((state) => state.societyById);
@@ -181,8 +185,9 @@ const AddService = ({ route, navigation  }) => {
             visitorName: name,
             flatNumber: flatNo,
             buildingName: block,
-            societyId:societyId,
+            societyId: societyId,
             action: "approve or decline",
+            securityId: securityId
           };
           socketServices.emit("AddVisitor", { data });
           setName("");
@@ -193,7 +198,7 @@ const AddService = ({ route, navigation  }) => {
           setFlatNo("");
           setImageFile(null);
           setImagePreview(null);
-          setDialogMessage(response.payload.message); 
+          setDialogMessage(response.payload.message);
           setShowDialog(true);
           setTimeout(() => {
             setShowDialog(false);
@@ -201,15 +206,15 @@ const AddService = ({ route, navigation  }) => {
             navigation.navigate("SecurityTabs", { screen: "Visitors Entries" });
           }, 1000);
         } else {
-          setDialogMessage(response.payload.message || "An error occurred"); 
+          setDialogMessage(response.payload.message || "An error occurred");
           setShowDialog(true);
           setTimeout(() => {
             setShowDialog(false);
           }, 1000);
         }
       } catch (error) {
-        console.error(error); 
-        setDialogMessage("An error occurred while creating the visitor."); 
+        console.error(error);
+        setDialogMessage("An error occurred while creating the visitor.");
         setShowDialog(true);
         setTimeout(() => {
           setShowDialog(false);
@@ -299,7 +304,7 @@ const AddService = ({ route, navigation  }) => {
     <SafeAreaView style={styles.container}>
       <ScrollView vertical={true} contentContainerStyle={styles.scrollViewContent} showsVerticalScrollIndicator={false}>
         <View style={styles.avatarWrapper}>
-        <TouchableOpacity
+          <TouchableOpacity
             style={styles.avatarContainer}
             onPress={handleAvatarPress}
           >
@@ -310,15 +315,15 @@ const AddService = ({ route, navigation  }) => {
                 size={174}
                 source={{ uri: imagePreview }}
               />
-            ) : 
-            (
-              <Avatar.Image
-                size={174}
-                style={styles.avatar}
-                color="#fff"
-                source={require("../../../assets/Security/images/user.png")}
-              />
-            )
+            ) :
+              (
+                <Avatar.Image
+                  size={174}
+                  style={styles.avatar}
+                  color="#fff"
+                  source={require("../../../assets/Security/images/user.png")}
+                />
+              )
             }
           </TouchableOpacity>
           <TouchableOpacity
@@ -340,7 +345,7 @@ const AddService = ({ route, navigation  }) => {
             value={name}
             mode="outlined"
             outlineColor={nameError ? "red" : "#ccc"}
-            theme={{ colors: { primary:  nameError ? "red" : "#800336",} }}
+            theme={{ colors: { primary: nameError ? "red" : "#800336", } }}
             // error={!!nameError}
             onChangeText={setName}
           />
@@ -355,7 +360,7 @@ const AddService = ({ route, navigation  }) => {
             keyboardType="phone-pad"
             mode="outlined"
             outlineColor={phoneNumberError ? "red" : "#CCC"}
-            theme={{ colors: { primary:  phoneNumberError ? "red" : "#800336", } }}
+            theme={{ colors: { primary: phoneNumberError ? "red" : "#800336", } }}
             // error={!!phoneNumberError}
             onChangeText={(text) => { setPhoneNumber(text); setPhoneNumberError(""); }}
           />
@@ -369,19 +374,19 @@ const AddService = ({ route, navigation  }) => {
             value={company}
             mode="outlined"
             outlineColor={companyError ? "red" : "#CCC"}
-            theme={{ colors: { primary:  companyError ? "red" : "#800336", } }}
+            theme={{ colors: { primary: companyError ? "red" : "#800336", } }}
             // error={!!companyError}
-            onChangeText={ setCompany}
+            onChangeText={setCompany}
           />
           {companyError ? (<Text style={styles.errorMessage}> {companyError}</Text>) : null}
-          
+
           <TextInput
-            style={[styles.inputBlock, { marginTop: 10},  detailsError && { borderColor: "red" },]}
+            style={[styles.inputBlock, { marginTop: 10 }, detailsError && { borderColor: "red" },]}
             label='Details *'
             value={details}
             mode='outlined'
             outlineColor={detailsError ? "red" : "#CCC"}
-            theme={{ colors: { primary: detailsError ? "red" : "#800336",} }}
+            theme={{ colors: { primary: detailsError ? "red" : "#800336", } }}
             // error={!!detailsError}
             onChangeText={(text) => setDetails(text)}
           />
@@ -390,7 +395,7 @@ const AddService = ({ route, navigation  }) => {
           <View>
             <TouchableOpacity
               style={[styles.dropdownButton, showBuildingDropdown && styles.dropdownActive, { marginTop: 15 },
-                blockError && { borderColor: "red" },]}
+              blockError && { borderColor: "red" },]}
               onPress={() => setShowBuildingDropdown(!showBuildingDropdown)}
             >
               <Text style={styles.dropdownButtonText}>  {block ? `${block}` : "Select Block *"} </Text>
@@ -419,7 +424,7 @@ const AddService = ({ route, navigation  }) => {
               style={[styles.dropdownButton, showFlatNoDropdown && styles.dropdownActive, { marginTop: 15 }, flatNoError && { borderColor: "red" },]}
               onPress={() => setShowFlatNoDropdown(!showFlatNoDropdown)}
             >
-              <Text style={styles.dropdownButtonText }>  {flatNo ? `${flatNo}` : "Select Flat Number *"}  </Text>
+              <Text style={styles.dropdownButtonText}>  {flatNo ? `${flatNo}` : "Select Flat Number *"}  </Text>
               <Text>
                 <MaterialIcons name={showFlatNoDropdown ? 'arrow-drop-up' : 'arrow-drop-down'} size={20} color="#000" style={{ marginRight: 5 }} />
               </Text>
@@ -441,69 +446,69 @@ const AddService = ({ route, navigation  }) => {
           {flatNoError ? <Text style={styles.errorMessage}>{flatNoError}</Text> : null}
         </View>
 
-      <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm} disabled={loading}>
-        <Text style={styles.confirmButtonText}>Add</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm} disabled={loading}>
+          <Text style={styles.confirmButtonText}>Add</Text>
+        </TouchableOpacity>
       </ScrollView>
       <MyDialog
-          message={dialogMessage || error}
-          showDialog={showDialog}
-          onClose={() => setShowDialog(false)}
-        />
+        message={dialogMessage || error}
+        showDialog={showDialog}
+        onClose={() => setShowDialog(false)}
+      />
       <Modal
         animationType="fade"
         transparent={true}
         visible={showModal}
         onRequestClose={() => setShowModal(false)}
-        >
-         <View style={styles.modalBackground}>
-            <View style={styles.modalContainer}>
-              <View style={styles.modalHeader}>
-                <Text style={{ fontSize: 22, fontWeight: "700" }}>
-                  Profile Photo
-                </Text>
-                <TouchableOpacity style={{ position: "absolute", right: 0 }}>
-                  <Entypo
-                    name="circle-with-cross"
+      >
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalHeader}>
+              <Text style={{ fontSize: 22, fontWeight: "700" }}>
+                Profile Photo
+              </Text>
+              <TouchableOpacity style={{ position: "absolute", right: 0 }}>
+                <Entypo
+                  name="circle-with-cross"
+                  size={27}
+                  color="#800336"
+                  onPress={closeCross}
+                />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.icons}>
+              <View style={styles.camera}>
+                <TouchableOpacity onPress={takePhoto}>
+                  <MaterialCommunityIcons
+                    name="camera-outline"
                     size={27}
                     color="#800336"
-                    onPress={closeCross}
                   />
+                  <Text style={styles.camText}>Camera</Text>
                 </TouchableOpacity>
               </View>
-              <View style={styles.icons}>
-                <View style={styles.camera}>
-                  <TouchableOpacity onPress={takePhoto}>
-                    <MaterialCommunityIcons
-                      name="camera-outline"
-                      size={27}
-                      color="#800336"
-                    />
-                    <Text style={styles.camText}>Camera</Text>
-                  </TouchableOpacity>
-                </View>
-                <View>
-                  <TouchableOpacity onPress={pickImage}>
-                    <MaterialCommunityIcons
-                      name="view-gallery-outline"
-                      size={27}
-                      color="#800336"
-                    />
-                    <Text style={styles.camText}>Gallery</Text>
-                  </TouchableOpacity>
-                </View>
-                <View>
-                  <TouchableOpacity onPress={deletePhoto}>
-                    <AntDesign name="delete" size={27} color="#800336" />
-                    <Text style={styles.camText}>Delete</Text>
-                  </TouchableOpacity>
-                </View>
+              <View>
+                <TouchableOpacity onPress={pickImage}>
+                  <MaterialCommunityIcons
+                    name="view-gallery-outline"
+                    size={27}
+                    color="#800336"
+                  />
+                  <Text style={styles.camText}>Gallery</Text>
+                </TouchableOpacity>
+              </View>
+              <View>
+                <TouchableOpacity onPress={deletePhoto}>
+                  <AntDesign name="delete" size={27} color="#800336" />
+                  <Text style={styles.camText}>Delete</Text>
+                </TouchableOpacity>
               </View>
             </View>
           </View>
-        </Modal>
-      
-        <Modal
+        </View>
+      </Modal>
+
+      <Modal
         visible={isImageModalVisible}
         transparent={true}
         animationType="fade"
@@ -512,8 +517,8 @@ const AddService = ({ route, navigation  }) => {
         <View style={styles.fullScreenImageContainer}>
           <View style={styles.profileHeader}>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <TouchableOpacity onPress={()=> setImageModalVisible(false)}>
-                
+              <TouchableOpacity onPress={() => setImageModalVisible(false)}>
+
                 <AntDesign name="arrowleft" size={28} color="#fff" />
               </TouchableOpacity>
               <Text style={styles.profileText}>Profile Photo</Text>
@@ -530,7 +535,7 @@ const AddService = ({ route, navigation  }) => {
           />
         </View>
       </Modal>
-   
+
     </SafeAreaView>
   );
 };
@@ -542,7 +547,7 @@ const styles = StyleSheet.create({
   },
   scrollViewContent: {
     paddingHorizontal: 20,
-    paddingVertical:20
+    paddingVertical: 20
   },
   avatarWrapper: {
     alignItems: "center",
@@ -602,7 +607,7 @@ const styles = StyleSheet.create({
   dropdownItemText: {
     color: "#192c4c",
   },
- 
+
   confirmButton: {
     backgroundColor: "#800336",
     padding: 12,

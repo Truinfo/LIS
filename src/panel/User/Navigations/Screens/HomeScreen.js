@@ -19,7 +19,7 @@ import { fetchUserProfiles } from "../../Redux/Slice/ProfileSlice/ProfileSlice";
 import { ImagebaseURL } from "../../../Security/helpers/axios";
 import { Dimensions } from "react-native";
 import { fetchEvents } from "../../Redux/Slice/CommunitySlice/EventSlice";
-import * as Linking from 'expo-linking';
+import * as Linking from "expo-linking";
 import {
   fetchNotices,
   selectNotices,
@@ -42,34 +42,16 @@ const HomeScreen = () => {
   const { profiles } = useSelector((state) => state.profiles);
   const [expanded, setExpanded] = useState(false);
   const [expandedPollId, setExpandedPollId] = useState(null);
+
   const [upiId, setUpiId] = useState('7997148737@ibl');
   const [payeeName, setPayeeName] = useState('');
   // const [amount, setAmount] = useState('1');
-  const [transactionNote, setTransactionNote] = useState('Maintenance');
+  const [transactionNote, setTransactionNote] = useState("Maintenance");
   const [SelectedMonthPayment, setSelectedMonthPayment] = useState(null);
-  const [NotifyUser, setNotifyUser] = useState(null);
-  useEffect(() => {
-    const getUserName = async () => {
-      try {
-        const userString = await AsyncStorage.getItem("user");
-        if (userString !== null) {
-          const user = JSON.parse(userString);
-          setSocietyId(user.societyId);
-          setUserId(user.userId);
-          setPayeeName(user?.name);
 
-          if (user._id) {
-            setNotifyUser(user._id);
-          }
-        }
-      } catch (error) {
-        console.error("Failed to fetch the user from async storage", error);
-      }
-    };
-    getUserName();
-  }, []);
+
   const generateUpiUrl = (upiId, payeeName, amount, transactionNote) => {
-    const currency = 'INR';
+    const currency = "INR";
     const encodedPayeeName = encodeURIComponent(payeeName);
     const encodedTransactionNote = encodeURIComponent(transactionNote);
     return `upi://pay?pa=${upiId}&pn=${encodedPayeeName}&am=${amount}&cu=${currency}&tn=${encodedTransactionNote}`;
@@ -77,15 +59,16 @@ const HomeScreen = () => {
   const initiateUpiPayment = async (data) => {
     const upiUrl = generateUpiUrl(upiId, payeeName, data.amount, transactionNote);
     setSelectedMonthPayment(data.monthAndYear)
+
     try {
       const supported = await Linking.canOpenURL(upiUrl);
       if (supported) {
         await Linking.openURL(upiUrl);
       } else {
-        Alert.alert('Error', 'No UPI apps installed to handle the payment.');
+        Alert.alert("Error", "No UPI apps installed to handle the payment.");
       }
     } catch (err) {
-      Alert.alert('Error', 'Failed to initiate UPI payment.');
+      Alert.alert("Error", "Failed to initiate UPI payment.");
       console.error(err);
     }
   };
@@ -174,10 +157,31 @@ const HomeScreen = () => {
       return () => {
         socketServices.removeListener("Visitor_Request");
       };
-    }, [societyId, NotifyUser])
+    }, [societyId, userId])
   );
-
   useEffect(() => {
+    const getUserName = async () => {
+      try {
+        const userString = await AsyncStorage.getItem("user");
+        if (userString !== null) {
+          const user = JSON.parse(userString);
+          setSocietyId(user.societyId);
+          setUserId(user.userId);
+          setPayeeName(user?.name)
+        }
+      } catch (error) {
+        console.error("Failed to fetch the user from async storage", error);
+      }
+    };
+    getUserName();
+  }, []);
+  useEffect(() => {
+    if (verified === false) {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "WaitingForAccess" }],
+      });
+    }
     if (userId && societyId) {
       dispatch(fetchUserProfiles({ userId, societyId }));
       dispatch(fetchEvents(societyId));
@@ -215,7 +219,6 @@ const HomeScreen = () => {
   const unpaidBills = Array.isArray(payments)
     ? payments.filter((bill) => bill.status !== "Paid")
     : [];
-
 
   return (
     <SafeAreaView style={styles.container}>
@@ -265,7 +268,10 @@ const HomeScreen = () => {
                 <Text style={styles.logoTitle}>{bill.monthAndYear}</Text> is
                 due. Please make the payment.
               </Text>
-              <TouchableOpacity style={styles.payButton} onPress={() => initiateUpiPayment(bill)}>
+              <TouchableOpacity
+                style={styles.payButton}
+                onPress={() => initiateUpiPayment(bill)}
+              >
                 <Text style={styles.payButtonText}>Make Payment</Text>
               </TouchableOpacity>
             </View>
@@ -337,14 +343,14 @@ const HomeScreen = () => {
                                 width:
                                   events.events[events.events.length - 1]
                                     .pictures.length === 1 ||
-                                    (events.events[events.events.length - 1]
-                                      .pictures.length %
-                                      2 !==
-                                      0 &&
-                                      index ===
+                                  (events.events[events.events.length - 1]
+                                    .pictures.length %
+                                    2 !==
+                                    0 &&
+                                    index ===
                                       events.events[events.events.length - 1]
                                         .pictures.length -
-                                      1)
+                                        1)
                                     ? "100%"
                                     : "49%",
                                 height: 100,

@@ -2,14 +2,23 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchBills } from "../../../../Redux/Slice/ProfileSlice/myBillsSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { View, Text, StyleSheet, FlatList } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  ActivityIndicator,
+  Image,
+} from "react-native";
 
 const Paidbills = () => {
   const dispatch = useDispatch();
   const [societyId, setSocietyId] = useState("");
   const [flatno, setFlatno] = useState("");
   const [blockno, setBlockno] = useState("");
-  const { payments } = useSelector((state) => state.mybills.bills);
+  const { payments, loading, error } = useSelector(
+    (state) => state.mybills.bills
+  );
 
   useEffect(() => {
     const getUserName = async () => {
@@ -62,7 +71,38 @@ const Paidbills = () => {
       </View>
     </View>
   );
-  console.log("payments",payments);
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text>Loading bills...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>Error fetching bills: {error}</Text>
+      </View>
+    );
+  }
+
+  // Check if there are no paid bills
+  if (paidBills.length === 0) {
+    return (
+      <View style={styles.noDataContainer}>
+        <Image
+          source={require('../../../../../../assets/Admin/Imgaes/nodatadound.png')}
+          style={styles.noDataImage}
+          resizeMode="contain"
+        />
+        <Text style={styles.noDataText}>No Bills Found</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <FlatList
@@ -99,7 +139,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   chip: {
-    backgroundColor: "#4caf50", // Green color for paid bills
+    backgroundColor: "#4caf50",
     borderRadius: 12,
     paddingVertical: 4,
     paddingHorizontal: 8,
@@ -111,8 +151,34 @@ const styles = StyleSheet.create({
   },
   amountContainer: {
     flexDirection: "row",
-    justifyContent: "flex-end", 
-    marginTop: 5, 
+    justifyContent: "flex-end",
+    marginTop: 5,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  errorText: {
+    color: "red",
+  },
+  noDataContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  noDataImage: {
+    width: 100,
+    height: 100,
+  },
+  noDataText: {
+    fontSize: 16,
+    marginTop: 10,
   },
 });
 

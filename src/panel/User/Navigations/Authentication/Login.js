@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { View, StyleSheet, Image, Text, TouchableOpacity, SafeAreaView, ActivityIndicator } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Image,
+  Text,
+  TouchableOpacity,
+  SafeAreaView,
+  ActivityIndicator,
+} from "react-native";
 import { TextInput } from "react-native-paper";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useDispatch, useSelector } from "react-redux";
@@ -44,32 +52,36 @@ const Login = () => {
 
     if (isValid) {
       try {
-        const resultAction = await dispatch(userLogin({ email: email.toLowerCase(), password }));
+        const resultAction = await dispatch(
+          userLogin({ email: email.toLowerCase(), password })
+        );
         if (resultAction.type === "auth/userLogin/fulfilled") {
-          await AsyncStorage.setItem('userToken', resultAction.payload.token);
+          await AsyncStorage.setItem("userToken", resultAction.payload.token);
           const user = resultAction.payload.profile;
-          console.log("user", user)
+          console.log("user", user);
           const userRole = user.role;
           const isVerified = user.isVerified;
-          console.log("userRole", userRole)
+          console.log("userRole", userRole);
           setEmail("");
           setPassword("");
-          if (userRole === 'User') {
+          if (userRole === "User") {
             if (isVerified === true) {
               navigation.reset({
                 index: 0,
                 routes: [{ name: "Tabs" }],
               });
             } else {
-              navigation.navigate("WaitingForAccess");
+              navigation.reset({
+                index: 0,
+                routes: [{ name: "WaitingForAccess" }],
+              });
             }
-
-          } else if (userRole === 'Sequrity') {
+          } else if (userRole === "Sequrity") {
             navigation.reset({
               index: 0,
               routes: [{ name: "SecurityTabs" }],
             });
-          } else if (userRole === 'SocietyAdmin') {
+          } else if (userRole === "SocietyAdmin") {
             navigation.reset({
               index: 0,
               routes: [{ name: "Sidebar" }],
@@ -77,19 +89,20 @@ const Login = () => {
           }
         } else {
           Toast.show({
-            type: 'error',
-            text1: 'Login Failed',
-            text2: resultAction.payload.message || 'An error occurred during login.',
-            position: 'top',
+            type: "error",
+            text1: "Login Failed",
+            text2:
+              resultAction.payload.message || "An error occurred during login.",
+            position: "top",
             topOffset: 60,
           });
         }
       } catch (error) {
         Toast.show({
-          type: 'error',
-          text1: 'Login Error',
-          text2: 'An error occurred. Please try again later.',
-          position: 'top',
+          type: "error",
+          text1: "Login Error",
+          text2: "An error occurred. Please try again later.",
+          position: "top",
         });
       }
     }
@@ -115,9 +128,7 @@ const Login = () => {
           style={styles.video}
           resizeMode="cover"
         />
-        <Text style={styles.loginSubtitle}>
-          Experience Seamless Access
-        </Text>
+        <Text style={styles.loginSubtitle}>Experience Seamless Access</Text>
       </View>
       <View style={styles.halfContainer2}>
         <Text style={styles.loginTitle}>Login</Text>
@@ -147,15 +158,21 @@ const Login = () => {
             theme={{ colors: { primary: "#27272A" } }}
           />
           <TouchableOpacity onPress={toggleShowPassword} style={styles.eyeIcon}>
-            <Icon name={showPassword ? 'eye-slash' : 'eye'} size={15} color="#888" />
+            <Icon
+              name={showPassword ? "eye-slash" : "eye"}
+              size={15}
+              color="#888"
+            />
           </TouchableOpacity>
         </View>
-        {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
+        {passwordError ? (
+          <Text style={styles.errorText}>{passwordError}</Text>
+        ) : null}
         <Text onPress={handleForgotpress} style={styles.forgotPassword}>
           Forgot Password
         </Text>
         <TouchableOpacity style={styles.Button} onPress={handleLogin}>
-          {status === 'loading' ? (
+          {status === "loading" ? (
             <View style={styles.loader}>
               <ActivityIndicator size="large" color="#fff" />
             </View>
@@ -165,7 +182,10 @@ const Login = () => {
         </TouchableOpacity>
         <Text style={styles.signUpPrompt}>
           Don't have an account!
-          <Text style={styles.signUpText} onPress={handleSignuppress}> Sign Up</Text>
+          <Text style={styles.signUpText} onPress={handleSignuppress}>
+            {" "}
+            Sign Up
+          </Text>
         </Text>
       </View>
       <Toast />
@@ -178,8 +198,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   loader: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   halfContainer1: {
     flex: 1,
@@ -193,7 +213,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 10,
     alignItems: "center",
-    backgroundColor: "#fbf5f1"
+    backgroundColor: "#fbf5f1",
   },
   video: {
     width: "80%",
@@ -221,7 +241,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   passwordInput: {
-    justifyContent: 'flex-start',
+    justifyContent: "flex-start",
     width: "90%",
     marginBottom: 5,
     flexDirection: "row",
@@ -229,7 +249,7 @@ const styles = StyleSheet.create({
   },
   eyeIcon: {
     position: "absolute",
-    justifyContent: 'flex-end',
+    justifyContent: "flex-end",
     right: 10,
     borderWidth: 1,
     borderColor: "gray",

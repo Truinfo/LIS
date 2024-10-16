@@ -22,6 +22,7 @@ function Tabs() {
       const getUserName = async () => {
         try {
           const userString = await AsyncStorage.getItem("user");
+
           if (userString) {
             const user = JSON.parse(userString);
             setSocietyId(user.societyId);
@@ -38,10 +39,6 @@ function Tabs() {
   );
 
   useEffect(() => {
-    if (userId) {
-      console.log("Joining user room:", userId);
-      socketServices.emit("joinUser", userId);
-    }
 
     if (societyId) {
       socketServices.emit("joinSecurityPanel", societyId);
@@ -50,55 +47,60 @@ function Tabs() {
   useFocusEffect(
     React.useCallback(() => {
       socketServices.initializeSocket();
-      socketServices.on("Visitor_Notification", (data) => {
-        console.log("recieving data")
-        if (data) {
-          const visitorName = data.visitorName || "Unknown Visitor";
-          const flatNumber = data.flatNumber || "Unknown Flat";
-          const buildingName = data.buildingName || "Unknown Building";
-
-          Alert.alert(
-            `Visitor Request`,
-            `Visitor ${visitorName} is requesting access to your flat ${flatNumber} in ${buildingName}. Do you want to approve?`,
-            [
-              {
-                text: "Decline",
-                onPress: () => {
-                  socketServices.emit("Visitor_Response", {
-                    visitorName,
-                    response: "declined",
-                    flatNumber,
-                    buildingName,
-                    residentName: userName,
-                    societyId,
-                    userId,
-                  });
-                },
-              },
-              {
-                text: "Approve",
-                onPress: () => {
-                  socketServices.emit("Visitor_Response", {
-                    visitorName,
-                    response: "approved",
-                    flatNumber,
-                    buildingName,
-                    residentName: userName,
-                    societyId,
-                    userId,
-                  });
-                },
-              },
-            ],
-            { cancelable: false }
-          );
-        } else {
-          console.error("Received data is undefined or null");
-        }
-      });
+      // socketServices.on("Visitor_Request", (data) => {
+      //   if (!data || !data.userId || !userId) {
+      //     console.error("Invalid data received for Visitor Request:", data);
+      //     return;
+      //   }
+      //   if (data.userId === userId) {
+      //     const visitorName = data.visitorName || "Unknown Visitor";
+      //     const flatNumber = data.flatNumber || "Unknown Flat";
+      //     const buildingName = data.buildingName || "Unknown Building";
+      //     const securityId = data.securityId || "Unknown Building";
+      //     Alert.alert(
+      //       `Visitor Request`,
+      //       `Visitor ${visitorName} is requesting access to your flat ${flatNumber} in ${buildingName}. Do you want to approve?`,
+      //       [
+      //         {
+      //           text: "Decline",
+      //           onPress: () => {
+      //             socketServices.emit("Visitor_Response", {
+      //               visitorName,
+      //               response: "declined",
+      //               flatNumber,
+      //               buildingName,
+      //               residentName: userName,
+      //               societyId,
+      //               userId,
+      //               securityId
+      //             });
+      //           },
+      //         },
+      //         {
+      //           text: "Approve",
+      //           onPress: () => {
+      //             socketServices.emit("Visitor_Response", {
+      //               visitorName,
+      //               response: "approved",
+      //               flatNumber,
+      //               buildingName,
+      //               residentName: userName,
+      //               societyId,
+      //               userId,
+      //               securityId
+      //             });
+      //           },
+      //         },
+      //       ],
+      //       { cancelable: false }
+      //     );
+      //   } else {
+      //     console.error("Received data is undefined or null");
+      //   }
+      // });
 
       return () => {
-        socketServices.removeListener("Visitor_Notification");
+        // socketServices.removeListener("Visitor_Notification");
       };
     }, [userId, societyId])
   );
@@ -205,8 +207,8 @@ function Tabs() {
             <Ionicons name="storefront-sharp"
               size={24}
               color="#fff"
-              style={{ marginRight: 15 }} 
-              onPress={() => navigation.navigate("Property List")} 
+              style={{ marginRight: 15 }}
+              onPress={() => navigation.navigate("Property List")}
             />
           ),
         }}

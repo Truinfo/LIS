@@ -36,6 +36,7 @@ function SecurityTabs() {
   const Guard = useSelector((state) => state.setting.settings);
   const { society } = useSelector((state) => state.societyById);
   const [sequrityId, setSequrityId] = useState(null);
+  const [verifySecurityId, setVerifySecurityId] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [alertData, setAlertData] = useState(null);
   const [sound, setSound] = useState();
@@ -44,10 +45,13 @@ function SecurityTabs() {
     const getUserName = async () => {
       try {
         const userString = await AsyncStorage.getItem("user");
+
         if (userString) {
           const user = JSON.parse(userString);
+          console.log(user._id, "security id");
           setSocietyId(user.societyId);
-          setSequrityId(user.sequrityId);
+          setSequrityId(user.sequrityId); // Assuming this is fetched as securityId
+          setVerifySecurityId(user._id);
         }
       } catch (error) {
         console.error("Failed to fetch the user from async storage", error);
@@ -89,7 +93,7 @@ function SecurityTabs() {
 
   const playAlertSound = async () => {
     const { sound: newSound } = await Audio.Sound.createAsync(
-      require("../../assets/alert-33762.mp3") 
+      require("../../assets/alert-33762.mp3")
     );
     setSound(newSound);
     await newSound.playAsync();
@@ -105,66 +109,95 @@ function SecurityTabs() {
     }
   };
 
+  useEffect(() => {
+    const getUserName = async () => {
+      try {
+        const userString = await AsyncStorage.getItem("user");
+  
+        if (userString) {
+          const user = JSON.parse(userString);
+          console.log(user._id, "security id");
+          setSocietyId(user.societyId);
+          setSequrityId(user.sequrityId);
+          setVerifySecurityId(user._id);
+        }
+      } catch (error) {
+        console.error("Failed to fetch the user from async storage", error);
+      }
+    };
+  
+    getUserName();
+  }, []);
+  
   useFocusEffect(
     React.useCallback(() => {
       socketServices.initializeSocket();
-
+  
       if (societyId) {
         socketServices.emit("joinSecurityPanel", societyId);
       }
-
+  
       const handleGateAlertReceived = (data) => {
         console.log("Received Gate Alert:", data);
         setAlertData(data);
         setModalVisible(true);
-        playAlertSound(); 
+        playAlertSound();
       };
-
+  
       socketServices.on("Gate_alert_received", handleGateAlertReceived);
-
-      const handleresponseRecieved = (data) => {
-        console.log("Received response Alert:", data);
-        const message = `
-        Building: ${data.buildingName || "N/A"}
-        Flat Number: ${data.flatNumber || "N/A"}
-        Visitor Name: ${data.visitorName || "N/A"}
-        Resident Name: ${data.residentName || "N/A"}
-        Resident Name: ${data.userId || "N/A"}
-        Response: ${data.response || "N/A"}
-    `;
-
-        Alert.alert(
-          "Alert Details", 
-          message.trim(), 
-          [{ text: "OK", onPress: () => console.log("OK Pressed") }] 
-        );
+  
+      const handleresponseRecieved = async (data) => {
+        // Check and ensure the verifySecurityId is fetched before comparing
+        if (!verifySecurityId) {
+          const userString = await AsyncStorage.getItem("user");
+          if (userString) {
+            const user = JSON.parse(userString);
+            setVerifySecurityId(user._id);
+          }
+        }
+  
+        // Log the IDs for debugging
+        console.log(verifySecurityId, "verifySecurityId after AsyncStorage check");
+        console.log(data.securityId, "data.securityId");
+  
+        // Proceed with the comparison only if both IDs are available
+        if (!data?.securityId || !verifySecurityId) {
+          console.error("Invalid data received or verifySecurityId is null:", data);
+          return;
+        }
+  
+        if (data?.securityId === verifySecurityId) {
+          const message = `
+            Flat Details: ${data.buildingName}/ ${data.flatNumber || "N/A"}
+            Flat Number: ${data.flatNumber || "N/A"}
+            Visitor Name: ${data.visitorName || "N/A"}
+            Resident Name: ${data.residentName || "N/A"}
+            Response: ${data.response || "N/A"}
+          `;
+          Alert.alert(
+            "Alert Details",
+            message.trim(),
+            [{ text: "OK", onPress: () => console.log("OK Pressed") }]
+          );
+        }
       };
-
-      socketServices.on(
-        "Visitor_Response_Notification",
-        handleresponseRecieved
-      );
-
+  
+      socketServices.on("Visitor_Response_Notification", handleresponseRecieved);
+  
       return () => {
-        socketServices.removeListener(
-          "Gate_alert_received",
-          handleGateAlertReceived
-        );
-        socketServices.removeListener(
-          "Visitor_Response_Notification",
-          handleresponseRecieved
-        );
+        socketServices.removeListener("Gate_alert_received", handleGateAlertReceived);
+        socketServices.removeListener("Visitor_Response_Notification", handleresponseRecieved);
         if (sound) {
           sound.stopAsync();
         }
       };
-    }, [societyId, sound])
+    }, [societyId, verifySecurityId, sound])
   );
 
   const closeModal = async () => {
     setModalVisible(false);
     if (sound) {
-      await sound.stopAsync(); 
+      await sound.stopAsync();
     }
   };
 

@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
         height: 50,
     },
     removeButton: {
-        backgroundColor: '#ff6347',
+        backgroundColor: '#7d0431',
         padding: 10,
         borderRadius: 5,
     },
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     addButton: {
-        backgroundColor: '#4CAF50',
+        backgroundColor: '#7d0431',
         padding: 10,
         borderRadius: 5,
         alignItems: 'center',
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
         marginTop: 20,
     },
     submitButton: {
-        backgroundColor: '#007BFF',
+        backgroundColor: '#7d0431',
         padding: 10,
         borderRadius: 5,
         flex: 1,
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     cancelButton: {
-        backgroundColor: 'red',
+        backgroundColor: '#7d0431',
         padding: 10,
         borderRadius: 5,
         flex: 1,

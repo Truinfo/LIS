@@ -1,7 +1,6 @@
 
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axiosInstance from "../../../../Security/helpers/axios";
-import axios from "axios";
 
 // Fetch emergency contacts by society ID
 export const fetchEmergencyContacts = createAsyncThunk(
@@ -11,6 +10,7 @@ export const fetchEmergencyContacts = createAsyncThunk(
       return rejectWithValue({ message: "Invalid society ID" });
     }
     try {
+      console.log(societyId)
       const response = await axiosInstance.get(`/getEmergencyContactBySocietyId/${societyId}`);
       return response.data;
     } catch (error) {
@@ -42,15 +42,15 @@ export const createEmergencyContact = createAsyncThunk(
 // Update an emergency contact
 export const updateEmergencyContact = createAsyncThunk(
   'emergencyContacts/updateContact',
-  async ({ id, name, phoneNumber, profession,serviceType, societyId }, { rejectWithValue }) => {
-    console.log( id, name, phoneNumber, profession,serviceType, societyId)
+  async ({ id, name, phoneNumber, profession, serviceType, societyId }, { rejectWithValue }) => {
+    console.log(id, name, phoneNumber, profession, serviceType, societyId)
     try {
       const response = await axiosInstance.put(`/updateEmergencyContact/${id}`, {
         name,
         phoneNumber,
         profession,
         serviceType,
-        societyId 
+        societyId
       }, {
         headers: {
           'Content-Type': 'application/json',
@@ -102,6 +102,7 @@ const emergencyContactsSlice = createSlice({
       .addCase(fetchEmergencyContacts.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload?.message || "Failed to fetch contacts";
+        console.log(action.payload)
       })
       .addCase(createEmergencyContact.pending, (state) => {
         state.status = 'loading';

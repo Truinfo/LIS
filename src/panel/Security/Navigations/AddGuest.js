@@ -25,7 +25,7 @@ import { AntDesign, Entypo, MaterialIcons } from "@expo/vector-icons";
 import socketServices from "../../User/Socket/SocketServices";
 import { fetchresidents } from "../../User/Redux/Slice/CommunitySlice/residentsSlice";
 
-const AddGuest = ({  navigation }) => {
+const AddGuest = ({ navigation }) => {
   const [name, setName] = useState("");
   const [user, setuser] = useState("");
   const [userId, setuserId] = useState("");
@@ -54,13 +54,16 @@ const AddGuest = ({  navigation }) => {
   const [image, setImage] = useState(null);
   const { userProfiles } = useSelector((state) => state.userResidents);
   const [societyId, setSocietyId] = useState(null);
+  const [securityId, setSecurityId] = useState(null);
   useEffect(() => {
     const getSocietyId = async () => {
       try {
         const user = await AsyncStorage.getItem("user");
-        const id = JSON.parse(user).societyId;
+        const id = JSON.parse(user);
+        console.log(user, "security")
         if (id !== null) {
-          setSocietyId(id);
+          setSocietyId(id.societyId);
+          setSecurityId(id._id);
         } else {
           console.error("No societyId found in AsyncStorage");
         }
@@ -176,6 +179,8 @@ const AddGuest = ({  navigation }) => {
             societyId: societyId,
             userId: userId, // Make sure the userId is correct here
             action: "approve or decline",
+            securityId: securityId,
+
           };
           socketServices.emit("AddVisitor", { data });
 

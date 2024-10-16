@@ -125,11 +125,11 @@ const Polls = () => {
         const expirationDate = new Date(expDate);
         return currentDate > expirationDate;
     };
-
+    const reversedPolls = [...polls].reverse()
     return (
         <View style={{ flex: 1, paddingHorizontal: 10, backgroundColor: "#f6f6f6" }}>
             <ScrollView >
-                {polls.map((item) => {
+                {reversedPolls.map((item) => {
                     const isExpired = isPollExpired(item.poll.expDate);
                     return (
                         <View key={item._id} style={{ paddingHorizontal: 10, paddingVertical: 5, marginVertical: 5, borderWidth: 1, borderColor: "#ccc", backgroundColor: "#fff", borderRadius: 8, elevation: 2 }}>

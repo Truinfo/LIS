@@ -42,34 +42,26 @@ const HomeScreen = () => {
   const { profiles } = useSelector((state) => state.profiles);
   const [expanded, setExpanded] = useState(false);
   const [expandedPollId, setExpandedPollId] = useState(null);
-  const [verified, setVerified] = useState(null);
 
-  const [upiId, setUpiId] = useState("7997148737@ibl");
-  const [payeeName, setPayeeName] = useState("");
+  const [upiId, setUpiId] = useState('7997148737@ibl');
+  const [payeeName, setPayeeName] = useState('');
   // const [amount, setAmount] = useState('1');
   const [transactionNote, setTransactionNote] = useState("Maintenance");
   const [SelectedMonthPayment, setSelectedMonthPayment] = useState(null);
+
 
   const generateUpiUrl = (upiId, payeeName, amount, transactionNote) => {
     const currency = "INR";
     const encodedPayeeName = encodeURIComponent(payeeName);
     const encodedTransactionNote = encodeURIComponent(transactionNote);
-
     return `upi://pay?pa=${upiId}&pn=${encodedPayeeName}&am=${amount}&cu=${currency}&tn=${encodedTransactionNote}`;
   };
-
   const initiateUpiPayment = async (data) => {
-    const upiUrl = generateUpiUrl(
-      upiId,
-      payeeName,
-      data.amount,
-      transactionNote
-    );
-    setSelectedMonthPayment(data.monthAndYear);
+    const upiUrl = generateUpiUrl(upiId, payeeName, data.amount, transactionNote);
+    setSelectedMonthPayment(data.monthAndYear)
 
     try {
       const supported = await Linking.canOpenURL(upiUrl);
-
       if (supported) {
         await Linking.openURL(upiUrl);
       } else {
@@ -92,86 +84,78 @@ const HomeScreen = () => {
     React.useCallback(() => {
       socketServices.initializeSocket();
 
-      socketServices.emit("get_polls_by_society_id", { societyId });
-      const handlePollsBySocietyId = (fetchedPolls) => {
-        const now = new Date();
-        const activePolls = fetchedPolls.filter((poll) => {
-          if (poll && poll.poll && poll.poll.expDate) {
-            const expDate = new Date(poll.poll.expDate);
-            return expDate > now;
-          }
-          return false;
-        });
-        setPolls(activePolls);
+      if (societyId) {
+        socketServices.emit("joinSecurityPanel", societyId);
+      }
 
-        const userVotes = {};
-        activePolls.forEach((poll) => {
-          if (poll.poll && Array.isArray(poll.poll.votes)) {
-            const userVote = poll.poll.votes.find(
-              (vote) => vote.userId === userId
-            );
-            if (userVote) {
-              userVotes[poll._id] = userVote.selectedOption;
+      socketServices.on("Visitor_Request", async (data) => {
+        console.log(data, "Received Visitor_Request Data");
+
+        // Fetch the NotifyUser if it's not already set
+        if (!NotifyUser) {
+          const userString = await AsyncStorage.getItem("user");
+          if (userString !== null) {
+            const user = JSON.parse(userString);
+            if (user._id) {
+              setNotifyUser(user._id);
             }
           }
-        });
-
-        setCheckedOption(userVotes);
-      };
-
-      const handleVoteUpdate = (data) => {
-        alert(data.message);
-
-        const userVote = data.votes.poll.votes.find(
-          (vote) => vote.userId === userId
-        );
-
-        if (userVote) {
-          console.log("User's Vote:", userVote);
-        } else {
-          console.log("User has not voted or vote not found.");
         }
-
-        setPolls((prevPolls) => {
-          const updatedPollIndex = prevPolls.findIndex(
-            (poll) => poll._id === data.votes._id
-          );
-          if (updatedPollIndex !== -1) {
-            const updatedPolls = [...prevPolls];
-            updatedPolls[updatedPollIndex] = data.votes;
-            return updatedPolls;
+        if (data?.userId && NotifyUser) {
+          console.log("Comparing User IDs:", data.userId, NotifyUser);
+          if (data.userId === NotifyUser) {
+            console.log("Matching visitor request data received:", data);
+            const visitorName = data.visitorName || "Unknown Visitor";
+            const flatNumber = data.flatNumber || "Unknown Flat";
+            const buildingName = data.buildingName || "Unknown Building";
+            const securityId = data.securityId || "Unknown Security ID";
+            Alert.alert(
+              `Visitor Request`,
+              `Visitor ${visitorName} is requesting access to your flat ${flatNumber} in ${buildingName}. Do you want to approve?`,
+              [
+                {
+                  text: "Decline",
+                  onPress: () => {
+                    socketServices.emit("Visitor_Response", {
+                      visitorName,
+                      response: "declined",
+                      flatNumber,
+                      buildingName,
+                      residentName: payeeName,
+                      societyId,
+                      userId,
+                      securityId,
+                    });
+                  },
+                },
+                {
+                  text: "Approve",
+                  onPress: () => {
+                    socketServices.emit("Visitor_Response", {
+                      visitorName,
+                      response: "approved",
+                      flatNumber,
+                      buildingName,
+                      residentName: payeeName,
+                      societyId,
+                      userId,
+                      securityId,
+                    });
+                  },
+                },
+              ],
+              { cancelable: false }
+            );
           } else {
-            return prevPolls;
+            console.log("UserId does not match the NotifyUser or incomplete data received.");
           }
-        });
-
-        setCheckedOption((prevState) => ({
-          ...prevState,
-          [data.votes._id]: null,
-        }));
-      };
-
-      const handleNewPollCreated = (newPoll) => {
-        setPolls((prevPolls) => [newPoll, ...prevPolls]);
-      };
-
-      const handleVoteError = (error) => {
-        alert(error.message);
-      };
-
-      socketServices.on("polls_by_society_id", handlePollsBySocietyId);
-      socketServices.on("vote_update", handleVoteUpdate);
-      socketServices.on("new_poll_created", handleNewPollCreated);
-      socketServices.on("vote_error", handleVoteError);
+        } else {
+          console.error("Invalid data received for Visitor Request or NotifyUser not set:", data);
+        }
+      });
 
       return () => {
-        socketServices.removeListener(
-          "polls_by_society_id",
-          handlePollsBySocietyId
-        );
-        socketServices.removeListener("new_poll_created", handleNewPollCreated);
-        socketServices.removeListener("vote_update", handleVoteUpdate);
-        socketServices.removeListener("vote_error", handleVoteError);
+        socketServices.removeListener("Visitor_Request");
       };
     }, [societyId, userId])
   );
@@ -183,8 +167,7 @@ const HomeScreen = () => {
           const user = JSON.parse(userString);
           setSocietyId(user.societyId);
           setUserId(user.userId);
-          setPayeeName(user?.name);
-          setVerified(user.isVerified);
+          setPayeeName(user?.name)
         }
       } catch (error) {
         console.error("Failed to fetch the user from async storage", error);
@@ -267,7 +250,7 @@ const HomeScreen = () => {
         </View>
       </View>
       <ScrollView vertical={true} style={styles.mainContainer}>
-        <View style={styles.postContainer}>
+        {unpaidBills.length !== 0 ? <View style={styles.postContainer}>
           <View style={[styles.row, { justifyContent: "space-between" }]}>
             <View style={styles.row}>
               <Image
@@ -294,10 +277,10 @@ const HomeScreen = () => {
               </TouchableOpacity>
             </View>
           ))}
-        </View>
+        </View> : null}
 
-        <View style={styles.postContainer}>
-          {events && events.events && events.events.length > 0 && (
+        {events && events.events && events.events.length > 0 ? (
+          <View style={styles.postContainer}>
             <>
               <View style={[styles.row, { justifyContent: "space-between" }]}>
                 <View style={styles.row}>
@@ -396,10 +379,10 @@ const HomeScreen = () => {
                 </TouchableOpacity>
               </View>
             </>
-          )}
-        </View>
-        <View style={styles.postContainer}>
-          {notices && notices.notices && notices.notices.length > 0 && (
+          </View>
+        ) : null}
+        {notices && notices.notices && notices.notices.length > 0 ? (
+          <View style={styles.postContainer}>
             <>
               <View style={[styles.row, { justifyContent: "space-between" }]}>
                 <View style={styles.row}>
@@ -426,8 +409,8 @@ const HomeScreen = () => {
                 {notices.notices[notices.notices.length - 1].description}
               </Text>
             </>
-          )}
-        </View>
+          </View>
+        ) : null}
         {polls.length > 0 &&
           polls.map((pollItem, index) => (
             <View key={index} style={styles.postContainer}>

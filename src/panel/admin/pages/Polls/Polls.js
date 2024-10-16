@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, ScrollView, StyleSheet, Image } from 'react-native';
-import { ActivityIndicator, Button, FAB, IconButton, Menu, Modal, Portal, ProgressBar, RadioButton } from 'react-native-paper';
+import { ActivityIndicator, FAB, IconButton, Menu, ProgressBar, } from 'react-native-paper';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import socketServices from '../../../User/Socket/SocketServices';
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -9,7 +9,6 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { Provider as PaperProvider } from 'react-native-paper';
 const Polls = () => {
     const [polls, setPolls] = useState([]);
-    const [userId, setUserId] = useState("");
     const [societyId, setSocietyId] = useState("");
     const [index, setIndex] = useState(0);
     const navigation = useNavigation();
@@ -22,15 +21,9 @@ const Polls = () => {
     useEffect(() => {
         const getUserName = async () => {
             try {
-                const userString = await AsyncStorage.getItem("user");
-                const societyAdmin = await AsyncStorage.getItem('societyAdmin');
+                const societyAdmin = await AsyncStorage.getItem('user');
                 const parsedAdmin = societyAdmin ? JSON.parse(societyAdmin) : {};
-                setSocietyId(parsedAdmin._id || "6683b57b073739a31e8350d0");
-                if (userString !== null) {
-                    const user = JSON.parse(userString);
-                    setSocietyId(user.societyId);
-                    setUserId(user.userId);
-                }
+                setSocietyId(parsedAdmin._id || "");
             } catch (error) {
                 console.error("Failed to fetch the user from async storage", error);
             }
@@ -95,7 +88,7 @@ const Polls = () => {
                 socketServices.removeListener('poll_deleted', handlePollDeleted);
                 socketServices.removeListener('pollsUpdated', handlePollEdited);
             };
-        }, [societyId, userId]) // Dependencies to re-run the effect
+        }, [societyId]) // Dependencies to re-run the effect
     );
     const calculateVotePercentage = (votes, option) => {
         const totalVotes = votes.length;
@@ -121,7 +114,7 @@ const Polls = () => {
                 </View>
             );
         }
-      
+
         return (
             <ScrollView>
                 {activePolls.length === 0 ? (

@@ -17,6 +17,7 @@ function Tabs() {
   const [userName, setUserName] = useState(null);
   const [userId, setUserId] = useState(null);
   const [payeeName, setPayeeName] = useState('');
+  const [NotifyUser, setNotifyUser] = useState('');
   useEffect(() => {
     const getUserName = async () => {
       try {

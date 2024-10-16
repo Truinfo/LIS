@@ -156,35 +156,24 @@ export default function App() {
       try {
         const user = await AsyncStorage.getItem("user");
         const userToken = await AsyncStorage.getItem("userToken");
-
+        const userRole = JSON.parse(user).role;
+        const isVerified = JSON.parse(user).isVerified;
         if (user !== null && userToken !== null) {
-          const parsedUser = JSON.parse(user);
-          const userRole = parsedUser.role;
-
-          if (userRole === "User") {
-            const isVerified = parsedUser.isVerified;
-            if (isVerified) {
-              setInitialRoute("Tabs");
-            } else {
-              setInitialRoute("WaitingForAccess");
-            }
-          } else if (userRole === "Security") {
+          if (userRole === "Sequrity") {
             setInitialRoute("SecurityTabs");
+          } else if (userRole === "User" && isVerified === true) {
+            setInitialRoute("Tabs");
           } else if (userRole === "SocietyAdmin") {
             setInitialRoute("Sidebar");
           } else {
             setInitialRoute("Login");
           }
-        } else {
-          setInitialRoute("Login");
         }
       } catch (error) {
-        // Handle error if needed
       } finally {
         setIsLoading(false);
       }
     };
-
     checkLoginStatus();
   }, []);
 

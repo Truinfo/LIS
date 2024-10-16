@@ -29,6 +29,7 @@ const AddGuest = ({ navigation }) => {
   const [name, setName] = useState("");
   const [user, setuser] = useState("");
   const [userId, setuserId] = useState("");
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -45,7 +46,7 @@ const AddGuest = ({ navigation }) => {
   const error = useSelector((state) => state.visitor.error);
   const [buildings, setBuildings] = useState([]);
   const [usersInFlat, setUsersInFlat] = useState([]);
-  const [showUserDropdown, setShowUserDropdown] = useState(false);
+  
   const [flatsForSelectedBlock, setFlatsForSelectedBlock] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [isImageModalVisible, setImageModalVisible] = useState(false);

@@ -42,6 +42,7 @@ const HomeScreen = () => {
   const { profiles } = useSelector((state) => state.profiles);
   const [expanded, setExpanded] = useState(false);
   const [expandedPollId, setExpandedPollId] = useState(null);
+  const [verified, setVerified] = useState(null);
 
   const [upiId, setUpiId] = useState('7997148737@ibl');
   const [payeeName, setPayeeName] = useState('');
@@ -167,6 +168,7 @@ const HomeScreen = () => {
           const user = JSON.parse(userString);
           setSocietyId(user.societyId);
           setUserId(user.userId);
+          setVerified(user.isVerified);
           setPayeeName(user?.name)
         }
       } catch (error) {

@@ -27,6 +27,7 @@ import {
   MaterialIcons,
 } from "@expo/vector-icons";
 import socketServices from "../../User/Socket/SocketServices";
+import { fetchresidents } from "../../User/Redux/Slice/CommunitySlice/residentsSlice";
 
 const AddDelivery = ({ route, navigation }) => {
   const [name, setName] = useState("");
@@ -47,21 +48,24 @@ const AddDelivery = ({ route, navigation }) => {
   const [flatNoError, setFlatNoError] = useState("");
   const [dialogMessage, setDialogMessage] = useState("");
   const error = useSelector((state) => state.visitor.error);
-  const successMessage = useSelector((state) => state.visitor.successMessage);
+
+  const [userId, setuserId] = useState("");
   const [buildings, setBuildings] = useState([]);
   const [flatsForSelectedBlock, setFlatsForSelectedBlock] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [isImageModalVisible, setImageModalVisible] = useState(false);
   const dispatch = useDispatch();
+  const [usersInFlat, setUsersInFlat] = useState([]);
+  const [user, setuser] = useState("");
   const [societyId, setSocietyId] = useState(null);
   const [securityId, setSecurityId] = useState(null);
-
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
   useEffect(() => {
     const getSocietyId = async () => {
       try {
         const user = await AsyncStorage.getItem("user");
         const id = JSON.parse(user);
-        console.log(user, "security")
+        console.log(user, "security");
         if (id !== null) {
           setSocietyId(id.societyId);
           setSecurityId(id._id);
@@ -75,8 +79,16 @@ const AddDelivery = ({ route, navigation }) => {
     getSocietyId();
     socketServices.initializeSocket();
   }, []);
-
-
+  useEffect(() => {
+    if (societyId) {
+      dispatch(fetchresidents(societyId)).then((response) => {
+        if (response.type === "residents/fetchResidents/fulfilled") {
+          console.log(response.payload); // Set all residents here
+        }
+      });
+    }
+  }, [dispatch, societyId]);
+  const { userProfiles } = useSelector((state) => state.userResidents);
   const { society } = useSelector((state) => state.societyById);
 
   useEffect(() => {
@@ -104,12 +116,28 @@ const AddDelivery = ({ route, navigation }) => {
       buildings.find((item) => item.blockName === block)?.flats || [];
     return flats;
   };
-
-  const selectFlatNo = (flatNo) => {
-    setFlatNo(flatNo.flatNumber);
-    setShowFlatNoDropdown(false);
+  const filterResidents = (selectedBlock, selectedFlat) => {
+    return userProfiles.filter((resident) => {
+      return (
+        resident.buildingName === selectedBlock &&
+        resident.flatNumber === selectedFlat
+      );
+    });
   };
-
+  const selectFlatNo = (flat) => {
+    setFlatNo(flat.flatNumber);
+    setShowFlatNoDropdown(false);
+    // Filter residents based on selected block and flat
+    const filteredResidents = filterResidents(block, flat.flatNumber);
+console.log(filteredResidents)
+    setUsersInFlat(filteredResidents); // Update usersInFlat with filtered residents
+    setShowUserDropdown(true); // Show the user dropdown
+  };
+  const selectuser = (user) => {
+    setuser(user.name);
+    setuserId(user._id);
+    setShowUserDropdown(false);
+  };
   const validateInputs = () => {
     let isValid = true;
 
@@ -144,6 +172,7 @@ const AddDelivery = ({ route, navigation }) => {
       setFlatNoError("Flat number is required");
       isValid = false;
     }
+
     return isValid;
   };
 
@@ -183,7 +212,7 @@ const AddDelivery = ({ route, navigation }) => {
             buildingName: block,
             societyId: societyId,
             action: "approve or decline",
-            securityId: securityId
+            securityId: securityId,
           };
           socketServices.emit("AddVisitor", { data });
           setName("");
@@ -469,6 +498,40 @@ const AddDelivery = ({ route, navigation }) => {
                   onPress={() => selectFlatNo(flat)}
                 >
                   <Text style={styles.dropdownItemText}>{flat.flatNumber}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
+          <TouchableOpacity
+            style={[
+              styles.dropdownButton,
+              showUserDropdown && styles.dropdownActive,
+              { marginTop: 15 },
+              flatNoError && { borderColor: "red" },
+            ]}
+            onPress={() => setShowUserDropdown(!showUserDropdown)}
+          >
+            <Text style={styles.dropdownButtonText}>
+              {user ? `${user}` : "Select User *"}
+            </Text>
+            <Text>
+              <MaterialIcons
+                name={showUserDropdown ? "arrow-drop-up" : "arrow-drop-down"}
+                size={20}
+                color="#000"
+                style={{ marginRight: 5 }}
+              />
+            </Text>
+          </TouchableOpacity>
+          {showUserDropdown && usersInFlat.length > 0 && (
+            <View style={styles.dropdownMenu}>
+              {usersInFlat.map((user) => (
+                <TouchableOpacity
+                  key={user._id}
+                  style={styles.dropdownItem}
+                  onPress={() => selectuser(user)}
+                >
+                  <Text style={styles.dropdownItemText}>{user.name}</Text>
                 </TouchableOpacity>
               ))}
             </View>

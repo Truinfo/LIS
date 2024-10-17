@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDispatch, useSelector } from 'react-redux';
 import { getSocityAdds } from '../../../Redux/Slice/MarketPlaceSlice/MarketPlace';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { FAB } from 'react-native-paper';
+import { ActivityIndicator, FAB } from 'react-native-paper';
 import { ImagebaseURL } from '../../../../Security/helpers/axios';
 const ListPage = () => {
     const [societyId, setSocietyId] = useState("");
@@ -59,15 +59,36 @@ const ListPage = () => {
             </View>
         </TouchableOpacity>
     );
+
     if (loading) {
-        return <Text>loading.</Text>;
-    }
-    if (Properties.length === 0 && !loading) {
-        return <Text>No properties available.</Text>;
+        return <ActivityIndicator size="large" color="#630000" style={styles.loadingContainer} />;
     }
 
+    if (!Properties || Properties.length === 0) { // Show spinner while loading
+        return (
+            <View style={styles.noDataContainer}>
+                <Image
+                    source={require('../../../../../assets/Admin/Imgaes/nodatadound.png')}
+                    style={styles.noDataImage}
+                    resizeMode="contain"
+                />
+                <Text style={styles.noDataText}>No adds Found</Text>
+            </View>
+        );
+    }
+
+
+
     if (error) {
-        return <Text>Error: {error}</Text>;
+        return (
+            <View style={styles.noDataContainer}>
+                <Image
+                    source={require('../../../../../assets/Admin/Imgaes/nodatadound.png')}
+                    style={styles.noDataImage}
+                    resizeMode="contain"
+                />
+                <Text style={styles.noDataText}>No Amenities Found</Text>
+            </View>)
     }
     return (
         <View style={{ flex: 1 }}>
@@ -129,7 +150,7 @@ const styles = StyleSheet.create({
     contact: {
         width: 70,
         color: "#222",
-        fontWeight: "bold", 
+        fontWeight: "bold",
     },
     value: {
         color: "#222",
@@ -143,8 +164,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#7d0431',
         justifyContent: 'center',
         alignItems: 'center',
-        bottom: 20,  
-        right: 20,   
+        bottom: 20,
+        right: 20,
         elevation: 5,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
@@ -155,6 +176,26 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 24,
         fontWeight: 'bold',
+    },
+    noDataContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    noDataImage: {
+        width: 150,
+        height: 150,
+        marginBottom: 16,
+    },
+    noDataText: {
+        fontSize: 18,
+        color: '#7d0431',
+        textAlign: 'center',
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });
 

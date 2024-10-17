@@ -10,11 +10,9 @@ export const fetchEmergencyContacts = createAsyncThunk(
       return rejectWithValue({ message: "Invalid society ID" });
     }
     try {
-      console.log(societyId)
       const response = await axiosInstance.get(`/getEmergencyContactBySocietyId/${societyId}`);
       return response.data;
     } catch (error) {
-      console.error("Error fetching emergency contacts:", error);
       return rejectWithValue(error.response ? error.response.data : { message: "Network error" });
     }
   }
@@ -33,7 +31,6 @@ export const createEmergencyContact = createAsyncThunk(
       });
       return response.data;
     } catch (error) {
-      console.error("Error creating emergency contact:", error);
       return rejectWithValue(error.response ? error.response.data : { message: "Network error" });
     }
   }

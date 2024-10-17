@@ -17,10 +17,11 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { FAB } from "react-native-paper";
+import { Image } from "react-native";
 const GetHelp = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const { loading, complaints } = useSelector((state) => state.complaints);
+  const { loading, complaints, error } = useSelector((state) => state.complaints);
   const [societyId, setSocietyId] = useState("");
   const [userId, setUserId] = useState("");
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
@@ -173,6 +174,35 @@ const GetHelp = () => {
       return dateB - dateA;  // Most recent first
     });
   };
+
+
+
+
+  if (error) {
+    return (
+      <View style={styles.noDataContainer}>
+        <Image
+          source={require('../../../../assets/Admin/Imgaes/nodatadound.png')}
+          style={styles.noDataImage}
+          resizeMode="contain"
+        />
+        <Text style={styles.noDataText}>No Tickets Found</Text>
+      </View>
+    );
+  }
+
+  if (!sortedTickets || sortedTickets.length === 0) { // Show spinner while loading
+    return (
+      <View style={styles.noDataContainer}>
+        <Image
+          source={require('../../../../assets/Admin/Imgaes/nodatadound.png')}
+          style={styles.noDataImage}
+          resizeMode="contain"
+        />
+        <Text style={styles.noDataText}>No Tickets Found</Text>
+      </View>
+    );
+  }
   const sortedTickets = sortComplaints(filteredTickets);
   return (
     <View style={styles.container}>
@@ -491,7 +521,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontWeight: '400',
-    width: 105,  
+    width: 105,
     color: '#333',
     fontSize: 14,
   },
@@ -502,6 +532,26 @@ const styles = StyleSheet.create({
   reqId: {
     marginTop: 5,
     fontSize: 14,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noDataContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noDataImage: {
+    width: 150,
+    height: 150,
+    marginBottom: 16,
+  },
+  noDataText: {
+    fontSize: 18,
+    color: '#7d0431',
+    textAlign: 'center',
   },
 });
 

@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDispatch, useSelector } from 'react-redux';
 import { DeletePost, ResidentsAdds } from '../../../Redux/Slice/MarketPlaceSlice/MarketPlace';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { FAB } from 'react-native-paper';
+import { ActivityIndicator, FAB } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { ImagebaseURL } from '../../../../Security/helpers/axios';
 
@@ -75,7 +75,7 @@ const MyAdds = () => {
 
 
     const handleMenuAction = (propertyId) => {
-        console.log(propertyId,": post id")
+        console.log(propertyId, ": post id")
         Alert.alert(
             "Delete Property",
             "Are you sure you want to delete this property?",
@@ -102,14 +102,36 @@ const MyAdds = () => {
 
     };
 
+
     if (loading) {
-        return <Text>Loading.</Text>;
+        return <ActivityIndicator size="large" color="#630000" style={styles.loadingContainer} />;
     }
-    if (Properties.length === 0 && !loading) {
-        return <Text>No properties available.</Text>;
+
+    if (!Properties || Properties.length === 0) { // Show spinner while loading
+        return (
+            <View style={styles.noDataContainer}>
+                <Image
+                    source={require('../../../../../assets/Admin/Imgaes/nodatadound.png')}
+                    style={styles.noDataImage}
+                    resizeMode="contain"
+                />
+                <Text style={styles.noDataText}>No Adds Found</Text>
+            </View>
+        );
     }
+
+
+
     if (error) {
-        return <Text>Error: {error}</Text>;
+        return (
+            <View style={styles.noDataContainer}>
+                <Image
+                    source={require('../../../../../assets/Admin/Imgaes/nodatadound.png')}
+                    style={styles.noDataImage}
+                    resizeMode="contain"
+                />
+                <Text style={styles.noDataText}>No Adds Found</Text>
+            </View>)
     }
 
     return (
@@ -201,6 +223,26 @@ const styles = StyleSheet.create({
         backgroundColor: '#7d0431',
         right: 16,
         bottom: 16,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    noDataContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    noDataImage: {
+        width: 150,
+        height: 150,
+        marginBottom: 16,
+    },
+    noDataText: {
+        fontSize: 18,
+        color: '#7d0431',
+        textAlign: 'center',
+    },
+    loadingContainer: {
+        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
     },

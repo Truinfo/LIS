@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet,  TouchableOpacity, Modal, ActivityIndicator, FlatList,  TextInput } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, ActivityIndicator, FlatList, TextInput, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteUserService, fetchServicePerson, updateRatingAndReview } from '../../../Redux/Slice/ProfileSlice/manageServiceSlice';
@@ -70,7 +70,7 @@ const ManageDailyHelp = () => {
     setShowModal(true);
   };
 
-;
+  ;
 
   const submitFeedback = async () => {
     if (selectedService && selectedServiceType) {
@@ -171,11 +171,36 @@ const ManageDailyHelp = () => {
       </View>
     );
   };
+  if (loading) {
+    return <ActivityIndicator size="large" color="#630000" style={styles.loadingContainer} />;
+  }
 
+  if (!servicePerson || servicePerson.length === 0) { // Show spinner while loading
+    return (
+      <View style={styles.noDataContainer}>
+        <Image
+          source={require('../../../../../assets/Admin/Imgaes/nodatadound.png')}
+          style={styles.noDataImage}
+          resizeMode="contain"
+        />
+        <Text style={styles.noDataText}>No DailyHelp Found</Text>
+      </View>
+    );
+  }
 
+  if (error) {
+    return (
+      <View style={styles.noDataContainer}>
+        <Image
+          source={require('../../../../../assets/Admin/Imgaes/nodatadound.png')}
+          style={styles.noDataImage}
+          resizeMode="contain"
+        />
+        <Text style={styles.noDataText}>No DailyHelp Found</Text>
+      </View>)
+  }
   return (
     <View>
-      {loading && <ActivityIndicator size="large" color="#7d0431" />}
       {error && <Text style={styles.error}>{error}</Text>}
       {!loading && !error && services && serviceType.map((typeObj) => {
         const { id, type } = typeObj;
@@ -359,6 +384,26 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     textAlignVertical: 'top',
   },
+  noDataContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noDataImage: {
+    width: 150,
+    height: 150,
+    marginBottom: 16,
+  },
+  noDataText: {
+    fontSize: 18,
+    color: '#7d0431',
+    textAlign: 'center',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+},
 });
 
 export default ManageDailyHelp;

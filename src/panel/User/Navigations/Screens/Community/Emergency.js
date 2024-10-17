@@ -52,22 +52,46 @@ const EmergencyContacts = () => {
       </View>
     </View>
   );
-  const spinner = () => {
-    return (
-      <View style={[styles.containerSpin, styles.horizontalSpin]}>
-        <ActivityIndicator size="large" color="#7d0431" />
-      </View>
-    );
-  };
 
   if (status === 'loading') {
-    return spinner();
+    return <ActivityIndicator size="large" color="#630000" style={styles.loadingContainer} />;
   }
 
   if (status === 'failed') {
-    return <Text>Error: {error}</Text>;
+    return (<View style={styles.noDataContainer}>
+      <Image
+        source={require('../../../../../assets/Admin/Imgaes/nodatadound.png')}
+        style={styles.noDataImage}
+        resizeMode="contain"
+      />
+      <Text style={styles.noDataText}>No Contacts Found</Text>
+    </View>);
   }
 
+  if (!contacts || contacts.length === 0) { // Show spinner while loading
+    return (
+      <View style={styles.noDataContainer}>
+        <Image
+          source={require('../../../../../assets/Admin/Imgaes/nodatadound.png')}
+          style={styles.noDataImage}
+          resizeMode="contain"
+        />
+        <Text style={styles.noDataText}>No Contacts Found</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.noDataContainer}>
+        <Image
+          source={require('../../../../../assets/Admin/Imgaes/nodatadound.png')}
+          style={styles.noDataImage}
+          resizeMode="contain"
+        />
+        <Text style={styles.noDataText}>No Amenities Found</Text>
+      </View>)
+  }
   return (
     <View style={styles.container}>
       <FlatList
@@ -144,6 +168,26 @@ const styles = StyleSheet.create({
   },
   callButton: {
     padding: 10,
+  },
+  noDataContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noDataImage: {
+    width: 150,
+    height: 150,
+    marginBottom: 16,
+  },
+  noDataText: {
+    fontSize: 18,
+    color: '#7d0431',
+    textAlign: 'center',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

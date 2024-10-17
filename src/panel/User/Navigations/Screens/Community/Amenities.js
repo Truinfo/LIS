@@ -14,6 +14,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { getAmenitiesBySocietyId } from "../../../Redux/Slice/CommunitySlice/Amenities";
 import { useDispatch, useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ActivityIndicator } from "react-native-paper";
 
 const DetailBox = ({ title, value, backgroundColor, width }) => (
   <View style={[styles.detailBox, { backgroundColor, width }]}>
@@ -22,17 +23,22 @@ const DetailBox = ({ title, value, backgroundColor, width }) => (
   </View>
 );
 
-const NoAmenityAvailable = ({ amenityName }) => (
-  <View style={styles.scene}>
-    <Text>No {amenityName} Available in Our Society</Text>
-  </View>
-);
-
 const CommunityHall = ({ data }) => {
   const navigation = useNavigation();
   const communityHall = data.find((amenity) => amenity.amenityName === "Community Hall");
 
-  if (!communityHall) return <NoAmenityAvailable amenityName="Community Hall" />;
+  if (!data || data.length === 0) { // Show spinner while loading
+    return (
+      <View style={styles.noDataContainer}>
+        <Image
+          source={require('../../../../../assets/Admin/Imgaes/nodatadound.png')}
+          style={styles.noDataImage}
+          resizeMode="contain"
+        />
+        <Text style={styles.noDataText}>No Amenities Found</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.scene}>
@@ -66,8 +72,19 @@ const CommunityHall = ({ data }) => {
 const PlayArea = ({ data }) => {
   const playArea = data.find((amenity) => amenity.amenityName === "Play Area");
 
-  if (!playArea) return <NoAmenityAvailable amenityName="Play Area" />;
 
+  if (!data || data.length === 0) { // Show spinner while loading
+    return (
+      <View style={styles.noDataContainer}>
+        <Image
+          source={require('../../../../../assets/Admin/Imgaes/nodatadound.png')}
+          style={styles.noDataImage}
+          resizeMode="contain"
+        />
+        <Text style={styles.noDataText}>No Amenities Found</Text>
+      </View>
+    );
+  }
   return (
     <View style={styles.scene}>
       <Image
@@ -101,7 +118,19 @@ const PlayArea = ({ data }) => {
 const Gym = ({ data }) => {
   const gym = data.find((amenity) => amenity.amenityName === "Gym");
 
-  if (!gym) return <NoAmenityAvailable amenityName="Gym" />;
+
+  if (!data || data.length === 0) { // Show spinner while loading
+    return (
+      <View style={styles.noDataContainer}>
+        <Image
+          source={require('../../../../../assets/Admin/Imgaes/nodatadound.png')}
+          style={styles.noDataImage}
+          resizeMode="contain"
+        />
+        <Text style={styles.noDataText}>No Amenities Found</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.scene}>
@@ -140,7 +169,7 @@ const Amenities = () => {
   const layout = useWindowDimensions();
   const [societyId, setSocietyId] = useState('');
   const dispatch = useDispatch();
-  const { amenities } = useSelector((state) => state.amenities);
+  const { amenities, status, error } = useSelector((state) => state.amenities);
 
   useEffect(() => {
     const getUserName = async () => {
@@ -156,6 +185,24 @@ const Amenities = () => {
     };
     getUserName();
   }, []);
+
+
+  if (status === 'loading') {
+    return <ActivityIndicator size="large" color="#630000" style={styles.loadingContainer} />;
+  }
+
+  if (error) {
+    return (<View style={styles.noDataContainer}>
+      <Image
+        source={require('../../../../../assets/Admin/Imgaes/nodatadound.png')}
+        style={styles.noDataImage}
+        resizeMode="contain"
+      />
+      <Text style={styles.noDataText}>No Amenities Found</Text>
+    </View>);
+  }
+
+
 
   useEffect(() => {
     if (societyId) {
@@ -408,6 +455,26 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "700",
     color: "#fff",
+  },
+  noDataContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noDataImage: {
+    width: 150,
+    height: 150,
+    marginBottom: 16,
+  },
+  noDataText: {
+    fontSize: 18,
+    color: '#7d0431',
+    textAlign: 'center',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

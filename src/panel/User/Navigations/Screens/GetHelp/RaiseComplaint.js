@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { RadioButton } from "react-native-paper";
 import { useRoute, useNavigation } from "@react-navigation/native";
-import { useDispatch,  } from "react-redux";
+import { useDispatch, } from "react-redux";
 import { createComplaint, fetchComplaints } from "../../../Redux/Slice/GetHelpSlice/ComplaintsSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -81,6 +81,7 @@ const RaiseComplaint = () => {
         // Handle error (e.g., show an error message)
       });
   };
+
 
   return (
     <View style={styles.container}>
@@ -186,6 +187,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 16,
   },
+ 
 });
 
 export default RaiseComplaint;

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Image } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { fetchAmenityBookings } from "../../../Redux/Slice/ProfileSlice/MyBookingSlice";
@@ -51,8 +51,8 @@ const MyBookings = () => {
                                         booking.status === "Completed"
                                             ? "#4caf50"
                                             : booking.status === "InProgress"
-                                            ? "#ff9800"
-                                            : "#f44336",
+                                                ? "#ff9800"
+                                                : "#f44336",
                                 },
                             ]}
                         >
@@ -93,7 +93,14 @@ const MyBookings = () => {
                     </View>
                 ))
             ) : (
-                <Text style={styles.noBookingsText}>No bookings found</Text>
+                <View style={styles.noDataContainer}>
+                    <Image
+                        source={require('../../../../../assets/Admin/Imgaes/nodatadound.png')}
+                        style={styles.noDataImage}
+                        resizeMode="contain"
+                    />
+                    <Text style={styles.noDataText}>No Booking Found</Text>
+                </View>
             )}
         </ScrollView>
     );
@@ -103,7 +110,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 16,
-        backgroundColor: "#f9f9f9", 
+        backgroundColor: "#f9f9f9",
     },
     card: {
         padding: 20,
@@ -114,7 +121,7 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 3 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
-        elevation: 4, 
+        elevation: 4,
         position: "relative",
     },
     statusChip: {
@@ -129,12 +136,12 @@ const styles = StyleSheet.create({
         color: "#fff",
         fontSize: 12,
         fontWeight: "bold",
-        textTransform: "uppercase", 
+        textTransform: "uppercase",
     },
     amenityName: {
         fontSize: 18,
         fontWeight: "bold",
-        color: "#333", 
+        color: "#333",
         marginBottom: 10,
     },
     row: {
@@ -144,19 +151,34 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 14,
-        color: "#777", 
+        color: "#777",
         fontWeight: "500",
     },
     value: {
         fontSize: 14,
         color: "#000",
-        fontWeight: "600", 
+        fontWeight: "600",
     },
     noBookingsText: {
         fontSize: 16,
         color: "#999",
         textAlign: "center",
         marginTop: 20,
+    },
+    noDataContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    noDataImage: {
+        width: 150,
+        height: 150,
+        marginBottom: 16,
+    },
+    noDataText: {
+        fontSize: 18,
+        color: '#7d0431',
+        textAlign: 'center',
     },
 });
 

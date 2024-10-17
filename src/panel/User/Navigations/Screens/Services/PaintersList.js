@@ -12,6 +12,7 @@ import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import Zocial from "@expo/vector-icons/Zocial";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchServices } from "../../../Redux/Slice/ServiceSlice/ServiceSlice";
+import { Image } from "react-native";
 
 const PaintersList = () => {
   const dispatch = useDispatch();
@@ -52,13 +53,38 @@ const PaintersList = () => {
   );
 
   if (loading) {
-    return (<View style={styles.loadingContainer}>
-      <ActivityIndicator size="large" color="#7d0431" />
-    </View>)
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#7d0431" />
+      </View>
+    );
   }
 
   if (error) {
-    return <Text>Error: {error}</Text>;
+    return (
+      <View style={styles.noDataContainer}>
+        <Image
+          source={require('../../../../../assets/Admin/Imgaes/nodatadound.png')}
+          style={styles.noDataImage}
+          resizeMode="contain"
+        />
+        <Text style={styles.noDataText}>No Services Found</Text>
+      </View>
+    );
+  }
+
+
+  if (!data || data.painter?.length === 0) { // Show spinner while loading
+    return (
+      <View style={styles.noDataContainer}>
+        <Image
+          source={require('../../../../../assets/Admin/Imgaes/nodatadound.png')}
+          style={styles.noDataImage}
+          resizeMode="contain"
+        />
+        <Text style={styles.noDataText}>No Services Found</Text>
+      </View>
+    );
   }
   return (
     <View style={styles.container}>
@@ -187,6 +213,21 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  noDataContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noDataImage: {
+    width: 150,
+    height: 150,
+    marginBottom: 16,
+  },
+  noDataText: {
+    fontSize: 18,
+    color: '#7d0431',
+    textAlign: 'center',
   },
 });
 

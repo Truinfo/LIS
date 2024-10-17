@@ -34,19 +34,28 @@ const Events = ({ navigation }) => {
     }
   }, [dispatch, societyId]);
 
-  let content;
-  const spinner = () => {
-    return (
-      <View style={[styles.containerSpin, styles.horizontalSpin]}>
-        <ActivityIndicator size="large" color="#7d0431" />
-      </View>
-    );
-  };
+  let content = null;  // Declare 'content' to be used in rendering
 
+  // Conditional Rendering based on status
   if (status === "loading") {
-    content = spinner();
+    return <ActivityIndicator size="large" color="#630000" style={styles.loadingContainer} />;
   } else if (status === "succeeded") {
-    const sortedEvents = [...events.events].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    // Check if events data is undefined or empty
+    if (!events || !events.length) {
+      return (
+        <View style={styles.noDataContainer}>
+          <Image
+            source={require('../../../../../assets/Admin/Imgaes/nodatadound.png')}
+            style={styles.noDataImage}
+            resizeMode="contain"
+          />
+          <Text style={styles.noDataText}>No Events Found</Text>
+        </View>
+      );
+    }
+
+    // If events exist and have data
+    const sortedEvents = [...events].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
     content = (
       <>
@@ -57,7 +66,7 @@ const Events = ({ navigation }) => {
             onPress={() => navigation.navigate('EventDetails', { event })}
           >
             <Card.Content>
-              {event.pictures[0] ? (
+              {event.pictures && event.pictures[0] ? (
                 <Image
                   source={{ uri: `https://livinsync.onrender.com${event.pictures[0].img}` }}
                   style={styles.pictures}
@@ -84,7 +93,16 @@ const Events = ({ navigation }) => {
       </>
     );
   } else if (status === "failed") {
-    content = <Text>{error}</Text>;
+    return (
+      <View style={styles.noDataContainer}>
+        <Image
+          source={require('../../../../../assets/Admin/Imgaes/nodatadound.png')}
+          style={styles.noDataImage}
+          resizeMode="contain"
+        />
+        <Text style={styles.noDataText}>No Events Found</Text>
+      </View>
+    );
   }
 
   return (
@@ -138,6 +156,26 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: 'red',
+    textAlign: 'center',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noDataContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noDataImage: {
+    width: 150,
+    height: 150,
+    marginBottom: 16,
+  },
+  noDataText: {
+    fontSize: 18,
+    color: '#7d0431',
     textAlign: 'center',
   },
 });

@@ -7,6 +7,7 @@ import * as FileSystem from 'expo-file-system';
 import { Ionicons } from '@expo/vector-icons';
 import * as Sharing from 'expo-sharing';
 import * as MediaLibrary from 'expo-media-library';
+import { ActivityIndicator } from 'react-native-paper';
 const SocietyBills = () => {
     const dispatch = useDispatch();
     const [societyId, setSocietyId] = useState('');
@@ -33,6 +34,9 @@ const SocietyBills = () => {
             dispatch(fetchSocietyBills(societyId));
         }
     }, [dispatch, societyId]);
+
+
+
     const downloadFile = async (relativeUrl) => {
         try {
             const baseUrl = "https://livinsync.onrender.com";
@@ -101,20 +105,38 @@ const SocietyBills = () => {
         </View>
     );
 
-    const spinner = () => {
+    if (loading) {
         return (
-            <View style={[styles.containerSpin, styles.horizontalSpin]}>
+            <View style={[styles.container, styles.loadingContainer]}>
                 <ActivityIndicator size="large" color="#7d0431" />
             </View>
         );
-    };
-
-    if (loading === "loading") {
-        return spinner(); // Show spinner when loading
     }
 
     if (error) {
-        return <Text>Error: {error}</Text>; // Show error if exists
+        return (
+            <View style={styles.noDataContainer}>
+                <Image
+                    source={require('../../../../../assets/Admin/Imgaes/nodatadound.png')}
+                    style={styles.noDataImage}
+                    resizeMode="contain"
+                />
+                <Text style={styles.noDataText}>No Bills Found</Text>
+            </View>
+        );
+    }
+
+    if (!society || society.length === 0) { // Show spinner while loading
+        return (
+            <View style={styles.noDataContainer}>
+                <Image
+                    source={require('../../../../../assets/Admin/Imgaes/nodatadound.png')}
+                    style={styles.noDataImage}
+                    resizeMode="contain"
+                />
+                <Text style={styles.noDataText}>No Bills Found</Text>
+            </View>
+        );
     }
     return (
         <View style={styles.container}>
@@ -171,11 +193,11 @@ const styles = StyleSheet.create({
     },
     shareButton: {
         position: 'absolute',
-        bottom: 10, 
-        right: 10,  
-        backgroundColor: 'rgba(0, 0, 0, 0.08)', 
-        padding: 8,  
-        borderRadius: 20, 
+        bottom: 10,
+        right: 10,
+        backgroundColor: 'rgba(0, 0, 0, 0.08)',
+        padding: 8,
+        borderRadius: 20,
     },
     chipText: {
         color: '#fff',
@@ -192,6 +214,26 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: "center",
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    noDataContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    noDataImage: {
+        width: 150,
+        height: 150,
+        marginBottom: 16,
+    },
+    noDataText: {
+        fontSize: 18,
+        color: '#7d0431',
+        textAlign: 'center',
     },
 });
 export default SocietyBills;

@@ -1,5 +1,3 @@
-
-
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, ActivityIndicator, FlatList } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
@@ -39,15 +37,34 @@ const Notice = () => {
   if (loading) {
     return (
       <View style={[styles.container, styles.loadingContainer]}>
-        <ActivityIndicator size="large" color="#7do431" />
+        <ActivityIndicator size="large" color="#7d0431" />
       </View>
     );
   }
 
   if (error) {
     return (
-      <View style={styles.container}>
-        <Text>Error: {error}</Text>
+      <View style={styles.noDataContainer}>
+        <Image
+          source={require('../../../../../assets/Admin/Imgaes/nodatadound.png')}
+          style={styles.noDataImage}
+          resizeMode="contain"
+        />
+        <Text style={styles.noDataText}>No Notices Found</Text>
+      </View>
+    );
+  }
+
+
+  if (!notices || notices.notices.length === 0) { // Show spinner while loading
+    return (
+      <View style={styles.noDataContainer}>
+        <Image
+          source={require('../../../../../assets/Admin/Imgaes/nodatadound.png')}
+          style={styles.noDataImage}
+          resizeMode="contain"
+        />
+        <Text style={styles.noDataText}>No Notices Found</Text>
       </View>
     );
   }
@@ -86,7 +103,6 @@ const Notice = () => {
     </View>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {
@@ -138,6 +154,26 @@ const styles = StyleSheet.create({
     fontSize: 14,
     letterSpacing: 0.5,
     color: "grey",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noDataContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noDataImage: {
+    width: 150,
+    height: 150,
+    marginBottom: 16,
+  },
+  noDataText: {
+    fontSize: 18,
+    color: '#7d0431',
+    textAlign: 'center',
   },
 });
 

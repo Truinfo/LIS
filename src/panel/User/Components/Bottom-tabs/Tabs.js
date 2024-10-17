@@ -7,7 +7,7 @@ import Services from "../../Navigations/Screens/Services";
 import Community from "../../Navigations/Screens/Community";
 import RentalProperties from "../../Navigations/Screens/Community/RentalProperties";
 import socketServices from "../../Socket/SocketServices";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from '@expo/vector-icons';
 const Tab = createBottomTabNavigator();
@@ -17,6 +17,7 @@ function Tabs() {
   const [userId, setUserId] = useState(null);
   const [payeeName, setPayeeName] = useState('');
   const [NotifyUser, setNotifyUser] = useState(null);
+  const navigation = useNavigation()
   useEffect(() => {
     const getUserName = async () => {
       try {

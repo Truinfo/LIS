@@ -34,10 +34,10 @@ const CheckIn = ({ data, setActiveTab }) => {
   const handleCheckOut = (id) => {
     const payload = {
       societyId,
-      id,
+      id:id._id,
+      userId:id.userId,
       visitorType: "Staff"
     };
-
     dispatch(fetchCheckOut(payload)).then((response) => {
       console.log(response)
       if (response.meta.requestStatus === 'fulfilled') {
@@ -79,7 +79,7 @@ const CheckIn = ({ data, setActiveTab }) => {
           {!response && (
             <TouchableOpacity
               style={[styles.button, styles.redButton]}
-              onPress={() => handleCheckOut(item.userId)}
+              onPress={() => handleCheckOut(item)}
             >
               <Text style={{ color: '#fff', fontSize: 10 }}>Check Out</Text>
             </TouchableOpacity>

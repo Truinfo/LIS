@@ -1,17 +1,18 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from '../../../../Security/helpers/axios';
+import axios from "axios";
 
 export const fetchCheckOut = createAsyncThunk(
   "checkOut/fetchCheckOut",
   async (payload, {rejectWithValue }) => {
     try {
-      const { societyId, id, visitorType } = payload;
+      const { societyId, id,userId, visitorType } = payload;
       let response;
       const endpoint = visitorType === "Guest" ? "checkoutVisitor" : "checkOutStaff";
       if (visitorType === "Guest") {
         response = await axiosInstance.put(`/${endpoint}`, {
           societyId,
-          visitorId : id,
+          id,
         },
         {
           headers: { 'Content-Type': "application/json" }
@@ -19,7 +20,8 @@ export const fetchCheckOut = createAsyncThunk(
       } else {
         response = await axiosInstance.put(`/${endpoint}`, {
           societyId,
-          userId: id,
+           id,
+           userId
         },{
           headers: { 'Content-Type': "application/json" }
         });

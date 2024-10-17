@@ -37,7 +37,7 @@ const CheckIn = ({ data, setActiveTab }) => {
   const handleCheckOut = (id) => {
     const payload = {
       societyId,
-      id,
+      id:id._id,
       visitorType: "Guest"
     };
     dispatch(fetchCheckOut(payload)).then((response) => {
@@ -92,7 +92,7 @@ const CheckIn = ({ data, setActiveTab }) => {
           {!response && (
             <TouchableOpacity
               style={[styles.button, styles.redButton]}
-              onPress={() => handleCheckOut(item.visitorId)}
+              onPress={() => handleCheckOut(item)}
             >
               <Text style={{ color: '#fff', fontSize: 10 }}>Check Out</Text>
             </TouchableOpacity>

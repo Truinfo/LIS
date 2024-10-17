@@ -6,7 +6,7 @@ import {  useSelector } from 'react-redux';
 import MyDialog from '../../DialogBox/DialogBox';
 import { Avatar } from 'react-native-paper'
 
-const CheckOut = ({ data,  }) => {
+const CheckOut = ({ data  }) => {
 
   const successMessage = useSelector(state => state.checkOuting.successMessage);
   const error = useSelector(state => state.checkOuting.error);

@@ -96,7 +96,7 @@ const Security = () => {
           style={styles.noDataImage}
           resizeMode="contain"
         />
-        <Text style={styles.noDataText}>No Adds Found</Text>
+        <Text style={styles.noDataText}>No Security Found</Text>
       </View>
     );
   }

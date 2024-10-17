@@ -364,16 +364,15 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     noDataImage: {
-        width: 300,
-        height: 300,
+        width: 150,
+        height: 150,
         alignItems: "center",
     },
     noDataText: {
         fontSize: 16,
         color: '#7D0431',
-        fontWeight: '700',
     },
-  
+
 });
 
 export default VisitorManagement;

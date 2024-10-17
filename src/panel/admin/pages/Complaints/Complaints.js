@@ -12,6 +12,7 @@ import {
   StatusBar,
   ActivityIndicator,
   Alert,
+  Image,
 } from "react-native";
 import {
   fetchComplaints,
@@ -247,7 +248,7 @@ const Complaints = () => {
       </View>
     );
   }
-  if (!complaints || !complaints.length === 0 || status === "error") {
+  if (!complaints || complaints.length === 0 || status === "error") {
     // Show spinner while loading
     return (
       <View style={styles.noDataContainer}>
@@ -409,12 +410,12 @@ const styles = StyleSheet.create({
     top: 45,
     right: 30,
     borderRadius: 8,
-    
+
   },
   menu: {
-    borderWidth:1,
-    borderColor:"#ccc",
-    borderRadius:5
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5
   },
   menuButton: {
     paddingVertical: 8,

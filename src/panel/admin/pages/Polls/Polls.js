@@ -35,19 +35,16 @@ const Polls = () => {
     useFocusEffect(
         React.useCallback(() => {
             socketServices.initializeSocket();
-
-            // Emit the event to get polls for the current society
             if (societyId) {
+                socketServices.emit('joinSecurityPanel', societyId);
                 socketServices.emit('get_polls_by_society_id', { societyId });
             }
             const handlePollsBySocietyId = (fetchedPolls) => {
-                console.log(fetchedPolls, "poll")
                 setPolls(fetchedPolls);
                 setLoading(false);
             };
 
             const handleVoteUpdate = (data) => {
-                console.log(data)
                 alert(data.message);
                 setPolls(prevPolls => {
                     const updatedPollIndex = prevPolls.findIndex(poll => poll._id === data.votes._id);
@@ -62,12 +59,11 @@ const Polls = () => {
             };
 
             const handlePollDeleted = (pollId) => {
-                console.log(pollId)
                 setPolls(prevPolls => prevPolls.filter(poll => poll._id !== pollId));
                 setLoading(false);
             };
             const handlePollEdited = (fetchedPolls) => {
-                setPolls(prevPolls => [fetchedPolls, ...prevPolls]);
+                setPolls(fetchedPolls);
                 setLoading(false);
             };
 
@@ -114,11 +110,12 @@ const Polls = () => {
                 </View>
             );
         }
-
+        const activerReversedPoll = [...activePolls].reverse()
         return (
             <ScrollView>
-                {activePolls.length === 0 ? (
+                {activerReversedPoll.length === 0 ? (
                     <View style={styles.noDataContainer}>
+
                         <Image
                             source={require('../../../../assets/Admin/Imgaes/nodatadound.png')}
                             style={styles.noDataImage}
@@ -127,7 +124,7 @@ const Polls = () => {
                         <Text style={styles.noDataText}>No More Active Polls</Text>
                     </View>
                 ) : (
-                    activePolls.map((item) => (
+                    activerReversedPoll.map((item) => (
                         <PollItem key={item._id} item={item} isExpired={false} />
                     ))
                 )}
@@ -144,10 +141,10 @@ const Polls = () => {
                 </View>
             );
         }
-        console.log(polls)
+        const closedReversedPolls = [...closedPolls].reverse()
         return (
             <ScrollView>
-                {closedPolls.length === 0 ? (
+                {closedReversedPolls.length === 0 ? (
                     <View style={styles.noDataContainer}>
                         <Image
                             source={require('../../../../assets/Admin/Imgaes/nodatadound.png')}
@@ -157,7 +154,7 @@ const Polls = () => {
                         <Text style={styles.noDataText}>No More Closed Polls</Text>
                     </View>
                 ) : (
-                    closedPolls.map((item) => (
+                    closedReversedPolls.map((item) => (
                         <PollItem key={item._id} item={item} isExpired={true} />
                     ))
                 )}
@@ -182,6 +179,7 @@ const Polls = () => {
             <View style={styles.pollContainer}>
                 <View style={styles.pollHeader}>
                     <Text style={styles.pollQuestion}>
+
                         {item.poll?.question} <Text style={styles.voteCount}>({item.poll?.votes.length} Votes)</Text>
                     </Text>
                     <Menu
@@ -332,7 +330,6 @@ const styles = StyleSheet.create({
     noDataText: {
         fontSize: 16,
         color: '#7D0431',
-        fontWeight: '700',
     },
     fab: {
         position: 'absolute',

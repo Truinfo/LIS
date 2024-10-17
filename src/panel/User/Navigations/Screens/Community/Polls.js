@@ -29,6 +29,9 @@ const Polls = () => {
 
     useEffect(() => {
         socketServices.initializeSocket();
+        if (societyId) {
+            socketServices.emit('joinSecurityPanel', societyId);
+        }
         socketServices.emit('get_polls_by_society_id', { societyId });
         const handlePollsBySocietyId = (fetchedPolls) => {
             setPolls(fetchedPolls);

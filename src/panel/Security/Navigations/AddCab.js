@@ -23,6 +23,7 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AntDesign, Entypo, MaterialIcons } from "@expo/vector-icons";
 import socketServices from "../../User/Socket/SocketServices";
+import { fetchresidents } from "../../User/Redux/Slice/CommunitySlice/residentsSlice";
 
 const AddCab = ({ route, navigation }) => {
   const [name, setName] = useState("");
@@ -53,13 +54,18 @@ const AddCab = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const [societyId, setSocietyId] = useState(null);
   const [securityId, setSecurityId] = useState(null);
+  const { userProfiles } = useSelector((state) => state.userResidents);
+  const [usersInFlat, setUsersInFlat] = useState([]);
+  const [user, setuser] = useState("");
+  const [userId, setuserId] = useState("");
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
 
   useEffect(() => {
     const getSocietyId = async () => {
       try {
         const user = await AsyncStorage.getItem("user");
         const id = JSON.parse(user);
-        console.log(user, "security")
+        console.log(user, "security");
         if (id !== null) {
           setSocietyId(id.societyId);
           setSecurityId(id._id);
@@ -73,9 +79,6 @@ const AddCab = ({ route, navigation }) => {
     getSocietyId();
     socketServices.initializeSocket();
   }, []);
-
-
-
 
   const { society } = useSelector((state) => state.societyById);
   console.log(successMessage);
@@ -92,7 +95,15 @@ const AddCab = ({ route, navigation }) => {
       socketServices.emit("joinSecurityPanel", societyId);
     }
   }, [dispatch, societyId]);
-
+  useEffect(() => {
+    if (societyId) {
+      dispatch(fetchresidents(societyId)).then((response) => {
+        if (response.type === "residents/fetchResidents/fulfilled") {
+          console.log(response.payload); // Set all residents here
+        }
+      });
+    }
+  }, [dispatch, societyId]);
   const selectBuilding = (building) => {
     setBlock(building.blockName);
     setShowBuildingDropdown(false);
@@ -105,11 +116,29 @@ const AddCab = ({ route, navigation }) => {
     return flats;
   };
 
-  const selectFlatNo = (flatNo) => {
-    setFlatNo(flatNo.flatNumber);
+  const filterResidents = (selectedBlock, selectedFlat) => {
+    return userProfiles.filter((resident) => {
+      return (
+        resident.buildingName === selectedBlock &&
+        resident.flatNumber === selectedFlat
+      );
+    });
+  };
+  const selectFlatNo = (flat) => {
+    setFlatNo(flat.flatNumber);
     setShowFlatNoDropdown(false);
+    // Filter residents based on selected block and flat
+    const filteredResidents = filterResidents(block, flat.flatNumber);
+
+    setUsersInFlat(filteredResidents); // Update usersInFlat with filtered residents
+    setShowUserDropdown(true); // Show the user dropdown
   };
 
+  const selectuser = (user) => {
+    setuser(user.name);
+    setuserId(user._id);
+    setShowUserDropdown(false);
+  };
   const validateInputs = () => {
     let isValid = true;
     if (!name) {
@@ -511,6 +540,40 @@ const AddCab = ({ route, navigation }) => {
           {flatNoError ? (
             <Text style={styles.errorMessage}>{flatNoError}</Text>
           ) : null}
+          <TouchableOpacity
+            style={[
+              styles.dropdownButton,
+              showUserDropdown && styles.dropdownActive,
+              { marginTop: 15 },
+              flatNoError && { borderColor: "red" },
+            ]}
+            onPress={() => setShowUserDropdown(!showUserDropdown)}
+          >
+            <Text style={styles.dropdownButtonText}>
+              {user ? `${user}` : "Select User *"}
+            </Text>
+            <Text>
+              <MaterialIcons
+                name={showUserDropdown ? "arrow-drop-up" : "arrow-drop-down"}
+                size={20}
+                color="#000"
+                style={{ marginRight: 5 }}
+              />
+            </Text>
+          </TouchableOpacity>
+          {showUserDropdown && usersInFlat.length > 0 && (
+            <View style={styles.dropdownMenu}>
+              {usersInFlat.map((user) => (
+                <TouchableOpacity
+                  key={user._id}
+                  style={styles.dropdownItem}
+                  onPress={() => selectuser(user)}
+                >
+                  <Text style={styles.dropdownItemText}>{user.name}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
         </View>
 
         <TouchableOpacity

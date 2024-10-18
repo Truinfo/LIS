@@ -29,7 +29,11 @@ const AddMaintenanceBill = () => {
         const storedAdmin = await AsyncStorage.getItem('user');
         if (storedAdmin) {
           const societyAdmin = JSON.parse(storedAdmin);
-          setSocietyId(societyAdmin._id || "");
+          console.log(societyAdmin)
+          if (societyAdmin._id) {
+            setSocietyId(societyAdmin._id);
+          }
+
         }
       } catch (error) {
         console.error("Error retrieving society admin data:", error);
@@ -45,25 +49,10 @@ const AddMaintenanceBill = () => {
   };
 
   const handleAdd = async () => {
-    const newErrors = {};
-    Object.keys(formData).forEach(key => {
-      if (!formData[key]) {
-        newErrors[key] = 'This field is required';
-      }
-    });
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-
-    setErrors({});
-    const formDataToAdd = new FormData();
-    Object.keys(formData).forEach(key => {
-      formDataToAdd.append(key, formData[key]);
-    });
 
     try {
-      const response = await dispatch(createMaintenanceRecords(formDataToAdd)).unwrap();
+      const response = await dispatch(createMaintenanceRecords(formDataToAdd))
+      console.log(response)
       if (response) {
         setFormData({
           societyId: societyId,

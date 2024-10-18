@@ -68,9 +68,9 @@ export default function Sidebar() {
     );
   };
   
-  // if (daysRemaining !== null && daysRemaining <= 0) {
-  //         navigation.navigate("Renewal Plan")
-  //     }
+  if (daysRemaining !== null && daysRemaining <= 0) {
+          navigation.navigate("Renewal Plan")
+      }
 
   return (
     <View style={{ flex: 1 }}>

@@ -52,6 +52,13 @@ export const DeletePost = createAsyncThunk(
         return response.data;
     }
 );
+export const getAllProducts = createAsyncThunk(
+    'marketPlace/getAllProducts',
+    async () => {
+        const response = await axiosInstance.get(`/getAllProducts`);
+        return response.data;
+    }
+);
 
 const MarketPlaceSlice = createSlice({
     name: 'notifications',
@@ -115,6 +122,18 @@ const MarketPlaceSlice = createSlice({
                 state.loading = false;
             })
             .addCase(DeletePost.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message;
+            })
+            .addCase(getAllProducts.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getAllProducts.fulfilled, (state, action) => {
+                state.loading = false;
+                state.Properties = action.payload;
+            })
+            .addCase(getAllProducts.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message;
             })

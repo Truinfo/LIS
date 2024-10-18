@@ -5,6 +5,7 @@ import { fetchInventory, deleteInventoryAsync, fetchaddInventory, fetchEditInven
 import { ActivityIndicator, FAB, Snackbar } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Image } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Inventory = () => {
     const dispatch = useDispatch();
@@ -13,11 +14,31 @@ const Inventory = () => {
     const [anchor, setAnchor] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
     const [modalVisible1, setModalVisible1] = useState(false);
+
+    const [societyId, setSocietyId] = useState("");
     const [inventoryData, setInventoryData] = useState({
         name: "",
         quantity: "",
-        societyId: "6683b57b073739a31e8350d0"
+        societyId: ""
     });
+    useEffect(() => {
+        const getUserName = async () => {
+            try {
+                const userString = await AsyncStorage.getItem("user");
+                if (userString !== null) {
+                    const user = JSON.parse(userString);
+                    if (user?._id) {
+                        setSocietyId(user?._id)
+                        setInventoryData(prev => ({ ...prev, societyId: user?._id }))
+                    }
+                }
+            } catch (error) {
+                console.error("Failed to fetch the user from async storage", error);
+            }
+        };
+        getUserName();
+    }, []);
+
     const [editInventoryData, setEditInventoryData] = useState({
         id: "",
         name: "",
@@ -27,8 +48,11 @@ const Inventory = () => {
     const [snackbarMessage, setSnackbarMessage] = useState("");
 
     useEffect(() => {
-        dispatch(fetchInventory());
-    }, [dispatch]);
+        if(societyId){
+            dispatch(fetchInventory(societyId));
+        }
+        
+    }, [dispatch,societyId]);
 
     const handleMenuPress = (item) => {
         setAnchor(anchor === item._id ? null : item._id);
@@ -52,7 +76,7 @@ const Inventory = () => {
                             .then(() => {
                                 setSnackbarMessage("Inventory deleted successfully");
                                 setSnackbarVisible(true);
-                                dispatch(fetchInventory()); // Refresh the inventory list
+                                  dispatch(fetchInventory(societyId));; // Refresh the inventory list
                             })
                             .catch((error) => {
                                 setSnackbarMessage("There was an error deleting the inventory");
@@ -60,7 +84,7 @@ const Inventory = () => {
                                 console.error("Error:", error);
                             });
                     },
-                    style: 'destructive', 
+                    style: 'destructive',
                 },
             ],
             { cancelable: true }
@@ -92,7 +116,7 @@ const Inventory = () => {
                 setModalVisible1(false);
                 setSnackbarMessage(`${response.payload.message}`);
                 setSnackbarVisible(true);
-                dispatch(fetchInventory()); // Refresh the inventory list
+                  dispatch(fetchInventory(societyId));; // Refresh the inventory list
             }
         } catch (error) {
             setSnackbarMessage("Failed to edit inventory");
@@ -108,6 +132,7 @@ const Inventory = () => {
     };
 
     const handleSubmit = async () => {
+        console.log(inventoryData)
         if (!inventoryData.name || !inventoryData.quantity || !inventoryData.societyId) {
             setSnackbarMessage("Please fill out all fields");
             setSnackbarVisible(true);
@@ -116,11 +141,10 @@ const Inventory = () => {
 
         try {
             const response = await dispatch(fetchaddInventory(inventoryData));
-            console.log(response)
-            if (response.meta.requestStatus === 'fulfilled') {
+            if (response.type === 'inventory/fetchaddInventory/fulfilled') {
                 setSnackbarMessage(`${response.payload.message}`);
                 setSnackbarVisible(true);
-                dispatch(fetchInventory());
+                  dispatch(fetchInventory(societyId));;
                 setModalVisible(false);
 
                 setInventoryData({
@@ -145,18 +169,7 @@ const Inventory = () => {
             </View>
         );
     }
-    if (!inventoryItems || status === "failed") {
-        return (
-            <View style={styles.noDataContainer}>
-                <Image
-                    source={require('../../../../assets/Admin/Imgaes/nodatadound.png')}
-                    style={styles.noDataImage}
-                    resizeMode="contain"
-                />
-                <Text style={styles.noDataText}>No Amenities Found</Text>
-            </View>
-        );
-    }
+
 
     const capitalizeFirstLetter = (string) => {
         return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
@@ -169,7 +182,16 @@ const Inventory = () => {
     };
     return (
         <View style={styles.container}>
-            {inventoryItems?.length !== 0 ?
+            {inventoryItems?.length === 0 || !inventoryItems ?
+                <View style={styles.noDataContainer}>
+                    <Image
+                        source={require('../../../../assets/Admin/Imgaes/nodatadound.png')}
+                        style={styles.noDataImage}
+                        resizeMode="contain"
+                    />
+                    <Text style={styles.noDataText}>No Inventory Found</Text>
+                </View> :
+
                 <FlatList
                     data={inventoryItems}
                     keyExtractor={(item) => item._id}
@@ -195,14 +217,9 @@ const Inventory = () => {
                             )}
                         </View>
                     )}
-                /> : <View style={styles.noDataContainer}>
-                    <Image
-                        source={require('../../../../assets/Admin/Imgaes/nodatadound.png')}
-                        style={styles.noDataImage}
-                        resizeMode="contain"
-                    />
-                    <Text style={styles.noDataText}>No Amenities Found</Text>
-                </View>}
+                />
+
+            }
             <FAB
                 style={styles.fab}
                 icon={() => <MaterialCommunityIcons name="plus" size={24} color="white" />}

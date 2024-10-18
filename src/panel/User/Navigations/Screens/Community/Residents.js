@@ -46,7 +46,6 @@ const Residents = () => {
       dispatch(fetchresidents(societyId));
     }
   }, [dispatch, societyId]);
-  console.log(userProfiles)
   useEffect(() => {
     if (societyId) {
       dispatch(fetchSocietyById(societyId));

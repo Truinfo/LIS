@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from "../../../Security/helpers/axios";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 const fetchSocietyId = async () => {
     const storedAdmin = await AsyncStorage.getItem('user');
@@ -32,7 +33,7 @@ export const createMaintenanceRecords = createAsyncThunk(
     async (formData, { rejectWithValue }) => {
 
         try {
-            const response = await axiosInstance.post('/createMaintenanceRecords', formData, {
+            const response = await axios.post('http://192.168.29.151:2000/api/createMaintenanceRecords', formData, {
                 headers: {
                     'Content-Type': 'application/json' // Ensure proper content type for FormData
                 }
@@ -115,10 +116,12 @@ const MaintainanceSlice = createSlice({
                 state.status = 'succeeded';
                 state.maintainances.push(action.payload);
                 state.successMessage = action.payload.message;
+                console.log(action.payload.message)
             })
             .addCase(createMaintenanceRecords.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.payload.message;
+                console.log(action.payload.message)
             })
 
             .addCase(updatePaymentDetails.pending, (state) => {

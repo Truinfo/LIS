@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDispatch, useSelector } from 'react-redux';
-import { getSocityAdds } from '../../../Redux/Slice/MarketPlaceSlice/MarketPlace';
+import { getAllProducts } from '../../../Redux/Slice/MarketPlaceSlice/MarketPlace';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ActivityIndicator, FAB } from 'react-native-paper';
 import { ImagebaseURL } from '../../../../Security/helpers/axios';
@@ -31,7 +31,7 @@ const ListPage = () => {
     useFocusEffect(
         React.useCallback(() => {
             if (societyId) {
-                dispatch(getSocityAdds(societyId));
+                dispatch(getAllProducts());
             }
         }, [societyId, dispatch]),);
 
@@ -63,8 +63,7 @@ const ListPage = () => {
     if (loading) {
         return <ActivityIndicator size="large" color="#630000" style={styles.loadingContainer} />;
     }
-
-    if (!Properties || Properties.length === 0) { // Show spinner while loading
+    if (!Properties || Properties.length === 0) {
         return (
             <View style={styles.noDataContainer}>
                 <Image

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
-    View, Text, FlatList, TouchableOpacity, Modal, StyleSheet, TextInput, Button, Alert, Image, ActivityIndicator
+    View, Text, FlatList, TouchableOpacity, Modal, StyleSheet, TextInput, Image, ActivityIndicator
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { createMaintenanceRecords, getByMonthAndYear } from './SocietyMaintainanceSlice';
@@ -30,7 +30,11 @@ const Maintenance = ({ navigation }) => {
                 const storedAdmin = await AsyncStorage.getItem('user');
                 if (storedAdmin) {
                     const societyAdmin = JSON.parse(storedAdmin);
-                    setSocietyId(societyAdmin._id || "");
+                    if (societyAdmin?._id) {
+                        setSocietyId(societyAdmin._id || "");
+                        setInventoryData(prev => ({ ...prev, societyId: societyAdmin?._id }))
+                    }
+
                 }
             } catch (error) {
                 console.error("Error retrieving society admin data:", error);
@@ -39,7 +43,7 @@ const Maintenance = ({ navigation }) => {
         getSocietyAdmin();
     }, []);
     const [inventoryData, setInventoryData] = useState({
-        societyId: societyId,
+        societyId: "",
         amount: '',
         monthAndYear: ''
     });
@@ -105,14 +109,15 @@ const Maintenance = ({ navigation }) => {
         }
     };
     const handleBillSubmit = async () => {
-        if (!inventoryData.amount || !inventoryData.monthAndYear) {
+        if (!inventoryData.amount || !inventoryData.monthAndYear || !inventoryData.societyId) {
             setSnackbarMessage("Please fill out all fields");
             setSnackbarVisible(true);
+            setFabModalVisible(false)
             return;
         }
         try {
             const response = await dispatch(createMaintenanceRecords(inventoryData));
-            if (response.meta.requestStatus === 'fulfilled') {
+            if (response.type === 'maintainances/createMaintenanceRecords/fulfilled') {
                 setSnackbarMessage(`${response.payload.message}`);
                 setSnackbarVisible(true);
                 setFabModalVisible(false);

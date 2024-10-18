@@ -1,14 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import axiosInstance from '../../../Security/helpers/axios';
 
-const getSocietyId = async () => {
-  const societyAdmin = await AsyncStorage.getItem('user');
-  return JSON.parse(societyAdmin)?._id || "";
-};
 export const fetchInventory = createAsyncThunk(
   'inventory/fetchInventoryList',
-  async () => {
-    const societyId = await getSocietyId();
+  async (societyId) => {
     const response = await axiosInstance.get(`/getAllInventory/${societyId}`)
     return response.data.inventory
   }
@@ -25,6 +20,7 @@ export const getInventoryById = createAsyncThunk(
 export const fetchaddInventory = createAsyncThunk(
   'inventory/fetchaddInventory',
   async (inventoryData) => {
+    console.log(inventoryData)
     const response = await axiosInstance.post(
       'createInventory',
       inventoryData,

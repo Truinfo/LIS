@@ -56,7 +56,6 @@ const MyAdds = () => {
             <View style={styles.infoContainer}>
                 <Text style={styles.title}>{item.title}</Text>
                 <View style={{ flexDirection: "row", justifyContent: "space-between", }}>
-                    <Text style={styles.contact}>{item.title}</Text>
                     <Text style={{ color: "#222" }}> {item.price}</Text>
                 </View>
                 <View style={{ flexDirection: "row" }}>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Text,
   TextInput,
@@ -23,7 +23,7 @@ const AddAmenity = () => {
         const userString = await AsyncStorage.getItem("user");
         if (userString !== null) {
           const user = JSON.parse(userString);
-          setSocietyId(user.societyId);
+          setSocietyId(user._id);
         }
       } catch (error) {
         console.error("Failed to fetch the user from async storage", error);
@@ -34,7 +34,7 @@ const AddAmenity = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const [formData, setFormData] = useState({
-    societyId:"",
+    societyId: "",
     amenityName: "",
     capacity: "",
     timings: "",
@@ -78,22 +78,8 @@ const AddAmenity = () => {
   };
 
   const handleSubmit = async () => {
-    const newErrors = {};
-    Object.keys(formData).forEach((key) => {
-      if (
-        !formData[key] &&
-        key !== "image" &&
-        key !== "picturePreview" &&
-        key !== "cost" &&
-        key !== "capacity"
-      ) {
-        newErrors[key] = "This field is required";
-      }
-    });
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
+
+
     const submissionData = new FormData();
     submissionData.append("societyId", societyId);
     submissionData.append("amenityName", formData.amenityName);
@@ -111,10 +97,10 @@ const AddAmenity = () => {
         name: "amenity_image.jpg",
       });
     }
-
+    console.log("getting")
     await dispatch(createAmenity(submissionData))
+
       .then((response) => {
-        console.log(response);
         if (response.type === "amenities/createAmenity/fulfilled") {
           setFormData({
             societyId: "",
@@ -134,7 +120,7 @@ const AddAmenity = () => {
             navigation.goBack();
           }, 2000);
         } else {
-          setSnackbarMessage(successMessage);
+          setSnackbarMessage("Failed Aminiety Creation");
           setSnackbarVisible(true); // Show Snackbar on error
         }
       })
@@ -163,6 +149,7 @@ const AddAmenity = () => {
         placeholder="Capacity"
         keyboardType="numeric"
         value={formData.capacity}
+        keyboardAppearance="numaric"
         onChangeText={(value) => handleChange("capacity", value)}
       />
       {errors.capacity && <Text style={styles.error}>{errors.capacity}</Text>}
